@@ -59,7 +59,7 @@ end
 -- SETTINGS
 ---------------------------------------
 
-config = os.getenv('XDG_CONFIG_HOME') or '/home/bsuth'
+config = os.getenv('DOTS_CORE') .. '/awesome'
 
 terminal = 'st'
 editor = os.getenv('EDITOR') or 'nvim'
@@ -76,7 +76,7 @@ root.keys(keys.global)
 -- THEME
 ---------------------------------------
 
-beautiful.init(config .. '/awesome/theme.lua')
+beautiful.init(config .. '/theme.lua')
 
 local function set_wallpaper(screen)
     if beautiful.wallpaper then
@@ -86,23 +86,6 @@ end
 
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
 screen.connect_signal('property::geometry', set_wallpaper)
-
-
----------------------------------------
--- MENU
----------------------------------------
-
-mymainmenu = awful.menu({
-    items = {
-       { 'hotkeys', function() return false, hotkeys_popup.show_help end},
-       { 'manual', terminal .. ' -e man awesome' },
-       { 'edit config', editor_cmd .. ' ' .. awesome.conffile },
-       { 'restart', awesome.restart },
-       { 'quit', function() awesome.quit() end}
-    }
-})
-
-mykeyboardlayout = awful.widget.keyboardlayout()
 
 
 ---------------------------------------
