@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 # startups
-ln -sf $DOTS_CORE/bashrc $HOME/.bashrc
-ln -sf $DOTS_CORE/profile $HOME/.profile
-ln -sf $DOTS_CORE/Xmodmap $HOME/.Xmodmap
-ln -sf $DOTS_CORE/xsession $HOME/.xsession
+ln -sf $DOTS_CORE/.bashrc $HOME/.bashrc
+ln -sf $DOTS_CORE/.profile $HOME/.profile
+ln -sf $DOTS_CORE/.Xmodmap $HOME/.Xmodmap
+ln -sf $DOTS_CORE/.xsession $HOME/.xsession
 
 # awesome
 ln -sf $DOTS_CORE/awesome $XDG_CONFIG_HOME/awesome

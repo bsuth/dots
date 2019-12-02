@@ -82,6 +82,7 @@ export FZF_DEFAULT_COMMAND="
 "
 
 # Specific rc's
+[ -f $DOTS_CORE/.aliases ] && source $DOTS_CORE/.aliases
 [ -f $DOTS_HOME/homerc ] && source $DOTS_HOME/homerc
 [ -f $DOTS_WORK/workrc ] && source $DOTS_WORK/workrc 
 
@@ -96,38 +97,6 @@ _pip_completion()
                    PIP_AUTO_COMPLETE=1 $1 ) )
 }
 complete -o default -F _pip_completion pip3
-
-
-# -------------------------------------------------------------------
-# ALIASES
-# -------------------------------------------------------------------
-
-alias l="ls -1 --color=auto --group-directories-first"
-alias vi="nvim"
-alias vim="nvim"
-alias dots='/usr/bin/git --git-dir=$HOME/.dots --work-tree=$HOME'
-alias update='sudo apt update; sudo apt upgrade; sudo apt autoremove'
-
-
-# -------------------------------------------------------------------
-# FUNCTIONS
-# -------------------------------------------------------------------
-
-# Man pages in nvim
-man() {
-    apropos -e "$1" && nvim -c ":Man $1 | :wincmd j | :wincmd c"
-}
-
-# Reverse search (keybound to <C-r>)
-_reverse_search_() {
-    cmd=$(history | sed -E "s/^\s+[0-9]+\s+//" | \
-        fzf --border --reverse --tac --no-sort -q "$READLINE_LINE")
-    if [[ -n "$cmd" ]]; then
-        alias vi="nvim"
-        alias vim="nvim"
-        eval "$cmd"
-    fi
-}
 
 
 # -------------------------------------------------------------------
