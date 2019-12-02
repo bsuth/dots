@@ -1,0 +1,7 @@
+
+# nvim
+autoload/
+bundle/
+
+# vifm
+vifminfo
