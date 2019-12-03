@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 
+
+# -------------------------------------
+# - ENVIRONMENT
+# - Note: this is necessary, since we haven't linked our bashrc or profile yet!
+# -------------------------------------
+
+DOTS_CORE="$HOME/dots/core"
+
+
 # -------------------------------------
 # - SYMLINKS
 # -------------------------------------
