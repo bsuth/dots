@@ -4,6 +4,7 @@ declare -A commands
 
 commands=(
     [firefox]="firefox"
+    [pstorm]="pstorm"
     [awesome]="st -e vifm $DOTS_CORE/awesome"
     [nvim]="st -e vifm $DOTS_CORE/nvim"
     [vifm]="st -e vifm $DOTS_CORE/vifm"
