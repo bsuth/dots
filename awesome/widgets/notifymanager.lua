@@ -2,6 +2,7 @@
 local awful = require('awful')
 local gears = require('gears')
 local naughty = require('naughty')
+local theme = require('theme')
 local utils = require('utils')
 
 
@@ -88,9 +89,12 @@ gears.timer({
 
             local battery_percent = math.ceil(100 * energy_now / energy_full)
 
-            if battery_percent < 75 then
+            if battery_percent < 20 then
                 _this.ids.battery = naughty.notify({
                     text = 'Battery Warning: ' .. tostring(battery_percent) .. '%',
+                    bg = theme.red,
+                    fg = theme.white,
+                    position = 'top_middle',
                     timeout = 0,
                     replaces_id = _this.ids.battery,
                 }).id
@@ -117,6 +121,9 @@ gears.timer({
             if ram_usage > 90 then
                 _this.ids.ram = naughty.notify({
                     text = 'RAM Warning: ' .. tostring(ram_usage) .. '%',
+                    bg = theme.red,
+                    fg = theme.white,
+                    position = 'top_middle',
                     timeout = 0,
                     replaces_id = _this.ids.ram,
                 }).id

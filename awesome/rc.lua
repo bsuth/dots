@@ -22,6 +22,10 @@ require('widgets.notifymanager')
 -- when client with a matching name is opened:
 require('awful.hotkeys_popup.keys')
 
+-- Tag Manager
+local tagmanager = require('widgets.tagmanager')
+local utils = require('utils')
+
 
 ---------------------------------------
 -- ERROR HANDLING
@@ -89,7 +93,7 @@ screen.connect_signal('property::geometry', set_wallpaper)
 
 
 ---------------------------------------
--- BAR
+-- SCREENS
 ---------------------------------------
 
 awful.screen.connect_for_each_screen(function(s)
@@ -97,10 +101,8 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag({ '1' }, s, awful.layout.layouts[1])
-
-    -- Create a taglist widget
-    s.mytaglist = awful.widget.taglist(s, awful.widget.taglist.filter.all, nil)
+    s.tagmanager = tagmanager.new()
+    awful.tag(s.tagmanager.history.stack, s, awful.layout.layouts[1])
 end)
 
 

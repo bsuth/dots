@@ -6,7 +6,6 @@ local naughty = require('naughty')
 local utils = require('utils')
 
 local notifymanager = require('widgets.notifymanager')
-local tagmanager = require('widgets.tagmanager')
 
 local keys = {}
 
@@ -191,13 +190,13 @@ keys.global = gears.table.join(
 
     awful.key({ modkey }, '=',
         function()
-            tagmanager:add()
+            awful.screen.focused().tagmanager:add()
         end,
     {description = 'spawn a new tag'}),
 
     awful.key({ modkey }, '-',
         function()
-            tagmanager:remove()
+            awful.screen.focused().tagmanager:remove()
         end,
     {description = 'remove a tag'}),
     
@@ -222,36 +221,7 @@ keys.global = gears.table.join(
         function()
             awful.spawn('firefox')
         end,
-    {description = 'open browser'}),
-
-    awful.key({ modkey }, ';',
-        function()
-            local get_bat_files_cmd = [[ find /sys/class/power_supply/ -name BAT* ]]
-
-            awful.spawn.easy_async_with_shell(get_bat_files_cmd, function(stdout)
-                naughty.notify({
-                    text = 'got here',
-                    timeout = 0,
-                })
-
-                local energy_now = 0
-                local energy_full = 0
-
-                for battery in string.gmatch(stdout, "%S+") do
-                    energy_now = energy_now + tonumber(utils.file_read(battery .. '/energy_now'))
-                    energy_full = energy_full + tonumber(utils.file_read(battery .. '/energy_full'))
-
-
-                    naughty.notify({
-                        text = 'Battery Warning: ' .. tostring(battery) .. '%',
-                        timeout = 0,
-                    })
-                end
-
-                local battery_percent = math.ceil(100 * energy_now / energy_full)
-            end)
-        end,
-    {description = 'test notification'})
+    {description = 'open browser'})
 )
 
 
@@ -305,18 +275,18 @@ keys.client = gears.table.join(
 
 awful.keygrabber({
     keybindings = {
-        {{ modkey }, 'Tab', function() tagmanager:view_prev() end},
+        {{ modkey }, 'Tab', function() awful.screen.focused().tagmanager:view_prev() end},
     },
 
     start_callback = function() 
-        tagmanager.tagbar.visible = true
+        awful.screen.focused().tagmanager.tagbar.visible = true
     end,
 
     stop_key = modkey,
     stop_event = 'release',
     stop_callback = function() 
-        tagmanager.history:commit() 
-        tagmanager.tagbar.visible = false 
+        awful.screen.focused().tagmanager.history:commit() 
+        awful.screen.focused().tagmanager.tagbar.visible = false 
     end,
 
     export_keybindings = true,

@@ -6,10 +6,17 @@ local utils = require('utils')
 
 
 ---------------------------------------
--- HELPERS
+-- INIT
 ---------------------------------------
 
-function factory()
+local _this = {}
+
+
+---------------------------------------
+-- PRIVATE
+---------------------------------------
+
+function _this._factory()
     local tag = wibox.widget.base.make_widget()
 
     function tag:fit(context, width, height)
@@ -18,107 +25,122 @@ function factory()
     end
 
     function tag:draw(context, cr, width, height)
-        draw_normal(context, cr, width, height)
+        _this._draw_focused(context, cr, width, height)
     end
 
     return tag
 end
 
 
-function draw_normal(context, cr, width, height)
+function _this._draw_normal(context, cr, width, height)
     cr:set_source_rgb(1, 0, 0)
     cr:arc(width / 2, height / 2, 0.6 * height / 2, 0, 2 * math.pi)
     cr:fill()
 end
 
 
-function draw_focused(context, cr, width, height)
+function _this._draw_focused(context, cr, width, height)
     cr:set_source_rgb(0, 1, 0)
     cr:arc(width / 2, height / 2, 0.6 * height / 2, 0, 2 * math.pi)
     cr:fill()
 end
 
 
----------------------------------------
--- INIT
----------------------------------------
+function _this._add(tagbar)
+    local children = tagbar.widget:get_widget():get_children()
+    local old_focus_index = awful.screen.focused().selected_tag.index
+    local old_child = children[old_focus_index]
 
-local default_tag = factory()
-
-function default_tag:draw(context, cr, width, height)
-    draw_focused(context, cr, width, height)
-end
-
-
-local _this = awful.popup({
-    widget = {
-        {
-            default_tag,
-            layout = wibox.layout.fixed.horizontal,
-        },
-        margins = 10,
-        widget  = wibox.container.margin
-    },
-
-    fg = '#e8e8e8',
-    bg = '#00000000',
-
-    border_color = theme.border_focus,
-    border_width = 1,
-
-    ontop = true,
-    placement = awful.placement.centered + awful.placement.bottom,
-    visible = false,
-})
-
-_this.state = {
-    current_idx = 1,
-}
-
-
----------------------------------------
--- MAIN
----------------------------------------
-
-function _this:toggle()
-    self.visible = not self.visible
-end
-
-
-function _this:add()
-    self.widget:get_widget():add(factory())
-end
-
-
-function _this:remove()
-    self.widget:get_widget():remove(1)
-end
-
-
-function _this:refresh()
-    local tag_collection = self.widget:get_widget():get_children()
-    local new_idx = awful.screen.focused().selected_tag.index
-
-    if self.state.current_idx ~= new_idx then
-        local old_tag = tag_collection[self.state.current_idx]
-        if old_tag then
-            function old_tag:draw(context, cr, width, height)
-                draw_normal(context, cr, width, height)
-            end
-            old_tag:emit_signal('widget::redraw_needed')
-        end
-
-        local new_tag = tag_collection[new_idx]
-        if new_tag then
-            function new_tag:draw(context, cr, width, height)
-                draw_focused(context, cr, width, height)
-            end
-            new_tag:emit_signal('widget::redraw_needed')
-        end
-
-        self.state.current_idx = new_idx
+    function old_child:draw(context, cr, width, height)
+        _this._draw_normal(context, cr, width, height)
     end
+    old_child:emit_signal('widget::redraw_needed')
+
+    tagbar.widget:get_widget():add(_this._factory())
 end
 
+
+function _this._remove(tagbar, idx)
+    local children = tagbar.widget:get_widget():get_children()
+    local new_focus_index = awful.screen.focused().selected_tag.index
+    local new_child = children[new_focus_index]
+
+    function new_child:draw(context, cr, width, height)
+        _this._draw_focused(context, cr, width, height)
+    end
+    new_child:emit_signal('widget::redraw_needed')
+
+    tagbar.widget:get_widget():remove(idx)
+end
+
+
+function _this._focus(tagbar, old_idx, new_idx)
+    local children = tagbar.widget:get_widget():get_children()
+
+    local old_focus = children[old_idx]
+    local new_focus = children[new_idx]
+
+    function old_focus:draw(context, cr, width, height)
+        _this._draw_normal(context, cr, width, height)
+    end
+    old_focus:emit_signal('widget::redraw_needed')
+
+    function new_focus:draw(context, cr, width, height)
+        _this._draw_focused(context, cr, width, height)
+    end
+    new_focus:emit_signal('widget::redraw_needed')
+end
+
+
+---------------------------------------
+-- PUBLIC
+---------------------------------------
+
+function _this.new()
+    local tagbar = awful.popup({
+        widget = {
+            {
+                _this._factory(),
+                layout = wibox.layout.fixed.horizontal,
+            },
+            margins = 10,
+            widget  = wibox.container.margin
+        },
+
+        fg = '#e8e8e8',
+        bg = '#000000',
+
+        border_color = theme.border_focus,
+        border_width = 1,
+
+        ontop = true,
+        placement = awful.placement.centered + awful.placement.bottom,
+        visible = false,
+    })
+
+    function tagbar:add()
+        _this._add(self)
+    end
+
+    function tagbar:remove(idx)
+        _this._remove(self, idx)
+    end
+
+    function tagbar:toggle()
+        self.visible = not self.visible
+    end
+
+    function tagbar:focus(old_idx, new_idx)
+        _this._focus(self, old_idx, new_idx)
+    end
+
+    return tagbar
+end
+
+
+---------------------------------------
+-- RETURN
+---------------------------------------
 
 return _this
+

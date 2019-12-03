@@ -3,56 +3,78 @@ local awful = require('awful')
 local naughty = require('naughty')
 local utils = require('utils')
 
+local tagbar = require('widgets.tagmanager.tagbar')
+local history = require('widgets.tagmanager.history')
+
 
 ---------------------------------------
 -- INIT
 ---------------------------------------
 
-local _this = {
-    tagbar = require('widgets.tagmanager.tagbar'),
-    history = require('widgets.tagmanager.history'),
-}
+local _this = {}
 
 
 ---------------------------------------
--- INTERFACE
+-- PRIVATE
 ---------------------------------------
 
-function _this:add()
-    local new_tag_name = #awful.screen.focused().tags + 1
-
-    awful.tag.add(tostring(new_tag_name), {
+function _this._add(tagmanager)
+    local new_tag = awful.tag.add(tostring(#awful.screen.focused().tags + 1), {
         screen = awful.screen.focused(),
         layout = awful.layout.suit.tile,
-    }):view_only()
+    })
 
-    self.tagbar:add()
-    self.tagbar:refresh()
-    self.history:push(new_tag_name)
+    tagmanager.tagbar:add()
+    tagmanager.history:push(new_tag.index)
+    new_tag:view_only()
 end
 
 
-function _this:remove()
-    local tag = awful.screen.focused().selected_tag
-    local idx = tag.index
-    local fallback_tag = awful.tag.find_fallback()
+function _this._remove(tagmanager)
+    local old_focus_tag = awful.screen.focused().selected_tag
+    local new_focus_tag = awful.tag.find_fallback()
 
-    for _, client in pairs(tag:clients()) do
+    for _, client in pairs(old_focus_tag:clients()) do
         client:kill()
     end
 
-    tag:delete(fallback_tag, true)
-
-    self.tagbar:remove()
-    self.tagbar:refresh()
-    self.history:remove(tag.index)
+    tagmanager.tagbar:remove(old_focus_tag.index)
+    tagmanager.history:remove(old_focus_tag.index)
+    old_focus_tag:delete(new_focus_tag, true)
 end
 
 
-function _this:view_prev()
-    local prev_tag = self.history:previous()
+function _this._view_prev(tagmanager)
+    local prev_tag = tagmanager.history:previous()
+
+    tagmanager.tagbar:focus(awful.screen.focused().selected_tag.index, prev_tag)
     awful.screen.focused().tags[prev_tag]:view_only()
-    self.tagbar:refresh()
+end
+
+
+---------------------------------------
+-- PUBLIC
+---------------------------------------
+
+function _this.new()
+    local tagmanager = {
+        history = history.new(),
+        tagbar = tagbar.new(),
+    }
+
+    function tagmanager:add()
+        _this._add(self)
+    end
+
+    function tagmanager:remove()
+        _this._remove(self)
+    end
+
+    function tagmanager:view_prev()
+        _this._view_prev(self)
+    end
+
+    return tagmanager
 end
 
 

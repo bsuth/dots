@@ -8,52 +8,76 @@ local utils = require('utils')
 -- INIT
 ---------------------------------------
 
-local _this = {
-    stack = {1},
-    stack_pointer = 1,
-    track = true,
-}
+local _this = {}
 
 
 ---------------------------------------
--- INTERFACE
+-- PRIVATE
 ---------------------------------------
 
-function _this:push(idx)
-    table.insert(self.stack, 1, idx)
+function _this._push(history, idx)
+    table.insert(history.stack, 1, idx)
 end
 
 
-function _this:remove(idx)
-    for key, val in pairs(self.stack) do
+function _this._remove(history, idx)
+    for key, val in pairs(history.stack) do
         if val == idx then
-            table.remove(self.stack, key)
+            table.remove(history.stack, key)
             break
         end
     end
 end
 
 
-function _this:previous()
-    if self.stack_pointer == #self.stack then
-        self.stack_pointer = 1
+function _this._previous(history)
+    if history.stack_pointer == #history.stack then
+        history.stack_pointer = 1
     else
-        self.stack_pointer = self.stack_pointer + 1
+        history.stack_pointer = history.stack_pointer + 1
     end
 
-    return self.stack[self.stack_pointer]
+    return history.stack[history.stack_pointer]
 end
 
 
-function _this:commit()
-    local new_stack_top = self.stack[self.stack_pointer]
+function _this._commit(history)
+    local new_stack_top = history.stack[history.stack_pointer]
 
-    table.remove(self.stack, self.stack_pointer)
-    table.insert(self.stack, 1, new_stack_top)
+    table.remove(history.stack, history.stack_pointer)
+    table.insert(history.stack, 1, new_stack_top)
 
-    self.stack_pointer = 1
+    history.stack_pointer = 1
+end
 
-    return self.stack[1]
+
+---------------------------------------
+-- PUBLIC
+---------------------------------------
+
+function _this.new()
+    local history = {
+        stack = { 1 },
+        stack_pointer = 1,
+    }
+
+    function history:push(idx)
+        _this._push(self, idx)
+    end
+
+    function history:remove(idx)
+        _this._remove(self, idx)
+    end
+
+    function history:previous()
+        return _this._previous(self)
+    end
+
+    function history:commit()
+        _this._commit(self)
+    end
+
+    return history
 end
 
 
@@ -62,3 +86,4 @@ end
 ---------------------------------------
 
 return _this
+
