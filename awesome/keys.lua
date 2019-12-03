@@ -208,7 +208,7 @@ keys.global = gears.table.join(
     
     awful.key({ modkey }, 'd',
         function()
-            awful.spawn.with_shell('$SCRIPTS_CORE/dmenu')
+            awful.spawn.with_shell('$SCRIPTS_CORE/dmenu.sh')
         end,
     {description = 'spawn custom dmenu'}),
 

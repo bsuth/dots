@@ -1,6 +1,5 @@
 [Unit]
 Description=Lock X session
-Before=sleep.target
 
 [Service]
 User=bsuth

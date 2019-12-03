@@ -5,8 +5,9 @@ declare -A commands
 commands=(
     [firefox]="firefox"
     [awesome]="st -e vifm $DOTS_CORE/awesome"
+    [nvim]="st -e vifm $DOTS_CORE/nvim"
     [vifm]="st -e vifm $DOTS_CORE/vifm"
-    [sleep]="$SCRIPTS_CORE/sleep.sh"
+    [sleep]="systemctl suspend"
     [reboot]="reboot"
     [poweroff]="poweroff"
 )

@@ -24,21 +24,14 @@ fi
 # ENVIRONMENT
 # ----------------------------------------------------
 
-# Dots
+export EDITOR=nvim
+export XDG_CONFIG_HOME="$HOME/.config"
+
 export DOTS_CORE="$HOME/dots/core"
 export DOTS_HOME="$HOME/dots/home"
 export DOTS_WORK="$HOME/dots/work"
+
 export SCRIPTS_CORE="$DOTS_CORE/scripts"
-
-# Nvim
-export EDITOR=nvim
-
-# Config Environment Variables
-export XDG_CONFIG_HOME="$HOME/.config"
-
-export HLWM_SCRIPTS="$XDG_CONFIG_HOME/herbstluftwm/scripts"
-export NOTIF_SCRIPTS="$XDG_CONFIG_HOME/dunst/scripts"
-export ROFI_SCRIPTS="$XDG_CONFIG_HOME/rofi/scripts"
 
 # Ranger
 export RANGER_LOAD_DEFAULT_RC=TRUE
@@ -56,10 +49,7 @@ export XMODIFIERS="@im=fcitx"
 # STARTUP
 # ----------------------------------------------------
 
-# Check for apt updates
-# $NOTIF_SCRIPTS/aptcheck.sh
-
 # Use fcitx as input method
-# fcitx -d -r
+fcitx -d -r
 
 # vim:syntax=sh
