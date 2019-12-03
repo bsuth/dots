@@ -16,7 +16,6 @@ local keys = {}
 ---------------------------------------
 
 local modkey = 'Mod4'
-local scriptpath = '$XDG_CONFIG_HOME/awesome/scripts/'
 
 
 ---------------------------------------
@@ -209,7 +208,7 @@ keys.global = gears.table.join(
     
     awful.key({ modkey }, 'd',
         function()
-            awful.spawn.with_shell(scriptpath .. 'dmenu.sh')
+            awful.spawn.with_shell('$SCRIPTS_CORE/dmenu')
         end,
     {description = 'spawn custom dmenu'}),
 

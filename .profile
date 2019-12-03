@@ -28,17 +28,13 @@ fi
 export DOTS_CORE="$HOME/dots/core"
 export DOTS_HOME="$HOME/dots/home"
 export DOTS_WORK="$HOME/dots/work"
+export SCRIPTS_CORE="$DOTS_CORE/scripts"
 
 # Nvim
 export EDITOR=nvim
 
-# vifm
-export VIFM="$DOTS_CORE/vifm"
-export MYVIFMRC="$DOTS_CORE/vifm/vifmrc"
-
 # Config Environment Variables
 export XDG_CONFIG_HOME="$HOME/.config"
-export XDG_CONFIG_DIRS="$DOTS_CORE:$XDG_CONFIG_DIRS"
 
 export HLWM_SCRIPTS="$XDG_CONFIG_HOME/herbstluftwm/scripts"
 export NOTIF_SCRIPTS="$XDG_CONFIG_HOME/dunst/scripts"

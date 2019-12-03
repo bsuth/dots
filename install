@@ -7,7 +7,7 @@ ln -sf $DOTS_CORE/.Xmodmap $HOME/.Xmodmap
 ln -sf $DOTS_CORE/.xsession $HOME/.xsession
 
 # awesome
-ln -sf $DOTS_CORE/awesome $XDG_CONFIG_HOME/awesome
+ln -sTf $DOTS_CORE/awesome $XDG_CONFIG_HOME/awesome/
 
 # nvim
 ln -sf  $DOTS_CORE/nvim/settings.vim $XDG_CONFIG_HOME/nvim/settings.vim
