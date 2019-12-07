@@ -101,8 +101,7 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    s.tagmanager = tagmanager.new()
-    awful.tag(s.tagmanager.history.stack, s, awful.layout.layouts[1])
+    s.tagmanager = tagmanager.new(s)
 end)
 
 

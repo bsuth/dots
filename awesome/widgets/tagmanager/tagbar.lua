@@ -1,7 +1,8 @@
 
-local awful = require("awful")
-local wibox = require("wibox")
-local theme = require("theme")
+local awful = require('awful')
+local naughty = require('naughty')
+local wibox = require('wibox')
+local theme = require('theme')
 local utils = require('utils')
 
 
@@ -100,7 +101,6 @@ function _this.new()
     local tagbar = awful.popup({
         widget = {
             {
-                _this._factory(),
                 layout = wibox.layout.fixed.horizontal,
             },
             margins = 10,
@@ -117,6 +117,12 @@ function _this.new()
         placement = awful.placement.centered + awful.placement.bottom,
         visible = false,
     })
+
+    function tagbar:init(num_tags)
+        for i = 1, num_tags do
+            tagbar.widget:get_widget():add(_this._factory())
+        end
+    end
 
     function tagbar:add()
         _this._add(self)

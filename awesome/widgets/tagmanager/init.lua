@@ -27,20 +27,22 @@ function _this._add(tagmanager)
     tagmanager.tagbar:add()
     tagmanager.history:push(new_tag.index)
     new_tag:view_only()
+
+    utils.print_table(awful.screen.focused().tags)
 end
 
 
 function _this._remove(tagmanager)
     local old_focus_tag = awful.screen.focused().selected_tag
-    local new_focus_tag = awful.tag.find_fallback()
+    local old_index = old_focus_tag.index
 
     for _, client in pairs(old_focus_tag:clients()) do
         client:kill()
     end
 
+    old_focus_tag:delete(awful.tag.find_fallback(), true)
     tagmanager.tagbar:remove(old_focus_tag.index)
-    tagmanager.history:remove(old_focus_tag.index)
-    old_focus_tag:delete(new_focus_tag, true)
+    tagmanager.history:pop(old_focus_tag.index)
 end
 
 
@@ -56,7 +58,7 @@ end
 -- PUBLIC
 ---------------------------------------
 
-function _this.new()
+function _this.new(screen)
     local tagmanager = {
         history = history.new(),
         tagbar = tagbar.new(),
@@ -74,6 +76,12 @@ function _this.new()
         _this._view_prev(self)
     end
 
+    for i = 1, 5 do
+        table.insert(tagmanager.history.stack, i)
+    end
+
+    awful.tag(tagmanager.history.stack, screen, awful.layout.layouts[1])
+    tagmanager.tagbar:init(#tagmanager.history.stack)
     return tagmanager
 end
 

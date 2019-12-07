@@ -6,35 +6,22 @@ local naughty = require('naughty')
 local utils = require('utils')
 
 local notifymanager = require('widgets.notifymanager')
-
-local keys = {}
+local clientbuffer = require('widgets.clientbuffer')
 
 
 ---------------------------------------
--- SETTINGS
+-- INIT
 ---------------------------------------
 
+local _this = {}
 local modkey = 'Mod4'
-
-
----------------------------------------
--- HELPERS
----------------------------------------
-
-function change_volume(dir)
-    local set_vol_cmd = "amixer sset Master 4%" .. dir
-
-    awful.spawn.easy_async_with_shell(set_vol_cmd, function()
-        notifymanager:volume()
-    end)
-end
 
 
 ---------------------------------------
 -- GLOBAL KEYS
 ---------------------------------------
 
-keys.global = gears.table.join(
+_this.global = gears.table.join(
 
     -- ------------------
     -- System
@@ -183,6 +170,11 @@ keys.global = gears.table.join(
         end,
     {description = 'focus screen right'}),
 
+
+    -- ------------------
+    -- Layout
+    -- ------------------
+
     awful.key({ modkey, 'Shift', 'Control' }, 'h',
         function()
             awful.tag.incmwfact(-0.05)
@@ -223,6 +215,12 @@ keys.global = gears.table.join(
             awful.screen.focused().tagmanager:remove()
         end,
     {description = 'remove a tag'}),
+
+    awful.key({ modkey, 'Shift' }, 'm',
+        function()
+            clientbuffer.pop()
+        end,
+    {description = 'restore client'}),
     
 
     -- ------------------
@@ -253,7 +251,7 @@ keys.global = gears.table.join(
 -- CLIENT KEYS
 ---------------------------------------
 
-keys.client = gears.table.join(
+_this.client = gears.table.join(
 
     -- ------------------
     -- System
@@ -279,17 +277,9 @@ keys.client = gears.table.join(
 
     awful.key({ modkey }, 'm',
         function(c)
-            c.maximized_vertical = not c.maximized_vertical
-            c:raise()
+            clientbuffer.push(c)
         end,
-    {description = '(un)maximize vertically'}),
-
-    awful.key({ modkey, 'Shift' }, 'm',
-        function(c)
-            c.maximized_horizontal = not c.maximized_horizontal
-            c:raise()
-        end,
-    {description = '(un)maximize horizontal'})
+    {description = 'store client'})
 )
 
 
@@ -318,48 +308,8 @@ awful.keygrabber({
 
 
 ---------------------------------------
--- TAGS
+-- RETURN
 ---------------------------------------
 
--- Bind key numbers to tags.
--- Be careful: we use keycodes to make it work on any keyboard layout.
--- This should map on the top row of your keyboard, usually 1 to 9.
-for i = 1, 9 do
-    keys.global = gears.table.join(keys.global,
-        awful.key({ modkey }, '#' .. i + 9,
-            function()
-                local tag = awful.screen.focused().tags[i]
-
-                if tag then
-                    tag:view_only()
-                end
-            end,
-        {description = 'switch to tag'}),
-
-        awful.key({ modkey, 'Shift' }, '#' .. i + 9,
-            function ()
-                if client.focus then
-                    local tag = client.focus.screen.tags[i]
-
-                    if tag then
-                        client.focus:move_to_tag(tag)
-                    end
-                end
-            end,
-        {description = 'move focused client to tag'}),
-
-        awful.key({ modkey, 'Control' }, '#' .. i + 9,
-            function ()
-                local tag = awful.screen.focused().tags[i]
-
-                if tag then
-                    awful.tag.viewtoggle(tag)
-                end
-            end,
-        {description = 'toggle tag'})
-    )
-end
-
-
-return keys
+return _this
 

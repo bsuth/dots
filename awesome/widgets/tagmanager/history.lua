@@ -20,7 +20,7 @@ function _this._push(history, idx)
 end
 
 
-function _this._remove(history, idx)
+function _this._pop(history, idx)
     for key, val in pairs(history.stack) do
         if val == idx then
             table.remove(history.stack, key)
@@ -57,16 +57,20 @@ end
 
 function _this.new()
     local history = {
-        stack = { 1 },
+        stack = {},
         stack_pointer = 1,
     }
+
+    function history:init(stack)
+        self.stack = stack
+    end
 
     function history:push(idx)
         _this._push(self, idx)
     end
 
-    function history:remove(idx)
-        _this._remove(self, idx)
+    function history:pop(idx)
+        _this._pop(self, idx)
     end
 
     function history:previous()

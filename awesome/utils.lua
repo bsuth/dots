@@ -1,12 +1,19 @@
+
 local naughty = require('naughty')
-local utils = {}
+
+
+---------------------------------------
+-- INIT
+---------------------------------------
+
+local _this = {}
 
 
 ---------------------------------------
 -- DEBUGGING
 ---------------------------------------
 
-function utils.print_table(table)
+function _this.print_table(table)
     string = ''
 
     for key, val in pairs(table) do
@@ -21,7 +28,7 @@ end
 -- FILE OPERATIONS
 ---------------------------------------
 
-function utils.file_read(file)
+function _this.file_read(file)
     local f = io.open(file, 'rb')
     local value = nil
 
@@ -34,4 +41,14 @@ function utils.file_read(file)
 end
 
 
-return utils
+function _this.file_write(file, value)
+    local f = io.open(file, 'w')
+
+    if f then
+        f:write(value)
+        f:close()
+    end
+end
+
+
+return _this
