@@ -26,7 +26,7 @@ function _this._factory()
     end
 
     function tag:draw(context, cr, width, height)
-        _this._draw_focused(context, cr, width, height)
+        _this._draw_normal(context, cr, width, height)
     end
 
     return tag

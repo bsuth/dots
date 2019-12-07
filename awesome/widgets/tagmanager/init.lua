@@ -82,6 +82,7 @@ function _this.new(screen)
 
     awful.tag(tagmanager.history.stack, screen, awful.layout.layouts[1])
     tagmanager.tagbar:init(#tagmanager.history.stack)
+    tagmanager.tagbar:focus(awful.screen.focused().selected_tag.index, awful.screen.focused().selected_tag.index)
     return tagmanager
 end
 

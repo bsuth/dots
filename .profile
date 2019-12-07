@@ -49,7 +49,10 @@ export XMODIFIERS="@im=fcitx"
 # STARTUP
 # ----------------------------------------------------
 
+# xmodmap
+xmodmap $HOME/.Xmodmap
+
 # Use fcitx as input method
-fcitx -d -r
+# fcitx -d -r
 
 # vim:syntax=sh
