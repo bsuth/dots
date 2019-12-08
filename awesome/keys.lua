@@ -13,7 +13,12 @@ local clientbuffer = require('widgets.clientbuffer')
 -- INIT
 ---------------------------------------
 
-local _this = {}
+local _this = {
+    state = {
+        kb_layout = 1,
+    }
+}
+
 local modkey = 'Mod4'
 
 
@@ -38,6 +43,29 @@ _this.global = gears.table.join(
             awesome.quit()
         end,
     {description = 'quit awesome'}),
+
+    awful.key({ modkey }, 'v',
+        function()
+            local layouts = {
+                'fcitx-keyboard-us',
+                'mozc',
+                'fcitx-keyboard-de',
+            }
+
+            if _this.state.kb_layout == #layouts then
+                _this.state.kb_layout = 1
+            else
+                _this.state.kb_layout = _this.state.kb_layout + 1
+            end
+
+            local new_layout = layouts[_this.state.kb_layout]
+
+            local change_kb_cmd = [[ fcitx-remote -s ]] .. layouts[_this.state.kb_layout]
+            awful.spawn.easy_async_with_shell(change_kb_cmd, function()
+                naughty.notify({ text = layouts[_this.state.kb_layout] })
+            end)
+        end,
+    {description = 'change keyboard layout'}),
 
 
     -- ------------------
@@ -229,7 +257,7 @@ _this.global = gears.table.join(
     
     awful.key({ modkey }, 'd',
         function()
-            awful.spawn.with_shell('$SCRIPTS_CORE/dmenu.sh')
+            awful.spawn.with_shell('$SCRIPTS_CORE/dmenu')
         end,
     {description = 'spawn custom dmenu'}),
 

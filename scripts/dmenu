@@ -1,13 +1,11 @@
-#/usr/bin/env bash
+#!/usr/bin/env bash
 
 declare -A commands
 
 commands=(
     [firefox]="firefox"
     [pstorm]="pstorm"
-    [awesome]="st -e vifm $DOTS_CORE/awesome"
-    [nvim]="st -e vifm $DOTS_CORE/nvim"
-    [vifm]="st -e vifm $DOTS_CORE/vifm"
+    [dots]="st -e vifm $DOTS_CORE"
     [sleep]="systemctl suspend"
     [reboot]="reboot"
     [poweroff]="poweroff"
