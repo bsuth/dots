@@ -65,21 +65,17 @@ imap <C-k> <Plug>(neosnippet_expand_or_jump)
 smap <C-k> <Plug>(neosnippet_expand_or_jump)
 xmap <C-k> <Plug>(neosnippet_expand_target)
 
-" PhpCD
-let g:deoplete#ignore_sources = get(g:, 'deoplete#ignore_sources', {})
-let g:deoplete#ignore_sources.php = ['omni']
-let g:phpcd_disable_modifier = 0
-
 
 " -------------------------------------------
 " MySQL
 " -------------------------------------------
 
 "  Login
-let g:vsql_user = 'test'
-let g:vsql_pass = 'test'
-let g:vsql_host= 'localhost'
 let g:vsql_db = 'employees'
+let g:vsql_username = 'test'
+let g:vsql_password = 'test'
+let g:vsql_host = 'localhost'
+let g:vsql_port = '80'
 
 " Settings
 let g:vsql_limit = 500

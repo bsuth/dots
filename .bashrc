@@ -107,3 +107,4 @@ complete -o default -F _pip_completion pip3
 # bind -m vi-insert "\C-l":clear-screen
 # bind -m vi "\C-l":clear-screen
 bind -x '"\C-r":_reverse_search_'
+export LUA_CPATH="/home/bsuth/tools/luarocks-3.2.1/lua_modules/lib/lua/5.1/?.so;;"
