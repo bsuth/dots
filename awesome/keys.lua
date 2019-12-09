@@ -296,12 +296,6 @@ _this.client = gears.table.join(
     -- Layout
     -- ------------------
 
-    awful.key({ modkey }, "n",
-        function(c)
-            c.raised = false
-        end,
-    {description = 'open browser'}),
-
     awful.key({ modkey }, 'f',
         function(c)
             c.fullscreen = not c.fullscreen
