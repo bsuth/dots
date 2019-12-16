@@ -244,7 +244,7 @@ _this.global = gears.table.join(
         end,
     {description = 'remove a tag'}),
 
-    awful.key({ modkey, 'Shift' }, 'm',
+    awful.key({ modkey }, 'n',
         function()
             clientbuffer.pop()
         end,
