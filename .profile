@@ -53,3 +53,5 @@ export XMODIFIERS="@im=fcitx"
 # fcitx -d -r
 
 # vim:syntax=sh
+
+export PATH="$HOME/.cargo/bin:$PATH"
