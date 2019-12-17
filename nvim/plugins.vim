@@ -20,16 +20,15 @@ call plug#begin('~/.config/nvim/bundle')
     Plug 'joshdick/onedark.vim'
 
     " Completion
-    Plug 'ycm-core/YouCompleteMe', { 'do': 'python3 install.py --clang-completer --rust-completer' }
     Plug 'vim-syntastic/syntastic'
 
     " Languages
     Plug 'rust-lang/rust.vim'
 
     " IDE
-    Plug 'majutsushi/tagbar'
     Plug 'vifm/vifm.vim'
     Plug 'airblade/vim-gitgutter'
+    Plug 'majutsushi/tagbar'
 
    " Util
     Plug 'tpope/vim-surround'
@@ -50,29 +49,6 @@ colorscheme onedark
 " -------------------------------------------
 
 nnoremap <c-n> :Vifm<cr>
-
-
-" -------------------------------------------
-" MySQL
-" -------------------------------------------
-
-"  Login
-let g:vsql_db = 'employees'
-let g:vsql_username = 'test'
-let g:vsql_password = 'test'
-let g:vsql_host = 'localhost'
-let g:vsql_port = '80'
-
-" Settings
-let g:vsql_limit = 500
-
-" Internal
-let g:vsql_offset = 0
-
-" Autocmds
-augroup vsql_au
-    autocmd BufEnter *.vsql :set filetype=vsql
-augroup END
 
 
 " -------------------------------------------
