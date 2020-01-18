@@ -22,7 +22,7 @@ require('widgets.notifymanager')
 require('awful.hotkeys_popup.keys')
 
 -- Tag Manager
-local tagmanager = require('widgets.tagmanager')
+local TagManager = require('TagManager')
 local utils = require('utils')
 
 
@@ -70,6 +70,7 @@ editor_cmd = terminal .. ' -e ' .. editor
 
 awful.layout.layouts = {
     awful.layout.suit.tile,
+    awful.layout.suit.floating,
 }
 
 root.keys(keys.global)
@@ -100,7 +101,7 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    s.tagmanager = tagmanager.new(s)
+    s.tagmanager = TagManager:new(s)
 end)
 
 
@@ -139,7 +140,7 @@ awful.rules.rules = {
                 'Wpa_gui',
                 'pinentry',
                 'veromix',
-                'xtightvncviewer'
+                'xtightvncviewer',
             },
             name = {
                 'Event Tester',  -- xev.

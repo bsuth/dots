@@ -234,13 +234,13 @@ _this.global = gears.table.join(
 
     awful.key({ modkey }, '=',
         function()
-            awful.screen.focused().tagmanager:add()
+            awful.screen.focused().tagmanager:push()
         end,
     {description = 'spawn a new tag'}),
 
     awful.key({ modkey }, '-',
         function()
-            awful.screen.focused().tagmanager:remove()
+            awful.screen.focused().tagmanager:pop()
         end,
     {description = 'remove a tag'}),
 
@@ -249,6 +249,18 @@ _this.global = gears.table.join(
             clientbuffer.pop()
         end,
     {description = 'restore client'}),
+
+
+    -- ------------------
+    -- test
+    -- ------------------
+    awful.key({ modkey }, 'r',
+        function()
+            for s in screen do
+                naughty.notify({text = tostring(s.index)})
+            end
+        end,
+    {description = 'test'}),
     
 
     -- ------------------
@@ -317,18 +329,21 @@ _this.client = gears.table.join(
 
 awful.keygrabber({
     keybindings = {
-        {{ modkey }, 'Tab', function() awful.screen.focused().tagmanager:view_prev() end},
+        {{ modkey }, 'Tab', function() 
+            awful.screen.focused().tagmanager:prev() 
+        end},
     },
 
     start_callback = function() 
-        awful.screen.focused().tagmanager.tagbar.visible = true
+        --awful.screen.focused().tagmanager.preview:show()
+        --awful.screen.focused().tagmanager.tagbar.visible = true
     end,
 
     stop_key = modkey,
     stop_event = 'release',
     stop_callback = function() 
         awful.screen.focused().tagmanager.history:commit() 
-        awful.screen.focused().tagmanager.tagbar.visible = false 
+        --awful.screen.focused().tagmanager.tagbar.visible = false 
     end,
 
     export_keybindings = true,

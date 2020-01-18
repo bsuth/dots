@@ -24,3 +24,9 @@ cnoreabbrev ? tab help
 " Tabs
 nnoremap <Tab> :tabnext<cr>
 nnoremap <S-Tab> :tabprevious<cr>
+
+
+" -------------------------------------------
+" DEVELOPMENT
+" -------------------------------------------
+set makeprg="npm start"

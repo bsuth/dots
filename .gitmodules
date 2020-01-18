@@ -1,0 +1,3 @@
+[submodule "awesome/TagManager"]
+	path = awesome/TagManager
+	url = git@github.com:bsuth/TagManager.git
