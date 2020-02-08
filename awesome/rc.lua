@@ -22,7 +22,7 @@ require('widgets.notifymanager')
 require('awful.hotkeys_popup.keys')
 
 -- Tag Manager
-local TagManager = require('TagManager')
+local tagger = require('widgets.tagger')
 local utils = require('utils')
 
 
@@ -101,7 +101,7 @@ awful.screen.connect_for_each_screen(function(s)
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    s.tagmanager = TagManager:new(s)
+    s.tagger = tagger:new(s)
 end)
 
 
@@ -183,10 +183,3 @@ end)
 
 client.connect_signal('focus', function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal('unfocus', function(c) c.border_color = beautiful.border_normal end)
-
-
----------------------------------------
--- DAEMONS
----------------------------------------
-
-require('daemons.battery')

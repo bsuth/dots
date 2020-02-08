@@ -110,3 +110,7 @@ bind -x '"\C-r":_reverse_search_'
 export LUA_CPATH="/home/bsuth/tools/luarocks-3.2.1/lua_modules/lib/lua/5.1/?.so;;"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# tabtab source for electron-forge package
+# uninstall by removing these lines or running `tabtab uninstall electron-forge`
+[ -f /home/bsuth/projects/electron-term/node_modules/tabtab/.completions/electron-forge.bash ] && . /home/bsuth/projects/electron-term/node_modules/tabtab/.completions/electron-forge.bash

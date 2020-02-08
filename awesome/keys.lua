@@ -234,13 +234,13 @@ _this.global = gears.table.join(
 
     awful.key({ modkey }, '=',
         function()
-            awful.screen.focused().tagmanager:push()
+            awful.screen.focused().tagger:push()
         end,
     {description = 'spawn a new tag'}),
 
     awful.key({ modkey }, '-',
         function()
-            awful.screen.focused().tagmanager:pop()
+            awful.screen.focused().tagger:pop()
         end,
     {description = 'remove a tag'}),
 
@@ -272,6 +272,12 @@ _this.global = gears.table.join(
             awful.spawn.with_shell('$SCRIPTS_CORE/dmenu')
         end,
     {description = 'spawn custom dmenu'}),
+
+    awful.key({ modkey }, 'r',
+        function()
+            naughty.notify({text = tostring(awful.screen.focused().tagger)})
+        end,
+    {description = 'open terminal'}),
 
     awful.key({ modkey }, 'Return',
         function()
@@ -330,20 +336,14 @@ _this.client = gears.table.join(
 awful.keygrabber({
     keybindings = {
         {{ modkey }, 'Tab', function() 
-            awful.screen.focused().tagmanager:prev() 
+            awful.screen.focused().tagger:prev() 
         end},
     },
 
-    start_callback = function() 
-        --awful.screen.focused().tagmanager.preview:show()
-        --awful.screen.focused().tagmanager.tagbar.visible = true
-    end,
-
     stop_key = modkey,
     stop_event = 'release',
-    stop_callback = function() 
-        awful.screen.focused().tagmanager.history:commit() 
-        --awful.screen.focused().tagmanager.tagbar.visible = false 
+    stop_callback = function()
+        awful.screen.focused().tagger:commit()
     end,
 
     export_keybindings = true,

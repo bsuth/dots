@@ -22,12 +22,12 @@ call plug#begin('~/.config/nvim/bundle')
     " IDE
     Plug 'neoclide/coc.nvim', { 'branch': 'release' }
     Plug 'tpope/vim-fugitive'
-    " Plug 'vifm/vifm.vim'
+    Plug 'vifm/vifm.vim'
+    " Plug 'majutsushi/tagbar'
 
     " Languages
     Plug 'pangloss/vim-javascript'
-
-    " Plug 'majutsushi/tagbar'
+    Plug 'peitalin/vim-jsx-typescript'
 
    " Util
     Plug 'tpope/vim-surround'
@@ -42,10 +42,7 @@ call plug#end()
 
 colorscheme onedark
 
-
-" -------------------------------------------
-" VIM-COMMENTARY
-" -------------------------------------------
+nnoremap <c-n> :Vifm<cr>
 
 " For some reason, vim register what should be <c-/> as <c-_>
 nnoremap <c-_> :Commentary<cr>
