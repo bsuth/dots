@@ -256,9 +256,10 @@ _this.global = gears.table.join(
     -- ------------------
     awful.key({ modkey }, 'r',
         function()
-            for s in screen do
-                naughty.notify({text = tostring(s.index)})
-            end
+            local screen = awful.screen.focused()
+            naughty.notify({text = tostring(#screen.tagger.stack)})
+            naughty.notify({text = tostring(screen.tagger.stack_pointer)})
+            naughty.notify({text = tostring(screen.tagger.stack[1])})
         end,
     {description = 'test'}),
     
@@ -272,12 +273,6 @@ _this.global = gears.table.join(
             awful.spawn.with_shell('$SCRIPTS_CORE/dmenu')
         end,
     {description = 'spawn custom dmenu'}),
-
-    awful.key({ modkey }, 'r',
-        function()
-            naughty.notify({text = tostring(awful.screen.focused().tagger)})
-        end,
-    {description = 'open terminal'}),
 
     awful.key({ modkey }, 'Return',
         function()
