@@ -39,11 +39,6 @@ colorscheme OneDark
 set timefmt='%F %H:%M'
 set statusline='%A %u:%g %d'
 
-" file types
-set classify=' :dir:/, :exe:, :reg:, :link:'
-" various file names
-set classify+=' ::../::, ::*.sh::, ::*.[hc]pp::, ::/^copying|license$/::, ::.git/,,*.git/::, ::*.pdf::, ::*.htm,,*.html,,**.[sx]html,,*.xml::'
-
 " ------------------------------------------------------------------------------
 " -- QUICKMARKS
 

@@ -96,6 +96,9 @@ screen.connect_signal('property::geometry', set_wallpaper)
 -- SCREENS
 ---------------------------------------
 
+mykeyboardlayout = awful.widget.keyboardlayout()
+mytextclock = wibox.widget.textclock()
+
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)

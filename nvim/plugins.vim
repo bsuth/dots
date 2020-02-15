@@ -28,6 +28,7 @@ call plug#begin('~/.config/nvim/bundle')
     " Languages
     Plug 'pangloss/vim-javascript'
     Plug 'peitalin/vim-jsx-typescript'
+    Plug 'cespare/vim-toml'
 
    " Util
     Plug 'tpope/vim-surround'
