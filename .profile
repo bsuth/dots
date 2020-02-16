@@ -24,17 +24,14 @@ fi
 # ENVIRONMENT
 # ----------------------------------------------------
 
+export SHELL="/bin/zsh"
 export EDITOR=nvim
 export XDG_CONFIG_HOME="$HOME/.config"
 
 export DOTS_CORE="$HOME/dots/core"
 export DOTS_HOME="$HOME/dots/home"
 export DOTS_WORK="$HOME/dots/work"
-
 export SCRIPTS_CORE="$DOTS_CORE/scripts"
-
-# Ranger
-export RANGER_LOAD_DEFAULT_RC=TRUE
 
 # Other Environment Variables
 export NOTES_DIR="$HOME/notes"
@@ -44,14 +41,6 @@ export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS="@im=fcitx"
 
-
-# ----------------------------------------------------
-# STARTUP
-# ----------------------------------------------------
-
-# Use fcitx as input method
-# fcitx -d -r
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # vim:syntax=sh
-
-export PATH="$HOME/.cargo/bin:$PATH"

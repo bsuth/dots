@@ -51,3 +51,17 @@ autoload -Uz _zinit
 # Plugins
 zplugin light zdharma/fast-syntax-highlighting
 zplugin light zsh-users/zsh-autosuggestions
+zplugin light zdharma/history-search-multi-word
+zplugin light softmoth/zsh-vim-mode
+
+
+# -------------------------------------------------------------------
+# BINDINGS
+# -------------------------------------------------------------------
+bindkey '^F' autosuggest-accept
+
+
+# -------------------------------------------------------------------
+# ALIASES
+# -------------------------------------------------------------------
+alias v='vifm'
