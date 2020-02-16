@@ -1,0 +1,15 @@
+# Enabled Modules
+default_prompt_order = [
+    "directory",
+    "git_branch",
+    "git_status",
+    "line_break",
+    "jobs",
+    "character",
+]
+
+# Module Settings
+[character]
+symbol = "➜"
+error_symbol = "x"
+vicmd_symbol = "V"
