@@ -182,13 +182,13 @@ _this.global = gears.table.join(
 
     awful.key({ modkey, 'Control' }, 'j',
         function()
-            awful.screen.focus_bydirection('left')
+            awful.screen.focus_bydirection('down')
         end,
     {description = 'focus screen down'}),
 
     awful.key({ modkey, 'Control' }, 'k',
         function()
-            awful.screen.focus_relative(-1)
+            awful.screen.focus_bydirection('up')
         end,
     {description = 'focus screen up'}),
 
