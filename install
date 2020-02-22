@@ -13,13 +13,18 @@ DOTS_CORE="$HOME/dots/core"
 # - SYMLINKS
 # -------------------------------------
 
-# startups
-ln -sf "$DOTS_CORE/.profile" "$HOME/.profile"
-ln -sf "$DOTS_CORE/.bashrc" "$HOME/.bashrc"
-ln -sf "$DOTS_CORE/.zshrc" "$HOME/.zshrc"
-ln -sf "$DOTS_CORE/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
+# X11
 ln -sf "$DOTS_CORE/.Xmodmap" "$HOME/.Xmodmap"
 ln -sf "$DOTS_CORE/.xsession" "$HOME/.xsession"
+
+# bash
+ln -sf "$DOTS_CORE/.profile" "$HOME/.profile"
+ln -sf "$DOTS_CORE/.bashrc" "$HOME/.bashrc"
+
+# zsh
+ln -sf "$DOTS_CORE/.zprofile" "$HOME/.zprofile"
+ln -sf "$DOTS_CORE/.zshrc" "$HOME/.zshrc"
+ln -sf "$DOTS_CORE/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
 
 # awesome
 rm -rf "$XDG_CONFIG_HOME/awesome"
