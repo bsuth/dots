@@ -22,3 +22,5 @@ set termguicolors
 
 set colorcolumn=80
 highlight ColorColumn guibg=#585858
+
+set clipboard=unnamedplus

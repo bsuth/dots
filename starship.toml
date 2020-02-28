@@ -1,5 +1,5 @@
 # Enabled Modules
-default_prompt_order = [
+prompt_order = [
     "directory",
     "git_branch",
     "git_status",
