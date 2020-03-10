@@ -76,28 +76,40 @@ gears.timer({
     autostart = true,
 
     callback = function()
-        local get_bat_files_cmd = [[ find /sys/class/power_supply/ -name BAT* ]]
+        local get_bat_files_cmd = [[ find /sys/class/power_supply/ -name 'BAT*' ]]
 
         awful.spawn.easy_async_with_shell(get_bat_files_cmd, function(stdout)
             local energy_now = 0
             local energy_full = 0
+            local batteries = string.gmatch(stdout, "%S+");
 
-            for battery in string.gmatch(stdout, "%S+") do
+            for battery in batteries do
                 energy_now = energy_now + tonumber(utils.file_read(battery .. '/energy_now'))
                 energy_full = energy_full + tonumber(utils.file_read(battery .. '/energy_full'))
             end
 
-            local battery_percent = math.ceil(100 * energy_now / energy_full)
-
-            if battery_percent < 20 then
+            if energy_full == 0 then
                 _this.ids.battery = naughty.notify({
-                    text = 'Battery Warning: ' .. tostring(battery_percent) .. '%',
+                    text = 'Battery Daemon Error: No batteries found.',
                     bg = theme.red,
                     fg = theme.white,
                     position = 'top_middle',
                     timeout = 0,
                     replaces_id = _this.ids.battery,
                 }).id
+            else
+                local battery_percent = math.ceil(100 * energy_now / energy_full)
+
+                if battery_percent < 20 then
+                    _this.ids.battery = naughty.notify({
+                        text = 'Battery Warning: ' .. tostring(battery_percent) .. '%',
+                        bg = theme.red,
+                        fg = theme.white,
+                        position = 'top_middle',
+                        timeout = 0,
+                        replaces_id = _this.ids.battery,
+                    }).id
+                end
             end
         end)
     end,
