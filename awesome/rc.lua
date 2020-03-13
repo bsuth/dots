@@ -25,6 +25,9 @@ require('awful.hotkeys_popup.keys')
 local tagger = require('widgets.tagger')
 local utils = require('utils')
 
+-- Tabbed layout
+local tabbed = require('widgets.tabbed')
+
 
 ---------------------------------------
 -- ERROR HANDLING
@@ -71,6 +74,7 @@ editor_cmd = terminal .. ' -e ' .. editor
 awful.layout.layouts = {
     awful.layout.suit.tile,
     awful.layout.suit.floating,
+    tabbed,
 }
 
 root.keys(keys.global)

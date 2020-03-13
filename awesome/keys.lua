@@ -152,7 +152,10 @@ _this.global = gears.table.join(
 
     awful.key({ modkey, 'Shift' }, 'h',
         function()
-            awful.client.swap.bydirection('left')
+            local tag = awful.screen.focused().selected_tag
+            return tag.layout.shift_by_dir and
+                tag.layout.shift_by_dir('left', client.focus) or
+                awful.client.swap.bydirection('left')
         end,
     {description = 'swap client left'}),
 
@@ -170,7 +173,10 @@ _this.global = gears.table.join(
 
     awful.key({ modkey, 'Shift' }, 'l',
         function()
-            awful.client.swap.bydirection('right')
+            local tag = awful.screen.focused().selected_tag
+            return tag.layout.shift_by_dir and
+                tag.layout.shift_by_dir('right', client.focus) or
+                awful.client.swap.bydirection('right')
         end,
     {description = 'swap client right'}),
 
@@ -203,23 +209,23 @@ _this.global = gears.table.join(
     -- Layout
     -- ------------------
 
+    awful.key({ modkey, 'Shift', 'Control' }, 'j',
+        function()
+            awful.tag.incnmaster(-1)
+        end,
+    {description = 'decrement master_count'}),
+
+    awful.key({ modkey, 'Shift', 'Control' }, 'k',
+        function()
+            awful.tag.incnmaster(1)
+        end,
+    {description = 'increment master_count'}),
+
     awful.key({ modkey, 'Shift', 'Control' }, 'h',
         function()
             awful.tag.incmwfact(-0.05)
         end,
     {description = 'decrease master width'}),
-
-    awful.key({ modkey, 'Shift', 'Control' }, 'j',
-        function()
-            awful.tag.incncol(-1, nil, true)
-        end,
-    {description = 'decrease number of columns'}),
-
-    awful.key({ modkey, 'Shift', 'Control' }, 'k',
-        function()
-            awful.tag.incncol(1, nil, true)
-        end,
-    {description = 'increase number of columns'}),
 
     awful.key({ modkey, 'Shift', 'Control' }, 'l',
         function()
@@ -256,12 +262,9 @@ _this.global = gears.table.join(
     -- ------------------
     awful.key({ modkey }, 'r',
         function()
-            local screen = awful.screen.focused()
-            naughty.notify({text = tostring(#screen.tagger.stack)})
-            naughty.notify({text = tostring(screen.tagger.stack_pointer)})
-            naughty.notify({text = tostring(screen.tagger.stack[1])})
+            awful.layout.inc(1)
         end,
-    {description = 'test'}),
+    {description = 'test: change layout'}),
     
 
     -- ------------------
