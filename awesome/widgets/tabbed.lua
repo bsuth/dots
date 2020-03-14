@@ -9,6 +9,9 @@
 --   +-----+-----+      +-----+-----+      +-----+-----+
 ---------------------------------------------------------------------------
 
+local awful = require('awful')
+local naughty = require('naughty')
+
 ---------------------------------------
 -- GLOBALS
 ---------------------------------------
@@ -38,6 +41,7 @@ local TEMPLATES = {
         { x = 0.5, y = 0.5, width = 0.5, height = 0.5 },
     },
 }
+local MAX_MASTER_COUNT = #TEMPLATES
 
 
 ---------------------------------------
@@ -51,37 +55,95 @@ local TEMPLATES = {
 --
 -- @param table workarea : { x: float, y: float, width: float, height: float }
 -- @param table template : { x: float, y: float, width: float, height: float }
--- @return table : { x: float, y: float, width: float, height: float }
+-- @return table         : { x: float, y: float, width: float, height: float }
 --
 function apply_template(workarea, template)
     return {
-        x      = geometry.x      * template.width  + template.x,
-        y      = geometry.y      * template.height + template.y,
-        width  = geometry.width  * template.width,
-        height = geometry.height * template.height,
+        x      = template.x      * workarea.width  + workarea.x,
+        y      = template.y      * workarea.height + workarea.y,
+        width  = template.width  * workarea.width,
+        height = template.height * workarea.height,
     }
+end
+
+--
+-- TODO
+--
+-- @param string dir        : left|right|up|down
+-- @param table prev_master : TEMPLATES[_][_]
+-- @param int master_count  : [1, #TEMPLATES]
+-- @return table            : TEMPLATES[_][_]
+--
+function get_rel_dir_master_id(prev_master_id, dir, master_count)
+    local dist_func = get_dist_func(dir, TEMPLATES[master_count][prev_master_id])
+    local min_dist = 2 -- anything larger than 1 is fine (template values in [0, 1])
+    local next_master_id = nil
+
+    for i, master in ipairs(TEMPLATES[master_count]) do
+        local dist = dist_func(master)
+        if dist > 0 and dist < min_dist then
+            next_master_id = i
+            min_dist = dist
+        end
+    end
+
+    return next_master_id
+end
+
+--
+-- TODO
+--
+-- @param table prev_template : TEMPLATES[_][_]
+-- @param string dir          : left|right|up|down
+-- @throw error               : if `dir` is invalid
+-- @return function           : dist function between geometries that will be
+--                              generated from template and prev_template
+--
+function get_dist_func(dir, prev_template)
+    if (dir == 'left') then
+        return function(template)
+            return prev_template.x - template.x
+        end
+    elseif (dir == 'right') then
+        return function(template)
+            return template.x - prev_template.x
+        end
+    elseif (dir == 'up') then
+        return function(template)
+            return prev_template.y - template.y
+        end
+    elseif (dir == 'down') then
+        return function(template)
+            return template.y - prev_template.y
+        end
+    else
+        error()
+        naughty.notify({ text = 'Tabtile: Invalid direction' })
+    end
 end
 
 
 ---------------------------------------
--- CLIENT STACK
+-- MASTER
 ---------------------------------------
 
-local ClientStack = {}
+local Master = {}
 
-function ClientStack:new()
-    local client_stack = {
-        stack = {},
+function Master:new(id)
+    local master = {
+        id = id,
+        geometry = nil,
+        client_stack = {},
         stack_pointer = 1,
     }
 
-    setmetatable(client_stack, { __index = self })
-    return client_stack
+    setmetatable(master, { __index = self })
+    return master
 end
 
 
-function ClientStack:has(client)
-    for _, _client in ipairs(self.stack) do
+function Master:has(client)
+    for _, _client in ipairs(self.client_stack) do
         if _client == client then
             return true
         end
@@ -90,24 +152,43 @@ function ClientStack:has(client)
     return false
 end
 
+function Master:set_geometry(geometry)
+    self.geometry = geometry
+    for _, client in ipairs(self.client_stack) do
+        client:geometry(geometry)
+    end
+end
 
-function ClientStack:push(client)
-    table.insert(self.stack, 1, client)
+function Master:push(client)
+    -- clients must be floating in order for awesomewm to allow clients to
+    -- truly overlap
+    client.floating = true
+    client.tabtile_master_id = self.id
+    client:geometry(self.geometry)
+    client:raise()
+    table.insert(self.client_stack, 1, client)
 end
 
 
-function ClientStack:pop()
-    table.remove(self.stack, 1)
+function Master:pop(client)
+    for i, _client in ipairs(self.client_stack) do
+        if _client == client then
+            table.remove(self.client_stack, i)
+            return
+        end
+    end
 end
 
 
-function ClientStack:prev()
-    self.stack_pointer = (self.stack_pointer) % #self.stack + 1
+function Master:prev()
+    self.stack_pointer = (self.stack_pointer) % #self.client_stack + 1
+    self.client_stack[self.stack_pointer]:raise()
 end
 
 
-function ClientStack:commit()
-    table.insert(self.stack, 1, table.remove(self.stack, self.stack_pointer))
+function Master:commit()
+    local new_client_stack_top = table.remove(self.client_stack, self.stack_pointer)
+    table.insert(self.client_stack, 1, new_client_stack_top)
     self.stack_pointer = 1
 end
 
@@ -118,42 +199,72 @@ end
 
 local TabtileState = {}
 
-function TabtileState:new()
+
+function TabtileState:new(tag)
     local state = {
-        client_stacks = {},
-        master_geometries = {},
-        workarea = {},
+        masters = {},
+        tag = tag,
+        workarea = nil,
     }
 
-    for i = 1, #TEMPLATES do
-        master_geometries.client_stacks[i] = ClientStack:new()
-        master_geometries.geometries[i] = {}
+    for i = 1, MAX_MASTER_COUNT do
+        state.masters[i] = Master:new(i)
+    end
+
+    for _, client in ipairs(tag:clients()) do
+        state.masters[1]:push(client)
     end
 
     setmetatable(state, { __index = self })
     return state
 end
 
-function TabtileState:push(client)
-    self.client_stacks[1]:push(client)
-end
 
-function TabtileState:set_workarea(workarea, master_count)
+function TabtileState:update_workarea(workarea)
     self.workarea = workarea
-    for i, template in ipairs(TEMPLATES[master_count]) do
-        self.master_geometries[i] = apply_template(self.workarea, template)
+    for i, template in ipairs(TEMPLATES[self.tag.master_count]) do
+        local new_master_geometry = apply_template(workarea, template)
+        self.masters[i]:set_geometry(new_master_geometry)
     end
 end
 
-function TabtileState:get_client_geometry(client)
-    for i, stack in ipairs(self.stacks) do
-        if stack:has(client) then
-            return self.master_geometries[i]
-        end
-    end
 
-    self:push(client)
-    return self.geometries[1]
+---------------------------------------
+-- API
+---------------------------------------
+
+local TabtileApi = {}
+
+function TabtileApi:new(state)
+    local api = {
+        state = state,
+    }
+
+    setmetatable(api, { __index = self })
+    return api
+end
+
+function TabtileApi:client_mv_rel_dir(client, dir)
+    local new_master_id = get_rel_dir_master_id(
+        client.tabtile_master_id,
+        dir,
+        self.state.tag.master_count
+    )
+
+    if new_master_id then
+        self.state.masters[client.tabtile_master_id]:pop(client)
+        self.state.masters[new_master_id]:push(client)
+    end
+end
+
+function TabtileApi:prev()
+    local master_id = client.focus.tabtile_master_id
+    self.state.masters[master_id]:prev()
+end
+
+function TabtileApi:commit()
+    local master_id = client.focus.tabtile_master_id
+    self.state.masters[master_id]:commit()
 end
 
 
@@ -161,78 +272,30 @@ end
 -- TABTILE LAYOUT
 ---------------------------------------
 
--- Actually arrange clients of p.clients for tabbed layout
--- @param layout_params: Mandatory table containing required informations for
--- layouts (clients to arrange, workarea geometry, etc.)
--- See: awful.layout.parameters
-
-function get_dist_func(dir, client_geometry)
-    if (dir == 'left') then
-        return function(geometry)
-            return client_geometry.x - geometry.x
-        end
-    elseif (dir == 'right') then
-        return function(geometry)
-            return geometry.x - client_geometry.x
-        end
-    elseif (dir == 'up') then
-        return function(geometry)
-            return client_geometry.y - geometry.y
-        end
-    else
-        return function(geometry)
-            return geometry.y - client_geometry.y
-        end
-    end
-end
-
-
--- Actually arrange clients of p.clients for tabbed layout
--- @param layout_params: Mandatory table containing required informations for
--- layouts (clients to arrange, workarea geometry, etc.)
--- See: awful.layout.parameters
-
+--
+-- TODO
+--
 local tabtile = function (tag)
-    local state = TabtileState:new()
+    local state = TabtileState:new(tag)
+    local api = TabtileApi:new(state)
 
+    --
+    -- TODO
+    -- @param layout_params: Mandatory table containing required informations for
+    -- layouts (clients to arrange, workarea geometry, etc.)
+    -- See: awful.layout.parameters
+    --
     function arrange(p)
-        state:set_workarea(p.workarea, tag.master_count)
-        for _, client in ipairs(p.clients) do
-            p.geometries[client] = layout_state:get_client_geometry(client)
+        if (p.workarea ~= state.workarea) then
+            state:update_workarea(p.workarea)
         end
-    end
-
-    function shift_by_dir(dir, client)
-        local client_geometry_template = nil
-        local new_client_geometry_template = nil
-
-        for i, stack in ipairs(layout_state.stacks) do
-            if stack:has(client) then
-                client_geometry_template = TEMPLATES[tag.master_count][i]
-                break
-            end
-        end
-
-        local min_dist = 2
-        local dist_func = get_dist_func(dir, client_geometry_template)
-
-        for _, geometry_template in ipairs(TEMPLATES[tag.master_count]) do
-            local dist = dist_func(geometry)
-            if dist > 0 and dist < min_dist then
-                new_client_geometry_template = geometry_template
-                min_dist = dist
-            end
-        end
-
-        local new_client_geometry = apply_template(state.workarea)
-        client:geometry(new_client_geometry or client_geometry)
     end
 
     return {
         name = 'tabtile',
-        arrange = function(p) arrange(p) end,
         is_dynamic = true,
-        shift_by_dir = shift_by_dir,
+        arrange = arrange,
+        api = api,
     }
 end
 

@@ -152,31 +152,38 @@ _this.global = gears.table.join(
 
     awful.key({ modkey, 'Shift' }, 'h',
         function()
-            local tag = awful.screen.focused().selected_tag
-            return tag.layout.shift_by_dir and
-                tag.layout.shift_by_dir('left', client.focus) or
+            local layout = awful.screen.focused().selected_tag.layout
+            return layout.api.client_mv_rel_dir and
+                layout.api:client_mv_rel_dir(client.focus, 'left') or
                 awful.client.swap.bydirection('left')
         end,
     {description = 'swap client left'}),
 
     awful.key({ modkey, 'Shift' }, 'j',
         function()
-            awful.client.swap.bydirection('down')
+            local layout = awful.screen.focused().selected_tag.layout
+            return layout.api.client_mv_rel_dir and
+                layout.api:client_mv_rel_dir(client.focus, 'down') or
+                awful.client.swap.bydirection('down')
         end,
     {description = 'swap client down'}),
 
     awful.key({ modkey, 'Shift' }, 'k',
         function()
-            awful.client.swap.bydirection('up')
+            local layout = awful.screen.focused().selected_tag.layout
+            return layout.api.client_mv_rel_dir and
+                layout.api:client_mv_rel_dir(client.focus, 'up') or
+                awful.client.swap.bydirection('up')
         end,
     {description = 'swap client up'}),
 
     awful.key({ modkey, 'Shift' }, 'l',
         function()
-            local tag = awful.screen.focused().selected_tag
-            return tag.layout.shift_by_dir and
-                tag.layout.shift_by_dir('right', client.focus) or
-                awful.client.swap.bydirection('right')
+            local layout = awful.screen.focused().selected_tag.layout
+            layout.api:client_mv_rel_dir(client.focus, 'right')
+            -- return layout.api.client_mv_rel_dir and
+            --     layout.api:client_mv_rel_dir('right', client.focus) or
+            --     awful.client.swap.bydirection('right')
         end,
     {description = 'swap client right'}),
 
@@ -342,6 +349,22 @@ awful.keygrabber({
     stop_event = 'release',
     stop_callback = function()
         awful.screen.focused().tagger:commit()
+    end,
+
+    export_keybindings = true,
+})
+
+awful.keygrabber({
+    keybindings = {
+        {{ modkey }, ' ', function() 
+            awful.screen.focused().selected_tag.layout.api:prev() 
+        end},
+    },
+
+    stop_key = modkey,
+    stop_event = 'release',
+    stop_callback = function()
+        awful.screen.focused().selected_tag.layout.api:commit() 
     end,
 
     export_keybindings = true,
