@@ -41,6 +41,7 @@ local TEMPLATES = {
         { x = 0.5, y = 0.5, width = 0.5, height = 0.5 },
     },
 }
+
 local MAX_MASTER_COUNT = #TEMPLATES
 
 
@@ -129,6 +130,7 @@ end
 
 local Master = {}
 
+
 function Master:new(id)
     local master = {
         id = id,
@@ -152,12 +154,14 @@ function Master:has(client)
     return false
 end
 
+
 function Master:set_geometry(geometry)
     self.geometry = geometry
     for _, client in ipairs(self.client_stack) do
         client:geometry(geometry)
     end
 end
+
 
 function Master:push(client)
     -- clients must be floating in order for awesomewm to allow clients to
@@ -189,6 +193,7 @@ end
 function Master:commit()
     local new_client_stack_top = table.remove(self.client_stack, self.stack_pointer)
     table.insert(self.client_stack, 1, new_client_stack_top)
+    awful.client.focus.history.add(new_client_stack_top)
     self.stack_pointer = 1
 end
 
@@ -215,17 +220,26 @@ function TabtileState:new(tag)
         state.masters[1]:push(client)
     end
 
+    client.connect_signal('manage', function (client)
+        state.masters[1]:push(client)
+    end)
+
     setmetatable(state, { __index = self })
     return state
 end
 
 
-function TabtileState:update_workarea(workarea)
-    self.workarea = workarea
+function TabtileState:arrange()
     for i, template in ipairs(TEMPLATES[self.tag.master_count]) do
-        local new_master_geometry = apply_template(workarea, template)
+        local new_master_geometry = apply_template(self.workarea, template)
         self.masters[i]:set_geometry(new_master_geometry)
     end
+end
+
+
+function TabtileState:transfer_client(client, new_master_id)
+    self.masters[client.tabtile_master_id]:pop(client)
+    self.masters[new_master_id]:push(client)
 end
 
 
@@ -234,6 +248,7 @@ end
 ---------------------------------------
 
 local TabtileApi = {}
+
 
 function TabtileApi:new(state)
     local api = {
@@ -244,6 +259,7 @@ function TabtileApi:new(state)
     return api
 end
 
+
 function TabtileApi:client_mv_rel_dir(client, dir)
     local new_master_id = get_rel_dir_master_id(
         client.tabtile_master_id,
@@ -252,19 +268,37 @@ function TabtileApi:client_mv_rel_dir(client, dir)
     )
 
     if new_master_id then
-        self.state.masters[client.tabtile_master_id]:pop(client)
-        self.state.masters[new_master_id]:push(client)
+        self.state:transfer_client(client, new_master_id)
     end
 end
+
 
 function TabtileApi:prev()
     local master_id = client.focus.tabtile_master_id
     self.state.masters[master_id]:prev()
 end
 
+
 function TabtileApi:commit()
     local master_id = client.focus.tabtile_master_id
     self.state.masters[master_id]:commit()
+end
+
+
+function TabtileApi:incnmaster(delta)
+    local new_master_count = self.state.tag.master_count + delta
+
+    if 1 <= new_master_count and new_master_count <= MAX_MASTER_COUNT then
+        if delta < 0 then
+            for i = self.state.tag.master_count, new_master_count + 1 do
+                for _, client in ipairs(self.state.masters[i].client_stack) do
+                    self.state:transfer_client(client, new_master_count)
+                end
+            end
+        end
+
+        awful.tag.incnmaster(delta)
+    end
 end
 
 
@@ -287,7 +321,8 @@ local tabtile = function (tag)
     --
     function arrange(p)
         if (p.workarea ~= state.workarea) then
-            state:update_workarea(p.workarea)
+            state.workarea = p.workarea
+            state:arrange()
         end
     end
 

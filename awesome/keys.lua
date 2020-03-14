@@ -218,13 +218,15 @@ _this.global = gears.table.join(
 
     awful.key({ modkey, 'Shift', 'Control' }, 'j',
         function()
-            awful.tag.incnmaster(-1)
+            local layout = awful.screen.focused().selected_tag.layout
+            layout.api:incnmaster(-1)
         end,
     {description = 'decrement master_count'}),
 
     awful.key({ modkey, 'Shift', 'Control' }, 'k',
         function()
-            awful.tag.incnmaster(1)
+            local layout = awful.screen.focused().selected_tag.layout
+            layout.api:incnmaster(1)
         end,
     {description = 'increment master_count'}),
 
