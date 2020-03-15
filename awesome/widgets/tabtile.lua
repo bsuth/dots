@@ -10,7 +10,9 @@
 ---------------------------------------------------------------------------
 
 local awful = require('awful')
+local gears = require('gears')
 local naughty = require('naughty')
+local wibox = require('wibox')
 
 ---------------------------------------
 -- GLOBALS
@@ -44,10 +46,27 @@ local TEMPLATES = {
 
 local MAX_MASTER_COUNT = #TEMPLATES
 
+local TABBAR_HEIGHT = 30
+
 
 ---------------------------------------
 -- HELPERS
 ---------------------------------------
+
+--
+-- TODO
+--
+-- @param string msg
+--
+function throw(msg)
+    if (type(msg) ~= 'string') then
+        naughty.notify({ text = 'Invalid type to `throw(msg: string)`, how ironic.' })
+        error('Invalid type to `throw(msg: string)`, how ironic.')
+    else
+        naughty.notify({ text = msg })
+        error(msg)
+    end
+end
 
 --
 -- Derive a master's geometry from the workarea using one of the templates
@@ -65,6 +84,26 @@ function apply_template(workarea, template)
         width  = template.width  * workarea.width,
         height = template.height * workarea.height,
     }
+end
+
+--
+-- TODO
+--
+-- @param table template1 : TEMPLATES[_][_]
+-- @param table template2 : TEMPLATES[_][_]
+-- @param string dim      : x|y
+-- @return bool
+--
+function check_template_overlap(template1, template2, dim)
+    local side = (dim == 'x' and 'width') or 
+        (dim == 'y' and 'height') or
+        throw('Tabtile::check_template_overlap: Invalid dim')
+
+    if template1[dim] < template2[dim] then
+        return template2[dim] < template1[dim] + template1[side]
+    end
+
+    return template1[dim] < template2[dim] + template2[side]
 end
 
 --
@@ -103,19 +142,23 @@ end
 function get_dist_func(dir, prev_template)
     if (dir == 'left') then
         return function(template)
-            return prev_template.x - template.x
+            return check_template_overlap(template, prev_template, 'y') and
+                prev_template.x - template.x or 0
         end
     elseif (dir == 'right') then
         return function(template)
-            return template.x - prev_template.x
+            return check_template_overlap(template, prev_template, 'y') and
+                template.x - prev_template.x or 0
         end
     elseif (dir == 'up') then
         return function(template)
-            return prev_template.y - template.y
+            return check_template_overlap(template, prev_template, 'x') and
+                prev_template.y - template.y or 0
         end
     elseif (dir == 'down') then
         return function(template)
-            return template.y - prev_template.y
+            return check_template_overlap(template, prev_template, 'x') and
+                template.y - prev_template.y or 0
         end
     else
         error()
@@ -131,13 +174,35 @@ end
 local Master = {}
 
 
-function Master:new(id)
+function Master:new(id, tag)
     local master = {
         id = id,
+        tag = tag,
         geometry = nil,
+        client_geometry = nil,
         client_stack = {},
         stack_pointer = 1,
+        tab_bar = wibox({
+            screen = tag.screen,
+            visible = true,
+        }),
     }
+
+    local tasklist = awful.widget.tasklist({
+        screen  = tag.screen,
+        filter  = awful.widget.tasklist.filter.currenttags,
+        buttons = tasklist_buttons,
+        source = function() return master.client_stack end,
+        style = {
+            border_width = 2,
+            border_color = '#ff0000',
+        },
+    })
+
+    master.tab_bar:setup({
+        tasklist,
+        layout = wibox.layout.flex.horizontal,
+    })
 
     setmetatable(master, { __index = self })
     return master
@@ -157,8 +222,23 @@ end
 
 function Master:set_geometry(geometry)
     self.geometry = geometry
+
+    self.client_geometry = {
+        x = geometry.x,
+        y = geometry.y + TABBAR_HEIGHT,
+        width = geometry.width,
+        height = geometry.height - TABBAR_HEIGHT,
+    }
+
+    self.tab_bar:geometry({
+        x = geometry.x,
+        y = geometry.y,
+        width = geometry.width,
+        height = TABBAR_HEIGHT,
+    })
+
     for _, client in ipairs(self.client_stack) do
-        client:geometry(geometry)
+        client:geometry(self.client_geometry)
     end
 end
 
@@ -168,8 +248,15 @@ function Master:push(client)
     -- truly overlap
     client.floating = true
     client.tabtile_master_id = self.id
-    client:geometry(self.geometry)
+    client:geometry(self.client_geometry)
     client:raise()
+
+    -- Wrap client's `kill()` to clean up tabtile references
+    client.tabtile_kill = function()
+        self:pop(client)
+        client:kill()
+    end
+
     table.insert(self.client_stack, 1, client)
 end
 
@@ -213,7 +300,7 @@ function TabtileState:new(tag)
     }
 
     for i = 1, MAX_MASTER_COUNT do
-        state.masters[i] = Master:new(i)
+        state.masters[i] = Master:new(i, tag)
     end
 
     for _, client in ipairs(tag:clients()) do

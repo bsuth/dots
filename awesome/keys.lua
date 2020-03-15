@@ -312,7 +312,7 @@ _this.client = gears.table.join(
 
     awful.key({ modkey, 'Shift' }, 'q',
         function(c)
-            c:kill()
+            return c.tabtile_kill and c.tabtile_kill() or c:kill()
         end,
     {description = 'close client'}),
 

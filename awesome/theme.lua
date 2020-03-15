@@ -11,17 +11,17 @@ local themes_path = gfs.get_themes_dir()
 -- COLORSCHEME: OneDark
 ---------------------------------------
 
-local black = "#282c34"
-local red = "#e06c75"
-local green = "#98c379"
-local yellow = "#e5c07b"
-local blue = "#61afef"
-local purple = "#c678dd"
-local cyan = "#56b6c2"
-local white = "#abb2bf"
+local black = '#282c34'
+local red = '#e06c75'
+local green = '#98c379'
+local yellow = '#e5c07b'
+local blue = '#61afef'
+local purple = '#c678dd'
+local cyan = '#56b6c2'
+local white = '#abb2bf'
 
-local dark_grey = "#545862"
-local light_grey = "#c8ccd4"
+local dark_grey = '#545862'
+local light_grey = '#c8ccd4'
 
 
 ---------------------------------------
@@ -32,8 +32,8 @@ local theme = {
     font = 'Source Code Pro Medium 10',
     wallpaper = os.getenv('HOME') .. '/Pictures/system/wallpaper.jpeg',
 
-    useless_gap   = dpi(8),
-    border_width  = dpi(5),
+    useless_gap   = dpi(5),
+    border_width  = dpi(3),
     border_normal = black,
     border_focus  = green,
     border_marked = red,
