@@ -244,7 +244,7 @@ function Master:new(id, tag)
         client_geometry = nil,
         client_stack = {},
         stack_pointer = 1,
-        tabbar = wibox({ screen = tag.screen, visible = true, }),
+        tabbar = wibox({ screen = tag.screen }),
     }
 
     local tasklist = awful.widget.tasklist({
@@ -259,6 +259,19 @@ function Master:new(id, tag)
         tasklist,
         layout = wibox.layout.flex.horizontal,
     })
+
+    -- DEBUG: need to extend this to popups as well
+    -- DEBUG: need tabbar to update instantly
+    -- DEBUG: need to hide tabbar with master_count
+    client.connect_signal('unmanage', function()
+        local new_client_stack = {}
+        for _, client in ipairs(master.client_stack) do
+            if client.valid then
+                new_client_stack[#new_client_stack + 1] = client
+            end
+        end
+        master.client_stack = new_client_stack
+    end)
 
     setmetatable(master, { __index = self })
     return master
@@ -341,6 +354,17 @@ function Master:commit()
 end
 
 
+function Master:autoclean()
+    local new_client_stack = {}
+    for _, client in ipairs(self.client_stack) do
+        if client.valid then
+            new_client_stack[#new_client_stack + 1] = client
+        end
+    end
+    self.client_stack = new_client_stack
+end
+
+
 ---------------------------------------
 -- LAYOUT STATE
 ---------------------------------------
@@ -358,6 +382,8 @@ function TabtileState:new(tag)
     for i = 1, MAX_MASTER_COUNT do
         state.masters[i] = Master:new(i, tag)
     end
+
+    state.masters[1].tabbar.visible = true
 
     for _, client in ipairs(tag:clients()) do
         state.masters[1]:push(client)
@@ -434,9 +460,16 @@ function TabtileApi:incnmaster(delta)
     if 1 <= new_master_count and new_master_count <= MAX_MASTER_COUNT then
         if delta < 0 then
             for i = self.state.tag.master_count, new_master_count + 1 do
-                for _, client in ipairs(self.state.masters[i].client_stack) do
+                local master = self.state.masters[i]
+                master.tabbar.visible = false
+
+                for _, client in ipairs(master.client_stack) do
                     self.state:transfer_client(client, new_master_count)
                 end
+            end
+        elseif delta > 0 then
+            for i = self.state.tag.master_count + 1, new_master_count do
+                self.state.masters[i].tabbar.visible = true
             end
         end
 

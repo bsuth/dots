@@ -274,6 +274,18 @@ _this.global = gears.table.join(
             awful.layout.inc(1)
         end,
     {description = 'test: change layout'}),
+    awful.key({ modkey, 'Shift' }, 'r',
+        function()
+            local clients = awful.screen.focused().selected_tag.layout.api.state.masters[1].client_stack
+            for i = 1, #clients do
+                if not clients[i].valid then
+                    naughty.notify({ text = 'hi' })
+                else
+                    naughty.notify({ text = tostring(clients[i]) })
+                end
+            end
+        end,
+    {description = 'test: change layout'}),
     
 
     -- ------------------
