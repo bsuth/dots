@@ -10,6 +10,7 @@
 ---------------------------------------------------------------------------
 
 local awful = require('awful')
+local beautiful = require('beautiful')
 local gears = require('gears')
 local naughty = require('naughty')
 local wibox = require('wibox')
@@ -44,9 +45,47 @@ local TEMPLATES = {
     },
 }
 
+--
+-- This is used internally and given its own variable for readability reasons.
+-- DO NOT CHANGE THIS.
+--
 local MAX_MASTER_COUNT = #TEMPLATES
 
+--
+-- Controls the height of the tabbar.
+--
 local TABBAR_HEIGHT = 30
+
+--
+-- create_callback needed if we wish to use clienticon
+--
+local TABBAR_TASKLIST_TEMPLATE = {
+    {
+        {
+            {
+                {
+                    id     = 'clienticon',
+                    widget = awful.widget.clienticon,
+                },
+                top = 5, right = 5, bottom = 5, left = 0,
+                widget  = wibox.container.margin,
+            },
+            {
+                id     = 'text_role',
+                widget = wibox.widget.textbox,
+            },
+            layout = wibox.layout.fixed.horizontal,
+        },
+        top = 0, right = 10, bottom = 0, left  = 10,
+        widget = wibox.container.margin
+    },
+    id     = 'background_role',
+    widget = wibox.container.background,
+
+    create_callback = function(self, client, index, objects)
+        self:get_children_by_id('clienticon')[1].client = client
+    end,
+}
 
 
 ---------------------------------------
@@ -78,12 +117,35 @@ end
 -- @return table         : { x: float, y: float, width: float, height: float }
 --
 function apply_template(workarea, template)
-    return {
-        x      = template.x      * workarea.width  + workarea.x,
-        y      = template.y      * workarea.height + workarea.y,
-        width  = template.width  * workarea.width,
-        height = template.height * workarea.height,
+    local geometry = {
+        x      = template.x      * workarea.width  + workarea.x + beautiful.border_width,
+        y      = template.y      * workarea.height + workarea.y + beautiful.border_width,
+        width  = template.width  * workarea.width - 2 * beautiful.border_width,
+        height = template.height * workarea.height - 2 * beautiful.border_width,
     }
+
+    -- The workare already takes care of the useless gap, but we still need to
+    -- account for the useless gap in between masters
+
+    if template.x ~= 0 then
+        geometry.x = geometry.x + beautiful.useless_gap
+        geometry.width = geometry.width - beautiful.useless_gap
+    end
+
+    if template.x + template.width ~= 1 then
+        geometry.width = geometry.width - beautiful.useless_gap
+    end
+
+    if template.y ~= 0 then
+        geometry.y = geometry.y + beautiful.useless_gap
+        geometry.height = geometry.height - beautiful.useless_gap
+    end
+
+    if template.y + template.height ~= 1 then
+        geometry.height = geometry.height - beautiful.useless_gap
+    end
+
+    return geometry
 end
 
 --
@@ -182,10 +244,7 @@ function Master:new(id, tag)
         client_geometry = nil,
         client_stack = {},
         stack_pointer = 1,
-        tab_bar = wibox({
-            screen = tag.screen,
-            visible = true,
-        }),
+        tabbar = wibox({ screen = tag.screen, visible = true, }),
     }
 
     local tasklist = awful.widget.tasklist({
@@ -193,13 +252,10 @@ function Master:new(id, tag)
         filter  = awful.widget.tasklist.filter.currenttags,
         buttons = tasklist_buttons,
         source = function() return master.client_stack end,
-        style = {
-            border_width = 2,
-            border_color = '#ff0000',
-        },
+        widget_template = TABBAR_TASKLIST_TEMPLATE,
     })
 
-    master.tab_bar:setup({
+    master.tabbar:setup({
         tasklist,
         layout = wibox.layout.flex.horizontal,
     })
@@ -230,10 +286,10 @@ function Master:set_geometry(geometry)
         height = geometry.height - TABBAR_HEIGHT,
     }
 
-    self.tab_bar:geometry({
+    self.tabbar:geometry({
         x = geometry.x,
         y = geometry.y,
-        width = geometry.width,
+        width = geometry.width + 2 * beautiful.border_width,
         height = TABBAR_HEIGHT,
     })
 

@@ -1,4 +1,5 @@
 
+local gears = require('gears')
 local naughty = require('naughty')
 local theme_assets = require('beautiful.theme_assets')
 local xresources = require('beautiful.xresources')
@@ -44,6 +45,14 @@ local theme = {
     notification_margin = 15,
     notification_border_width = 5,
     notification_border_color = '#0000',
+
+    tasklist_fg_normal = '#888',
+    tasklist_fg_focus = '#fff',
+    tasklist_plain_task_name = true,
+    tasklist_font = 'Source Code Pro Medium 10',
+    tasklist_shape = gears.shape.rectangle,
+    tasklist_shape_border_width = 2,
+    tasklist_shape_border_color_focus = purple,
 }
 
 -- Some notification theme properties don't get overridden by default, so we
