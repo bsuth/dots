@@ -21,12 +21,27 @@ nnoremap <c-l> <c-w>l
 " Nvim help
 cnoreabbrev ? tab help
 
-" Tabs
-nnoremap <Tab> :tabnext<cr>
-nnoremap <S-Tab> :tabprevious<cr>
+" Buffer/Tab Navigatino
+nnoremap <Tab> :bn<cr>
+nnoremap <S-Tab> :bp<cr>
+nnoremap <leader>[ :tabprevious<cr>
+nnoremap <leader>] :tabnext<cr>
+
+nnoremap <c-n> :call CustomVifm()<cr>
+nnoremap <c-m> :call LocateFunctions()<cr>
 
 
 " -------------------------------------------
 " DEVELOPMENT
 " -------------------------------------------
-set makeprg="npm start"
+
+function! CustomVifm()
+    set nonumber
+    :Vifm
+    set number
+endfunction
+
+function! LocateFunctions()
+    let cmd = "rg '^function! ([a-zA-Z]+)' " . expand('%:p') . " -r '$1'"
+    lex system(cmd)
+endfunction

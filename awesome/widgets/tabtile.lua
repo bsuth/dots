@@ -341,7 +341,15 @@ end
 
 
 function Master:prev()
-    self.stack_pointer = (self.stack_pointer) % #self.client_stack + 1
+    local sp = self.stack_pointer
+    self.stack_pointer = (sp == #self.client_stack and 1 or sp + 1)
+    self.client_stack[self.stack_pointer]:raise()
+end
+
+
+function Master:next()
+    local sp = self.stack_pointer
+    self.stack_pointer = (sp == 1 and #self.client_stack or sp - 1)
     self.client_stack[self.stack_pointer]:raise()
 end
 
@@ -349,8 +357,10 @@ end
 function Master:commit()
     local new_client_stack_top = table.remove(self.client_stack, self.stack_pointer)
     table.insert(self.client_stack, 1, new_client_stack_top)
-    awful.client.focus.history.add(new_client_stack_top)
     self.stack_pointer = 1
+
+    -- emit a fake focus event to force the tabbar to update
+    new_client_stack_top:emit_signal('focus')
 end
 
 
@@ -409,6 +419,9 @@ end
 function TabtileState:transfer_client(client, new_master_id)
     self.masters[client.tabtile_master_id]:pop(client)
     self.masters[new_master_id]:push(client)
+
+    -- emit a fake focus event to force the tabbar to update
+    client:emit_signal('focus')
 end
 
 
@@ -447,6 +460,10 @@ function TabtileApi:prev()
     self.state.masters[master_id]:prev()
 end
 
+function TabtileApi:next()
+    local master_id = client.focus.tabtile_master_id
+    self.state.masters[master_id]:next()
+end
 
 function TabtileApi:commit()
     local master_id = client.focus.tabtile_master_id

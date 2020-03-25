@@ -32,7 +32,6 @@ ln -sfn "$DOTS_CORE/awesome" "$XDG_CONFIG_HOME/awesome"
 
 # nvim
 ln -sf  "$DOTS_CORE/nvim/init.vim" "$XDG_CONFIG_HOME/nvim/init.vim"
-ln -sf  "$DOTS_CORE/nvim/settings.vim" "$XDG_CONFIG_HOME/nvim/settings.vim"
 ln -sf  "$DOTS_CORE/nvim/plugins.vim" "$XDG_CONFIG_HOME/nvim/plugins.vim"
 ln -sf  "$DOTS_CORE/nvim/mappings.vim" "$XDG_CONFIG_HOME/nvim/mappings.vim"
 ln -sf  "$DOTS_CORE/nvim/augroups.vim" "$XDG_CONFIG_HOME/nvim/augroups.vim"

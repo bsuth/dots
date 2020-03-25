@@ -13,7 +13,7 @@ local clientbuffer = require('widgets.clientbuffer')
 -- INIT
 ---------------------------------------
 
-local _this = {
+local keys = {
     state = {
         kb_layout = 1,
     }
@@ -23,10 +23,97 @@ local modkey = 'Mod4'
 
 
 ---------------------------------------
+-- KEYGRABBERS
+---------------------------------------
+
+-- ------------------
+-- Tagger
+-- ------------------
+
+local function taggerPrev()
+    awful.screen.focused().tagger:prev() 
+end
+
+local function taggerNext()
+    awful.screen.focused().tagger:next() 
+end
+
+local taggerKeygrabber = awful.keygrabber({
+    keybindings = {
+        { { modkey }, 'Tab', taggerPrev },
+        { { modkey, 'Shift' }, 'Tab', taggerNext },
+    },
+
+    stop_key = modkey,
+    stop_event = 'release',
+    stop_callback = function()
+        awful.screen.focused().tagger:commit()
+    end,
+})
+
+-- ------------------
+-- Tabtile
+-- ------------------
+
+local function tabtilePrev()
+    awful.screen.focused().selected_tag.layout.api:prev() 
+end
+
+local function tabtileNext()
+    awful.screen.focused().selected_tag.layout.api:next() 
+end
+
+local tabtileCycleKeygrabber = awful.keygrabber({
+    keybindings = {
+        { { modkey }, ' ', tabtilePrev },
+        { { modkey, 'Shift' }, ' ', tabtileNext },
+    },
+
+    stop_key = modkey,
+    stop_event = 'release',
+    stop_callback = function()
+        awful.screen.focused().selected_tag.layout.api:commit() 
+    end,
+})
+
+
+---------------------------------------
 -- GLOBAL KEYS
 ---------------------------------------
 
-_this.global = gears.table.join(
+keys.global = gears.table.join(
+
+    -- ------------------
+    -- Keygrabbers
+    -- ------------------
+
+    awful.key({ modkey }, 'Tab',
+        function() 
+            taggerKeygrabber:start()
+            taggerPrev()
+        end,
+    { description = 'start tagger keygrabber, init prev' }),
+
+    awful.key({ modkey, 'Shift' }, 'Tab',
+        function() 
+            taggerKeygrabber:start()
+            taggerNext()
+        end,
+    { description = 'start tagger keygrabber, init next' }),
+
+    awful.key({ modkey }, ' ',
+        function() 
+            tabtileCycleKeygrabber:start()
+            tabtilePrev()
+        end,
+    {description = 'start tabtile keygrabber, init prev'}),
+
+    awful.key({ modkey, 'Shift' }, ' ',
+        function() 
+            tabtileCycleKeygrabber:start()
+            tabtileNext()
+        end,
+    {description = 'start tabtile keygrabber, init next'}),
 
     -- ------------------
     -- System
@@ -52,21 +139,20 @@ _this.global = gears.table.join(
                 'fcitx-keyboard-de',
             }
 
-            if _this.state.kb_layout == #layouts then
-                _this.state.kb_layout = 1
+            if keys.state.kb_layout == #layouts then
+                keys.state.kb_layout = 1
             else
-                _this.state.kb_layout = _this.state.kb_layout + 1
+                keys.state.kb_layout = keys.state.kb_layout + 1
             end
 
-            local new_layout = layouts[_this.state.kb_layout]
+            local new_layout = layouts[keys.state.kb_layout]
 
-            local change_kb_cmd = [[ fcitx-remote -s ]] .. layouts[_this.state.kb_layout]
+            local change_kb_cmd = [[ fcitx-remote -s ]] .. layouts[keys.state.kb_layout]
             awful.spawn.easy_async_with_shell(change_kb_cmd, function()
-                naughty.notify({ text = layouts[_this.state.kb_layout] })
+                naughty.notify({ text = layouts[keys.state.kb_layout] })
             end)
         end,
     {description = 'change keyboard layout'}),
-
 
     -- ------------------
     -- Volume
@@ -97,7 +183,6 @@ _this.global = gears.table.join(
         end,
     {description = 'toggle mute volume'}),
 
-
     -- ------------------
     -- Brightness
     -- ----------
@@ -120,7 +205,6 @@ _this.global = gears.table.join(
             awful.spawn.with_shell([[ xbacklight +6 ]])
         end,
     {description = 'raise brightness'}),
-
 
     -- ------------------
     -- Movement
@@ -152,35 +236,38 @@ _this.global = gears.table.join(
 
     awful.key({ modkey, 'Shift' }, 'h',
         function()
-            local layout = awful.screen.focused().selected_tag.layout
-            return layout.api.client_mv_rel_dir and
-                layout.api:client_mv_rel_dir(client.focus, 'left') or
-                awful.client.swap.bydirection('left')
+            awful.client.swap.bydirection('left')
+            -- local layout = awful.screen.focused().selected_tag.layout
+            -- return layout.api.client_mv_rel_dir and
+            --     layout.api:client_mv_rel_dir(client.focus, 'left') or
+            --     awful.client.swap.bydirection('left')
         end,
     {description = 'swap client left'}),
 
     awful.key({ modkey, 'Shift' }, 'j',
         function()
-            local layout = awful.screen.focused().selected_tag.layout
-            return layout.api.client_mv_rel_dir and
-                layout.api:client_mv_rel_dir(client.focus, 'down') or
-                awful.client.swap.bydirection('down')
+            awful.client.swap.bydirection('down')
+            -- local layout = awful.screen.focused().selected_tag.layout
+            -- return layout.api.client_mv_rel_dir and
+            --     layout.api:client_mv_rel_dir(client.focus, 'down') or
+            --     awful.client.swap.bydirection('down')
         end,
     {description = 'swap client down'}),
 
     awful.key({ modkey, 'Shift' }, 'k',
         function()
-            local layout = awful.screen.focused().selected_tag.layout
-            return layout.api.client_mv_rel_dir and
-                layout.api:client_mv_rel_dir(client.focus, 'up') or
-                awful.client.swap.bydirection('up')
+            awful.client.swap.bydirection('up')
+            -- local layout = awful.screen.focused().selected_tag.layout
+            -- return layout.api.client_mv_rel_dir and
+            --     layout.api:client_mv_rel_dir(client.focus, 'up') or
+            --     awful.client.swap.bydirection('up')
         end,
     {description = 'swap client up'}),
 
     awful.key({ modkey, 'Shift' }, 'l',
         function()
-            local layout = awful.screen.focused().selected_tag.layout
-            layout.api:client_mv_rel_dir(client.focus, 'right')
+            awful.client.swap.bydirection('right')
+            -- local layout = awful.screen.focused().selected_tag.layout
             -- return layout.api.client_mv_rel_dir and
             --     layout.api:client_mv_rel_dir('right', client.focus) or
             --     awful.client.swap.bydirection('right')
@@ -210,7 +297,6 @@ _this.global = gears.table.join(
             awful.screen.focus_bydirection('right')
         end,
     {description = 'focus screen right'}),
-
 
     -- ------------------
     -- Layout
@@ -242,7 +328,6 @@ _this.global = gears.table.join(
         end,
     {description = 'increase master width'}),
 
-
     -- ------------------
     -- Tags
     -- ------------------
@@ -265,7 +350,6 @@ _this.global = gears.table.join(
         end,
     {description = 'restore client'}),
 
-
     -- ------------------
     -- test
     -- ------------------
@@ -287,7 +371,6 @@ _this.global = gears.table.join(
         end,
     {description = 'test: change layout'}),
     
-
     -- ------------------
     -- Spawners
     -- ------------------
@@ -316,7 +399,7 @@ _this.global = gears.table.join(
 -- CLIENT KEYS
 ---------------------------------------
 
-_this.client = gears.table.join(
+keys.client = gears.table.join(
 
     -- ------------------
     -- System
@@ -349,45 +432,8 @@ _this.client = gears.table.join(
 
 
 ---------------------------------------
--- KEYGRABBERS
----------------------------------------
-
-awful.keygrabber({
-    keybindings = {
-        {{ modkey }, 'Tab', function() 
-            awful.screen.focused().tagger:prev() 
-        end},
-    },
-
-    stop_key = modkey,
-    stop_event = 'release',
-    stop_callback = function()
-        awful.screen.focused().tagger:commit()
-    end,
-
-    export_keybindings = true,
-})
-
-awful.keygrabber({
-    keybindings = {
-        {{ modkey }, ' ', function() 
-            awful.screen.focused().selected_tag.layout.api:prev() 
-        end},
-    },
-
-    stop_key = modkey,
-    stop_event = 'release',
-    stop_callback = function()
-        awful.screen.focused().selected_tag.layout.api:commit() 
-    end,
-
-    export_keybindings = true,
-})
-
-
----------------------------------------
 -- RETURN
 ---------------------------------------
 
-return _this
+return keys
 

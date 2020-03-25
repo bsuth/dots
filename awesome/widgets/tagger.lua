@@ -9,6 +9,33 @@ local naughty = require('naughty')
 
 local LAYOUT = awful.layout.suit.tile
 
+-- local POPUP_TEMPLATE = {
+--     {
+--         {
+--             {
+--                 {
+--                     id     = 'clienticon',
+--                     widget = awful.widget.clienticon,
+--                 },
+--                 top = 5, right = 5, bottom = 5, left = 0,
+--                 widget  = wibox.container.margin,
+--             },
+--             {
+--                 id     = 'text_role',
+--                 widget = wibox.widget.textbox,
+--             },
+--             layout = wibox.layout.fixed.horizontal,
+--         },
+--         top = 0, right = 10, bottom = 0, left  = 10,
+--         widget = wibox.container.margin
+--     },
+--     id     = 'background_role',
+--     widget = wibox.container.background,
+
+--     create_callback = function(self, client, index, objects)
+--         self:get_children_by_id('clienticon')[1].client = client
+--     end,
+-- }
 
 ---------------------------------------
 -- TAGGER
@@ -56,12 +83,15 @@ end
 
 
 function Tagger:prev()
-    if self.stack_pointer == #self.stack then
-        self.stack_pointer = 1
-    else
-        self.stack_pointer = self.stack_pointer + 1
-    end
+    local sp = self.stack_pointer
+    self.stack_pointer = (sp == #self.stack and 1 or sp + 1)
+    awful.tag.find_by_name(self.screen, self.stack[self.stack_pointer]):view_only()
+end
 
+
+function Tagger:next()
+    local sp = self.stack_pointer
+    self.stack_pointer = (sp == 1 and #self.stack or sp - 1)
     awful.tag.find_by_name(self.screen, self.stack[self.stack_pointer]):view_only()
 end
 

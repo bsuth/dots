@@ -1,6 +1,6 @@
 
 " -------------------------------------------
-" AUTO-INSTALL
+" AUTOINSTALL VIM-PLUG
 " -------------------------------------------
 
 let plug_install_path = '~/.config/nvim/autoload/plug.vim'
@@ -21,16 +21,15 @@ call plug#begin('~/.config/nvim/bundle')
 
     " IDE
     Plug 'neoclide/coc.nvim', { 'branch': 'release' }
-    Plug 'tpope/vim-fugitive'
     Plug 'vifm/vifm.vim'
-    " Plug 'majutsushi/tagbar'
+    Plug 'vim-airline/vim-airline'
 
     " Languages
     Plug 'pangloss/vim-javascript'
     Plug 'peitalin/vim-jsx-typescript'
-    Plug 'cespare/vim-toml'
 
    " Util
+    Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
     Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --no-key-bindings --no-zsh --no-fish' }
@@ -43,10 +42,31 @@ call plug#end()
 
 colorscheme onedark
 
-nnoremap <c-n> :Vifm<cr>
-
 " For some reason, vim register what should be <c-/> as <c-_>
 nnoremap <c-_> :Commentary<cr>
+
+
+" -------------------------------------------
+" AIRLINE
+" -------------------------------------------
+
+" Enable tabline
+let g:airline#extensions#tabline#enabled = 1
+
+" Remove tabline separators
+let g:airline#extensions#tabline#left_sep = ' '
+let g:airline#extensions#tabline#left_alt_sep = ' '
+
+" Enable syntax highlight group caching. To clear the cache,
+" use :AirlineRefresh
+let g:airline_highlighting_cache = 1
+
+
+" -------------------------------------------
+" TAGBR
+" -------------------------------------------
+
+let g:tagbar_left = 1
 
 
 " -------------------------------------------
@@ -83,13 +103,10 @@ inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 " inoremap <expr> <cr> complete_info()["selected"] != "-1" ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> <c-]> <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
-
-" Use K to show documentation in preview window
-nnoremap <silent> K :call <SID>show_documentation()<CR>
 
 function! s:show_documentation()
   if (index(['vim','help'], &filetype) >= 0)
