@@ -27,8 +27,10 @@ call plug#begin('~/.config/nvim/bundle')
     " Languages
     Plug 'pangloss/vim-javascript'
     Plug 'peitalin/vim-jsx-typescript'
+    Plug 'posva/vim-vue'
 
    " Util
+    Plug 'vimwiki/vimwiki'
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
