@@ -65,7 +65,7 @@ end
 -- SETTINGS
 ---------------------------------------
 
-config = os.getenv('DOTS_CORE') .. '/awesome'
+config = os.getenv('DOTS') .. '/awesome'
 
 terminal = 'alacritty'
 editor = os.getenv('EDITOR') or 'nvim'

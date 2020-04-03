@@ -28,6 +28,6 @@ set clipboard=unnamedplus
 " INIT
 " -------------------------------------------
 
-source $DOTS_CORE/nvim/plugins.vim
-source $DOTS_CORE/nvim/mappings.vim
-source $DOTS_CORE/nvim/augroups.vim
+source $DOTS/nvim/plugins.vim
+source $DOTS/nvim/mappings.vim
+source $DOTS/nvim/augroups.vim

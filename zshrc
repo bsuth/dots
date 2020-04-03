@@ -65,3 +65,4 @@ bindkey '^F' autosuggest-accept
 # ALIASES
 # -------------------------------------------------------------------
 alias v='vifm'
+alias l="ls -1 --color=auto --group-directories-first"

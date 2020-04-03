@@ -131,29 +131,6 @@ keys.global = gears.table.join(
         end,
     {description = 'quit awesome'}),
 
-    awful.key({ modkey }, 'v',
-        function()
-            local layouts = {
-                'fcitx-keyboard-us',
-                'mozc',
-                'fcitx-keyboard-de',
-            }
-
-            if keys.state.kb_layout == #layouts then
-                keys.state.kb_layout = 1
-            else
-                keys.state.kb_layout = keys.state.kb_layout + 1
-            end
-
-            local new_layout = layouts[keys.state.kb_layout]
-
-            local change_kb_cmd = [[ fcitx-remote -s ]] .. layouts[keys.state.kb_layout]
-            awful.spawn.easy_async_with_shell(change_kb_cmd, function()
-                naughty.notify({ text = layouts[keys.state.kb_layout] })
-            end)
-        end,
-    {description = 'change keyboard layout'}),
-
     -- ------------------
     -- Volume
     -- ------------------

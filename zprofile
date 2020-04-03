@@ -7,11 +7,6 @@ if [ -d "$HOME/.local/bin" ]; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
-# set PATH so it includes rust packages
-if [ -d "$HOME/.cargo/bin" ]; then
-    PATH="$HOME/.cargo/bin:$PATH"
-fi
-
 
 # ----------------------------------------------------
 # ENVIRONMENT
@@ -21,15 +16,18 @@ export SHELL="/bin/zsh"
 export EDITOR=nvim
 export XDG_CONFIG_HOME="$HOME/.config"
 
-export DOTS_CORE="$HOME/dots/core"
-export DOTS_HOME="$HOME/dots/home"
-export DOTS_WORK="$HOME/dots/work"
+export DOTS="$HOME/dots"
 export SCRIPTS_CORE="$DOTS_CORE/scripts"
 
 # fcitx variables
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS="@im=fcitx"
+
+# run startx on login
+if systemctl -q is-active graphical.target && [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
+  exec startx
+fi
 
 
 # vim:syntax=sh

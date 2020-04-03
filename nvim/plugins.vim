@@ -34,7 +34,6 @@ call plug#begin('~/.config/nvim/bundle')
     Plug 'tpope/vim-fugitive'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
-    Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --no-key-bindings --no-zsh --no-fish' }
 call plug#end()
 
 

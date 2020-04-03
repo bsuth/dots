@@ -6,7 +6,7 @@
 # - Note: this is necessary, since we haven't linked our bashrc or profile yet!
 # -------------------------------------
 
-DOTS_CORE="$HOME/dots/core"
+DOTS="$HOME/dots"
 
 
 # -------------------------------------
@@ -14,42 +14,36 @@ DOTS_CORE="$HOME/dots/core"
 # -------------------------------------
 
 # X11
-ln -sf "$DOTS_CORE/.Xmodmap" "$HOME/.Xmodmap"
-ln -sf "$DOTS_CORE/.xsession" "$HOME/.xsession"
-
-# bash
-ln -sf "$DOTS_CORE/.profile" "$HOME/.profile"
-ln -sf "$DOTS_CORE/.bashrc" "$HOME/.bashrc"
+ln -sf "$DOTS/Xmodmap" "$HOME/.Xmodmap"
+ln -sf "$DOTS/xinitrc" "$HOME/.xinitrc"
 
 # zsh
-ln -sf "$DOTS_CORE/.zprofile" "$HOME/.zprofile"
-ln -sf "$DOTS_CORE/.zshrc" "$HOME/.zshrc"
-ln -sf "$DOTS_CORE/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
+ln -sf "$DOTS/zprofile" "$HOME/.zprofile"
+ln -sf "$DOTS/zshrc" "$HOME/.zshrc"
+ln -sf "$DOTS/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
 
 # awesome
-rm -rf "$XDG_CONFIG_HOME/awesome"
-ln -sfn "$DOTS_CORE/awesome" "$XDG_CONFIG_HOME/awesome"
+ln -sfn "$DOTS/awesome" "$XDG_CONFIG_HOME/awesome"
 
 # nvim
-ln -sf  "$DOTS_CORE/nvim/init.vim" "$XDG_CONFIG_HOME/nvim/init.vim"
-ln -sf  "$DOTS_CORE/nvim/plugins.vim" "$XDG_CONFIG_HOME/nvim/plugins.vim"
-ln -sf  "$DOTS_CORE/nvim/mappings.vim" "$XDG_CONFIG_HOME/nvim/mappings.vim"
-ln -sf  "$DOTS_CORE/nvim/augroups.vim" "$XDG_CONFIG_HOME/nvim/augroups.vim"
+ln -sf  "$DOTS/nvim/init.vim" "$XDG_CONFIG_HOME/nvim/init.vim"
+ln -sf  "$DOTS/nvim/plugins.vim" "$XDG_CONFIG_HOME/nvim/plugins.vim"
+ln -sf  "$DOTS/nvim/mappings.vim" "$XDG_CONFIG_HOME/nvim/mappings.vim"
+ln -sf  "$DOTS/nvim/augroups.vim" "$XDG_CONFIG_HOME/nvim/augroups.vim"
 
 # vifm
-ln -sf  "$DOTS_CORE/vifm/vifmrc" "$XDG_CONFIG_HOME/vifm/vifmrc"
-ln -sf  "$DOTS_CORE/vifm/scripts" "$XDG_CONFIG_HOME/vifm/scripts"
-ln -sf  "$DOTS_CORE/vifm/colors" "$XDG_CONFIG_HOME/vifm/colors"
+ln -sf  "$DOTS/vifm/vifmrc" "$XDG_CONFIG_HOME/nvim/vifmrc"
+ln -sf  "$DOTS/vifm/colors" "$XDG_CONFIG_HOME/nvim/colors"
+ln -sf  "$DOTS/vifm/scripts" "$XDG_CONFIG_HOME/nvim/scripts"
 
 # alacritty
-rm -rf "$XDG_CONFIG_HOME/alacritty"
-ln -sfn "$DOTS_CORE/alacritty" "$XDG_CONFIG_HOME/alacritty"
+ln -sfn "$DOTS/alacritty" "$XDG_CONFIG_HOME/alacritty"
 
 
 # -------------------------------------
 # - SYSTEMD UNITS
 # -------------------------------------
 
-sudo ln -sf "$DOTS_CORE/systemd/slock.service" "/etc/systemd/system/slock.service"
-sudo systemctl enable slock.service
-sudo systemctl start slock.service
+#sudo ln -sf "$DOTS/systemd/slock.service" "/etc/systemd/system/slock.service"
+#sudo systemctl enable slock.service
+#sudo systemctl start slock.service
