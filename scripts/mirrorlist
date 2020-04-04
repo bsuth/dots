@@ -1,0 +1,21 @@
+#!/bin/bash
+
+
+# Pacman Mirrorlist Generator
+# ---------------------------
+
+COUNTRY="DE"
+LIST_SIZE=5
+
+# use_mirror_status: ensure mirrors are up to date
+LOCAL_MIRRORLIST="/etc/pacman.d/mirrorlist"
+CURL_PARAMS="country=$COUNTRY&protocol=https&use_mirror_status=on"
+CURL_MIRRORLIST="https://www.archlinux.org/mirrorlist/?$CURL_PARAMS"
+
+# Backup old mirror list
+sudo cp "$LOCAL_MIRRORLIST" "$LOCAL_MIRRORLIST.backup"
+
+# Update mirrorlist (may take awhile)
+curl -s "$CURL_MIRRORLIST" | \
+    sed -e 's/^#Server/Server/' -e '/^#/d' | \
+    rankmirrors -n $LIST_SIZE - | sudo tee "$LOCAL_MIRRORLIST"

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 
-# -------------------------------------
+# ------------------------------------------------------------------------------
 # - ENVIRONMENT
 # - Note: this is necessary, since we haven't linked our bashrc or profile yet!
-# -------------------------------------
+# ------------------------------------------------------------------------------
 
 DOTS="$HOME/dots"
 
@@ -26,15 +26,10 @@ ln -sf "$DOTS/starship.toml" "$XDG_CONFIG_HOME/starship.toml"
 ln -sfn "$DOTS/awesome" "$XDG_CONFIG_HOME/awesome"
 
 # nvim
-ln -sf  "$DOTS/nvim/init.vim" "$XDG_CONFIG_HOME/nvim/init.vim"
-ln -sf  "$DOTS/nvim/plugins.vim" "$XDG_CONFIG_HOME/nvim/plugins.vim"
-ln -sf  "$DOTS/nvim/mappings.vim" "$XDG_CONFIG_HOME/nvim/mappings.vim"
-ln -sf  "$DOTS/nvim/augroups.vim" "$XDG_CONFIG_HOME/nvim/augroups.vim"
+ln -sfn "$DOTS/nvim" "$XDG_CONFIG_HOME/nvim"
 
 # vifm
-ln -sf  "$DOTS/vifm/vifmrc" "$XDG_CONFIG_HOME/nvim/vifmrc"
-ln -sf  "$DOTS/vifm/colors" "$XDG_CONFIG_HOME/nvim/colors"
-ln -sf  "$DOTS/vifm/scripts" "$XDG_CONFIG_HOME/nvim/scripts"
+ln -sfn "$DOTS/vifm" "$XDG_CONFIG_HOME/vifm"
 
 # alacritty
 ln -sfn "$DOTS/alacritty" "$XDG_CONFIG_HOME/alacritty"

@@ -14,8 +14,12 @@ unsetopt beep
 # Vim bindings
 bindkey -v
 
+# Enable powerline fonts
+# powerline-daemon -q
+# . /usr/lib/python3.8/site-packages/powerline/bindings/zsh/powerline.zsh
+
 # Starship prompt
-eval "$(starship init zsh)"
+#eval "$(starship init zsh)"
 
 
 # -------------------------------------------------------------------
@@ -53,16 +57,43 @@ zplugin light zdharma/fast-syntax-highlighting
 zplugin light zsh-users/zsh-autosuggestions
 zplugin light zdharma/history-search-multi-word
 zplugin light softmoth/zsh-vim-mode
+zplugin light softmoth/zsh-vim-mode
+zplugin light denysdovhan/spaceship-prompt
+
+
+# -------------------------------------------------------------------
+# SPACESHIP-PROMPT
+# -------------------------------------------------------------------
+
+SPACESHIP_PROMPT_ORDER=(
+  time          # Time stamps section
+  user          # Username section
+  dir           # Current directory section
+  host          # Hostname section
+  git           # Git section (git_branch + git_status)
+  node          # Node.js section
+  line_sep      # Line break
+  battery       # Battery level and status
+  vi_mode       # Vi-mode indicator
+  jobs          # Background jobs indicator
+  exit_code     # Exit code section
+  char          # Prompt character
+)
 
 
 # -------------------------------------------------------------------
 # BINDINGS
 # -------------------------------------------------------------------
+
 bindkey '^F' autosuggest-accept
 
 
 # -------------------------------------------------------------------
 # ALIASES
 # -------------------------------------------------------------------
+
 alias v='vifm'
-alias l="ls -1 --color=auto --group-directories-first"
+alias l='ls -1 --color=auto --group-directories-first'
+alias vi='nvim'
+alias vim='nvim'
+alias wiki='nvim -c :VimwikiIndex'

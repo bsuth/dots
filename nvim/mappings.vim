@@ -6,7 +6,7 @@
 let mapleader = ' '
 
 " Open/Source vimrc
-nnoremap <leader>ev :find $MYVIMRC<cr>
+nnoremap <leader>ev :Vifm /home/bsuth/dots/nvim<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 
 " Clear highlighting and redraw
@@ -24,6 +24,7 @@ cnoreabbrev ? tab help
 " Buffer/Tab Navigatino
 nnoremap <Tab> :bn<cr>
 nnoremap <S-Tab> :bp<cr>
+nnoremap <c-q> :bd<cr>
 nnoremap <leader>[ :tabprevious<cr>
 nnoremap <leader>] :tabnext<cr>
 

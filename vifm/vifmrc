@@ -60,8 +60,8 @@ set statusline='%A %u:%g %d'
 
 " :mark mark /full/directory/path [filename]
 
-mark h ~/
 mark b ~/bin/
+mark h ~/
 
 
 " ------------------------------------------------------------------------------
