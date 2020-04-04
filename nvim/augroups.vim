@@ -14,3 +14,9 @@ augroup typescript
     autocmd QuickFixCmdPost    l* nested lwindow
 augroup END
 
+augroup bsuth-vimwiki
+    autocmd FileType vimwiki nnoremap <buffer> <Tab> :bn<cr>
+    autocmd FileType vimwiki nnoremap <buffer> <S-Tab> :bp<cr>
+    autocmd FileType vimwiki nnoremap <buffer> <c-n> :VimwikiNextLink<cr>
+    autocmd FileType vimwiki nnoremap <buffer> <S-Tab> :VimwikiPrevLink<cr>
+augroup END

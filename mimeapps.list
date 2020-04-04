@@ -1,0 +1,7 @@
+
+# Change default programs. Application list can be found under:
+#   /usr/share/applications
+
+[Default Applications]
+application/png=feh.desktop
+
