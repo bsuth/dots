@@ -34,6 +34,9 @@ ln -sfn "$DOTS/vifm" "$XDG_CONFIG_HOME/vifm"
 # alacritty
 ln -sfn "$DOTS/alacritty" "$XDG_CONFIG_HOME/alacritty"
 
+# mimelist
+ln -sf "$DOTS/mimeapps.list" "$XDG_CONFIG_HOME/mimeapps.list"
+
 
 # -------------------------------------
 # - SYSTEMD UNITS
