@@ -354,7 +354,7 @@ keys.global = gears.table.join(
     
     awful.key({ modkey }, 'd',
         function()
-            awful.spawn.with_shell('rofi -show window')
+            awful.spawn.with_shell('rofi -show run')
         end,
     {description = 'spawn custom dmenu'}),
 

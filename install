@@ -31,6 +31,9 @@ ln -sfn "$DOTS/nvim" "$XDG_CONFIG_HOME/nvim"
 # vifm
 ln -sfn "$DOTS/vifm" "$XDG_CONFIG_HOME/vifm"
 
+# rofi
+ln -sfn "$DOTS/rofi" "$XDG_CONFIG_HOME/rofi"
+
 # alacritty
 ln -sfn "$DOTS/alacritty" "$XDG_CONFIG_HOME/alacritty"
 

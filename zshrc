@@ -7,19 +7,12 @@ HISTFILE=~/.histfile
 HISTSIZE=1000
 SAVEHIST=1000
 
+# Emacs Bindings
+bindkey -e
+
 # Options
 setopt appendhistory autocd extendedglob nomatch notify
 unsetopt beep
-
-# Vim bindings
-bindkey -v
-
-# Enable powerline fonts
-# powerline-daemon -q
-# . /usr/lib/python3.8/site-packages/powerline/bindings/zsh/powerline.zsh
-
-# Starship prompt
-#eval "$(starship init zsh)"
 
 
 # -------------------------------------------------------------------
@@ -56,8 +49,6 @@ autoload -Uz _zinit
 zplugin light zdharma/fast-syntax-highlighting
 zplugin light zsh-users/zsh-autosuggestions
 zplugin light zdharma/history-search-multi-word
-zplugin light softmoth/zsh-vim-mode
-zplugin light softmoth/zsh-vim-mode
 zplugin light denysdovhan/spaceship-prompt
 
 
