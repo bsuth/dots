@@ -5,12 +5,10 @@ declare -A commands
 
 commands=(
     [firefox]="firefox"
-    [pstorm]="pstorm"
-    [dots]="st -e vifm $DOTS_CORE"
     [sleep]="systemctl suspend"
     [reboot]="reboot"
     [poweroff]="poweroff"
 )
 
-key=$(echo "${!commands[@]}" | tr " " "\n" | dmenu)
+key=$(echo "${!commands[@]}" | tr " " "\n" | rofi -dmenu)
 eval "${commands[$key]}" & disown

@@ -19,4 +19,26 @@ augroup bsuth-vimwiki
     autocmd FileType vimwiki nnoremap <buffer> <S-Tab> :bp<cr>
     autocmd FileType vimwiki nnoremap <buffer> <c-n> :VimwikiNextLink<cr>
     autocmd FileType vimwiki nnoremap <buffer> <S-Tab> :VimwikiPrevLink<cr>
+
+
+    function! VimwikiLinkHandler(link)
+        " Use nvim to open files with the 'vfile:' scheme.
+        let link = a:link
+
+        if link =~# '^vfile:'
+            let link = link[1:]
+        else
+            return 0
+        endif
+
+        let link_infos = vimwiki#base#resolve_link(link)
+
+        if link_infos.filename == ''
+            echomsg 'Vimwiki Error: Unable to resolve link!'
+            return 0
+        else
+            exe 'tabnew ' . fnameescape(link_infos.filename)
+            return 1
+        endif
+    endfunction
 augroup END
