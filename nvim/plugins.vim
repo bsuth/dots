@@ -74,6 +74,9 @@ let g:tagbar_left = 1
 " COC.NVIM
 " -------------------------------------------
 
+" Extension List
+call coc#add_extension('coc-tsserver', 'coc-html', 'coc-css', 'coc-json')
+
 " You will have bad experience for diagnostic messages when it's default 4000.
 set updatetime=300
 

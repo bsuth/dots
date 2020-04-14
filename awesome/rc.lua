@@ -9,13 +9,15 @@ local wibox = require('wibox')
 -- Keybindings
 local keys = require('keys')
 
+-- Mouse Bindings
+local mouse = require('mouse')
+
 -- Theme handling library
 local beautiful = require('beautiful')
 
 -- Notification library
 local naughty = require('naughty')
 local hotkeys_popup = require('awful.hotkeys_popup').widget
-require('widgets.notifymanager')
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
@@ -23,10 +25,6 @@ require('awful.hotkeys_popup.keys')
 
 -- Tag Manager
 local tagger = require('widgets.tagger')
-local utils = require('utils')
-
--- Tabtile layout
-local tabtile = require('widgets.tabtile')
 
 
 ---------------------------------------
@@ -72,8 +70,7 @@ editor = os.getenv('EDITOR') or 'nvim'
 editor_cmd = terminal .. ' -e ' .. editor
 
 awful.layout.layouts = {
-    awful.layout.suit.tile,
-    tabtile,
+    awful.layout.suit.floating
 }
 
 root.keys(keys.global)
@@ -110,7 +107,6 @@ awful.screen.connect_for_each_screen(function(s)
     s.tagger = tagger:new(s)
 end)
 
-
 ---------------------------------------
 -- RULES
 ---------------------------------------
@@ -126,6 +122,7 @@ awful.rules.rules = {
             focus = awful.client.focus.filter,
             raise = true,
             keys = keys.client,
+            buttons = mouse.client,
             screen = awful.screen.preferred,
             placement = awful.placement.no_overlap+awful.placement.no_offscreen
         }
@@ -187,5 +184,6 @@ client.connect_signal('mouse::enter', function(c)
     end
 end)
 
+-- Focus changes border color
 client.connect_signal('focus', function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal('unfocus', function(c) c.border_color = beautiful.border_normal end)

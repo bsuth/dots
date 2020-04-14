@@ -1,16 +1,13 @@
-
 local awful = require('awful')
 local gears = require('gears')
 local naughty = require('naughty')
 local theme = require('theme')
-local utils = require('utils')
-
 
 ---------------------------------------
 -- INIT
 ---------------------------------------
 
-local _this = {
+local notifier = {
     ids = {
         system = nil,
         battery = nil,
@@ -20,10 +17,27 @@ local _this = {
 
 
 ---------------------------------------
+-- HELPERS
+---------------------------------------
+
+function fread(file)
+    local f = io.open(file, 'rb')
+    local value = nil
+
+    if f then
+        value = f:read('*a')
+        f:close()
+    end
+
+    return value
+end
+
+
+---------------------------------------
 -- VOLUME
 ---------------------------------------
 
-function _this:volume()
+function notifier:volume()
     local get_vol_cmd = [[ awk -F"[][]" 'END { print $2 }' <(amixer sget -D pulse Master) ]]
 
     awful.spawn.easy_async_with_shell(get_vol_cmd, function(stdout)
@@ -46,11 +60,11 @@ end
 --      XF86MonBrightnessUp
 ---------------------------------------
 
-function _this:brightness(plus_minus, diff)
+function notifier:brightness(plus_minus, diff)
     local br_dir = '/sys/class/backlight/intel_backlight/'
 
-    local curr_br = tonumber(utils.file_read(br_dir .. 'brightness'))
-    local max_br = tonumber(utils.file_read(br_dir .. 'max_brightness'))
+    local curr_br = tonumber(fread(br_dir .. 'brightness'))
+    local max_br = tonumber(fread(br_dir .. 'max_brightness'))
     local br_percent = math.floor(100 * curr_br / max_br)
 
     if plus_minus == '+' then
@@ -84,30 +98,30 @@ gears.timer({
             local batteries = string.gmatch(stdout, "%S+");
 
             for battery in batteries do
-                energy_now = energy_now + tonumber(utils.file_read(battery .. '/energy_now'))
-                energy_full = energy_full + tonumber(utils.file_read(battery .. '/energy_full'))
+                energy_now = energy_now + tonumber(fread(battery .. '/energy_now'))
+                energy_full = energy_full + tonumber(fread(battery .. '/energy_full'))
             end
 
             if energy_full == 0 then
-                _this.ids.battery = naughty.notify({
+                notifier.ids.battery = naughty.notify({
                     text = 'Battery Daemon Error: No batteries found.',
                     bg = theme.red,
                     fg = theme.white,
                     position = 'top_middle',
                     timeout = 0,
-                    replaces_id = _this.ids.battery,
+                    replaces_id = notifier.ids.battery,
                 }).id
             else
                 local battery_percent = math.ceil(100 * energy_now / energy_full)
 
                 if battery_percent < 20 then
-                    _this.ids.battery = naughty.notify({
+                    notifier.ids.battery = naughty.notify({
                         text = 'Battery Warning: ' .. tostring(battery_percent) .. '%',
                         bg = theme.red,
                         fg = theme.white,
                         position = 'top_middle',
                         timeout = 0,
-                        replaces_id = _this.ids.battery,
+                        replaces_id = notifier.ids.battery,
                     }).id
                 end
             end
@@ -131,13 +145,13 @@ gears.timer({
             local ram_usage = math.floor(tonumber(stdout))
 
             if ram_usage > 90 then
-                _this.ids.ram = naughty.notify({
+                notifier.ids.ram = naughty.notify({
                     text = 'RAM Warning: ' .. tostring(ram_usage) .. '%',
                     bg = theme.red,
                     fg = theme.white,
                     position = 'top_middle',
                     timeout = 0,
-                    replaces_id = _this.ids.ram,
+                    replaces_id = notifier.ids.ram,
                 }).id
             end
         end)
@@ -149,5 +163,4 @@ gears.timer({
 -- RETURN
 ---------------------------------------
 
-return _this
-
+return notifier

@@ -18,7 +18,7 @@ augroup bsuth-vimwiki
     autocmd FileType vimwiki nnoremap <buffer> <Tab> :bn<cr>
     autocmd FileType vimwiki nnoremap <buffer> <S-Tab> :bp<cr>
     autocmd FileType vimwiki nnoremap <buffer> <c-n> :VimwikiNextLink<cr>
-    autocmd FileType vimwiki nnoremap <buffer> <S-Tab> :VimwikiPrevLink<cr>
+    autocmd FileType vimwiki nnoremap <buffer> <c-p> :VimwikiPrevLink<cr>
 
 
     function! VimwikiLinkHandler(link)

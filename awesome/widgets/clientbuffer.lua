@@ -1,9 +1,7 @@
-
 local awful = require('awful')
 
-
 ---------------------------------------
--- INIT
+-- CLIENTBUFFER
 ---------------------------------------
 
 local clientbuffer = {
@@ -12,33 +10,27 @@ local clientbuffer = {
     }),
     clients = {},
 }
+setmetatable(clientbuffer, { __index = self })
 
 
----------------------------------------
--- PUBLIC
----------------------------------------
-
-function clientbuffer.push(client)
+function clientbuffer:push(client)
     local restore_screen = client.screen
 
-    client:move_to_tag(clientbuffer.buffer)
-    table.insert(clientbuffer.clients, client)
+    client:move_to_tag(self.buffer)
+    table.insert(self.clients, client)
 
     awful.screen.focus(restore_screen)
 end
 
 
-function clientbuffer.pop()
-    if #clientbuffer.clients > 0 then
-        local client = table.remove(clientbuffer.clients)
-        client:move_to_screen(awful.screen.focused())
+function clientbuffer:pop()
+    if #self.clients > 0 then
+        local c = table.remove(self.clients)
+        c:move_to_screen(awful.screen.focused())
+        client.focus = c
+        c:raise()
     end
 end
 
 
----------------------------------------
--- RETURN
----------------------------------------
-
 return clientbuffer
-

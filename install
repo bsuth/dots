@@ -40,6 +40,9 @@ ln -sfn "$DOTS/alacritty" "$XDG_CONFIG_HOME/alacritty"
 # mimelist
 ln -sf "$DOTS/mimeapps.list" "$XDG_CONFIG_HOME/mimeapps.list"
 
+# tmux
+ln -sf "$DOTS/tmux.conf" "$HOME/.tmux.conf"
+
 
 # -------------------------------------
 # - SYSTEMD UNITS

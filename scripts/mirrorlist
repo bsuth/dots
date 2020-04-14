@@ -5,7 +5,7 @@
 # ---------------------------
 
 COUNTRY="DE"
-LIST_SIZE=5
+LIST_SIZE=10
 
 # use_mirror_status: ensure mirrors are up to date
 LOCAL_MIRRORLIST="/etc/pacman.d/mirrorlist"
@@ -19,3 +19,6 @@ sudo cp "$LOCAL_MIRRORLIST" "$LOCAL_MIRRORLIST.backup"
 curl -s "$CURL_MIRRORLIST" | \
     sed -e 's/^#Server/Server/' -e '/^#/d' | \
     rankmirrors -n $LIST_SIZE - | sudo tee "$LOCAL_MIRRORLIST"
+
+# Refresh package lists, but downgrade any too new packages (just in case)
+sudo pacman -Syyuu

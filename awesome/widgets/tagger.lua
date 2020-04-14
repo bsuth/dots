@@ -1,41 +1,13 @@
-
 local awful = require('awful')
 local naughty = require('naughty')
-
 
 ---------------------------------------
 -- CONFIG
 ---------------------------------------
 
-local LAYOUT = awful.layout.suit.tile
+-- local LAYOUT = awful.layout.suit.tile
+local LAYOUT = awful.layout.suit.floating
 
--- local POPUP_TEMPLATE = {
---     {
---         {
---             {
---                 {
---                     id     = 'clienticon',
---                     widget = awful.widget.clienticon,
---                 },
---                 top = 5, right = 5, bottom = 5, left = 0,
---                 widget  = wibox.container.margin,
---             },
---             {
---                 id     = 'text_role',
---                 widget = wibox.widget.textbox,
---             },
---             layout = wibox.layout.fixed.horizontal,
---         },
---         top = 0, right = 10, bottom = 0, left  = 10,
---         widget = wibox.container.margin
---     },
---     id     = 'background_role',
---     widget = wibox.container.background,
-
---     create_callback = function(self, client, index, objects)
---         self:get_children_by_id('clienticon')[1].client = client
---     end,
--- }
 
 ---------------------------------------
 -- TAGGER

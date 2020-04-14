@@ -1,13 +1,11 @@
-
 local gears = require('gears')
 local awful = require('awful')
 local wibox = require('wibox')
 local naughty = require('naughty')
-local utils = require('utils')
 
-local notifymanager = require('widgets.notifymanager')
+local notifier = require('widgets.notifier')
 local clientbuffer = require('widgets.clientbuffer')
-
+local alttab = require('widgets.alttab')
 
 ---------------------------------------
 -- INIT
@@ -27,54 +25,54 @@ local modkey = 'Mod4'
 ---------------------------------------
 
 -- ------------------
+-- Alttab
+-- ------------------
+
+local function alttabPrev()
+    awful.screen.focused().selected_tag.alttab:prev()
+end
+
+local function alttabNext()
+    awful.screen.focused().selected_tag.alttab:next()
+end
+
+local alttabKeygrabber = awful.keygrabber({
+    keybindings = {
+        { { modkey }, 'Tab', alttabPrev },
+        { { modkey, 'Shift' }, 'Tab', alttabNext },
+    },
+
+    stop_key = modkey,
+    stop_event = 'release',
+    stop_callback = function()
+        awful.screen.focused().selected_tag.alttab:commit()
+    end,
+})
+
+-- ------------------
 -- Tagger
 -- ------------------
 
-local function taggerPrev()
-    awful.screen.focused().tagger:prev() 
-end
+-- local function taggerPrev()
+--     awful.screen.focused().tagger:prev() 
+-- end
 
-local function taggerNext()
-    awful.screen.focused().tagger:next() 
-end
+-- local function taggerNext()
+--     awful.screen.focused().tagger:next() 
+-- end
 
-local taggerKeygrabber = awful.keygrabber({
-    keybindings = {
-        { { modkey }, 'Tab', taggerPrev },
-        { { modkey, 'Shift' }, 'Tab', taggerNext },
-    },
+-- local taggerKeygrabber = awful.keygrabber({
+--     keybindings = {
+--         { { modkey }, 'Tab', taggerPrev },
+--         { { modkey, 'Shift' }, 'Tab', taggerNext },
+--     },
 
-    stop_key = modkey,
-    stop_event = 'release',
-    stop_callback = function()
-        awful.screen.focused().tagger:commit()
-    end,
-})
-
--- ------------------
--- Tabtile
--- ------------------
-
-local function tabtilePrev()
-    awful.screen.focused().selected_tag.layout.api:prev() 
-end
-
-local function tabtileNext()
-    awful.screen.focused().selected_tag.layout.api:next() 
-end
-
-local tabtileCycleKeygrabber = awful.keygrabber({
-    keybindings = {
-        { { modkey }, ' ', tabtilePrev },
-        { { modkey, 'Shift' }, ' ', tabtileNext },
-    },
-
-    stop_key = modkey,
-    stop_event = 'release',
-    stop_callback = function()
-        awful.screen.focused().selected_tag.layout.api:commit() 
-    end,
-})
+--     stop_key = modkey,
+--     stop_event = 'release',
+--     stop_callback = function()
+--         awful.screen.focused().tagger:commit()
+--     end,
+-- })
 
 
 ---------------------------------------
@@ -89,31 +87,31 @@ keys.global = gears.table.join(
 
     awful.key({ modkey }, 'Tab',
         function() 
-            taggerKeygrabber:start()
-            taggerPrev()
+            alttabKeygrabber:start()
+            alttabPrev()
         end,
-    { description = 'start tagger keygrabber, init prev' }),
+    { description = 'start alttab keygrabber, init prev' }),
 
     awful.key({ modkey, 'Shift' }, 'Tab',
         function() 
-            taggerKeygrabber:start()
-            taggerNext()
+            alttabKeygrabber:start()
+            alttabNext()
         end,
-    { description = 'start tagger keygrabber, init next' }),
+    { description = 'start alttab keygrabber, init next' }),
+    
+    -- awful.key({ modkey }, 'Tab',
+    --     function() 
+    --         taggerKeygrabber:start()
+    --         taggerPrev()
+    --     end,
+    -- { description = 'start tagger keygrabber, init prev' }),
 
-    awful.key({ modkey }, ' ',
-        function() 
-            tabtileCycleKeygrabber:start()
-            tabtilePrev()
-        end,
-    {description = 'start tabtile keygrabber, init prev'}),
-
-    awful.key({ modkey, 'Shift' }, ' ',
-        function() 
-            tabtileCycleKeygrabber:start()
-            tabtileNext()
-        end,
-    {description = 'start tabtile keygrabber, init next'}),
+    -- awful.key({ modkey, 'Shift' }, 'Tab',
+    --     function() 
+    --         taggerKeygrabber:start()
+    --         taggerNext()
+    --     end,
+    -- { description = 'start tagger keygrabber, init next' }),
 
     -- ------------------
     -- System
@@ -139,7 +137,7 @@ keys.global = gears.table.join(
         function()
             local set_vol_cmd = [[ amixer sset -D pulse Master 6%- ]]
             awful.spawn.easy_async_with_shell(set_vol_cmd, function()
-                notifymanager:volume()
+                notifier:volume()
             end)
         end,
     {description = 'lower volume'}),
@@ -148,7 +146,7 @@ keys.global = gears.table.join(
         function()
             local set_vol_cmd = [[ amixer sset -D pulse Master 6%+ ]]
             awful.spawn.easy_async_with_shell(set_vol_cmd, function()
-                notifymanager:volume()
+                notifier:volume()
             end)
         end,
     {description = 'raise volume'}),
@@ -156,7 +154,7 @@ keys.global = gears.table.join(
     awful.key({ }, 'XF86AudioMute',
         function()
             awful.spawn.with_shell('amixer -D pulse set Master 1+ toggle')
-            notifymanager.volume()
+            notifier:volume()
         end,
     {description = 'toggle mute volume'}),
 
@@ -171,14 +169,14 @@ keys.global = gears.table.join(
 
     awful.key({ }, 'XF86MonBrightnessDown',
         function()
-            notifymanager:brightness('-', 6)
+            notifier:brightness('-', 6)
             awful.spawn.with_shell([[ xbacklight -6 ]])
         end,
     {description = 'lower brightness'}),
 
     awful.key({ }, 'XF86MonBrightnessUp',
         function()
-            notifymanager:brightness('+', 6)
+            notifier:brightness('+', 6)
             awful.spawn.with_shell([[ xbacklight +6 ]])
         end,
     {description = 'raise brightness'}),
@@ -214,40 +212,24 @@ keys.global = gears.table.join(
     awful.key({ modkey, 'Shift' }, 'h',
         function()
             awful.client.swap.bydirection('left')
-            -- local layout = awful.screen.focused().selected_tag.layout
-            -- return layout.api.client_mv_rel_dir and
-            --     layout.api:client_mv_rel_dir(client.focus, 'left') or
-            --     awful.client.swap.bydirection('left')
         end,
     {description = 'swap client left'}),
 
     awful.key({ modkey, 'Shift' }, 'j',
         function()
             awful.client.swap.bydirection('down')
-            -- local layout = awful.screen.focused().selected_tag.layout
-            -- return layout.api.client_mv_rel_dir and
-            --     layout.api:client_mv_rel_dir(client.focus, 'down') or
-            --     awful.client.swap.bydirection('down')
         end,
     {description = 'swap client down'}),
 
     awful.key({ modkey, 'Shift' }, 'k',
         function()
             awful.client.swap.bydirection('up')
-            -- local layout = awful.screen.focused().selected_tag.layout
-            -- return layout.api.client_mv_rel_dir and
-            --     layout.api:client_mv_rel_dir(client.focus, 'up') or
-            --     awful.client.swap.bydirection('up')
         end,
     {description = 'swap client up'}),
 
     awful.key({ modkey, 'Shift' }, 'l',
         function()
             awful.client.swap.bydirection('right')
-            -- local layout = awful.screen.focused().selected_tag.layout
-            -- return layout.api.client_mv_rel_dir and
-            --     layout.api:client_mv_rel_dir('right', client.focus) or
-            --     awful.client.swap.bydirection('right')
         end,
     {description = 'swap client right'}),
 
@@ -323,30 +305,9 @@ keys.global = gears.table.join(
 
     awful.key({ modkey }, 'n',
         function()
-            clientbuffer.pop()
+            clientbuffer:pop()
         end,
     {description = 'restore client'}),
-
-    -- ------------------
-    -- test
-    -- ------------------
-    awful.key({ modkey }, 'r',
-        function()
-            awful.layout.inc(1)
-        end,
-    {description = 'test: change layout'}),
-    awful.key({ modkey, 'Shift' }, 'r',
-        function()
-            local clients = awful.screen.focused().selected_tag.layout.api.state.masters[1].client_stack
-            for i = 1, #clients do
-                if not clients[i].valid then
-                    naughty.notify({ text = 'hi' })
-                else
-                    naughty.notify({ text = tostring(clients[i]) })
-                end
-            end
-        end,
-    {description = 'test: change layout'}),
     
     -- ------------------
     -- Spawners
@@ -384,7 +345,7 @@ keys.client = gears.table.join(
 
     awful.key({ modkey, 'Shift' }, 'q',
         function(c)
-            return c.tabtile_kill and c.tabtile_kill() or c:kill()
+            c:kill()
         end,
     {description = 'close client'}),
 
@@ -402,7 +363,7 @@ keys.client = gears.table.join(
 
     awful.key({ modkey }, 'm',
         function(c)
-            clientbuffer.push(c)
+            clientbuffer:push(c)
         end,
     {description = 'store client'})
 )
@@ -413,4 +374,3 @@ keys.client = gears.table.join(
 ---------------------------------------
 
 return keys
-

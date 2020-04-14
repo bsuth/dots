@@ -4,13 +4,16 @@
 
 # set PATH so it includes user's private bin if it exists
 if [ -d "$HOME/.local/bin" ]; then
-    PATH="$HOME/.local/bin:$PATH"
+    export PATH="$HOME/.local/bin:$PATH"
 fi
 
+export GOPATH="$HOME/.go"
+export PATH="${GOPATH//://bin:}/bin:$PATH"
 
 # ----------------------------------------------------
 # ENVIRONMENT
 # ----------------------------------------------------
+
 
 export SHELL="/bin/zsh"
 export EDITOR=nvim
@@ -28,6 +31,5 @@ export XMODIFIERS="@im=fcitx"
 if systemctl -q is-active graphical.target && [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   exec startx
 fi
-
 
 # vim:syntax=sh
