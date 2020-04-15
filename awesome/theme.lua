@@ -29,7 +29,7 @@ local theme = {
 
     useless_gap   = dpi(5),
     border_width  = dpi(3),
-    border_normal = black,
+    border_normal = red,
     border_focus  = green,
     border_marked = red,
 

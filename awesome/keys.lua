@@ -5,7 +5,7 @@ local naughty = require('naughty')
 
 local notifier = require('widgets.notifier')
 local clientbuffer = require('widgets.clientbuffer')
-local alttab = require('widgets.alttab')
+local Alttab = require('widgets.alttab')
 
 ---------------------------------------
 -- INIT
@@ -29,11 +29,11 @@ local modkey = 'Mod4'
 -- ------------------
 
 local function alttabPrev()
-    awful.screen.focused().selected_tag.alttab:prev()
+    Alttab:get():prev()
 end
 
 local function alttabNext()
-    awful.screen.focused().selected_tag.alttab:next()
+    Alttab:get():next()
 end
 
 local alttabKeygrabber = awful.keygrabber({
@@ -45,7 +45,7 @@ local alttabKeygrabber = awful.keygrabber({
     stop_key = modkey,
     stop_event = 'release',
     stop_callback = function()
-        awful.screen.focused().selected_tag.alttab:commit()
+        Alttab:get():commit()
     end,
 })
 

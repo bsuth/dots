@@ -8,6 +8,8 @@ commands=(
     [sleep]="systemctl suspend"
     [reboot]="reboot"
     [poweroff]="poweroff"
+    [inkscape]="inkscape"
+    [discord]="discord"
 )
 
 key=$(echo "${!commands[@]}" | tr " " "\n" | rofi -dmenu)

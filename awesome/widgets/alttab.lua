@@ -39,8 +39,11 @@ function Alttab:prev()
     self.stack_pointer = (sp == #self.stack and 1 or sp + 1)
 
     local c = self.stack[self.stack_pointer]
-    client.focus = c
-    c:raise()
+
+    if c then
+        client.focus = c
+        c:raise()
+    end
 end
 
 
@@ -49,12 +52,19 @@ function Alttab:next()
     self.stack_pointer = (sp == 1 and #self.stack or sp - 1)
 
     local c = self.stack[self.stack_pointer]
-    client.focus = c
-    c:raise()
+
+    if c then
+        client.focus = c
+        c:raise()
+    end
 end
 
 
 function Alttab:commit()
+    if #self.stack == 0 then
+        return
+    end
+
     table.insert(self.stack, 1, table.remove(self.stack, self.stack_pointer))
     self.stack_pointer = 1
 
@@ -69,12 +79,6 @@ end
 ---------------------------------------
 -- SIGNALS
 ---------------------------------------
-
-tag.connect_signal('request::select', function (t)
-    if not t.alttab then
-        t.alttab = Alttab:new()
-    end
-end)
 
 client.connect_signal('manage', function (c)
     local alttab = Alttab:get()
