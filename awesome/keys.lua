@@ -11,11 +11,7 @@ local Alttab = require('widgets.alttab')
 -- INIT
 ---------------------------------------
 
-local keys = {
-    state = {
-        kb_layout = 1,
-    }
-}
+local keys = {}
 
 local modkey = 'Mod4'
 
@@ -53,26 +49,26 @@ local alttabKeygrabber = awful.keygrabber({
 -- Tagger
 -- ------------------
 
--- local function taggerPrev()
---     awful.screen.focused().tagger:prev() 
--- end
+local function taggerPrev()
+    awful.screen.focused().tagger:prev() 
+end
 
--- local function taggerNext()
---     awful.screen.focused().tagger:next() 
--- end
+local function taggerNext()
+    awful.screen.focused().tagger:next() 
+end
 
--- local taggerKeygrabber = awful.keygrabber({
---     keybindings = {
---         { { modkey }, 'Tab', taggerPrev },
---         { { modkey, 'Shift' }, 'Tab', taggerNext },
---     },
+local taggerKeygrabber = awful.keygrabber({
+    keybindings = {
+        { { modkey }, '[', taggerPrev },
+        { { modkey }, ']', taggerNext },
+    },
 
---     stop_key = modkey,
---     stop_event = 'release',
---     stop_callback = function()
---         awful.screen.focused().tagger:commit()
---     end,
--- })
+    stop_key = modkey,
+    stop_event = 'release',
+    stop_callback = function()
+        awful.screen.focused().tagger:commit()
+    end,
+})
 
 
 ---------------------------------------
@@ -99,19 +95,19 @@ keys.global = gears.table.join(
         end,
     { description = 'start alttab keygrabber, init next' }),
     
-    -- awful.key({ modkey }, 'Tab',
-    --     function() 
-    --         taggerKeygrabber:start()
-    --         taggerPrev()
-    --     end,
-    -- { description = 'start tagger keygrabber, init prev' }),
+    awful.key({ modkey }, '[',
+        function() 
+            taggerKeygrabber:start()
+            taggerPrev()
+        end,
+    { description = 'start tagger keygrabber, init prev' }),
 
-    -- awful.key({ modkey, 'Shift' }, 'Tab',
-    --     function() 
-    --         taggerKeygrabber:start()
-    --         taggerNext()
-    --     end,
-    -- { description = 'start tagger keygrabber, init next' }),
+    awful.key({ modkey }, ']',
+        function() 
+            taggerKeygrabber:start()
+            taggerNext()
+        end,
+    { description = 'start tagger keygrabber, init next' }),
 
     -- ------------------
     -- System
@@ -180,6 +176,16 @@ keys.global = gears.table.join(
             awful.spawn.with_shell([[ xbacklight +6 ]])
         end,
     {description = 'raise brightness'}),
+
+    -- ------------------
+    -- Keyboard
+    -- ------------------
+
+    awful.key({ 'Control' }, ' ', 
+        function()
+            notifier:keyboard()
+        end,
+    {description = 'change keyboard'}),
 
     -- ------------------
     -- Movement
