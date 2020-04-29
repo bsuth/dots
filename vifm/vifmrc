@@ -1,7 +1,7 @@
 " ------------------------------------------------------------------------------
 " -- SETTINGS
 
-" This is the actual command used to start vi.  The default is vim.
+" This is the actual command used to start vi. The default is vim.
 " If you would like to use another vi clone such as Elvis or Vile
 " you will need to change this setting.
 set vicmd=nvim
@@ -132,16 +132,6 @@ nnoremap ,c :write | edit $MYVIFMRC | restart<cr>
 
 " Pdf
 filextype *.pdf zathura %c %i &
-fileviewer *.pdf pdftotext -nopgbrk %c -
-
-" Audio
-filetype *.mp3
-       \ {Play using MPlayer}
-       \ mplayer %f,
-fileviewer *.mp3 mp3info
-
-" Object
-filetype *.o nm %f | less
 
 " Man page
 filetype *.[1-8] man ./%c
@@ -221,4 +211,5 @@ fileviewer *.tar tar -tf %c
 " For Windows:
 " filetype * start, explorer
 
+" rc: /usr/share/vifm/vifmrc
 " vim: filetype=vifm

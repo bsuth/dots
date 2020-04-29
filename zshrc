@@ -88,3 +88,9 @@ alias l='ls -1 --color=auto --group-directories-first'
 alias vi='nvim'
 alias vim='nvim'
 alias wiki='nvim -c :VimwikiIndex'
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/bsuth/tools/google-cloud-sdk/path.zsh.inc' ]; then . '/home/bsuth/tools/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/bsuth/tools/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/bsuth/tools/google-cloud-sdk/completion.zsh.inc'; fi

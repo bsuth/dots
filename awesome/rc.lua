@@ -65,9 +65,9 @@ end
 
 config = os.getenv('DOTS') .. '/awesome'
 
+-- terminal = 'alacritty -e nvim -c \'terminal\''
 terminal = 'alacritty'
 editor = os.getenv('EDITOR') or 'nvim'
-editor_cmd = terminal .. ' -e ' .. editor
 
 awful.layout.layouts = {
     awful.layout.suit.floating

@@ -10,10 +10,10 @@ fi
 export GOPATH="$HOME/.go"
 export PATH="${GOPATH//://bin:}/bin:$PATH"
 
+
 # ----------------------------------------------------
 # ENVIRONMENT
 # ----------------------------------------------------
-
 
 export SHELL="/bin/zsh"
 export EDITOR=nvim
@@ -22,7 +22,6 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export DOTS="$HOME/dots"
 export SCRIPTS_CORE="$DOTS_CORE/scripts"
 
-# fcitx variables
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS="@im=fcitx"
