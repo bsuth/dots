@@ -1,7 +1,7 @@
-local gears = require('gears')
 local awful = require('awful')
-local wibox = require('wibox')
+local gears = require('gears')
 local naughty = require('naughty')
+local wibox = require('wibox')
 
 local notifier = require('widgets.notifier')
 local clientbuffer = require('widgets.clientbuffer')
@@ -14,7 +14,6 @@ local Alttab = require('widgets.alttab')
 local keys = {}
 
 local modkey = 'Mod4'
-
 
 ---------------------------------------
 -- KEYGRABBERS
@@ -45,32 +44,6 @@ local alttabKeygrabber = awful.keygrabber({
     end,
 })
 
--- ------------------
--- Tagger
--- ------------------
-
-local function taggerPrev()
-    awful.screen.focused().tagger:prev() 
-end
-
-local function taggerNext()
-    awful.screen.focused().tagger:next() 
-end
-
-local taggerKeygrabber = awful.keygrabber({
-    keybindings = {
-        { { modkey }, '[', taggerPrev },
-        { { modkey }, ']', taggerNext },
-    },
-
-    stop_key = modkey,
-    stop_event = 'release',
-    stop_callback = function()
-        awful.screen.focused().tagger:commit()
-    end,
-})
-
-
 ---------------------------------------
 -- GLOBAL KEYS
 ---------------------------------------
@@ -95,20 +68,6 @@ keys.global = gears.table.join(
         end,
     { description = 'start alttab keygrabber, init next' }),
     
-    awful.key({ modkey }, '[',
-        function() 
-            taggerKeygrabber:start()
-            taggerPrev()
-        end,
-    { description = 'start tagger keygrabber, init prev' }),
-
-    awful.key({ modkey }, ']',
-        function() 
-            taggerKeygrabber:start()
-            taggerNext()
-        end,
-    { description = 'start tagger keygrabber, init next' }),
-
     -- ------------------
     -- System
     -- ------------------
@@ -267,20 +226,6 @@ keys.global = gears.table.join(
     -- Layout
     -- ------------------
 
-    awful.key({ modkey, 'Shift', 'Control' }, 'j',
-        function()
-            local layout = awful.screen.focused().selected_tag.layout
-            layout.api:incnmaster(-1)
-        end,
-    {description = 'decrement master_count'}),
-
-    awful.key({ modkey, 'Shift', 'Control' }, 'k',
-        function()
-            local layout = awful.screen.focused().selected_tag.layout
-            layout.api:incnmaster(1)
-        end,
-    {description = 'increment master_count'}),
-
     awful.key({ modkey, 'Shift', 'Control' }, 'h',
         function()
             awful.tag.incmwfact(-0.05)
@@ -293,28 +238,18 @@ keys.global = gears.table.join(
         end,
     {description = 'increase master width'}),
 
-    -- ------------------
-    -- Tags
-    -- ------------------
-
-    awful.key({ modkey }, '=',
-        function()
-            awful.screen.focused().tagger:push()
+    awful.key({ modkey }, ',', 
+        function ()
+            awful.layout.inc(1)
         end,
-    {description = 'spawn a new tag'}),
+    {description = 'next layout'}),
 
-    awful.key({ modkey }, '-',
-        function()
-            awful.screen.focused().tagger:pop()
-        end,
-    {description = 'remove a tag'}),
-
-    awful.key({ modkey }, 'n',
+    awful.key({ modkey, 'Shift' }, 'm',
         function()
             clientbuffer:pop()
         end,
     {description = 'restore client'}),
-    
+
     -- ------------------
     -- Spawners
     -- ------------------
@@ -338,6 +273,27 @@ keys.global = gears.table.join(
     {description = 'open browser'})
 )
 
+---------------------------------------
+-- TAG KEYS
+---------------------------------------
+
+for i = 1, 9 do
+    keys.global = gears.table.join(keys.global,
+        awful.key({ modkey }, i,
+            function ()
+                local tag = awful.screen.focused().tags[i]
+                if tag then tag:view_only() end
+            end,
+        {description = 'view tag'}),
+
+        awful.key({ modkey, 'Shift' }, i,
+            function ()
+                local tag = awful.screen.focused().tags[i]
+                if tag then awful.tag.viewtoggle(tag) end
+            end,
+        {description = 'toggle tag'})
+    )
+end
 
 ---------------------------------------
 -- CLIENT KEYS
@@ -371,9 +327,26 @@ keys.client = gears.table.join(
         function(c)
             clientbuffer:push(c)
         end,
-    {description = 'store client'})
-)
+    {description = 'store client'}),
 
+    -- ------------------
+    -- Debugging
+    -- ------------------
+
+    awful.key({ modkey, 'Shift' }, 'i',
+        function(c)
+            local info = { 'name', 'class', 'role' }
+            local msg = ''
+            
+            for i, prop in pairs(info) do
+                msg = string.format('%s%s: %s', msg, prop, c[prop])
+                if i ~= #info then msg = msg .. '\n' end
+            end
+
+            naughty.notify({text = msg })
+        end,
+    {description = 'print client info'})
+)
 
 ---------------------------------------
 -- RETURN

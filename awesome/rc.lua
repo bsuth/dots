@@ -1,31 +1,17 @@
--- Standard awesome library
-local gears = require('gears')
 local awful = require('awful')
-require('awful.autofocus')
-
--- Widget and layout library
+local beautiful = require('beautiful')
+local gears = require('gears')
+local naughty = require('naughty')
 local wibox = require('wibox')
 
--- Keybindings
+local bar = require('bar')
 local keys = require('keys')
-
--- Mouse Bindings
 local mouse = require('mouse')
-
--- Theme handling library
-local beautiful = require('beautiful')
-
--- Notification library
-local naughty = require('naughty')
-local hotkeys_popup = require('awful.hotkeys_popup').widget
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
-require('awful.hotkeys_popup.keys')
-
--- Tag Manager
-local tagger = require('widgets.tagger')
-
+-- require('awful.hotkeys_popup.keys')
+require('awful.autofocus')
 
 ---------------------------------------
 -- ERROR HANDLING
@@ -58,29 +44,27 @@ do
     end)
 end
 
-
 ---------------------------------------
 -- SETTINGS
 ---------------------------------------
-
-config = os.getenv('DOTS') .. '/awesome'
 
 -- terminal = 'alacritty -e nvim -c \'terminal\''
 terminal = 'alacritty'
 editor = os.getenv('EDITOR') or 'nvim'
 
 awful.layout.layouts = {
-    awful.layout.suit.floating
+    awful.layout.suit.tile,
+    awful.layout.suit.magnifier,
+    awful.layout.suit.fair.horizontal,
 }
 
 root.keys(keys.global)
-
 
 ---------------------------------------
 -- THEME
 ---------------------------------------
 
-beautiful.init(config .. '/theme.lua')
+beautiful.init(os.getenv('DOTS') .. '/awesome/theme.lua')
 
 local function set_wallpaper(screen)
     if beautiful.wallpaper then
@@ -91,20 +75,19 @@ end
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
 screen.connect_signal('property::geometry', set_wallpaper)
 
-
 ---------------------------------------
--- SCREENS
+-- SCREEN SETUP
 ---------------------------------------
-
-mykeyboardlayout = awful.widget.keyboardlayout()
-mytextclock = wibox.widget.textclock()
 
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    s.tagger = tagger:new(s)
+    awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
+
+    -- Attach bar
+    bar.attach(s)
 end)
 
 ---------------------------------------
@@ -157,31 +140,27 @@ awful.rules.rules = {
     },
 }
 
-
 ---------------------------------------
 -- SIGNALS
 ---------------------------------------
 
 -- Signal function to execute when a new client appears.
 client.connect_signal('manage', function (c)
-    -- Set the windows at the slave,
-    -- i.e. put it at the end of others instead of setting it master.
-    -- if not awesome.startup then awful.client.setslave(c) end
-
-    if awesome.startup and
-        not c.size_hints.user_position
-        and not c.size_hints.program_position then
+    if awesome.startup then
         -- Prevent clients from being unreachable after screen count changes.
-        awful.placement.no_offscreen(c)
+        if not c.size_hints.user_position and not c.size_hints.program_position then
+            awful.placement.no_offscreen(c)
+        end
+    else
+        -- Set the windows at the slave,
+        -- i.e. put it at the end of others instead of setting it master.
+        awful.client.setslave(c)
     end
 end)
 
--- Focus follows mouse.
-client.connect_signal('mouse::enter', function(c)
-    if awful.layout.get(c.screen) ~= awful.layout.suit.magnifier
-        and awful.client.focus.filter(c) then
-        client.focus = c
-    end
+-- Enable sloppy focus, so that focus follows mouse.
+client.connect_signal("mouse::enter", function(c)
+    c:emit_signal("request::activate", "mouse_enter", {raise = false})
 end)
 
 -- Focus changes border color
