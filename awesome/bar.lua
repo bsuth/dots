@@ -16,7 +16,7 @@ local clock = wibox.widget.textclock()
 -- TAGLIST
 ---------------------------------------
 
-function taglist(widget, is_selected)
+function taglist(screen)
     return awful.widget.taglist({
         screen = screen,
         filter = awful.widget.taglist.filter.all,
@@ -57,7 +57,7 @@ end
 -- BAR
 ---------------------------------------
 
-function bar:attach(screen)
+function bar.attach(screen)
     local wibar = awful.wibar({
         position = 'top',
         screen = screen,
