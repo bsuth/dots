@@ -13,66 +13,81 @@ local kblayout = awful.widget.keyboardlayout()
 local clock = wibox.widget.textclock()
 
 ---------------------------------------
--- GLOBAL BUTTONS
+-- TAGLIST
 ---------------------------------------
 
-function bar.attach(screen)
-    local taglist = awful.widget.taglist({
-        screen  = screen,
-        filter  = awful.widget.taglist.filter.all,
-        layout = {
-            spacing = 12,
-            layout  = wibox.layout.fixed.horizontal,
-        },
+function taglist(widget, is_selected)
+    return awful.widget.taglist({
+        screen = screen,
+        filter = awful.widget.taglist.filter.all,
         widget_template = {
             {
                 {
-                    id     = 'index_role',
+                    id = 'index_role',
                     widget = wibox.widget.textbox,
                 },
-                margins = 6,
-                widget  = wibox.container.margin,
+                margins = 10,
+                widget = wibox.container.margin,
             },
-            bg = '#181818',
-            fg = '#e8e8e8',
-            shape  = gears.shape.circle,
             widget = wibox.container.background,
-            create_callback = function(self, tag, index, tags) --luacheck: no unused args
+
+            -- Set tag widget content and colors
+            create_callback = function(self, tag, index, tags)
                 self:get_children_by_id('index_role')[1].markup = index
-                if tag.selected then
-                    self.fg = '#181818'
-                    self.bg = '#e8e8e8'
-                else
-                    self.fg = '#e8e8e8'
-                    self.bg = '#181818'
-                end
+                taglist_widget_color(self, tag.selected)
             end,
-            update_callback = function(self, tag, index, tags) --luacheck: no unused args
-                if tag.selected then
-                    self.fg = '#181818'
-                    self.bg = '#e8e8e8'
-                else
-                    self.fg = '#e8e8e8'
-                    self.bg = '#181818'
-                end
+            update_callback = function(self, tag, index, tags)
+                taglist_widget_color(self, tag.selected)
             end,
         },
     })
+end
 
+function taglist_widget_color(widget, is_selected)
+    if is_selected then
+        widget.fg = '#000000'
+        widget.bg = '#d8d8d8'
+    else
+        widget.fg = '#d8d8d8'
+        widget.bg = '#000000'
+    end
+end
+
+---------------------------------------
+-- BAR
+---------------------------------------
+
+function bar:attach(screen)
     local wibar = awful.wibar({
         position = 'top',
         screen = screen,
     })
 
     wibar:setup({
-        layout = wibox.layout.flex.horizontal,
-        clock,
-        taglist,
-        { -- Right widgets
-            layout = wibox.layout.fixed.horizontal,
-            kblayout,
-            wibox.widget.systray(),
+        {
+            {
+                clock,
+                layout = wibox.layout.fixed.horizontal,
+            },
+            {
+                -- Center the taglist
+                nil,
+                taglist(screen),
+                nil,
+                expand = 'outside',
+                layout = wibox.layout.align.horizontal,
+            },
+            {
+                kblayout,
+                layout = wibox.layout.fixed.horizontal,
+            },
+            layout = wibox.layout.align.horizontal,
         },
+
+        -- Padding
+        left = 20,
+        right = 20,
+        widget = wibox.container.margin,
     })
 end
 
