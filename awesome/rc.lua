@@ -7,6 +7,8 @@ local wibox = require('wibox')
 local bar = require('bar')
 local keys = require('keys')
 local mouse = require('mouse')
+local layouts = require('layouts')
+require('theme')
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
@@ -53,36 +55,20 @@ terminal = 'alacritty'
 editor = os.getenv('EDITOR') or 'nvim'
 
 awful.layout.layouts = {
+    -- awful.layout.suit.floating,
+    layouts.music,
     awful.layout.suit.tile,
-    awful.layout.suit.magnifier,
-    awful.layout.suit.fair.horizontal,
+    -- awful.layout.suit.magnifier,
+    -- awful.layout.suit.fair.horizontal,
 }
 
 root.keys(keys.global)
-
----------------------------------------
--- THEME
----------------------------------------
-
-beautiful.init(os.getenv('DOTS') .. '/awesome/theme.lua')
-
-local function set_wallpaper(screen)
-    if beautiful.wallpaper then
-        gears.wallpaper.maximized(beautiful.wallpaper, screen, true)
-    end
-end
-
--- Re-set wallpaper when screen geometry changes (e.g. resolution change)
-screen.connect_signal('property::geometry', set_wallpaper)
 
 ---------------------------------------
 -- SCREEN SETUP
 ---------------------------------------
 
 awful.screen.connect_for_each_screen(function(s)
-    -- Wallpaper
-    set_wallpaper(s)
-
     -- Each screen has its own tag table.
     awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
 

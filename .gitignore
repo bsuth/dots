@@ -7,3 +7,9 @@ bundle/
 # vifm
 vifminfo
 vifm-help.txt
+
+# xmonad
+xmonad.hi
+xmonad.errors
+xmonad-x86_64-linux
+xmonad.o

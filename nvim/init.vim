@@ -9,7 +9,6 @@ if empty(glob(plug_install_path))
     exec 'silent !curl -fLo ' . plug_install_path . ' --create-dirs ' . plug_curl_url
 endif
 
-
 " ------------------------------------------------------------------------------
 " PLUGINS
 " ------------------------------------------------------------------------------
@@ -21,16 +20,19 @@ call plug#begin('~/.config/nvim/bundle')
     " IDE
     Plug 'neoclide/coc.nvim', { 'branch': 'release' }
     Plug 'vifm/vifm.vim'
+    Plug 'sheerun/vim-polyglot'
     Plug 'vim-airline/vim-airline'
     Plug 'preservim/nerdtree'
-    Plug 'sheerun/vim-polyglot'
+
+    " VimL LSP
+    Plug 'Shougo/neco-vim'
+    Plug 'neoclide/coc-neco'
 
    " Util
     Plug 'vimwiki/vimwiki'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
 call plug#end()
-
 
 " ------------------------------------------------------------------------------
 " SETTINGS
@@ -93,22 +95,20 @@ let g:airline_highlighting_cache = 1
 
 " Extension List
 call coc#add_extension(
-    \ 'coc-tsserver',
+    \ 'coc-lists',
+    \ 'coc-snippets',
     \ 'coc-html',
+    \ 'coc-emmet',
     \ 'coc-css',
     \ 'coc-json',
-    \ 'coc-vetur'
+    \ 'coc-tsserver',
+    \ 'coc-vetur',
+    \ 'coc-clangd',
+    \ 'coc-lua',
 \ )
-
-" coc: avoid default for diagnostic messages
-" set updatetime=300
-
-" don't give |ins-completion-menu| messages.
-" set shortmess+=c
 
 " Add status line support, for integration with other plugin, checkout `:h coc-status`
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
 
 " ------------------------------------------------------------------------------
 " GENERAL MAPPINGS
@@ -122,41 +122,21 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 nnoremap <leader>/ :nohlsearch<cr><c-l>
 
 " Nvim help
-cnoreabbrev ? tab help
+nnoremap <leader>he :help 
+nnoremap <leader>vhe :vert :help 
 
 " For some reason, vim registers <c-/> as <c-_>
 nnoremap <c-_> :Commentary<cr>
 
-
-" ------------------------------------------------------------------------------
-" MOVEMENT
-" ------------------------------------------------------------------------------
-
-" Pane switching
-nnoremap <c-h> <c-w>h
-nnoremap <c-j> <c-w>j
-nnoremap <c-k> <c-w>k
-nnoremap <c-l> <c-w>l
-nnoremap <leader>w <c-w>
-
-" Buffer switching
-nnoremap <Tab> :bn<cr>
-nnoremap <S-Tab> :bp<cr>
-
-" Buffer actions
-nnoremap <c-w> :bd<cr>
-nnoremap <c-t> :Vifm<cr>
-nnoremap <C-n> :NERDTreeToggle<CR>
-
-" Pane splitting
-nnoremap <leader>term :sp\|:term<cr>
-nnoremap <leader>vterm :vsp\|:term<cr>
-nnoremap <leader>sp :sp\|:Vifm<cr>
-nnoremap <leader>vsp :vsp\|:Vifm<cr>
-
 " Terminal mode back to normal mode
 tnoremap <c-[> <c-\><c-n>
 
+" ------------------------------------------------------------------------------
+" MODULES
+" ------------------------------------------------------------------------------
+
+let MYVIMDIR = fnamemodify(expand($MYVIMRC), ':p:h') .. '/'
+execute 'source ' .. MYVIMDIR .. 'movement.vim'
 
 " -------------------------------------------
 " COC MAPPINGS
@@ -175,6 +155,17 @@ nmap <silent> gr <Plug>(coc-references)
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-rename)
 
+" ------------------------------------------------------------------------------
+" XML AUGROUP
+" 1) Set tabstop
+" 2) Start the terminal in insert mode
+" ------------------------------------------------------------------------------
+
+augroup bsuth-terminal
+    au FileType xml set tabstop=2
+    au FileType xml set softtabstop=2
+    au FileType xml set shiftwidth=2
+augroup END
 
 " ------------------------------------------------------------------------------
 " TERMINAL AUGROUP

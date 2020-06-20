@@ -21,7 +21,6 @@ mouse.global = gears.table.join(
 ---------------------------------------
 
 mouse.client = gears.table.join(
-
     -- ------------------
     -- Move/Resize
     -- ------------------

@@ -4,20 +4,21 @@ local naughty = require('naughty')
 local wibox = require('wibox')
 
 local notifier = require('widgets.notifier')
-local clientbuffer = require('widgets.clientbuffer')
+local Pie = require('widgets.pie_focus')
 local Alttab = require('widgets.alttab')
 
----------------------------------------
--- INIT
----------------------------------------
+--------------------------------------------------------------------------------
+-- INIT/STATE
+--------------------------------------------------------------------------------
 
 local keys = {}
-
 local modkey = 'Mod4'
 
----------------------------------------
+local clientbuffer = {}
+
+--------------------------------------------------------------------------------
 -- KEYGRABBERS
----------------------------------------
+--------------------------------------------------------------------------------
 
 -- ------------------
 -- Alttab
@@ -44,12 +45,35 @@ local alttabKeygrabber = awful.keygrabber({
     end,
 })
 
----------------------------------------
+-- ------------------
+-- Pie Focus
+-- ------------------
+
+local pie = nil
+
+local function showPieFocus()
+    test_screen.fake_resize(800, 0, 1600, 900)
+end
+
+local function hidePieFocus()
+    test_screen.fake_resize(1600, 0, 1600, 900)
+end
+
+local alttabKeygrabber = awful.keygrabber({
+    keybindings = {
+        { { modkey }, 'w', showPieFocus },
+    },
+
+    stop_key = modkey,
+    stop_event = 'release',
+    stop_callback = hidePieFocus
+})
+
+--------------------------------------------------------------------------------
 -- GLOBAL KEYS
----------------------------------------
+--------------------------------------------------------------------------------
 
 keys.global = gears.table.join(
-
     -- ------------------
     -- Keygrabbers
     -- ------------------
@@ -246,7 +270,12 @@ keys.global = gears.table.join(
 
     awful.key({ modkey, 'Shift' }, 'm',
         function()
-            clientbuffer:pop()
+            if #clientbuffer > 0 then
+                local c = table.remove(clientbuffer)
+                c:move_to_tag(awful.screen.focused().selected_tag)
+                c.minimized = false
+                client.focus = c
+            end
         end,
     {description = 'restore client'}),
 
@@ -268,14 +297,14 @@ keys.global = gears.table.join(
 
     awful.key({ modkey }, "'",
         function()
-            awful.spawn('firefox')
+            awful.spawn('qutebrowser')
         end,
     {description = 'open browser'})
 )
 
----------------------------------------
+--------------------------------------------------------------------------------
 -- TAG KEYS
----------------------------------------
+--------------------------------------------------------------------------------
 
 for i = 1, 9 do
     keys.global = gears.table.join(keys.global,
@@ -295,12 +324,11 @@ for i = 1, 9 do
     )
 end
 
----------------------------------------
+--------------------------------------------------------------------------------
 -- CLIENT KEYS
----------------------------------------
+--------------------------------------------------------------------------------
 
 keys.client = gears.table.join(
-
     -- ------------------
     -- System
     -- ------------------
@@ -310,7 +338,6 @@ keys.client = gears.table.join(
             c:kill()
         end,
     {description = 'close client'}),
-
 
     -- ------------------
     -- Layout
@@ -325,31 +352,14 @@ keys.client = gears.table.join(
 
     awful.key({ modkey }, 'm',
         function(c)
-            clientbuffer:push(c)
+            table.insert(clientbuffer, c)
+            c.minimized = true
         end,
-    {description = 'store client'}),
-
-    -- ------------------
-    -- Debugging
-    -- ------------------
-
-    awful.key({ modkey, 'Shift' }, 'i',
-        function(c)
-            local info = { 'name', 'class', 'role' }
-            local msg = ''
-            
-            for i, prop in pairs(info) do
-                msg = string.format('%s%s: %s', msg, prop, c[prop])
-                if i ~= #info then msg = msg .. '\n' end
-            end
-
-            naughty.notify({text = msg })
-        end,
-    {description = 'print client info'})
+    {description = 'store client'})
 )
 
----------------------------------------
+--------------------------------------------------------------------------------
 -- RETURN
----------------------------------------
+--------------------------------------------------------------------------------
 
 return keys

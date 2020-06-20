@@ -1,7 +1,8 @@
+local awful = require('awful')
+local beautiful = require('beautiful')
 local dpi = require('beautiful.xresources').apply_dpi
 local gears = require('gears')
 local naughty = require('naughty')
-local theme_assets = require('beautiful.theme_assets')
 
 ---------------------------------------
 -- COLORSCHEME: ONEDARK
@@ -23,7 +24,7 @@ local light_grey = '#c8ccd4'
 -- THEME
 ---------------------------------------
 
-local theme = {
+beautiful.init({
     font = 'Quicksand Medium 15',
     wallpaper = os.getenv('HOME') .. '/Pictures/cubes.png',
 
@@ -43,7 +44,7 @@ local theme = {
     notification_margin = 15,
     notification_border_width = 5,
     notification_border_color = '#0000',
-}
+})
 
 -- Some notification theme properties don't get overridden by default, so we
 -- have to directly set them here. See defaults here:
@@ -53,7 +54,18 @@ naughty.config.defaults.border_width = dpi(25)
 naughty.config.defaults.position = 'bottom_right'
 
 ---------------------------------------
--- RETURN
+-- WALLPAPER SETUP
 ---------------------------------------
 
-return theme
+local function set_wallpaper(screen)
+    if beautiful.wallpaper then
+        gears.wallpaper.maximized(beautiful.wallpaper, screen, true)
+    end
+end
+
+-- Re-set wallpaper when screen geometry changes (e.g. resolution change)
+screen.connect_signal('property::geometry', set_wallpaper)
+
+awful.screen.connect_for_each_screen(function(s)
+    set_wallpaper(s)
+end)

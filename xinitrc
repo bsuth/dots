@@ -37,4 +37,5 @@ fi
 fcitx &
 udiskie &
 eval $(ssh-agent)
+# exec startplasma-x11
 exec awesome
