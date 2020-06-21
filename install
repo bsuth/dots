@@ -21,17 +21,11 @@ ln -sf "$DOTS/xinitrc" "$HOME/.xinitrc"
 ln -sf "$DOTS/zprofile" "$HOME/.zprofile"
 ln -sf "$DOTS/zshrc" "$HOME/.zshrc"
 
-# -------------------------------------
-# - SXHKD
-# -------------------------------------
-
-ln -sf "$DOTS/sxhkd" "$XDG_CONFIG_HOME/sxhkd"
-
 # ------------------------------------------------------------------------------
 # - AWESOME
 # ------------------------------------------------------------------------------
 
-# ln -sfn "$DOTS/awesome" "$XDG_CONFIG_HOME/awesome"
+ln -sfn "$DOTS/awesome" "$XDG_CONFIG_HOME/awesome"
 
 # ------------------------------------------------------------------------------
 # - NVIM
@@ -54,13 +48,13 @@ ln -sfn "$DOTS/vifm/scripts" "$XDG_CONFIG_HOME/vifm/scripts"
 # - QUTEBROWSER
 # ------------------------------------------------------------------------------
 
-# ln -sfn "$DOTS/qutebrowser" "$XDG_CONFIG_HOME/qutebrowser"
+ln -sfn "$DOTS/qutebrowser" "$XDG_CONFIG_HOME/qutebrowser"
 
 # ------------------------------------------------------------------------------
 # - ROFI
 # ------------------------------------------------------------------------------
 
-# ln -sfn "$DOTS/rofi" "$XDG_CONFIG_HOME/rofi"
+ln -sfn "$DOTS/rofi" "$XDG_CONFIG_HOME/rofi"
 
 # ------------------------------------------------------------------------------
 # - ALACRITTY

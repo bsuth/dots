@@ -6,6 +6,7 @@ local wibox = require('wibox')
 local notifier = require('widgets.notifier')
 local Pie = require('widgets.pie_focus')
 local Alttab = require('widgets.alttab')
+local db = require('dashboard')
 
 --------------------------------------------------------------------------------
 -- INIT/STATE
@@ -286,6 +287,12 @@ keys.global = gears.table.join(
     awful.key({ modkey }, 'd',
         function()
             awful.spawn.with_shell('$DOTS/rofi/scripts/dmenu')
+        end,
+    {description = 'spawn custom dmenu'}),
+
+    awful.key({ modkey, 'Shift' }, 'd',
+        function()
+            db.kg:start()
         end,
     {description = 'spawn custom dmenu'}),
 

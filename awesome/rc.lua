@@ -8,6 +8,7 @@ local bar = require('bar')
 local keys = require('keys')
 local mouse = require('mouse')
 local layouts = require('layouts')
+local db = require('dashboard')
 require('theme')
 
 -- Enable hotkeys help widget for VIM and other apps

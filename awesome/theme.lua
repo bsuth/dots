@@ -8,39 +8,43 @@ local naughty = require('naughty')
 -- COLORSCHEME: ONEDARK
 ---------------------------------------
 
-local black = '#282c34'
-local red = '#e06c75'
-local green = '#98c379'
-local yellow = '#e5c07b'
-local blue = '#61afef'
-local purple = '#c678dd'
-local cyan = '#56b6c2'
-local white = '#abb2bf'
+local colors = {
+    black = '#282c34',
+    red = '#e06c75',
+    green = '#98c379',
+    yellow = '#e5c07b',
+    blue = '#61afef',
+    purple = '#c678dd',
+    cyan = '#56b6c2',
+    white = '#abb2bf',
 
-local dark_grey = '#545862'
-local light_grey = '#c8ccd4'
+    dark_grey = '#545862',
+    light_grey = '#c8ccd4',
+}
 
 ---------------------------------------
 -- THEME
 ---------------------------------------
 
 beautiful.init({
+    colors = colors,
+
     font = 'Quicksand Medium 15',
     wallpaper = os.getenv('HOME') .. '/Pictures/cubes.png',
 
-    fg_normal = white,
-    bg_focus = white,
-    fg_focus = black,
+    fg_normal = colors.white,
+    bg_focus = colors.white,
+    fg_focus = colors.black,
 
     useless_gap = dpi(5),
     border_width = dpi(3),
-    border_normal = red,
-    border_focus = green,
-    border_marked = red,
+    border_normal = colors.red,
+    border_focus = colors.green,
+    border_marked = colors.red,
 
     notification_font = 'Quicksand Medium 15',
     notification_bg = '#181818',
-    notification_fg = purple,
+    notification_fg = colors.purple,
     notification_margin = 15,
     notification_border_width = 5,
     notification_border_color = '#0000',
