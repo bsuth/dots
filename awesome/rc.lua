@@ -58,6 +58,7 @@ editor = os.getenv('EDITOR') or 'nvim'
 awful.layout.layouts = {
     -- awful.layout.suit.floating,
     layouts.music,
+    layouts.dual,
     awful.layout.suit.tile,
     -- awful.layout.suit.magnifier,
     -- awful.layout.suit.fair.horizontal,

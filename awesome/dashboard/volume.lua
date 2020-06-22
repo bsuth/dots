@@ -52,28 +52,58 @@ local volume = wibox.widget({
 
 volume.keys = hkeys.create_keys({
     {{ }, 'j', function() 
-        awful.spawn.spawn('amixer sset -D pulse Master 5%-')
-        vslider.value = vslider.value - 5
+        volume:change_rel(-5)
     end },
     {{ }, 'k', function() 
-        awful.spawn.spawn('amixer sset -D pulse Master 5%+')
-        vslider.value = vslider.value + 5
+        volume:change_rel(5)
     end },
     {{ }, 'd', function() 
-        awful.spawn.spawn('amixer sset -D pulse Master 15%-')
-        vslider.value = vslider.value - 15
+        volume:change_rel(-15)
     end },
     {{ }, 'u', function() 
-        awful.spawn.spawn('amixer sset -D pulse Master 15%+')
-        vslider.value = vslider.value + 15
+        volume:change_rel(15)
     end },
     {{ }, 'Return', function() 
-        awful.spawn.spawn('amixer -D pulse set Master 1+ toggle')
+        volume:mute()
     end },
 })
 
 ---------------------------------------
+-- API
+---------------------------------------
+
+function volume:mute()
+    awful.spawn.spawn('amixer -D pulse set Master 1+ toggle')
+
+    if vslider.pvalue then
+        vslider.value = vslider.pvalue
+        vslider.pvalue = nil
+        vslider.bar_color = beautiful.border_color
+        vslider.handle_color = beautiful.bg_normal
+    else
+        vslider.pvalue = vslider.value
+        vslider.value = 0
+        vslider.bar_color = beautiful.colors.red
+        vslider.handle_color = beautiful.colors.red
+    end
+end
+
+function volume:change_rel(delta)
+    local sign = delta < 0 and '-' or '+'
+    awful.spawn.spawn(string.format('amixer sset -D pulse Master %d%%%s', math.abs(delta), sign))
+    vslider.value = vslider.value + delta
+end
+
+---------------------------------------
 -- RETURN
 ---------------------------------------
+
+local cmd = [[ bash -c "amixer sget -D pulse Master | grep -oE '[0-9]+%' | head --lines 1" ]]
+
+awful.spawn.easy_async(cmd, function(stdout, stderr, exitreason, exitcode)
+    local x = tonumber(string.sub(stdout, 1, -2))
+    naughty.notify({text=tostring(x)})
+    naughty.notify({text=tostring(stdout)})
+end)
 
 return volume

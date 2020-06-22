@@ -4,7 +4,6 @@ local naughty = require('naughty')
 local wibox = require('wibox')
 
 local notifier = require('widgets.notifier')
-local Pie = require('widgets.pie_focus')
 local Alttab = require('widgets.alttab')
 local db = require('dashboard')
 
@@ -44,30 +43,6 @@ local alttabKeygrabber = awful.keygrabber({
     stop_callback = function()
         Alttab:get():commit()
     end,
-})
-
--- ------------------
--- Pie Focus
--- ------------------
-
-local pie = nil
-
-local function showPieFocus()
-    test_screen.fake_resize(800, 0, 1600, 900)
-end
-
-local function hidePieFocus()
-    test_screen.fake_resize(1600, 0, 1600, 900)
-end
-
-local alttabKeygrabber = awful.keygrabber({
-    keybindings = {
-        { { modkey }, 'w', showPieFocus },
-    },
-
-    stop_key = modkey,
-    stop_event = 'release',
-    stop_callback = hidePieFocus
 })
 
 --------------------------------------------------------------------------------
@@ -284,13 +259,13 @@ keys.global = gears.table.join(
     -- Spawners
     -- ------------------
     
-    awful.key({ modkey }, 'd',
+    awful.key({ modkey }, ' ',
         function()
             awful.spawn.with_shell('$DOTS/rofi/scripts/dmenu')
         end,
     {description = 'spawn custom dmenu'}),
 
-    awful.key({ modkey, 'Shift' }, 'd',
+    awful.key({ modkey }, 'd',
         function()
             db.kg:start()
         end,

@@ -1,23 +1,10 @@
-local naughty = require('naughty')
 
 ---------------------------------------
--- INIT
+-- MUSIC LAYOUT
 ---------------------------------------
 
 local music = {
-    name = 'music'
-}
-
-local config = {
-    double = {
-        mplayer = {
-            width = 0.6,
-        },
-    },
-    cava = {
-        width = 0.8,
-        height = 0.3,
-    },
+    name = 'music', -- required!
 }
 
 ---------------------------------------
@@ -37,8 +24,8 @@ local function _arrange_cava(wa)
 end
 
 local function _arrange_one(wa)
-    local pwidth = 0.8
-    local pheight = 0.8
+    local pwidth = 0.9
+    local pheight = 0.9
 
     return {
         x = wa.x + ((1 - pwidth) / 2) * wa.width,
