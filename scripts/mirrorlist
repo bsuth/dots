@@ -1,13 +1,11 @@
 #!/bin/bash
 
-
 # Pacman Mirrorlist Generator
 # ---------------------------
 
 COUNTRY="DE"
 LIST_SIZE=10
 
-# use_mirror_status: ensure mirrors are up to date
 LOCAL_MIRRORLIST="/etc/pacman.d/mirrorlist"
 CURL_PARAMS="country=$COUNTRY&protocol=https&use_mirror_status=on"
 CURL_MIRRORLIST="https://www.archlinux.org/mirrorlist/?$CURL_PARAMS"

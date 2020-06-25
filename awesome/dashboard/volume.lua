@@ -10,19 +10,19 @@ local hkeys = require('helpers.keys')
 -- VOLUME WIDGET
 ---------------------------------------
 
-local vslider = wibox.widget({
-    bar_shape = gears.shape.rounded_rect,
-    bar_height = 3,
-    bar_color = beautiful.border_color,
-
-    handle_color = beautiful.bg_normal,
-    handle_width = 30,
-    handle_shape = gears.shape.circle,
-    handle_border_color = beautiful.border_color,
-    handle_border_width = 1,
+local state = {
     value = 25,
+    pvalue = nil,
+}
 
-    widget = wibox.widget.slider,
+local vprogressbar = wibox.widget({
+    background_color = beautiful.colors.dark_grey,
+    color = beautiful.colors.green,
+
+    value = state.value,
+    max_value = 100,
+
+    widget = wibox.widget.progressbar,
 })
 
 local volume = wibox.widget({
@@ -32,7 +32,7 @@ local volume = wibox.widget({
             widget = wibox.widget.textbox,
         },
         {
-            vslider,
+            vprogressbar,
             direction = 'east',
             widget = wibox.container.rotate,
         },
@@ -75,35 +75,48 @@ volume.keys = hkeys.create_keys({
 function volume:mute()
     awful.spawn.spawn('amixer -D pulse set Master 1+ toggle')
 
-    if vslider.pvalue then
-        vslider.value = vslider.pvalue
-        vslider.pvalue = nil
-        vslider.bar_color = beautiful.border_color
-        vslider.handle_color = beautiful.bg_normal
+    if state.pvalue then
+        state.value = state.pvalue
+        state.pvalue = nil
     else
-        vslider.pvalue = vslider.value
-        vslider.value = 0
-        vslider.bar_color = beautiful.colors.red
-        vslider.handle_color = beautiful.colors.red
+        state.pvalue = state.value
+        state.value = 0
     end
+
+    vprogressbar:set_value(state.value)
 end
 
 function volume:change_rel(delta)
-    local sign = delta < 0 and '-' or '+'
-    awful.spawn.spawn(string.format('amixer sset -D pulse Master %d%%%s', math.abs(delta), sign))
-    vslider.value = vslider.value + delta
+    local sign
+
+    if delta < 0 then
+        sign = '-'
+        delta = math.max(delta, -state.value)
+    else
+        sign = '+'
+        delta = math.min(delta, 100 - state.value)
+    end
+
+    if delta ~= 0 then
+        awful.spawn.spawn(string.format('amixer sset -D pulse Master %d%%%s', math.abs(delta), sign))
+        state.value = state.value + delta
+        vprogressbar:set_value(state.value)
+    end
 end
 
 ---------------------------------------
 -- RETURN
 ---------------------------------------
 
-local cmd = [[ bash -c "amixer sget -D pulse Master | grep -oE '[0-9]+%' | head --lines 1" ]]
+local cmd = [[ bash -c "
+    amixer sget -D pulse Master |
+    grep -oE '[0-9]+%' |
+    head --lines 1
+"]]
 
-awful.spawn.easy_async(cmd, function(stdout, stderr, exitreason, exitcode)
-    local x = tonumber(string.sub(stdout, 1, -2))
-    naughty.notify({text=tostring(x)})
-    naughty.notify({text=tostring(stdout)})
+awful.spawn.easy_async(cmd, function(stdout)
+    state.value = tonumber(string.sub(string.gsub(stdout, '%s+', ''), 1, -2), 10)
+    vprogressbar:set_value(state.value)
 end)
 
 return volume

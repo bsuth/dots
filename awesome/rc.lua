@@ -8,6 +8,7 @@ local bar = require('bar')
 local keys = require('keys')
 local mouse = require('mouse')
 local layouts = require('layouts')
+local tagger = require('tagger')
 local db = require('dashboard')
 require('theme')
 
@@ -56,12 +57,9 @@ terminal = 'alacritty'
 editor = os.getenv('EDITOR') or 'nvim'
 
 awful.layout.layouts = {
-    -- awful.layout.suit.floating,
     layouts.music,
     layouts.dual,
     awful.layout.suit.tile,
-    -- awful.layout.suit.magnifier,
-    -- awful.layout.suit.fair.horizontal,
 }
 
 root.keys(keys.global)
@@ -71,8 +69,10 @@ root.keys(keys.global)
 ---------------------------------------
 
 awful.screen.connect_for_each_screen(function(s)
-    -- Each screen has its own tag table.
-    awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
+    tagger:new(s, {
+        { 'code', 'music' },
+        { 'art', 'web' },
+    })
 
     -- Attach bar
     bar.attach(s)

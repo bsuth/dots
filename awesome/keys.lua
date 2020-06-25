@@ -4,7 +4,6 @@ local naughty = require('naughty')
 local wibox = require('wibox')
 
 local notifier = require('widgets.notifier')
-local Alttab = require('widgets.alttab')
 local db = require('dashboard')
 
 --------------------------------------------------------------------------------
@@ -17,56 +16,10 @@ local modkey = 'Mod4'
 local clientbuffer = {}
 
 --------------------------------------------------------------------------------
--- KEYGRABBERS
---------------------------------------------------------------------------------
-
--- ------------------
--- Alttab
--- ------------------
-
-local function alttabPrev()
-    Alttab:get():prev()
-end
-
-local function alttabNext()
-    Alttab:get():next()
-end
-
-local alttabKeygrabber = awful.keygrabber({
-    keybindings = {
-        { { modkey }, 'Tab', alttabPrev },
-        { { modkey, 'Shift' }, 'Tab', alttabNext },
-    },
-
-    stop_key = modkey,
-    stop_event = 'release',
-    stop_callback = function()
-        Alttab:get():commit()
-    end,
-})
-
---------------------------------------------------------------------------------
 -- GLOBAL KEYS
 --------------------------------------------------------------------------------
 
 keys.global = gears.table.join(
-    -- ------------------
-    -- Keygrabbers
-    -- ------------------
-
-    awful.key({ modkey }, 'Tab',
-        function() 
-            alttabKeygrabber:start()
-            alttabPrev()
-        end,
-    { description = 'start alttab keygrabber, init prev' }),
-
-    awful.key({ modkey, 'Shift' }, 'Tab',
-        function() 
-            alttabKeygrabber:start()
-            alttabNext()
-        end,
-    { description = 'start alttab keygrabber, init next' }),
     
     -- ------------------
     -- System
