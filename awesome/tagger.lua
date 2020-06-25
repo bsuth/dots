@@ -73,6 +73,8 @@ function tagger:new(s, taglayout)
 end
 
 function tagger:viewdir(dir)
+    local wold = self.popup.widget:get_widgets_at(self.y, self.x)[1]
+
     if dir == 'left' and self.x > 1 then
         self.x = self.x - 1
     elseif dir == 'right' and self.x < #self.tags[self.y] then
@@ -85,11 +87,11 @@ function tagger:viewdir(dir)
         return
     end
 
+    local wnew = self.popup.widget:get_widgets_at(self.y, self.x)[1]
+    wold.shape_border_color = beautiful.colors.dark_grey
+    wnew.shape_border_color = beautiful.colors.white
+
     self.tags[self.y][self.x]:view_only()
-    local w = self.popup.widget:get_widgets_at(self.y, self.x)
-    if w ~= nil then
-        w[1].shape_border_color = beautiful.colors.white
-    end
 end
 
 ---------------------------------------
