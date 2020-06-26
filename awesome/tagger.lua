@@ -33,10 +33,10 @@ function tagger:new(s, taglayout)
                 layout = wibox.layout.grid,
             }),
 
+            bg = '#00000000',
             placement = awful.placement.centered,
             ontop = true,
             visible = false,
-            bg = '#000000cc',
         }),
     }
 
@@ -57,17 +57,20 @@ function tagger:new(s, taglayout)
                     widget = wibox.widget.textbox,
                 },
 
+                bg = '#000000ee',
                 shape = gears.shape.rounded_rect,
-                shape_border_width = 2,
+                shape_border_width = 5,
                 shape_border_color = beautiful.colors.dark_grey,
                 widget = wibox.container.background,
             }), i, j, 1, 1)
         end
     end
 
+    w = _tagger.popup.widget:get_widgets_at(_tagger.y, _tagger.x)[1]
+    w.shape_border_color = beautiful.colors.green
     _tagger.tags[1][1]:view_only()
-    s.tagger = _tagger
 
+    s.tagger = _tagger
     setmetatable(_tagger, { __index = self })
     return _tagger
 end
@@ -89,7 +92,7 @@ function tagger:viewdir(dir)
 
     local wnew = self.popup.widget:get_widgets_at(self.y, self.x)[1]
     wold.shape_border_color = beautiful.colors.dark_grey
-    wnew.shape_border_color = beautiful.colors.white
+    wnew.shape_border_color = beautiful.colors.green
 
     self.tags[self.y][self.x]:view_only()
 end
@@ -100,8 +103,11 @@ end
 
 local modkey = 'Mod4'
 
-awful.keygrabber({
+tagger.kg = awful.keygrabber({
     keybindings = {
+        { { modkey }, 'Control_L',function() 
+            awful.screen.focused().tagger.kg:start()
+        end },
         { { modkey, 'Control' }, 'h', function() 
             awful.screen.focused().tagger:viewdir('left')
         end },

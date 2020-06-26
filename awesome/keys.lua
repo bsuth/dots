@@ -25,7 +25,7 @@ keys.global = gears.table.join(
     -- System
     -- ------------------
     
-    awful.key({ modkey, 'Control' }, 'r', 
+    awful.key({ modkey, 'Shift' }, 'r', 
         function()
             awesome.restart()
         end,
