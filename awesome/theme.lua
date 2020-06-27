@@ -58,7 +58,7 @@ naughty.config.defaults.border_width = dpi(25)
 naughty.config.defaults.position = 'bottom_right'
 
 ---------------------------------------
--- WALLPAPER SETUP
+-- WALLPAPER
 ---------------------------------------
 
 local function set_wallpaper(screen)

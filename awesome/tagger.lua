@@ -10,7 +10,7 @@ local wibox = require('wibox')
 local tagger = {}
 
 ---------------------------------------
--- TAGGER API
+-- API
 ---------------------------------------
 
 function tagger:new(s, taglayout)
@@ -39,7 +39,6 @@ function tagger:new(s, taglayout)
             visible = false,
         }),
     }
-
 
     for j, row in ipairs(taglayout) do
         _tagger.tags[j] = _tagger.tags[j] or {}
@@ -98,16 +97,13 @@ function tagger:viewdir(dir)
 end
 
 ---------------------------------------
--- TAGGER KEYGRABBER
+-- KEYGRABBER
 ---------------------------------------
 
 local modkey = 'Mod4'
 
 tagger.kg = awful.keygrabber({
     keybindings = {
-        { { modkey }, 'Control_L',function() 
-            awful.screen.focused().tagger.kg:start()
-        end },
         { { modkey, 'Control' }, 'h', function() 
             awful.screen.focused().tagger:viewdir('left')
         end },
@@ -121,8 +117,6 @@ tagger.kg = awful.keygrabber({
             awful.screen.focused().tagger:viewdir('down')
         end },
     },
-
-    export_keybindings = true,
 
     stop_key = modkey,
     stop_event = 'release',

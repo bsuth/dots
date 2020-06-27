@@ -7,7 +7,7 @@ local wibox = require('wibox')
 local hkeys = require('helpers.keys')
 
 ---------------------------------------
--- VOLUME WIDGET
+-- WIDGET
 ---------------------------------------
 
 local state = {
@@ -51,21 +51,11 @@ local volume = wibox.widget({
 ---------------------------------------
 
 volume.keys = hkeys.create_keys({
-    {{ }, 'j', function() 
-        volume:change_rel(-5)
-    end },
-    {{ }, 'k', function() 
-        volume:change_rel(5)
-    end },
-    {{ }, 'd', function() 
-        volume:change_rel(-15)
-    end },
-    {{ }, 'u', function() 
-        volume:change_rel(15)
-    end },
-    {{ }, 'Return', function() 
-        volume:mute()
-    end },
+    {{ }, 'j', function() volume:change_rel(-5) end },
+    {{ }, 'k', function() volume:change_rel(5) end },
+    {{ }, 'd', function() volume:change_rel(-15) end },
+    {{ }, 'u', function() volume:change_rel(15) end },
+    {{ }, 'Return', function() volume:mute() end },
 })
 
 ---------------------------------------

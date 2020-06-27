@@ -9,7 +9,7 @@ local volume = require('dashboard.volume')
 local brightness = require('dashboard.brightness')
 
 ---------------------------------------
--- DASHBOARD
+-- WIDGET
 ---------------------------------------
 
 local db = awful.popup({
@@ -22,7 +22,6 @@ local db = awful.popup({
         layout = wibox.layout.grid,
     },
 
-    placement = awful.placement.centered,
     ontop = true,
     visible = false,
     bg = '#000000cc',
@@ -32,7 +31,7 @@ db.widget:add_widget_at(volume, 7, 19, 8, 1)
 db.widget:add_widget_at(brightness, 7, 18, 8, 1)
 
 ---------------------------------------
--- DASHBOARD API
+-- API
 ---------------------------------------
 
 function db:focus(w)
@@ -94,7 +93,7 @@ function db:focus_by_direction(dir)
 end
 
 ---------------------------------------
--- DASHBOARD KEYGRABBER
+-- KEYGRABBER
 ---------------------------------------
 
 local modkey = 'Mod4'
@@ -107,11 +106,23 @@ db.kg = awful.keygrabber({
         {{ modkey }, 'l', function() db:focus_by_direction('right') end},
     },
 
-    -- Note that it is using the key name and not the modifier name.
-    stop_key = { modkey, '[' },
     start_callback = function() db:show() end,
     stop_callback = function() db:hide() end,
+
     keypressed_callback = function(self, mods, k)
+        if k == 'bracketleft' and #mods then
+            for _, mod in ipairs(mods) do
+                if mod ~= 'Control' then
+                    goto process_key
+                end
+            end
+
+            db.kg:stop()
+            return
+        end
+
+        ::process_key::
+
         if db.focused_widget.keys then
             hkeys.keypress(db.focused_widget.keys, mods, k)
         end

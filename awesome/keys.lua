@@ -3,8 +3,9 @@ local gears = require('gears')
 local naughty = require('naughty')
 local wibox = require('wibox')
 
-local notifier = require('widgets.notifier')
 local db = require('dashboard')
+local launchpad = require('launchpad')
+local notifier = require('widgets.notifier')
 
 --------------------------------------------------------------------------------
 -- INIT/STATE
@@ -211,18 +212,24 @@ keys.global = gears.table.join(
     -- ------------------
     -- Spawners
     -- ------------------
-    
-    awful.key({ modkey }, ' ',
+
+    awful.key({ modkey }, 'Control_L',
         function()
-            awful.spawn.with_shell('$DOTS/rofi/scripts/dmenu')
+            awful.screen.focused().tagger.kg:start()
+        end,
+    {description = 'spawn tagger'}),
+    
+    awful.key({ modkey }, 'd',
+        function()
+            launchpad:start()
         end,
     {description = 'spawn custom dmenu'}),
 
-    awful.key({ modkey }, 'd',
+    awful.key({ modkey }, ' ',
         function()
             db.kg:start()
         end,
-    {description = 'spawn custom dmenu'}),
+    {description = 'spawn dashboard'}),
 
     awful.key({ modkey }, 'Return',
         function()

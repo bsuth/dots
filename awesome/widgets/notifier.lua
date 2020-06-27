@@ -1,7 +1,7 @@
 local awful = require('awful')
+local beautiful = require('beautiful')
 local gears = require('gears')
 local naughty = require('naughty')
-local theme = require('theme')
 
 ---------------------------------------
 -- INIT
@@ -120,6 +120,11 @@ gears.timer({
             local batteries = string.gmatch(stdout, "%S+");
 
             for battery in batteries do
+                local status = string.gsub(fread(battery .. '/status'), '%s+', '')
+                if status == 'Charging' then
+                    return
+                end
+
                 energy_now = energy_now + tonumber(fread(battery .. '/energy_now'))
                 energy_full = energy_full + tonumber(fread(battery .. '/energy_full'))
             end
@@ -127,8 +132,8 @@ gears.timer({
             if energy_full == 0 then
                 notifier.ids.battery = naughty.notify({
                     text = 'Battery Daemon Error: No batteries found.',
-                    bg = theme.red,
-                    fg = theme.white,
+                    bg = beautiful.colors.red,
+                    fg = beautiful.colors.white,
                     position = 'top_middle',
                     timeout = 0,
                     replaces_id = notifier.ids.battery,
@@ -139,8 +144,8 @@ gears.timer({
                 if battery_percent < 20 then
                     notifier.ids.battery = naughty.notify({
                         text = 'Battery Warning: ' .. tostring(battery_percent) .. '%',
-                        bg = theme.red,
-                        fg = theme.white,
+                        bg = beautiful.colors.red,
+                        fg = beautiful.colors.white,
                         position = 'top_middle',
                         timeout = 0,
                         replaces_id = notifier.ids.battery,
@@ -169,8 +174,8 @@ gears.timer({
             if ram_usage > 90 then
                 notifier.ids.ram = naughty.notify({
                     text = 'RAM Warning: ' .. tostring(ram_usage) .. '%',
-                    bg = theme.red,
-                    fg = theme.white,
+                    bg = beautiful.colors.red,
+                    fg = beautiful.colors.white,
                     position = 'top_middle',
                     timeout = 0,
                     replaces_id = notifier.ids.ram,

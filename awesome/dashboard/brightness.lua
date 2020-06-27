@@ -7,7 +7,7 @@ local wibox = require('wibox')
 local hkeys = require('helpers.keys')
 
 ---------------------------------------
--- BRIGHTNESS WIDGET
+-- WIDGET
 ---------------------------------------
 
 local state = {
