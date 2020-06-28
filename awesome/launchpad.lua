@@ -28,6 +28,9 @@ local apps = {
     gimp = function()
         awful.spawn('gimp')
     end,
+    anki = function()
+        awful.spawn('anki')
+    end,
 }
 
 local app_widgets = {}
@@ -90,8 +93,22 @@ end
 
 local content = wibox.widget({
     filter,
+    {
+        {
+            span_ratio = 0.5,
+            forced_height = 5,
+            thickness = 5,
+            color = beautiful.colors.purple,
+            widget = wibox.widget.separator,
+        },
+
+        bottom = 50,
+        layout = wibox.container.margin,
+    },
     grid,
-    layout = wibox.layout.align.vertical,
+
+    expand = 'outside',
+    layout = wibox.layout.fixed.vertical,
 })
 
 --------------------------------------------------------------------------------
