@@ -30,7 +30,7 @@ beautiful.init({
     colors = colors,
 
     font = 'Quicksand Medium 15',
-    wallpaper = os.getenv('HOME') .. '/Pictures/manjaro.jpg',
+    wallpaper = os.getenv('HOME') .. '/Pictures/spaceship.jpg',
 
     fg_normal = colors.white,
     bg_focus = colors.white,
@@ -38,7 +38,7 @@ beautiful.init({
 
     useless_gap = dpi(5),
     border_width = dpi(3),
-    border_normal = colors.red,
+    border_normal = colors.dark_grey,
     border_focus = colors.green,
     border_marked = colors.red,
 

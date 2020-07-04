@@ -4,7 +4,7 @@ local naughty = require('naughty')
 local wibox = require('wibox')
 
 local db = require('dashboard')
-local launchpad = require('launchpad')
+local dmenu = require('dmenu')
 local notifier = require('widgets.notifier')
 
 --------------------------------------------------------------------------------
@@ -152,25 +152,25 @@ keys.global = gears.table.join(
         end,
     {description = 'swap client right'}),
 
-    awful.key({ modkey, 'Control' }, 'h',
+    awful.key({ modkey, 'Control', 'Shift' }, 'h',
         function()
             awful.screen.focus_bydirection('left')
         end,
     {description = 'focus screen left'}),
 
-    awful.key({ modkey, 'Control' }, 'j',
+    awful.key({ modkey, 'Control', 'Shift' }, 'j',
         function()
             awful.screen.focus_bydirection('down')
         end,
     {description = 'focus screen down'}),
 
-    awful.key({ modkey, 'Control' }, 'k',
+    awful.key({ modkey, 'Control', 'Shift' }, 'k',
         function()
             awful.screen.focus_bydirection('up')
         end,
     {description = 'focus screen up'}),
 
-    awful.key({ modkey, 'Control' }, 'l',
+    awful.key({ modkey, 'Control', 'Shift' }, 'l',
         function()
             awful.screen.focus_bydirection('right')
         end,
@@ -180,17 +180,17 @@ keys.global = gears.table.join(
     -- Layout
     -- ------------------
 
-    awful.key({ modkey, 'Shift', 'Control' }, 'h',
-        function()
-            awful.tag.incmwfact(-0.05)
-        end,
-    {description = 'decrease master width'}),
+    -- awful.key({ modkey, 'Shift', 'Control' }, 'h',
+    --     function()
+    --         awful.tag.incmwfact(-0.05)
+    --     end,
+    -- {description = 'decrease master width'}),
 
-    awful.key({ modkey, 'Shift', 'Control' }, 'l',
-        function()
-            awful.tag.incmwfact(0.05)
-        end,
-    {description = 'increase master width'}),
+    -- awful.key({ modkey, 'Shift', 'Control' }, 'l',
+    --     function()
+    --         awful.tag.incmwfact(0.05)
+    --     end,
+    -- {description = 'increase master width'}),
 
     awful.key({ modkey }, ',', 
         function ()
@@ -221,7 +221,7 @@ keys.global = gears.table.join(
     
     awful.key({ modkey }, 'd',
         function()
-            launchpad:start()
+            dmenu:start()
         end,
     {description = 'spawn custom dmenu'}),
 

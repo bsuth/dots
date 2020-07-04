@@ -16,7 +16,7 @@ function wgrid.grid(args)
     local grid = wibox.widget(args)
 
     -- defaults
-    grid.inactive_color = grid.active_color or beautiful.colors.dark_grey
+    grid.inactive_color = grid.inactive_color or beautiful.colors.dark_grey
     grid.active_color = grid.active_color or beautiful.colors.green
 
     return setmetatable(grid, { __index = wgrid })

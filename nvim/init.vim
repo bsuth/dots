@@ -13,6 +13,8 @@ endif
 " PLUGINS
 " ------------------------------------------------------------------------------
 
+set rtp+=$HOME/projects/vim-platinum
+
 call plug#begin('~/.config/nvim/bundle')
     " Colorscheme
     Plug 'joshdick/onedark.vim'
@@ -32,6 +34,9 @@ call plug#begin('~/.config/nvim/bundle')
     Plug 'vimwiki/vimwiki'
     Plug 'tpope/vim-surround'
     Plug 'tpope/vim-commentary'
+
+    " In-Dev plugins
+    Plug 'file://'.expand('~/projects/vim-platinum')
 call plug#end()
 
 " ------------------------------------------------------------------------------
