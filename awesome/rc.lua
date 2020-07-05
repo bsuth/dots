@@ -52,14 +52,12 @@ end
 -- SETTINGS
 ---------------------------------------
 
--- terminal = 'alacritty -e nvim -c \'terminal\''
-terminal = 'alacritty'
 editor = os.getenv('EDITOR') or 'nvim'
 
 awful.layout.layouts = {
+    awful.layout.suit.tile,
     layouts.music,
     layouts.dual,
-    awful.layout.suit.tile,
 }
 
 root.keys(keys.global)
@@ -70,12 +68,10 @@ root.keys(keys.global)
 
 awful.screen.connect_for_each_screen(function(s)
     tagger:new(s, {
-        { 'code', 'music' },
-        { 'art', 'web' },
+        { '1', '2', '3' },
+        { '4', '5', '6' },
+        { '7', '8', '9' },
     })
-
-    -- Attach bar
-    -- bar.attach(s)
 end)
 
 ---------------------------------------

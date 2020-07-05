@@ -1,7 +1,6 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
-local naughty = require('naughty')
 local wibox = require('wibox')
 
 local wgrid = require('widgets.grid')
@@ -104,7 +103,7 @@ for _, app in ipairs(apps) do
 
         forced_height = 100,
 
-        shape = gears.shape.rounded_rect,
+        shape = gears.shape.rectangle,
         shape_border_width = 5,
         shape_border_color = beautiful.colors.dark_grey,
 

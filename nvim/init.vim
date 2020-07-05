@@ -24,7 +24,6 @@ call plug#begin('~/.config/nvim/bundle')
     Plug 'vifm/vifm.vim'
     Plug 'sheerun/vim-polyglot'
     Plug 'vim-airline/vim-airline'
-    Plug 'preservim/nerdtree'
 
     " VimL LSP
     Plug 'Shougo/neco-vim'

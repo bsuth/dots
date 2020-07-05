@@ -37,10 +37,7 @@ ln -sfn "$DOTS/nvim" "$XDG_CONFIG_HOME/nvim"
 # - VIFM
 # ------------------------------------------------------------------------------
 
-! [[ -d "$XDG_CONFIG_HOME/vifm" ]] && mkdir "$XDG_CONFIG_HOME/vifm"
-ln -sfn "$DOTS/vifm/vifmrc" "$XDG_CONFIG_HOME/vifm/vifmrc"
-ln -sfn "$DOTS/vifm/colors" "$XDG_CONFIG_HOME/vifm/colors"
-ln -sfn "$DOTS/vifm/scripts" "$XDG_CONFIG_HOME/vifm/scripts"
+ln -sfn "$DOTS/vifm" "$XDG_CONFIG_HOME/vifm"
 
 # ------------------------------------------------------------------------------
 # - QUTEBROWSER
@@ -49,16 +46,16 @@ ln -sfn "$DOTS/vifm/scripts" "$XDG_CONFIG_HOME/vifm/scripts"
 ln -sfn "$DOTS/qutebrowser" "$XDG_CONFIG_HOME/qutebrowser"
 
 # ------------------------------------------------------------------------------
-# - ROFI
-# ------------------------------------------------------------------------------
-
-ln -sfn "$DOTS/rofi" "$XDG_CONFIG_HOME/rofi"
-
-# ------------------------------------------------------------------------------
 # - ALACRITTY
 # ------------------------------------------------------------------------------
 
 ln -sfn "$DOTS/alacritty" "$XDG_CONFIG_HOME/alacritty"
+
+# ------------------------------------------------------------------------------
+# - ROFI
+# ------------------------------------------------------------------------------
+
+# ln -sfn "$DOTS/rofi" "$XDG_CONFIG_HOME/rofi"
 
 # ------------------------------------------------------------------------------
 # - MIMELIST
@@ -70,6 +67,4 @@ ln -sfn "$DOTS/alacritty" "$XDG_CONFIG_HOME/alacritty"
 # - SYSTEMD UNITS
 # -------------------------------------
 
-#sudo ln -sf "$DOTS/systemd/slock.service" "/etc/systemd/system/slock.service"
-#sudo systemctl enable slock.service
-#sudo systemctl start slock.service
+sudo ln -sf "$DOTS/services/physlock.service" "/etc/systemd/system/physlock.service"

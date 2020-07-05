@@ -1,14 +1,14 @@
 
 palette = {
-    'black': '#282c34',
+    'black': '#181818',
     'red': '#e06c75',
     'green': '#98c379',
     'yellow': '#d19a66',
     'blue': '#61afef',
     'magenta': '#c678dd',
     'cyan': '#56b6c2',
-    'white': '#e0e0e0',
-    'dark_grey': '#5c6370',
+    'white': '#d0d0d0',
+    'dark_grey': '#282c34',
     'light_grey': '#abb2bf',
 }
 

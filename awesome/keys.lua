@@ -152,25 +152,25 @@ keys.global = gears.table.join(
         end,
     {description = 'swap client right'}),
 
-    awful.key({ modkey, 'Control', 'Shift' }, 'h',
+    awful.key({ modkey, 'Mod1' }, 'h',
         function()
             awful.screen.focus_bydirection('left')
         end,
     {description = 'focus screen left'}),
 
-    awful.key({ modkey, 'Control', 'Shift' }, 'j',
+    awful.key({ modkey, 'Mod1' }, 'j',
         function()
             awful.screen.focus_bydirection('down')
         end,
     {description = 'focus screen down'}),
 
-    awful.key({ modkey, 'Control', 'Shift' }, 'k',
+    awful.key({ modkey, 'Mod1' }, 'k',
         function()
             awful.screen.focus_bydirection('up')
         end,
     {description = 'focus screen up'}),
 
-    awful.key({ modkey, 'Control', 'Shift' }, 'l',
+    awful.key({ modkey, 'Mod1' }, 'l',
         function()
             awful.screen.focus_bydirection('right')
         end,
@@ -180,17 +180,17 @@ keys.global = gears.table.join(
     -- Layout
     -- ------------------
 
-    -- awful.key({ modkey, 'Shift', 'Control' }, 'h',
-    --     function()
-    --         awful.tag.incmwfact(-0.05)
-    --     end,
-    -- {description = 'decrease master width'}),
+    awful.key({ modkey, 'Shift', 'Control' }, 'h',
+        function()
+            awful.tag.incmwfact(-0.05)
+        end,
+    {description = 'decrease master width'}),
 
-    -- awful.key({ modkey, 'Shift', 'Control' }, 'l',
-    --     function()
-    --         awful.tag.incmwfact(0.05)
-    --     end,
-    -- {description = 'increase master width'}),
+    awful.key({ modkey, 'Shift', 'Control' }, 'l',
+        function()
+            awful.tag.incmwfact(0.05)
+        end,
+    {description = 'increase master width'}),
 
     awful.key({ modkey }, ',', 
         function ()
@@ -233,7 +233,7 @@ keys.global = gears.table.join(
 
     awful.key({ modkey }, 'Return',
         function()
-            awful.spawn(terminal)
+            awful.spawn('alacritty')
         end,
     {description = 'open terminal'}),
 

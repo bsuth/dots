@@ -69,7 +69,9 @@ c.content.default_encoding = 'utf-8'
 ## The file `~/.config/qutebrowser/blocked-hosts` is always read if it
 ## exists.
 ## Type: List of Url
-# c.content.host_blocking.lists = ['https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts']
+c.content.host_blocking.lists = [
+    'https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts'
+]
 
 ## A list of patterns that should always be loaded, despite being ad-
 ## blocked. Note this whitelists blocked hosts, not first-party URLs. As
@@ -111,48 +113,9 @@ c.downloads.position = 'bottom'
 ## Type: ShellCommand
 c.editor.command = ['alacritty', '-e', 'nvim', '{}']
 
-## Duration (in milliseconds) to ignore normal-mode key bindings after a
-## successful auto-follow.
-## Type: Int
-# c.hints.auto_follow_timeout = 0
-
 ## Characters used for hint strings.
 ## Type: UniqueCharString
-# c.hints.chars = 'asdfghjkl'
-
-## Mode to use for hints.
-## Type: String
-## Valid values:
-##   - number: Use numeric hints. (In this mode you can also type letters from the hinted element to filter and reduce the number of elements that are hinted.)
-##   - letter: Use the characters in the `hints.chars` setting.
-##   - word: Use hints words based on the html elements and the extra words.
-# c.hints.mode = 'letter'
-
-## Comma-separated list of regular expressions to use for 'next' links.
-## Type: List of Regex
-# c.hints.next_regexes = ['\\bnext\\b', '\\bmore\\b', '\\bnewer\\b', '\\b[>→≫]\\b', '\\b(>>|»)\\b', '\\bcontinue\\b']
-
-## Comma-separated list of regular expressions to use for 'prev' links.
-## Type: List of Regex
-# c.hints.prev_regexes = ['\\bprev(ious)?\\b', '\\bback\\b', '\\bolder\\b', '\\b[<←≪]\\b', '\\b(<<|«)\\b']
-
-## CSS selectors used to determine which elements on a page should have
-## hints.
-## Type: Dict
-# c.hints.selectors = {'all': ['a', 'area', 'textarea', 'select', 'input:not([type="hidden"])', 'button', 'frame', 'iframe', 'img', 'link', 'summary', '[onclick]', '[onmousedown]', '[role="link"]', '[role="option"]', '[role="button"]', '[ng-click]', '[ngClick]', '[data-ng-click]', '[x-ng-click]', '[tabindex]'], 'links': ['a[href]', 'area[href]', 'link[href]', '[role="link"][href]'], 'images': ['img'], 'media': ['audio', 'img', 'video'], 'url': ['[src]', '[href]'], 'inputs': ['input[type="text"]', 'input[type="date"]', 'input[type="datetime-local"]', 'input[type="email"]', 'input[type="month"]', 'input[type="number"]', 'input[type="password"]', 'input[type="search"]', 'input[type="tel"]', 'input[type="time"]', 'input[type="url"]', 'input[type="week"]', 'input:not([type])', 'textarea']}
-
-## Which unbound keys to forward to the webview in normal mode.
-## Type: String
-## Valid values:
-##   - all: Forward all unbound keys.
-##   - auto: Forward unbound non-alphanumeric keys.
-##   - none: Don't forward any keys.
-# c.input.forward_unbound_keys = 'auto'
-
-## Automatically enter insert mode if an editable element is focused
-## after loading the page.
-## Type: Bool
-c.input.insert_mode.auto_load = True
+c.hints.chars = 'sdfjkl'
 
 ## Timeout (in milliseconds) for partially typed key bindings. If the
 ## current input forms only partial matches, the keystring will be
@@ -171,31 +134,12 @@ c.input.partial_timeout = 0
 ##   - tab-silent: Open a new tab in the existing window without activating the window.
 ##   - tab-bg-silent: Open a new background tab in the existing window without activating the window.
 ##   - window: Open in a new window.
-# c.new_instance_open_target = 'tab'
-
-## Which window to choose when opening links as new tabs. When
-## `new_instance_open_target` is set to `window`, this is ignored.
-## Type: String
-## Valid values:
-##   - first-opened: Open new tabs in the first (oldest) opened window.
-##   - last-opened: Open new tabs in the last (newest) opened window.
-##   - last-focused: Open new tabs in the most recently focused window.
-##   - last-visible: Open new tabs in the most recently visible window.
-# c.new_instance_open_target_window = 'last-focused'
+c.new_instance_open_target = 'window'
 
 ## Name of the session to save by default. If this is set to null, the
 ## session which was last loaded is saved.
 ## Type: SessionName
 # c.session.default_name = None
-
-## Languages to use for spell checking. You can check for available
-## languages and install dictionaries using scripts/dictcli.py. Run the
-## script with -h/--help for instructions.
-## Type: List of String
-## Valid values:
-##   - de-DE: German (Germany)
-##   - en-US: English (United States)
-# c.spellcheck.languages = []
 
 ## List of widgets displayed in the statusbar.
 ## Type: List of String
@@ -207,7 +151,7 @@ c.input.partial_timeout = 0
 ##   - tabs: Current active tab, e.g. `2`.
 ##   - keypress: Display pressed keys when composing a vi command.
 ##   - progress: Progress bar for the current page loading.
-# c.statusbar.widgets = ['keypress', 'url', 'scroll', 'history', 'tabs', 'progress']
+c.statusbar.widgets = ['keypress', 'progress', 'url', 'scroll', 'history']
 
 # ------------------------------------------------------------------------------
 # TABS

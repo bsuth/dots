@@ -3,6 +3,8 @@ local beautiful = require('beautiful')
 local gears = require('gears')
 local wibox = require('wibox')
 
+local wgrid = require('widgets.grid')
+
 ---------------------------------------
 -- TAGGER
 ---------------------------------------
@@ -18,27 +20,36 @@ function tagger:new(s, taglayout)
         x = 1,
         y = 1,
         tags = {},
-        popup = awful.popup({
-            widget = wibox.widget({
-                forced_width = 200 * #taglayout[1],
-                forced_height = 200 * #taglayout,
-
-                forced_num_rows = #taglayout,
-                forced_num_cols= #taglayout[1],
-
-                spacing = 10,
-                expand = true,
-                homogeneous = true,
-
-                layout = wibox.layout.grid,
-            }),
-
-            bg = '#00000000',
-            placement = awful.placement.centered,
-            ontop = true,
-            visible = false,
-        }),
     }
+
+    _tagger.grid = wgrid.grid({
+        forced_width = 150 * #taglayout[1],
+        forced_height = 150 * #taglayout,
+
+        forced_num_rows = #taglayout,
+        forced_num_cols= #taglayout[1],
+
+        spacing = 10,
+        expand = true,
+        homogeneous = true,
+    })
+
+    _tagger.popup = awful.popup({
+        widget = {
+            _tagger.grid,
+            valign = 'center',
+            halign = 'center',
+            widget = wibox.container.place,
+        },
+
+        bg = '#000000e8',
+        placement = awful.placement.centered,
+        ontop = true,
+        visible = false,
+        screen = s,
+        minimum_width = s.geometry.width,
+        minimum_height = s.geometry.height,
+    })
 
     for j, row in ipairs(taglayout) do
         _tagger.tags[j] = _tagger.tags[j] or {}
@@ -48,7 +59,7 @@ function tagger:new(s, taglayout)
                 layout = awful.layout.layouts[1],
             })
 
-            _tagger.popup.widget:add_widget_at(wibox.widget({
+            _tagger.grid:add_widget_at(wibox.widget({
                 {
                     markup = tagname,
                     align  = 'center',
@@ -56,16 +67,15 @@ function tagger:new(s, taglayout)
                     widget = wibox.widget.textbox,
                 },
 
-                bg = '#000000ee',
-                shape = gears.shape.rounded_rect,
+                shape = gears.shape.rectangle,
                 shape_border_width = 5,
                 shape_border_color = beautiful.colors.dark_grey,
                 widget = wibox.container.background,
-            }), i, j, 1, 1)
+            }), j, i, 1, 1)
         end
     end
 
-    w = _tagger.popup.widget:get_widgets_at(_tagger.y, _tagger.x)[1]
+    w = _tagger.grid:get_widgets_at(_tagger.y, _tagger.x)[1]
     w.shape_border_color = beautiful.colors.green
     _tagger.tags[1][1]:view_only()
 
@@ -75,25 +85,9 @@ function tagger:new(s, taglayout)
 end
 
 function tagger:viewdir(dir)
-    local wold = self.popup.widget:get_widgets_at(self.y, self.x)[1]
-
-    if dir == 'left' and self.x > 1 then
-        self.x = self.x - 1
-    elseif dir == 'right' and self.x < #self.tags[self.y] then
-        self.x = self.x + 1
-    elseif dir == 'up' and self.y > 1 then
-        self.y = self.y - 1
-    elseif dir == 'down' and self.y < #self.tags then
-        self.y = self.y + 1
-    else
-        return
-    end
-
-    local wnew = self.popup.widget:get_widgets_at(self.y, self.x)[1]
-    wold.shape_border_color = beautiful.colors.dark_grey
-    wnew.shape_border_color = beautiful.colors.green
-
-    self.tags[self.y][self.x]:view_only()
+    self.grid:focus_by_direction(dir)
+    local wpos = self.grid:get_widget_position(self.grid.focused_widget)
+    self.tags[wpos.row][wpos.col]:view_only()
 end
 
 ---------------------------------------

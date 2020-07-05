@@ -7,7 +7,7 @@ if [ -d "$HOME/.local/bin" ]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
 
-export PATH="${GOPATH//://bin:}/bin:$PATH"
+export PATH="$DOTS/scripts:$PATH"
 
 # ----------------------------------------------------
 # ENVIRONMENT
