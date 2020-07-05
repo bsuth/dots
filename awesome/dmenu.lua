@@ -48,9 +48,21 @@ local apps = {
         end,
     },
     {
+        alias = 'poweroff',
+        callback = function()
+            awful.spawn('poweroff')
+        end,
+    },
+    {
         alias = 'qutebrowser',
         callback = function()
             awful.spawn('qutebrowser')
+        end,
+    },
+    {
+        alias = 'sleep',
+        callback = function()
+            awful.spawn('systemctl suspend')
         end,
     },
 }

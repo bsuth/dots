@@ -30,7 +30,7 @@ beautiful.init({
     colors = colors,
 
     font = 'Quicksand Medium 15',
-    wallpaper = os.getenv('HOME') .. '/Pictures/spaceship.jpg',
+    wallpaper = os.getenv('HOME') .. '/Pictures/arch.png',
 
     fg_normal = colors.white,
     bg_focus = colors.white,

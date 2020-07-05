@@ -1,4 +1,3 @@
-
 # nvim
 autoload/
 bundle/
@@ -10,3 +9,5 @@ vifm-help.txt
 
 # qutebrowser
 __pycache__
+qsettings
+autoconfig.yml

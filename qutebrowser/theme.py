@@ -1,26 +1,21 @@
 def apply(c):
+    tabs(c)
+    statusbar(c)
+    prompt(c)
+    completion(c)
+    hints(c)
     _apply_colors(c)
+    _apply_fonts(c)
 
-def _apply_tab_theme(c):
-    ## Padding (in pixels) for tab indicators.
-    ## Type: Padding
-    c.tabs.indicator.padding = {'top': 2, 'bottom': 2, 'left': 0, 'right': 4}
 
+def tabs(c):
     ## Width (in pixels) of the progress indicator (0 to disable).
     ## Type: Int
     c.tabs.indicator.width = 0
 
     ## Padding (in pixels) around text for tabs.
     ## Type: Padding
-    # c.tabs.padding = {'top': 0, 'bottom': 0, 'left': 5, 'right': 5}
-
-    ## Alignment of the text inside of tabs.
-    ## Type: TextAlignment
-    ## Valid values:
-    ##   - left
-    ##   - right
-    ##   - center
-    # c.tabs.title.alignment = 'left'
+    c.tabs.padding = {'top': 5, 'bottom': 5, 'left': 5, 'right': 5}
 
     ## Format to use for the tab title. The following placeholders are
     ## defined:  * `{perc}`: Percentage as a string like `[10%]`. *
@@ -34,38 +29,92 @@ def _apply_tab_theme(c):
     ## `{protocol}`: Protocol (http/https/...) of the current web page. *
     ## `{audio}`: Indicator for audio/mute status.
     ## Type: FormatString
-    # c.tabs.title.format = '{audio}{index}: {current_title}'
+    c.tabs.title.format = '{audio} {current_title}'
 
-    ## Format to use for the tab title for pinned tabs. The same placeholders
-    ## like for `tabs.title.format` are defined.
-    ## Type: FormatString
-    # c.tabs.title.format_pinned = '{index}'
+    ## Background color of the tab bar.
+    ## Type: QssColor
+    c.colors.tabs.bar.bg = '#181818'
+
+    ## Background color of unselected even tabs.
+    ## Type: QtColor
+    c.colors.tabs.even.bg = '#383838'
+
+    ## Background color of unselected odd tabs.
+    ## Type: QtColor
+    c.colors.tabs.odd.bg = '#383838'
+
+    ## Background color of selected even tabs.
+    ## Type: QtColor
+    c.colors.tabs.selected.even.bg = '#181818'
+
+    ## Background color of selected odd tabs.
+    ## Type: QtColor
+    c.colors.tabs.selected.odd.bg = '#181818'
 
 
-def _apply_statusbar_theme(c):
+def statusbar(c):
     ## Padding (in pixels) for the statusbar.
     ## Type: Padding
-    c.statusbar.padding = {'top': 1, 'bottom': 1, 'left': 0, 'right': 0}
+    c.statusbar.padding = {'top': 5, 'bottom': 5, 'left': 5, 'right': 5}
 
-def _apply_prompt_theme(c):
+    ## Background color of the statusbar in caret mode.
+    ## Type: QssColor
+    # c.colors.statusbar.caret.bg = 'purple'
+
+    ## Foreground color of the statusbar in caret mode.
+    ## Type: QssColor
+    # c.colors.statusbar.caret.fg = 'white'
+
+    ## Background color of the statusbar in caret mode with a selection.
+    ## Type: QssColor
+    # c.colors.statusbar.caret.selection.bg = '#a12df'
+
+    # Default foreground color of the URL in the statusbar.
+    ## Type: QssColor
+    # c.colors.statusbar.url.fg = 'white'
+
+    ## Foreground color of the URL in the statusbar for hovered links.
+    ## Type: QssColor
+    # c.colors.statusbar.url.hover.fg = 'aqua'
+
+    ## Foreground color of the URL in the statusbar on successful load
+    ## (http).
+    ## Type: QssColor
+    # c.colors.statusbar.url.success.http.fg = 'white'
+
+    ## Foreground color of the URL in the statusbar on successful load
+    ## (https).
+    ## Type: QssColor
+    # c.colors.statusbar.url.success.https.fg = 'lime'
+
+    ## Foreground color of the URL in the statusbar when there's a warning.
+    ## Type: QssColor
+    # c.colors.statusbar.url.warn.fg = 'yellow'
+
+
+def prompt(c):
     ## Rounding radius (in pixels) for the edges of prompts.
     ## Type: Int
     c.prompt.radius = 8
 
-def _apply_hint_theme(c):
-    ## CSS border value for hints.
+    ## Background color for prompts.
+    ## Type: QssColor
+    # c.colors.prompts.bg = '#444444'
+
+    ## Border used around UI elements in prompts.
     ## Type: String
-    c.hints.border = '1px solid #E3BE23'
+    # c.colors.prompts.border = '1px solid gray'
 
-    ## Padding (in pixels) for hints.
-    ## Type: Padding
-    # c.hints.padding = {'top': 0, 'bottom': 0, 'left': 3, 'right': 3}
+    ## Foreground color for prompts.
+    ## Type: QssColor
+    # c.colors.prompts.fg = 'white'
 
-    ## Rounding radius (in pixels) for the edges of hints.
-    ## Type: Int
-    # c.hints.radius = 3
+    ## Background color for the selected item in filename prompts.
+    ## Type: QssColor
+    # c.colors.prompts.selected.bg = 'grey'
 
-def _apply_colors(c):
+
+def completion(c):
     ## Background color of the completion widget category headers.
     ## Type: QssColor
     c.colors.completion.category.bg = 'qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #888888, stop:1 #1d1f21)'
@@ -127,10 +176,36 @@ def _apply_colors(c):
     ## Type: QssColor
     # c.colors.completion.scrollbar.fg = 'white'
 
+
+def hints(c):
+    ## CSS border value for hints.
+    ## Type: String
+    c.hints.border = '2px solid #181818'
+
+    ## Rounding radius (in pixels) for the edges of hints.
+    ## Type: Int
+    c.hints.radius = 0
+
+    ## Background color for hints. Note that you can use a `rgba(...)` value
+    ## for transparency.
+    ## Type: QssColor
+    # c.colors.hints.bg = 'qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 247, 133, 0.8), stop:1 rgba(255, 197, 66, 0.8))'
+    c.colors.hints.bg = '#e0e0e0'
+
+    ## Font color for hints.
+    ## Type: QssColor
+    c.colors.hints.fg = '#181818'
+
+    ## Font color for the matched part of hints.
+    ## Type: QtColor
+    # c.colors.hints.match.fg = 'green'
+
+
+def _apply_colors(c):
     ## Background color of disabled items in the context menu. If set to
     ## null, the Qt default is used.
     ## Type: QssColor
-    # c.colors.contextmenu.disabled.bg = None
+    c.colors.contextmenu.disabled.bg = None
 
     ## Foreground color of disabled items in the context menu. If set to
     ## null, the Qt default is used.
@@ -203,19 +278,6 @@ def _apply_colors(c):
     ##   - none: Don't show a gradient.
     # c.colors.downloads.system.fg = 'rgb'
 
-    ## Background color for hints. Note that you can use a `rgba(...)` value
-    ## for transparency.
-    ## Type: QssColor
-    # c.colors.hints.bg = 'qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgba(255, 247, 133, 0.8), stop:1 rgba(255, 197, 66, 0.8))'
-
-    ## Font color for hints.
-    ## Type: QssColor
-    # c.colors.hints.fg = 'black'
-
-    ## Font color for the matched part of hints.
-    ## Type: QtColor
-    # c.colors.hints.match.fg = 'green'
-
     ## Background color of the keyhint widget.
     ## Type: QssColor
     # c.colors.keyhint.bg = 'rgba(0, 0, 0, 80%)'
@@ -264,209 +326,10 @@ def _apply_colors(c):
     ## Type: QssColor
     # c.colors.messages.warning.fg = 'white'
 
-    ## Background color for prompts.
-    ## Type: QssColor
-    # c.colors.prompts.bg = '#444444'
-
-    ## Border used around UI elements in prompts.
-    ## Type: String
-    # c.colors.prompts.border = '1px solid gray'
-
-    ## Foreground color for prompts.
-    ## Type: QssColor
-    # c.colors.prompts.fg = 'white'
-
-    ## Background color for the selected item in filename prompts.
-    ## Type: QssColor
-    # c.colors.prompts.selected.bg = 'grey'
-
-    ## Background color of the statusbar in caret mode.
-    ## Type: QssColor
-    # c.colors.statusbar.caret.bg = 'purple'
-
-    ## Foreground color of the statusbar in caret mode.
-    ## Type: QssColor
-    # c.colors.statusbar.caret.fg = 'white'
-
-    ## Background color of the statusbar in caret mode with a selection.
-    ## Type: QssColor
-    # c.colors.statusbar.caret.selection.bg = '#a12dff'
-
-    ## Foreground color of the statusbar in caret mode with a selection.
-    ## Type: QssColor
-    # c.colors.statusbar.caret.selection.fg = 'white'
-
-    ## Background color of the statusbar in command mode.
-    ## Type: QssColor
-    # c.colors.statusbar.command.bg = 'black'
-
-    ## Foreground color of the statusbar in command mode.
-    ## Type: QssColor
-    # c.colors.statusbar.command.fg = 'white'
-
-    ## Background color of the statusbar in private browsing + command mode.
-    ## Type: QssColor
-    # c.colors.statusbar.command.private.bg = 'darkslategray'
-
-    ## Foreground color of the statusbar in private browsing + command mode.
-    ## Type: QssColor
-    # c.colors.statusbar.command.private.fg = 'white'
-
-    ## Background color of the statusbar in insert mode.
-    ## Type: QssColor
-    # c.colors.statusbar.insert.bg = 'darkgreen'
-
-    ## Foreground color of the statusbar in insert mode.
-    ## Type: QssColor
-    # c.colors.statusbar.insert.fg = 'white'
-
-    ## Background color of the statusbar.
-    ## Type: QssColor
-    # c.colors.statusbar.normal.bg = 'black'
-
-    ## Foreground color of the statusbar.
-    ## Type: QssColor
-    # c.colors.statusbar.normal.fg = 'white'
-
-    ## Background color of the statusbar in passthrough mode.
-    ## Type: QssColor
-    # c.colors.statusbar.passthrough.bg = 'darkblue'
-
-    ## Foreground color of the statusbar in passthrough mode.
-    ## Type: QssColor
-    # c.colors.statusbar.passthrough.fg = 'white'
-
-    ## Background color of the statusbar in private browsing mode.
-    ## Type: QssColor
-    # c.colors.statusbar.private.bg = '#666666'
-
-    ## Foreground color of the statusbar in private browsing mode.
-    ## Type: QssColor
-    # c.colors.statusbar.private.fg = 'white'
-
-    ## Background color of the progress bar.
-    ## Type: QssColor
-    # c.colors.statusbar.progress.bg = 'white'
-
-    ## Foreground color of the URL in the statusbar on error.
-    ## Type: QssColor
-    # c.colors.statusbar.url.error.fg = 'orange'
-
-    ## Default foreground color of the URL in the statusbar.
-    ## Type: QssColor
-    # c.colors.statusbar.url.fg = 'white'
-
-    ## Foreground color of the URL in the statusbar for hovered links.
-    ## Type: QssColor
-    # c.colors.statusbar.url.hover.fg = 'aqua'
-
-    ## Foreground color of the URL in the statusbar on successful load
-    ## (http).
-    ## Type: QssColor
-    # c.colors.statusbar.url.success.http.fg = 'white'
-
-    ## Foreground color of the URL in the statusbar on successful load
-    ## (https).
-    ## Type: QssColor
-    # c.colors.statusbar.url.success.https.fg = 'lime'
-
-    ## Foreground color of the URL in the statusbar when there's a warning.
-    ## Type: QssColor
-    # c.colors.statusbar.url.warn.fg = 'yellow'
-
-    ## Background color of the tab bar.
-    ## Type: QssColor
-    # c.colors.tabs.bar.bg = '#555555'
-
-    ## Background color of unselected even tabs.
-    ## Type: QtColor
-    # c.colors.tabs.even.bg = 'darkgrey'
-
-    ## Foreground color of unselected even tabs.
-    ## Type: QtColor
-    # c.colors.tabs.even.fg = 'white'
-
-    ## Color for the tab indicator on errors.
-    ## Type: QtColor
-    # c.colors.tabs.indicator.error = '#ff0000'
-
-    ## Color gradient start for the tab indicator.
-    ## Type: QtColor
-    # c.colors.tabs.indicator.start = '#0000aa'
-
-    ## Color gradient end for the tab indicator.
-    ## Type: QtColor
-    # c.colors.tabs.indicator.stop = '#00aa00'
-
-    ## Color gradient interpolation system for the tab indicator.
-    ## Type: ColorSystem
-    ## Valid values:
-    ##   - rgb: Interpolate in the RGB color system.
-    ##   - hsv: Interpolate in the HSV color system.
-    ##   - hsl: Interpolate in the HSL color system.
-    ##   - none: Don't show a gradient.
-    # c.colors.tabs.indicator.system = 'rgb'
-
-    ## Background color of unselected odd tabs.
-    ## Type: QtColor
-    # c.colors.tabs.odd.bg = 'grey'
-
-    ## Foreground color of unselected odd tabs.
-    ## Type: QtColor
-    # c.colors.tabs.odd.fg = 'white'
-
-    ## Background color of pinned unselected even tabs.
-    ## Type: QtColor
-    # c.colors.tabs.pinned.even.bg = 'darkseagreen'
-
-    ## Foreground color of pinned unselected even tabs.
-    ## Type: QtColor
-    # c.colors.tabs.pinned.even.fg = 'white'
-
-    ## Background color of pinned unselected odd tabs.
-    ## Type: QtColor
-    # c.colors.tabs.pinned.odd.bg = 'seagreen'
-
-    ## Foreground color of pinned unselected odd tabs.
-    ## Type: QtColor
-    # c.colors.tabs.pinned.odd.fg = 'white'
-
-    ## Background color of pinned selected even tabs.
-    ## Type: QtColor
-    # c.colors.tabs.pinned.selected.even.bg = 'black'
-
-    ## Foreground color of pinned selected even tabs.
-    ## Type: QtColor
-    # c.colors.tabs.pinned.selected.even.fg = 'white'
-
-    ## Background color of pinned selected odd tabs.
-    ## Type: QtColor
-    # c.colors.tabs.pinned.selected.odd.bg = 'black'
-
-    ## Foreground color of pinned selected odd tabs.
-    ## Type: QtColor
-    # c.colors.tabs.pinned.selected.odd.fg = 'white'
-
-    ## Background color of selected even tabs.
-    ## Type: QtColor
-    # c.colors.tabs.selected.even.bg = 'black'
-
-    ## Foreground color of selected even tabs.
-    ## Type: QtColor
-    # c.colors.tabs.selected.even.fg = 'white'
-
-    ## Background color of selected odd tabs.
-    ## Type: QtColor
-    # c.colors.tabs.selected.odd.bg = 'black'
-
-    ## Foreground color of selected odd tabs.
-    ## Type: QtColor
-    # c.colors.tabs.selected.odd.fg = 'white'
-
     ## Background color for webpages if unset (or empty to use the theme's
     ## color).
     ## Type: QtColor
-    # c.colors.webpage.bg = 'white'
+    c.colors.webpage.bg = '#181818'
 
     ## Which algorithm to use for modifying how colors are rendered with
     ## darkmode.
@@ -554,18 +417,10 @@ def _apply_fonts(c):
     ## Type: Font
     c.fonts.completion.category = 'bold default_size default_family'
 
-    ## Font used in the completion widget.
-    ## Type: Font
-    # c.fonts.completion.entry = 'default_size default_family'
-
     ## Font used for the context menu. If set to null, the Qt default is
     ## used.
     ## Type: Font
     # c.fonts.contextmenu = None
-
-    ## Font used for the debugging console.
-    ## Type: QtFont
-    # c.fonts.debug_console = 'default_size default_family'
 
     ## Default font families to use. Whenever "default_family" is used in a
     ## font setting, it's replaced with the fonts listed here. If set to an
@@ -579,42 +434,6 @@ def _apply_fonts(c):
     ## "px" suffix.
     ## Type: String
     # c.fonts.default_size = '10pt'
-
-    ## Font used for the downloadbar.
-    ## Type: Font
-    # c.fonts.downloads = 'default_size default_family'
-
-    ## Font used for the hints.
-    ## Type: Font
-    # c.fonts.hints = 'bold default_size default_family'
-
-    ## Font used in the keyhint widget.
-    ## Type: Font
-    # c.fonts.keyhint = 'default_size default_family'
-
-    ## Font used for error messages.
-    ## Type: Font
-    # c.fonts.messages.error = 'default_size default_family'
-
-    ## Font used for info messages.
-    ## Type: Font
-    # c.fonts.messages.info = 'default_size default_family'
-
-    ## Font used for warning messages.
-    ## Type: Font
-    # c.fonts.messages.warning = 'default_size default_family'
-
-    ## Font used for prompts.
-    ## Type: Font
-    # c.fonts.prompts = 'default_size sans-serif'
-
-    ## Font used in the statusbar.
-    ## Type: Font
-    # c.fonts.statusbar = 'default_size default_family'
-
-    ## Font used in the tab bar.
-    ## Type: QtFont
-    # c.fonts.tabs = 'default_size default_family'
 
     ## Font family for cursive fonts.
     ## Type: FontFamily

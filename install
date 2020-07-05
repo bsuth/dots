@@ -31,9 +31,7 @@ ln -sfn "$DOTS/awesome" "$XDG_CONFIG_HOME/awesome"
 # - NVIM
 # ------------------------------------------------------------------------------
 
-! [[ -d "$XDG_CONFIG_HOME/nvim" ]] && mkdir "$XDG_CONFIG_HOME/nvim"
-ln -sfn "$DOTS/nvim/init.vim" "$XDG_CONFIG_HOME/nvim/init.vim"
-ln -sfn "$DOTS/nvim/movement.vim" "$XDG_CONFIG_HOME/nvim/movement.vim"
+ln -sfn "$DOTS/nvim" "$XDG_CONFIG_HOME/nvim"
 
 # ------------------------------------------------------------------------------
 # - VIFM
