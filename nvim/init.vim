@@ -1,42 +1,7 @@
-" ------------------------------------------------------------------------------
-" AUTOINSTALL VIM-PLUG
-" ------------------------------------------------------------------------------
+luafile $DOTS/nvim/init.lua
 
-let plug_install_path = '~/.config/nvim/autoload/plug.vim'
-let plug_curl_url = 'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
-
-if empty(glob(plug_install_path))
-    exec 'silent !curl -fLo ' . plug_install_path . ' --create-dirs ' . plug_curl_url
-endif
-
-" ------------------------------------------------------------------------------
-" PLUGINS
-" ------------------------------------------------------------------------------
-
-set rtp+=$HOME/projects/vim-platinum
-
-call plug#begin('~/.config/nvim/bundle')
-    " Colorscheme
-    Plug 'joshdick/onedark.vim'
-
-    " IDE
-    Plug 'neoclide/coc.nvim', { 'branch': 'release' }
-    Plug 'vifm/vifm.vim'
-    Plug 'sheerun/vim-polyglot'
-    Plug 'vim-airline/vim-airline'
-
-    " VimL LSP
-    Plug 'Shougo/neco-vim'
-    Plug 'neoclide/coc-neco'
-
-   " Util
-    Plug 'vimwiki/vimwiki'
-    Plug 'tpope/vim-surround'
-    Plug 'tpope/vim-commentary'
-
-    " In-Dev plugins
-    Plug 'file://'.expand('~/projects/vim-platinum')
-call plug#end()
+" Local plugins
+set rtp+=$HOME/projects/nvim-platinum
 
 " ------------------------------------------------------------------------------
 " SETTINGS
@@ -48,71 +13,27 @@ call plug#end()
 
 let mapleader = ' '
 
-set number
-
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
-set expandtab
-
-set ignorecase
-set smartcase
-
-set nowrap
-
-set termguicolors
-
-set colorcolumn=80
-highlight ColorColumn guibg=#585858
-
-set clipboard=unnamedplus
-
-set signcolumn=yes
-
-set splitright
-set splitbelow
-
-" ---------------
-" OneDark
-" ---------------
-
-colorscheme onedark
-
 " ---------------
 " Airline
 " ---------------
 
-" Enable tabline
-let g:airline#extensions#tabline#enabled = 1
+" " Enable tabline
+" let g:airline#extensions#tabline#enabled = 1
 
-" Remove tabline separators
-let g:airline#extensions#tabline#left_sep = ' '
-let g:airline#extensions#tabline#left_alt_sep = ' '
+" " Remove tabline separators
+" let g:airline#extensions#tabline#left_sep = ' '
+" let g:airline#extensions#tabline#left_alt_sep = ' '
 
-" Enable syntax highlight group caching. To clear the cache,
-" use :AirlineRefresh
-let g:airline_highlighting_cache = 1
+" " Enable syntax highlight group caching. To clear the cache,
+" " use :AirlineRefresh
+" let g:airline_highlighting_cache = 1
 
 " ---------------
 " Coc
 " ---------------
 
-" Extension List
-call coc#add_extension(
-    \ 'coc-lists',
-    \ 'coc-snippets',
-    \ 'coc-html',
-    \ 'coc-emmet',
-    \ 'coc-css',
-    \ 'coc-json',
-    \ 'coc-tsserver',
-    \ 'coc-vetur',
-    \ 'coc-clangd',
-    \ 'coc-lua',
-\ )
-
 " Add status line support, for integration with other plugin, checkout `:h coc-status`
-set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
+" set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
 " ------------------------------------------------------------------------------
 " GENERAL MAPPINGS
@@ -146,8 +67,8 @@ execute 'source ' .. MYVIMDIR .. 'movement.vim'
 " COC MAPPINGS
 " -------------------------------------------
 
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
-" Coc only does snippet and additional edit on confirm.
+" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+" position. Coc only does snippet and additional edit on confirm.
 inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
 
 " Remap keys for gotos
@@ -158,18 +79,6 @@ nmap <silent> gr <Plug>(coc-references)
 
 " Remap for rename current word
 nmap <leader>rn <Plug>(coc-rename)
-
-" ------------------------------------------------------------------------------
-" XML AUGROUP
-" 1) Set tabstop
-" 2) Start the terminal in insert mode
-" ------------------------------------------------------------------------------
-
-augroup bsuth-terminal
-    au FileType xml set tabstop=2
-    au FileType xml set softtabstop=2
-    au FileType xml set shiftwidth=2
-augroup END
 
 " ------------------------------------------------------------------------------
 " TERMINAL AUGROUP

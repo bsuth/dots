@@ -20,10 +20,6 @@ nnoremap <c-k> <c-w>k
 nnoremap <c-l> <c-w>l
 nnoremap <leader>w <c-w>
 
-" Buffer switching
-nnoremap <Tab> :bn<cr>
-nnoremap <S-Tab> :bp<cr>
-
 " Buffer actions
 nnoremap <c-w> :bd<cr>
 nnoremap <c-t> :Vifm<cr>
@@ -34,3 +30,12 @@ nnoremap <leader>term :sp\|:term<cr>
 nnoremap <leader>vterm :vsp\|:term<cr>
 nnoremap <leader>sp :sp\|:Vifm<cr>
 nnoremap <leader>vsp :vsp\|:Vifm<cr>
+
+" ------------------------------------------------------------------------------
+" BUFFERS
+" ------------------------------------------------------------------------------
+
+nnoremap <Tab> :bn<cr>
+nnoremap <S-Tab> :bp<cr>
+nnoremap <leader>b :b <Tab>
+

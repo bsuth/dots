@@ -269,7 +269,7 @@ def tabs(c):
 
 def web(c):
     ## Background color for webpages if unset.
-    c.colors.webpage.bg = palette['black']
+    c.colors.webpage.bg = palette['white']
 
     ## Force `prefers-color-scheme: dark` colors for websites.
     c.colors.webpage.prefers_color_scheme_dark = True

@@ -152,25 +152,25 @@ keys.global = gears.table.join(
         end,
     {description = 'swap client right'}),
 
-    awful.key({ modkey, 'Mod1' }, 'h',
+    awful.key({ modkey, 'Control' }, 'h',
         function()
             awful.screen.focus_bydirection('left')
         end,
     {description = 'focus screen left'}),
 
-    awful.key({ modkey, 'Mod1' }, 'j',
+    awful.key({ modkey, 'Control' }, 'j',
         function()
             awful.screen.focus_bydirection('down')
         end,
     {description = 'focus screen down'}),
 
-    awful.key({ modkey, 'Mod1' }, 'k',
+    awful.key({ modkey, 'Control' }, 'k',
         function()
             awful.screen.focus_bydirection('up')
         end,
     {description = 'focus screen up'}),
 
-    awful.key({ modkey, 'Mod1' }, 'l',
+    awful.key({ modkey, 'Control' }, 'l',
         function()
             awful.screen.focus_bydirection('right')
         end,
@@ -213,7 +213,7 @@ keys.global = gears.table.join(
     -- Spawners
     -- ------------------
 
-    awful.key({ modkey }, 'Control_L',
+    awful.key({ modkey }, 'Alt_L',
         function()
             awful.screen.focused().tagger.kg:start()
         end,

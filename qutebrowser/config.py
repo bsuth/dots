@@ -186,7 +186,8 @@ c.tabs.last_close = 'startpage'
 ## Page to open if :open -t/-b/-w is used without URL. Use `about:blank`
 ## for a blank page.
 ## Type: FuzzyUrl
-c.url.default_page = '~/dots/qutebrowser/home/index.html'
+# c.url.default_page = '~/dots/qutebrowser/home/index.html'
+c.url.default_page = 'https://google.com/'
 
 ## Open base URL of the searchengine if a searchengine shortcut is
 ## invoked without parameters.
@@ -215,7 +216,8 @@ c.url.searchengines = {'DEFAULT': 'https://google.com/search?q={}'}
 
 ## Page(s) to open at the start.
 ## Type: List of FuzzyUrl, or FuzzyUrl
-c.url.start_pages = [ '~/dots/qutebrowser/home/index.html']
+# c.url.start_pages = ['~/dots/qutebrowser/home/index.html']
+c.url.start_pages = ['https://google.com/']
 
 ## URL parameters to strip with `:yank url`.
 ## Type: List of String

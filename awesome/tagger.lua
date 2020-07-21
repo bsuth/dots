@@ -98,16 +98,16 @@ local modkey = 'Mod4'
 
 tagger.kg = awful.keygrabber({
     keybindings = {
-        { { modkey, 'Control' }, 'h', function() 
+        { { modkey }, 'h', function() 
             awful.screen.focused().tagger:viewdir('left')
         end },
-        { { modkey, 'Control' }, 'l', function() 
+        { { modkey }, 'l', function() 
             awful.screen.focused().tagger:viewdir('right')
         end },
-        { { modkey, 'Control' }, 'k', function() 
+        { { modkey }, 'k', function() 
             awful.screen.focused().tagger:viewdir('up')
         end },
-        { { modkey, 'Control' }, 'j', function() 
+        { { modkey }, 'j', function() 
             awful.screen.focused().tagger:viewdir('down')
         end },
     },
