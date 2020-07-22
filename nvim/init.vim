@@ -8,12 +8,6 @@ set rtp+=$HOME/projects/nvim-platinum
 " ------------------------------------------------------------------------------
 
 " ---------------
-" Core
-" ---------------
-
-let mapleader = ' '
-
-" ---------------
 " Airline
 " ---------------
 
@@ -34,51 +28,6 @@ let mapleader = ' '
 
 " Add status line support, for integration with other plugin, checkout `:h coc-status`
 " set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
-
-" ------------------------------------------------------------------------------
-" GENERAL MAPPINGS
-" ------------------------------------------------------------------------------
-
-" Open/Source vimrc
-nnoremap <leader>ev :Vifm /home/bsuth/dots/nvim<cr>
-nnoremap <leader>sv :source $MYVIMRC<cr>
-
-" Clear highlighting and redraw
-nnoremap <leader>/ :nohlsearch<cr><c-l>
-
-" Nvim help
-nnoremap <leader>he :help 
-nnoremap <leader>vhe :vert :help 
-
-" For some reason, vim registers <c-/> as <c-_>
-nnoremap <c-_> :Commentary<cr>
-
-" Terminal mode back to normal mode
-tnoremap <c-[> <c-\><c-n>
-
-" ------------------------------------------------------------------------------
-" MODULES
-" ------------------------------------------------------------------------------
-
-let MYVIMDIR = fnamemodify(expand($MYVIMRC), ':p:h') .. '/'
-execute 'source ' .. MYVIMDIR .. 'movement.vim'
-
-" -------------------------------------------
-" COC MAPPINGS
-" -------------------------------------------
-
-" Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
-" position. Coc only does snippet and additional edit on confirm.
-inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" Remap keys for gotos
-nmap <silent> <c-]> <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
-
-" Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
 
 " ------------------------------------------------------------------------------
 " TERMINAL AUGROUP

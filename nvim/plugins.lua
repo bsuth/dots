@@ -60,3 +60,20 @@ vim.api.nvim_call_function('coc#add_extension', {
     'coc-clangd',
     'coc-lua',
 })
+
+-- " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
+-- " position. Coc only does snippet and additional edit on confirm.
+vim.api.nvim_set_keymap('i', '<cr>', [[ pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>" ]], { 
+	noremap = true,
+	expr = true,
+})
+
+-- " Remap keys for gotos
+-- nmap <silent> <c-]> <Plug>(coc-definition)
+-- nmap <silent> gy <Plug>(coc-type-definition)
+-- nmap <silent> gi <Plug>(coc-implementation)
+-- nmap <silent> gr <Plug>(coc-references)
+
+-- " Remap for rename current word
+-- nmap <leader>rn <Plug>(coc-rename)
+
