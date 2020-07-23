@@ -114,6 +114,9 @@ nnoremap ,t :!alacritty &<cr>
 " Open editor to edit vifmrc and apply settings after returning to vifm
 nnoremap ,c :write | edit $MYVIFMRC | restart<cr>
 
+" Remap individual select to <c-v> to emulate vim a little more
+nnoremap <c-v> t
+
 
 " ------------------------------------------------------------------------------
 " -- FILETYPES
@@ -132,6 +135,9 @@ nnoremap ,c :write | edit $MYVIFMRC | restart<cr>
 
 " Pdf
 filextype *.pdf zathura %c %i &
+
+" Png
+filextype *.png feh %f &
 
 " Man page
 filetype *.[1-8] man ./%c

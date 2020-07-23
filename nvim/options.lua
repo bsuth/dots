@@ -29,17 +29,17 @@ local win_options = {
 -- to change both the local and global options!
 
 for k, v in pairs(global_options) do
-    vim.api.nvim_set_option(k, v)
+    nvim.nvim_set_option(k, v)
 end
 
 for k, v in pairs(buf_options) do
-    vim.api.nvim_set_option(k, v)
-    vim.api.nvim_buf_set_option(0, k, v)
+    nvim.nvim_set_option(k, v)
+    nvim.nvim_buf_set_option(0, k, v)
 end
 
 for k, v in pairs(win_options) do
-    vim.api.nvim_set_option(k, v)
-    vim.api.nvim_win_set_option(0, k, v)
+    nvim.nvim_set_option(k, v)
+    nvim.nvim_win_set_option(0, k, v)
 end
 
-vim.api.nvim_command([[ highlight ColorColumn guibg=#585858 ]])
+nvim.nvim_command([[ highlight ColorColumn guibg=#585858 ]])

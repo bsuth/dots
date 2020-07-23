@@ -34,21 +34,21 @@ local plugins = {
 	-- [[ Plug 'vim-airline/vim-airline' ]],
 }
 
-vim.api.nvim_call_function('plug#begin', { '$DOTS/nvim/bundle' })
-for _, v in ipairs(plugins) do vim.api.nvim_command(v) end
-vim.api.nvim_call_function('plug#end', {})
+nvim.nvim_call_function('plug#begin', { '$DOTS/nvim/bundle' })
+for _, v in ipairs(plugins) do nvim.nvim_command(v) end
+nvim.nvim_call_function('plug#end', {})
 
 -- -----------------------------------------------------------------------------
 -- GENERAL PLUGIN OPTIONS
 -- -----------------------------------------------------------------------------
 
-vim.api.nvim_command([[ colorscheme onedark ]])
+nvim.nvim_command([[ colorscheme onedark ]])
 
 -- -----------------------------------------------------------------------------
 -- COC.NVIM OPTIONS
 -- -----------------------------------------------------------------------------
 
-vim.api.nvim_call_function('coc#add_extension', {
+nvim.nvim_call_function('coc#add_extension', {
 	'coc-lists',
     'coc-snippets',
     'coc-html',
@@ -63,7 +63,7 @@ vim.api.nvim_call_function('coc#add_extension', {
 
 -- " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
 -- " position. Coc only does snippet and additional edit on confirm.
-vim.api.nvim_set_keymap('i', '<cr>', [[ pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>" ]], { 
+nvim.nvim_set_keymap('i', '<cr>', [[ pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>" ]], { 
 	noremap = true,
 	expr = true,
 })
