@@ -137,7 +137,7 @@ nnoremap <c-v> t
 filextype *.pdf zathura %c %i &
 
 " Png
-filextype *.png feh %f &
+filextype *.jpg,*.jpeg,*.png feh %f &
 
 " Man page
 filetype *.[1-8] man ./%c
