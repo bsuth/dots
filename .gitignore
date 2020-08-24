@@ -4,7 +4,7 @@ bundle/
 .netrwhist
 
 # vifm
-vifminfo
+vifminfo*
 vifm-help.txt
 
 # qutebrowser

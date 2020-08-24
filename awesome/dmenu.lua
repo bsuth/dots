@@ -188,6 +188,7 @@ return awful.keygrabber({
         {{ modkey }, 'd', function(self) self:stop() end},
         {{ 'Control' }, 'u', function() filter.markup = ''; apply_filter(true) end},
         {{ 'Control' }, 'bracketleft', function(self) self:stop() end},
+        {{ }, 'Escape', function(self) self:stop() end},
         {{ }, 'Return', function(self) grid.focused_widget.callback(); self:stop() end},
     },
 

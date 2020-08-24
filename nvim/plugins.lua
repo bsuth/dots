@@ -23,7 +23,6 @@ local plugins = {
 	[[ Plug 'joshdick/onedark.vim' ]],
 	[[ Plug 'neoclide/coc.nvim', { 'branch': 'release' } ]],
 	[[ Plug 'vifm/vifm.vim' ]],
-    [[ Plug 'sheerun/vim-polyglot' ]],
 	[[ Plug 'tpope/vim-surround' ]],
 	[[ Plug 'tpope/vim-commentary' ]],
 
@@ -31,7 +30,10 @@ local plugins = {
     [[ Plug 'Shougo/neco-vim' ]],
     [[ Plug 'neoclide/coc-neco' ]],
 	[[ Plug 'vimwiki/vimwiki' ]],
-	-- [[ Plug 'vim-airline/vim-airline' ]],
+
+	-- Had conflicts with coc-vetur that caused inconsistent highlighting and
+	-- extremely slow startup
+    [[ Plug 'sheerun/vim-polyglot' ]],
 }
 
 nvim.nvim_call_function('plug#begin', { '$DOTS/nvim/bundle' })
@@ -45,21 +47,37 @@ nvim.nvim_call_function('plug#end', {})
 nvim.nvim_command([[ colorscheme onedark ]])
 
 -- -----------------------------------------------------------------------------
--- COC.NVIM OPTIONS
+-- POLYGLOT
+-- -----------------------------------------------------------------------------
+
+nvim.nvim_set_var('vue_pre_processors', { 'pug', 'scss' })
+
+-- -----------------------------------------------------------------------------
+-- COC.NVIM
 -- -----------------------------------------------------------------------------
 
 nvim.nvim_call_function('coc#add_extension', {
 	'coc-lists',
     'coc-snippets',
+
     'coc-html',
-    'coc-emmet',
     'coc-css',
     'coc-json',
     'coc-tsserver',
+	'coc-prettier',
     'coc-vetur',
+
+	'coc-sql',
+
     'coc-clangd',
     'coc-lua',
+    'coc-rls',
 })
+
+-- Setup prettier command (run automatically on save, see :CocConfig
+nvim.nvim_command([[
+	command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
+]])
 
 -- " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
 -- " position. Coc only does snippet and additional edit on confirm.

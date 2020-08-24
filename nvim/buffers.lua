@@ -20,14 +20,16 @@ function bl_enter()
 	bl.map = {}
 
 	for _, v in ipairs(nvim.nvim_list_bufs()) do
-		local bname = nvim.nvim_buf_get_name(v)
+		if nvim.nvim_buf_get_option(v, 'buflisted') then
+			local bname = nvim.nvim_buf_get_name(v)
 
-		if bname:sub(0, 12) == '/home/bsuth/' then
-			bname = bname:sub(13)
+			if bname:sub(0, 11) == '/home/bsuth' then
+				bname = '~' .. bname:sub(12)
+			end
+
+			bl.map[bname] = v
+			table.insert(lines, bname)
 		end
-
-		bl.map[bname] = v
-		table.insert(lines, bname)
 	end
 
 	local b = nvim.nvim_create_buf(false, false)
@@ -39,6 +41,7 @@ function bl_enter()
 	nvim.nvim_buf_set_option(b, 'modifiable', false)
 	nvim.nvim_buf_set_option(b, 'buftype', 'nowrite')
 	nvim.nvim_buf_set_option(b, 'bufhidden', 'delete')
+	nvim.nvim_buf_set_option(b, 'buflisted', false)
 	nvim.nvim_buf_set_option(b, 'swapfile', false)
 
 	nvim.nvim_buf_set_keymap(b, 'n', '<cr>', ':lua bl_select()<cr>', { noremap = true })

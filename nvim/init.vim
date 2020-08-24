@@ -8,21 +8,6 @@ set rtp+=$HOME/projects/nvim-platinum
 " ------------------------------------------------------------------------------
 
 " ---------------
-" Airline
-" ---------------
-
-" " Enable tabline
-" let g:airline#extensions#tabline#enabled = 1
-
-" " Remove tabline separators
-" let g:airline#extensions#tabline#left_sep = ' '
-" let g:airline#extensions#tabline#left_alt_sep = ' '
-
-" " Enable syntax highlight group caching. To clear the cache,
-" " use :AirlineRefresh
-" let g:airline_highlighting_cache = 1
-
-" ---------------
 " Coc
 " ---------------
 
@@ -32,12 +17,13 @@ set rtp+=$HOME/projects/nvim-platinum
 " ------------------------------------------------------------------------------
 " TERMINAL AUGROUP
 " 1) Don't use numbers in terminal mode
-" 2) Start the terminal in insert mode
+" 2/3) Start the terminal in insert mode
 " ------------------------------------------------------------------------------
 
 augroup bsuth-terminal
     au TermOpen term://* setlocal nonumber
     au TermOpen term://* startinsert
+    au BufEnter term://* startinsert
 augroup END
 
 " ------------------------------------------------------------------------------

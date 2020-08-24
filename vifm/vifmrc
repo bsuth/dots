@@ -4,7 +4,7 @@
 " This is the actual command used to start vi. The default is vim.
 " If you would like to use another vi clone such as Elvis or Vile
 " you will need to change this setting.
-set vicmd=nvim
+set vicmd=nvr
 
 " This is how many directories to store in the directory history.
 set history=100
@@ -85,8 +85,9 @@ command! reload :write | restart
 " ------------------------------------------------------------------------------
 " MAPPINGS
 
-" Start shell in current directory
 nnoremap s :shell<cr>
+nnoremap o :!nvr $(fd --type f | fzf)<cr>
+nnoremap cd :execute 'cd ' . term('fd --type d | fzf 2> /dev/tty || echo .')<cr>
 
 " Display sorting dialog
 nnoremap S :sort<cr>
@@ -134,7 +135,7 @@ nnoremap <c-v> t
 " Other programs for the file type can be accessed with :file
 
 " Pdf
-filextype *.pdf zathura %c %i &
+filextype *.pdf zathura %f 2>/dev/null &
 
 " Png
 filextype *.jpg,*.jpeg,*.png feh %f &

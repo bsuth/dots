@@ -104,6 +104,19 @@ c.downloads.location.prompt = False
 ##   - bottom
 c.downloads.position = 'bottom'
 
+## Mode to use for hints.
+## Type: String
+## Valid values:
+##   - number: Use numeric hints. (In this mode you can also type letters from the hinted element to filter and reduce the number of elements that are hinted.)
+##   - letter: Use the characters in the `hints.chars` setting.
+##   - word: Use hints words based on the html elements and the extra words.
+c.hints.mode = 'number'
+
+## Duration (in milliseconds) to ignore normal-mode key bindings after a
+## successful auto-follow.
+## Type: Int
+c.hints.auto_follow_timeout = 500
+
 ## Editor (and arguments) to use for the `open-editor` command. The
 ## following placeholders are defined:  * `{file}`: Filename of the file
 ## to be edited. * `{line}`: Line in which the caret is found in the

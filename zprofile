@@ -8,6 +8,7 @@ if [ -d "$HOME/.local/bin" ]; then
 fi
 
 export PATH="$DOTS/scripts:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # ----------------------------------------------------
 # ENVIRONMENT

@@ -22,7 +22,7 @@ window:
 
 
 font:
-  size: 7.0
+  size: 10.0
 
   normal:
     family: Hack

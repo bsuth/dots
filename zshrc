@@ -71,12 +71,11 @@ SPACESHIP_PROMPT_ORDER=(
   char          # Prompt character
 )
 
-
 # -------------------------------------------------------------------
-# BINDINGS
+# FZF
 # -------------------------------------------------------------------
 
-bindkey '^F' autosuggest-accept
+export FZF_DEFAULT_COMMAND='rg --files'
 
 
 # -------------------------------------------------------------------
@@ -88,3 +87,5 @@ alias l='ls -1 --color=auto --group-directories-first'
 alias vi='nvim'
 alias vim='nvim'
 alias wiki='nvim -c :VimwikiIndex'
+alias single='xrandr --output eDP1 --primary --mode 1600x900 --pos 1920x90 --output DP2-2 --off'
+alias double='xrandr --output DP2-2 --primary --mode 1920x1080 --pos 0x0 --output eDP1 --mode 1600x900 --pos 1920x90'
