@@ -14,7 +14,6 @@ bindkey -e
 setopt appendhistory autocd extendedglob nomatch notify
 unsetopt beep
 
-
 # -------------------------------------------------------------------
 # COMPLETION
 # -------------------------------------------------------------------
@@ -25,7 +24,6 @@ zstyle :compinstall filename '/home/bsuth/.zshrc'
 
 autoload -Uz compinit
 compinit
-
 
 # -------------------------------------------------------------------
 # ZINIT
@@ -50,7 +48,6 @@ zplugin light zdharma/fast-syntax-highlighting
 zplugin light zsh-users/zsh-autosuggestions
 zplugin light zdharma/history-search-multi-word
 zplugin light denysdovhan/spaceship-prompt
-
 
 # -------------------------------------------------------------------
 # SPACESHIP-PROMPT
@@ -77,11 +74,25 @@ SPACESHIP_PROMPT_ORDER=(
 
 export FZF_DEFAULT_COMMAND='rg --files'
 
+### PROCESS
+# mnemonic: [K]ill [P]rocess
+# show output of "ps -ef", use [tab] to select one or multiple entries
+# press [enter] to kill selected processes and go back to the process list.
+# or press [escape] to go back to the process list. Press [escape] twice to exit completely.
+
+function kp() {
+	local pid=$(ps -ef | sed 1d | eval "fzf ${FZF_DEFAULT_OPTS} -m --header='[kill:process]'" | awk '{print $2}')
+
+	if [ "x$pid" != "x" ]
+	then
+	  echo $pid | xargs kill -${1:-9}
+	  kp
+	fi
+}
 
 # -------------------------------------------------------------------
 # ALIASES
 # -------------------------------------------------------------------
-
 alias v='vifm'
 alias l='ls -1 --color=auto --group-directories-first'
 alias vi='nvim'

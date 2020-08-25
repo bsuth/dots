@@ -25,6 +25,8 @@ local plugins = {
 	[[ Plug 'vifm/vifm.vim' ]],
 	[[ Plug 'tpope/vim-surround' ]],
 	[[ Plug 'tpope/vim-commentary' ]],
+	[[ Plug 'junegunn/fzf' ]],
+	[[ Plug 'junegunn/fzf.vim' ]],
 
 	-- unstable
     [[ Plug 'Shougo/neco-vim' ]],
@@ -41,7 +43,7 @@ for _, v in ipairs(plugins) do nvim.nvim_command(v) end
 nvim.nvim_call_function('plug#end', {})
 
 -- -----------------------------------------------------------------------------
--- GENERAL PLUGIN OPTIONS
+-- ONEDARK
 -- -----------------------------------------------------------------------------
 
 nvim.nvim_command([[ colorscheme onedark ]])
@@ -57,7 +59,6 @@ nvim.nvim_set_var('vue_pre_processors', { 'pug', 'scss' })
 -- -----------------------------------------------------------------------------
 
 nvim.nvim_call_function('coc#add_extension', {
-	'coc-lists',
     'coc-snippets',
 
     'coc-html',

@@ -86,8 +86,6 @@ command! reload :write | restart
 " MAPPINGS
 
 nnoremap s :shell<cr>
-nnoremap o :!nvr $(fd --type f | fzf)<cr>
-nnoremap cd :execute 'cd ' . term('fd --type d | fzf 2> /dev/tty || echo .')<cr>
 
 " Display sorting dialog
 nnoremap S :sort<cr>

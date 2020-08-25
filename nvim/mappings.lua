@@ -1,5 +1,5 @@
 -- -----------------------------------------------------------------------------
--- GENERAL MAPPINGS
+-- GENERAL
 -- -----------------------------------------------------------------------------
 
 nvim.nvim_set_var('mapleader', ' ')
@@ -20,7 +20,7 @@ nvim.nvim_set_keymap('v', '<c-_>', ':Commentary<cr>', { noremap = true })
 nvim.nvim_set_keymap('t', '<c-[>', '<c-\\><c-n>', { noremap = true })
 
 -- -----------------------------------------------------------------------------
--- WINDOW MAPPINGS
+-- WINDOWS
 -- -----------------------------------------------------------------------------
 
 nvim.nvim_set_keymap('n', '<leader>w', '<c-w>', { noremap = true })
@@ -39,3 +39,26 @@ nvim.nvim_set_keymap('n', '<leader>term', ':sp|:term<cr>', { noremap = true })
 nvim.nvim_set_keymap('n', '<leader>vterm', ':vsp|:term<cr>', { noremap = true })
 nvim.nvim_set_keymap('n', '<leader>sp', ':sp|:Vifm<cr>', { noremap = true })
 nvim.nvim_set_keymap('n', '<leader>vsp', ':vsp|:Vifm<cr>', { noremap = true })
+
+-- -----------------------------------------------------------------------------
+-- BUFFERS
+-- -----------------------------------------------------------------------------
+
+nvim.nvim_set_keymap('n', '<c-w>', ':bd<cr>', { noremap = true })
+nvim.nvim_set_keymap('n', '<c-t>', ':Vifm<cr>', { noremap = true })
+nvim.nvim_set_keymap('n', '<Tab>', ':bn<cr>', { noremap = true })
+nvim.nvim_set_keymap('n', '<s-Tab>', ':bp<cr>', { noremap = true })
+
+-- -----------------------------------------------------------------------------
+-- FZF
+-- -----------------------------------------------------------------------------
+
+-- TODO: Auto adjust fzf layout depending on vim dimensions
+function FzfLayout(query, fullscreen)
+end
+
+nvim.nvim_set_var('fzf_layout', {up = '100%'})
+nvim.nvim_set_var('fzf_preview_window', 'right:60%')
+nvim.nvim_set_keymap('n', '<leader>o', ':Files<cr>', { noremap = true })
+nvim.nvim_set_keymap('n', '<leader>cd', ':Files<cr>', { noremap = true })
+nvim.nvim_set_keymap('n', '<leader>rg', ':Rg<cr>', { noremap = true })
