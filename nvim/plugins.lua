@@ -2,11 +2,11 @@
 -- AUTOINSTALL VIM-PLUG
 -- -----------------------------------------------------------------------------
 
-local vim_plug_install_path = '$DOTS/nvim/autoload/plug.vim'
+local vim_plug_install_path = os.getenv('DOTS') .. '/nvim/autoload/plug.vim'
 local f = io.open(vim_plug_install_path, 'r')
 
 if f == nil then
-    os.execute(('silent !curl -fLo %s --create-dirs %s'):format(
+    os.execute(('curl -fLo %s --create-dirs %s'):format(
 		vim_plug_install_path,
 		'https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
 	))
