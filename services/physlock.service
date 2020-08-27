@@ -6,7 +6,7 @@ Before=sleep.target
 User=bsuth
 Environment=DISPLAY=:0
 Type=forking
-ExecStart=/usr/bin/physlock -p "If you're reading this, it means you're trying to break into my computer >:(" 2>/dev/null
+ExecStart=/usr/bin/physlock -d -p "If you're reading this, it means you're trying to break into my computer >:(" 2>/dev/null
 
 [Install]
 WantedBy=sleep.target
