@@ -1,11 +1,33 @@
+# ----------------------------------------------------
+# PATH
+# ----------------------------------------------------
+
+MYPATHS=(
+	"$HOME/.local/bin"
+	"$DOTS/scripts"
+	"$HOME/.cargo/bin"
+	"/opt/openresty/bin"
+	"/opt/openresty/nginx/sbin "
+)
+
+for p in "${MYPATHS[@]}"; do
+	[[ -d $p ]] && PATH="$PATH:$p"
+done
+
+# -------------------------------------------------------------------
+# ALIASES
+# -------------------------------------------------------------------
+alias v='vifm'
+alias l='ls -1 --color=auto --group-directories-first'
+alias vi='nvim'
+alias vim='nvim'
+alias wiki='nvim -c :VimwikiIndex'
+alias single='xrandr --output eDP1 --primary --mode 1600x900 --pos 1920x90 --output DP2-2 --off'
+alias double='xrandr --output DP2-2 --primary --mode 1920x1080 --pos 0x0 --output eDP1 --mode 1600x900 --pos 1920x90'
+
 # -------------------------------------------------------------------
 # SETTINGS
 # -------------------------------------------------------------------
-
-# History
-HISTFILE=~/.histfile
-HISTSIZE=1000
-SAVEHIST=1000
 
 # Emacs Bindings
 bindkey -e
@@ -14,14 +36,10 @@ bindkey -e
 setopt appendhistory autocd extendedglob nomatch notify
 unsetopt beep
 
-# -------------------------------------------------------------------
-# COMPLETION
-# -------------------------------------------------------------------
-
+# Completion
 zstyle ':completion:*' completer _complete _ignored _approximate
 zstyle ':completion:*' matcher-list '' '' '' ''
 zstyle :compinstall filename '/home/bsuth/.zshrc'
-
 autoload -Uz compinit
 compinit
 
@@ -89,14 +107,3 @@ function kp() {
 	  kp
 	fi
 }
-
-# -------------------------------------------------------------------
-# ALIASES
-# -------------------------------------------------------------------
-alias v='vifm'
-alias l='ls -1 --color=auto --group-directories-first'
-alias vi='nvim'
-alias vim='nvim'
-alias wiki='nvim -c :VimwikiIndex'
-alias single='xrandr --output eDP1 --primary --mode 1600x900 --pos 1920x90 --output DP2-2 --off'
-alias double='xrandr --output DP2-2 --primary --mode 1920x1080 --pos 0x0 --output eDP1 --mode 1600x900 --pos 1920x90'
