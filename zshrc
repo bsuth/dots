@@ -6,8 +6,6 @@ MYPATHS=(
 	"$HOME/.local/bin"
 	"$DOTS/scripts"
 	"$HOME/.cargo/bin"
-	"/opt/openresty/bin"
-	"/opt/openresty/nginx/sbin "
 )
 
 for p in "${MYPATHS[@]}"; do

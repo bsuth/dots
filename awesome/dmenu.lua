@@ -1,6 +1,7 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
+local naughty = require('naughty')
 local wibox = require('wibox')
 
 local wgrid = require('widgets.grid')
@@ -11,15 +12,15 @@ local wgrid = require('widgets.grid')
 
 local apps = {
     {
-        alias = 'alacritty',
-        callback = function()
-            awful.spawn('alacritty')
-        end,
-    },
-    {
         alias = 'anki',
         callback = function()
             awful.spawn('anki')
+        end,
+    },
+    {
+        alias = 'db',
+        callback = function()
+            awful.spawn('st -e nvim -c ":DBUI"')
         end,
     },
     {
@@ -41,6 +42,12 @@ local apps = {
         end,
     },
     {
+        alias = 'google-chrome',
+        callback = function()
+            awful.spawn('google-chrome-stable')
+        end,
+    },
+    {
         alias = 'inkscape',
         callback = function()
             awful.spawn('inkscape')
@@ -50,12 +57,6 @@ local apps = {
         alias = 'poweroff',
         callback = function()
             awful.spawn('poweroff')
-        end,
-    },
-    {
-        alias = 'qutebrowser',
-        callback = function()
-            awful.spawn('qutebrowser')
         end,
     },
     {
@@ -161,11 +162,11 @@ local popup = awful.popup({
 -- HELPERS
 --------------------------------------------------------------------------------
 
-local function apply_filter(unfilter)
+local function apply_filter()
     grid:reset()
 
     for _, w in pairs(app_widgets) do
-        if w.filter:sub(1, filter.markup:len()) == filter.markup then
+        if w.filter:sub(1, #filter.markup) == filter.markup then
             grid:add(w)
         end
     end
@@ -209,14 +210,14 @@ return awful.keygrabber({
     stop_callback = function()
         popup.visible = false
         filter.markup = ''
-        apply_filter(true)
+        apply_filter()
     end,
 
     keypressed_callback = function(self, mods, key)
         if key == 'BackSpace' and #filter.markup > 0 then
-            filter.markup = string.sub(filter.markup, 1, -2)
-            apply_filter(true)
-        elseif #mods == 0 and string.match(key, '^[a-zA-Z ]$') then
+            filter.markup = filter.markup:sub(1, #filter.markup - 1)
+            apply_filter()
+        elseif #mods == 0 and key:match('^[a-zA-Z ]$') then
             filter.markup = filter.markup .. key
             apply_filter()
         end

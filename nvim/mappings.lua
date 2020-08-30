@@ -19,6 +19,9 @@ nvim.nvim_set_keymap('v', '<c-_>', ':Commentary<cr>', { noremap = true })
 -- Terminal mode back to normal mode
 nvim.nvim_set_keymap('t', '<c-[>', '<c-\\><c-n>', { noremap = true })
 
+-- Open console in current directory
+nvim.nvim_set_keymap('n', '<leader><cr>', ':silent !st -e nvim -c ":term" 2>/dev/null &<cr>', { noremap = true })
+
 -- -----------------------------------------------------------------------------
 -- WINDOWS
 -- -----------------------------------------------------------------------------

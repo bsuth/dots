@@ -1,0 +1,4 @@
+This directory contains all dot configurations that may differ between
+workstations, such as a home vs work computer.
+
+Copy template/ -> live/ and change accordingly.

@@ -1,3 +1,6 @@
+# workstation-specific config
+config/live
+
 # nvim
 autoload/
 bundle/

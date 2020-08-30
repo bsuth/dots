@@ -29,6 +29,8 @@ local plugins = {
 	[[ Plug 'junegunn/fzf.vim' ]],
 
 	-- unstable
+    [[ Plug 'tpope/vim-dadbod' ]],
+    [[ Plug 'kristijanhusak/vim-dadbod-ui' ]],
     [[ Plug 'Shougo/neco-vim' ]],
     [[ Plug 'neoclide/coc-neco' ]],
 	[[ Plug 'vimwiki/vimwiki' ]],
@@ -55,6 +57,18 @@ nvim.nvim_command([[ colorscheme onedark ]])
 nvim.nvim_set_var('vue_pre_processors', { 'pug', 'scss' })
 
 -- -----------------------------------------------------------------------------
+-- VIM-DADBOD-UI
+-- -----------------------------------------------------------------------------
+
+nvim.nvim_set_var('db_ui_auto_execute_table_helpers', 1)
+
+nvim.nvim_set_var('db_ui_table_helpers', {
+	mongodb = {
+		List = '{table}.find().pretty()',
+	},
+})
+
+-- -----------------------------------------------------------------------------
 -- COC.NVIM
 -- -----------------------------------------------------------------------------
 
@@ -67,8 +81,8 @@ nvim.nvim_call_function('coc#add_extension', {
     'coc-tsserver',
 	'coc-prettier',
     'coc-vetur',
-
-	'coc-sql',
+	
+	'coc-db',
 
     'coc-clangd',
     'coc-lua',
