@@ -10,7 +10,17 @@ nvim = vim.api
 -- MODULES
 -- -----------------------------------------------------------------------------
 
-require '__config/globals'
+local config = {
+	'globals',
+}
+
+for i, path in ipairs(config) do
+	local fd = io.open(path, 'r')
+	if f ~= nil then
+		io.close(f)
+		require('__config/' .. path)
+	end
+end
 
 require 'options'
 require 'plugins'
