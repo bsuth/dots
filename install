@@ -18,8 +18,8 @@ ln -sf "$DOTS/xinitrc" "$HOME/.xinitrc"
 # - ZSH
 # -------------------------------------
 
-ln -sf "$DOTS/zprofile" "$HOME/.zprofile"
-ln -sf "$DOTS/zshrc" "$HOME/.zshrc"
+ln -sf "$DOTS/zsh/zprofile" "$HOME/.zprofile"
+ln -sf "$DOTS/zsh/zshrc" "$HOME/.zshrc"
 
 # ------------------------------------------------------------------------------
 # - AWESOME

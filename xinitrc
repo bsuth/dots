@@ -38,5 +38,4 @@ fcitx &
 udiskie &
 picom -b
 eval $(ssh-agent)
-# exec startplasma-x11
 exec awesome

@@ -1,5 +1,7 @@
 # workstation-specific config
-config/live
+**/__config/*
+!**/__config/__*
+__zshrc
 
 # nvim
 autoload/
@@ -14,3 +16,5 @@ vifm-help.txt
 __pycache__
 qsettings
 autoconfig.yml
+bookmarks/
+quickmarks

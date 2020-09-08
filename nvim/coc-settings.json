@@ -3,5 +3,8 @@
 	  "typescript",
 	  "css",
 	  "Markdown"
-  ]
+  ],
+  "python.jediEnabled": true,
+  "python.jediPath": "/usr/lib/python3.8/site-packages",
+  "python.pythonPath": "~/projects/mujin/venv/bin/python"
 }
