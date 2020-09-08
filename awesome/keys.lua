@@ -239,7 +239,7 @@ keys.global = gears.table.join(
 
     awful.key({ modkey }, "'",
         function()
-            awful.spawn('qutebrowser')
+            awful.spawn('google-chrome-stable')
         end,
     {description = 'open browser'})
 )

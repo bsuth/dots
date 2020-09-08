@@ -4,14 +4,73 @@ local gears = require('gears')
 local naughty = require('naughty')
 local wibox = require('wibox')
 
+local layouts = require('layouts')
 local wgrid = require('widgets.grid')
 
 --------------------------------------------------------------------------------
--- APPS
+-- COMMANDS
 --------------------------------------------------------------------------------
 
-local apps = require('__config/dmenu')
-local app_widgets = {}
+local commands = {
+    {
+        alias = 'music',
+        callback = function()
+			for s in screen do
+				local music_tag = awful.tag.find_by_name(s, 'music')
+				local music_clients = {
+					['st-256color'] = 'st -e cava',
+					['Google-chrome'] = 'google-chrome-stable --app="https://music.youtube.com"',
+				}
+
+				if music_tag ~= nil then
+					local clients = music_tag:clients()
+
+					for _, existing_client in ipairs(music_tag:clients()) do
+						music_clients[existing_client.class] = nil
+					end
+
+					for _, missing_client in pairs(music_clients) do
+						awful.spawn(missing_client)
+					end
+
+					music_tag.screen = awful.screen.focused()
+					music_tag:view_only()
+					return
+				end
+			end
+        end,
+    },
+    {
+        alias = 'db',
+        callback = function()
+            awful.spawn('st -e nvim -c ":DBUI"')
+        end,
+    },
+    {
+        alias = 'sleep',
+        callback = function()
+            awful.spawn('systemctl suspend')
+        end,
+    },
+    {
+        alias = 'reboot',
+        callback = function()
+            awful.spawn('reboot')
+        end,
+    },
+    {
+        alias = 'poweroff',
+        callback = function()
+            awful.spawn('poweroff')
+        end,
+    },
+}
+
+for _, command in ipairs(require('__config/dmenu')) do
+	table.insert(commands, command)
+end
+
+local command_widgets = {}
 
 --------------------------------------------------------------------------------
 -- FILTER
@@ -37,10 +96,10 @@ local grid = wgrid.grid({
     homogeneous = true,
 })
 
-for _, app in ipairs(apps) do
+for _, command in ipairs(commands) do
     local w = wibox.widget({
         {
-            markup = app.alias,
+            markup = command.alias,
             align  = 'center',
             valign = 'center',
             widget = wibox.widget.textbox,
@@ -52,13 +111,13 @@ for _, app in ipairs(apps) do
         shape_border_width = 5,
         shape_border_color = beautiful.colors.dark_grey,
 
-        filter = app.alias,
-        callback = app.callback,
+        filter = command.alias,
+        callback = command.callback,
         widget = wibox.container.background,
     })
 
     grid:add(w)
-    table.insert(app_widgets, w)
+    table.insert(command_widgets, w)
 end
 
 --------------------------------------------------------------------------------
@@ -109,7 +168,7 @@ local popup = awful.popup({
 local function apply_filter()
     grid:reset()
 
-    for _, w in pairs(app_widgets) do
+    for _, w in pairs(command_widgets) do
         if w.filter:sub(1, #filter.markup) == filter.markup then
             grid:add(w)
         end
