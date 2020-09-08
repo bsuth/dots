@@ -6,6 +6,7 @@ local wibox = require('wibox')
 local db = require('dashboard')
 local dmenu = require('dmenu')
 local notifier = require('widgets.notifier')
+local tag_history = require('tag/history')
 
 --------------------------------------------------------------------------------
 -- INIT/STATE
@@ -22,9 +23,9 @@ local clientbuffer = {}
 
 keys.global = gears.table.join(
     
-    -- ------------------
+    -- -------------------------------------------------------------------------
     -- System
-    -- ------------------
+    -- -------------------------------------------------------------------------
     
     awful.key({ modkey, 'Shift' }, 'r', 
         function()
@@ -38,9 +39,9 @@ keys.global = gears.table.join(
         end,
     {description = 'quit awesome'}),
 
-    -- ------------------
+    -- -------------------------------------------------------------------------
     -- Volume
-    -- ------------------
+    -- -------------------------------------------------------------------------
 
     awful.key({ }, 'XF86AudioLowerVolume', 
         function()
@@ -67,14 +68,14 @@ keys.global = gears.table.join(
         end,
     {description = 'toggle mute volume'}),
 
-    -- ------------------
+    -- -------------------------------------------------------------------------
     -- Brightness
     -- ----------
     -- Note: xbacklight is SLOW. If we wait for xbacklight to finish before
     -- sending the notification, there is a considerable amount of lag. Thus,
     -- we precompute the new brightness percentage when sending the notification
     -- and only change it after.
-    -- ------------------
+    -- -------------------------------------------------------------------------
 
     awful.key({ }, 'XF86MonBrightnessDown',
         function()
@@ -90,9 +91,9 @@ keys.global = gears.table.join(
         end,
     {description = 'raise brightness'}),
 
-    -- ------------------
+    -- -------------------------------------------------------------------------
     -- Keyboard
-    -- ------------------
+    -- -------------------------------------------------------------------------
 
     awful.key({ 'Control' }, ' ', 
         function()
@@ -100,9 +101,9 @@ keys.global = gears.table.join(
         end,
     {description = 'change keyboard'}),
 
-    -- ------------------
+    -- -------------------------------------------------------------------------
     -- Movement
-    -- ------------------
+    -- -------------------------------------------------------------------------
     
     awful.key({ modkey }, 'h',
         function()
@@ -176,9 +177,21 @@ keys.global = gears.table.join(
         end,
     {description = 'focus screen right'}),
 
-    -- ------------------
+    awful.key({ modkey }, 'i',
+        function()
+			tag_history:forward()
+        end,
+    {description = 'focus screen right'}),
+
+    awful.key({ modkey }, 'o',
+        function()
+			tag_history:back()
+        end,
+    {description = 'focus screen right'}),
+
+    -- -------------------------------------------------------------------------
     -- Layout
-    -- ------------------
+    -- -------------------------------------------------------------------------
 
     awful.key({ modkey, 'Shift', 'Control' }, 'h',
         function()
@@ -209,9 +222,9 @@ keys.global = gears.table.join(
         end,
     {description = 'restore client'}),
 
-    -- ------------------
+    -- -------------------------------------------------------------------------
     -- Spawners
-    -- ------------------
+    -- -------------------------------------------------------------------------
 
     awful.key({ modkey }, 'Alt_L',
         function()
@@ -271,9 +284,10 @@ end
 --------------------------------------------------------------------------------
 
 keys.client = gears.table.join(
-    -- ------------------
+
+    -- -------------------------------------------------------------------------
     -- System
-    -- ------------------
+    -- -------------------------------------------------------------------------
 
     awful.key({ modkey, 'Shift' }, 'q',
         function(c)
@@ -281,9 +295,9 @@ keys.client = gears.table.join(
         end,
     {description = 'close client'}),
 
-    -- ------------------
+    -- -------------------------------------------------------------------------
     -- Layout
-    -- ------------------
+    -- -------------------------------------------------------------------------
 
     awful.key({ modkey }, 'f',
         function(c)

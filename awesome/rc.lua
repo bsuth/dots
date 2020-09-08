@@ -4,13 +4,12 @@ local gears = require('gears')
 local naughty = require('naughty')
 local wibox = require('wibox')
 
-local bar = require('bar')
+require('theme')
 local keys = require('keys')
 local mouse = require('mouse')
 local layouts = require('layouts')
 local tagger = require('tagger')
 local db = require('dashboard')
-require('theme')
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
@@ -156,8 +155,8 @@ client.connect_signal('manage', function (c)
 end)
 
 -- Enable sloppy focus, so that focus follows mouse.
-client.connect_signal("mouse::enter", function(c)
-    c:emit_signal("request::activate", "mouse_enter", {raise = false})
+client.connect_signal('mouse::enter', function(c)
+    c:emit_signal('request::activate', 'mouse_enter', { raise = false })
 end)
 
 -- Focus changes border color
