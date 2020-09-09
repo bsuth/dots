@@ -86,7 +86,7 @@ nvim.nvim_call_function('coc#add_extension', {
 
 	'coc-python',
     'coc-clangd',
-    'coc-lua',
+    -- 'coc-lua',
     'coc-rls',
 })
 

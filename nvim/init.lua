@@ -7,20 +7,34 @@ package.path = package.path .. (';%s/nvim/?.lua'):format(DOTS)
 nvim = vim.api
 
 -- -----------------------------------------------------------------------------
--- MODULES
+-- CONFIG
 -- -----------------------------------------------------------------------------
 
 local config = {
 	'globals',
 }
 
-for i, path in ipairs(config) do
-	local fd = io.open(path, 'r')
-	if f ~= nil then
-		io.close(f)
-		require('__config/' .. path)
+local missing_configs = {}
+
+for _, path in ipairs(config) do
+	if not pcall(require, '__config/' .. path) then
+		table.insert(missing_configs, path)
 	end
 end
+
+if #missing_configs > 0 then
+	local msg = 'Missing Config Files:'
+
+	for _, path in ipairs(missing_configs) do
+		msg = ('%s\n%s'):format(msg, path)
+	end
+
+	nvim.nvim_call_function('confirm', { msg, '&confirm', 1 })
+end
+
+-- -----------------------------------------------------------------------------
+-- MODULES
+-- -----------------------------------------------------------------------------
 
 require 'options'
 require 'plugins'
