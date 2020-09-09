@@ -51,6 +51,7 @@ export SPACESHIP_PROMPT_ORDER=(
 # ------------------------------------------------------------------------------
 
 export FZF_DEFAULT_COMMAND='rg --files'
+export FZF_DEFAULT_OPTS='--exact'
 
 # ------------------------------------------------------------------------------
 # CONFIG

@@ -57,6 +57,7 @@ nvim.nvim_set_keymap('n', '<s-Tab>', ':bp<cr>', { noremap = true })
 -- -----------------------------------------------------------------------------
 
 -- TODO: Auto adjust fzf layout depending on vim dimensions
+-- TODO: CD command
 function FzfLayout(query, fullscreen)
 end
 
