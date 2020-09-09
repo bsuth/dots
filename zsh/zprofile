@@ -9,7 +9,7 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export DOTS="$HOME/dots"
 export AWESOME="$DOTS/awesome"
 export QUTEBROWSER="$DOTS/qutebrowser"
-export NVIM="$DOTS/awesome"
+export NVIM="$DOTS/nvim"
 export VIFM="$DOTS/vifm"
 export ZSH="$DOTS/zsh"
 
