@@ -30,7 +30,6 @@ beautiful.init({
     colors = colors,
 
     font = 'Quicksand Medium 15',
-    wallpaper = require('__config/wallpaper'),
 
     fg_normal = colors.white,
     bg_focus = colors.white,
@@ -61,11 +60,7 @@ naughty.config.defaults.position = 'bottom_right'
 -- WALLPAPER
 ---------------------------------------
 
-local function set_wallpaper(screen)
-    if beautiful.wallpaper then
-        gears.wallpaper.maximized(beautiful.wallpaper, screen, true)
-    end
-end
+local set_wallpaper = require('__config/wallpaper')
 
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
 screen.connect_signal('property::geometry', set_wallpaper)

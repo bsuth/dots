@@ -4,8 +4,6 @@ local gears = require('gears')
 local naughty = require('naughty')
 local wibox = require('wibox')
 
-local hkeys = require('helpers.keys')
-
 ---------------------------------------
 -- WIDGET
 ---------------------------------------
@@ -15,84 +13,41 @@ local state = {
     pvalue = nil,
 }
 
+local gradient = { 
+    type = 'linear',
+    from = { 0, 0 },
+    to = { 100, 0 },
+    stops = {
+        { 0, '#70fabc' },
+        { 1, '#78f597' },
+    },
+}
+
 local vprogressbar = wibox.widget({
-    background_color = beautiful.colors.dark_grey,
-    color = beautiful.colors.green,
+    background_color = beautiful.colors.black,
+    color = gradient,
 
     value = state.value,
     max_value = 100,
 
+    shape = gears.shape.rounded_bar,
+    bar_shape = gears.shape.rounded_bar,
     widget = wibox.widget.progressbar,
 })
 
 local volume = wibox.widget({
     {
         {
-            text   = 'v',
+            text   = 'volume',
             widget = wibox.widget.textbox,
         },
-        {
-            vprogressbar,
-            direction = 'east',
-            widget = wibox.container.rotate,
-        },
 
-        layout = wibox.layout.fixed.vertical,
+        vprogressbar,
+        layout = wibox.layout.fixed.horizontal,
     },
 
-    shape = gears.shape.rounded_rect,
-    shape_border_width = 2,
-    shape_border_color = beautiful.colors.dark_grey,
     widget  = wibox.container.background,
 })
-
----------------------------------------
--- KEYBINDINGS
----------------------------------------
-
-volume.keys = hkeys.create_keys({
-    {{ }, 'j', function() volume:change_rel(-5) end },
-    {{ }, 'k', function() volume:change_rel(5) end },
-    {{ }, 'd', function() volume:change_rel(-15) end },
-    {{ }, 'u', function() volume:change_rel(15) end },
-    {{ }, 'Return', function() volume:mute() end },
-})
-
----------------------------------------
--- API
----------------------------------------
-
-function volume:mute()
-    awful.spawn.spawn('amixer -D pulse set Master 1+ toggle')
-
-    if state.pvalue then
-        state.value = state.pvalue
-        state.pvalue = nil
-    else
-        state.pvalue = state.value
-        state.value = 0
-    end
-
-    vprogressbar:set_value(state.value)
-end
-
-function volume:change_rel(delta)
-    local sign
-
-    if delta < 0 then
-        sign = '-'
-        delta = math.max(delta, -state.value)
-    else
-        sign = '+'
-        delta = math.min(delta, 100 - state.value)
-    end
-
-    if delta ~= 0 then
-        awful.spawn.spawn(string.format('amixer sset -D pulse Master %d%%%s', math.abs(delta), sign))
-        state.value = state.value + delta
-        vprogressbar:set_value(state.value)
-    end
-end
 
 ---------------------------------------
 -- RETURN

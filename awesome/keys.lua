@@ -3,7 +3,7 @@ local gears = require('gears')
 local naughty = require('naughty')
 local wibox = require('wibox')
 
-local db = require('dashboard')
+local dashboard = require('dashboard')
 local dmenu = require('dmenu')
 local notifier = require('widgets.notifier')
 local tag_history = require('tag/history')
@@ -240,9 +240,9 @@ keys.global = gears.table.join(
 
     awful.key({ modkey }, ' ',
         function()
-            db.kg:start()
+            dashboard:toggle()
         end,
-    {description = 'spawn dashboard'}),
+    {description = 'toggle dashboard'}),
 
     awful.key({ modkey }, 'Return',
         function()
@@ -254,7 +254,41 @@ keys.global = gears.table.join(
         function()
             awful.spawn('google-chrome-stable')
         end,
-    {description = 'open browser'})
+    {description = 'open browser'}),
+
+    awful.key({ modkey }, ";",
+        function()
+            local current_screen = awful.screen.focused()
+
+            if current_screen.selected_tag.name ~= 'music' then
+                for s in screen do
+                    local music_tag = awful.tag.find_by_name(s, 'music')
+                    local music_clients = {
+                        ['st-256color'] = 'st -e cava',
+                        ['Google-chrome'] = 'google-chrome-stable --app="https://music.youtube.com"',
+                    }
+
+                    if music_tag ~= nil then
+                        local clients = music_tag:clients()
+
+                        for _, existing_client in ipairs(music_tag:clients()) do
+                            music_clients[existing_client.class] = nil
+                        end
+
+                        for _, missing_client in pairs(music_clients) do
+                            awful.spawn(missing_client)
+                        end
+
+                        music_tag.screen = current_screen 
+                        music_tag:view_only()
+                        return
+                    end
+                end
+            else
+			    tag_history:back()
+            end
+        end,
+    {description = 'toggle music'})
 )
 
 --------------------------------------------------------------------------------

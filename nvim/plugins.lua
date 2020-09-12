@@ -54,7 +54,7 @@ nvim.nvim_command([[ colorscheme onedark ]])
 -- POLYGLOT
 -- -----------------------------------------------------------------------------
 
-nvim.nvim_set_var('vue_pre_processors', { 'pug', 'scss' })
+nvim.nvim_set_var('vue_pre_processors', { 'typescript', 'pug', 'scss' })
 
 -- -----------------------------------------------------------------------------
 -- VIM-DADBOD-UI
@@ -79,7 +79,6 @@ nvim.nvim_call_function('coc#add_extension', {
     'coc-css',
     'coc-json',
     'coc-tsserver',
-	'coc-prettier',
     'coc-vetur',
 	
 	'coc-db',
@@ -89,11 +88,6 @@ nvim.nvim_call_function('coc#add_extension', {
     -- 'coc-lua',
     'coc-rls',
 })
-
--- Setup prettier command (run automatically on save, see :CocConfig
-nvim.nvim_command([[
-	command! -nargs=0 Prettier :call CocAction('runCommand', 'prettier.formatFile')
-]])
 
 -- " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current
 -- " position. Coc only does snippet and additional edit on confirm.

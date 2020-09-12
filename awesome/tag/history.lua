@@ -32,6 +32,10 @@ awful.screen.connect_for_each_screen(function(s)
 		if s.history_event then
 			s.history_event = false
 		elseif s.selected_tag ~= stack[stack_pointer] then
+			for i = 1, stack_pointer - 1, 1 do
+				table.remove(stack, i)
+			end
+
 			table.insert(stack, 1, s.selected_tag)
 			history.screens[s.index].stack_pointer = 1
 

@@ -4,136 +4,213 @@ local gears = require('gears')
 local naughty = require('naughty')
 local wibox = require('wibox')
 
-local hkeys = require('helpers.keys')
-local volume = require('dashboard.volume')
-local brightness = require('dashboard.brightness')
+local slider = require('widgets/slider')
 
----------------------------------------
--- WIDGET
----------------------------------------
+--------------------------------------------------------------------------------
+-- GRID
+--------------------------------------------------------------------------------
 
-local db = awful.popup({
-    widget = {
-        forced_num_rows = 20,
-        forced_num_cols= 20,
-        spacing = 10,
-        expand = true,
-        homogeneous = true,
-        layout = wibox.layout.grid,
+local grid = wibox.widget({
+    forced_num_rows = 12,
+    forced_num_cols = 2,
+    spacing = 20,
+    expand = true,
+    homogeneous = true,
+    layout = wibox.layout.grid,
+})
+
+--------------------------------------------------------------------------------
+-- SLIDERS
+--------------------------------------------------------------------------------
+
+local volume = slider({ icon = 'vol', value = 50, })
+local brightness = slider({ icon = 'br', value = 50, })
+local battery = slider({ icon = 'bat', value = 50, })
+
+local sliders = wibox.widget({
+    {
+        {
+            {
+                volume,
+                brightness,
+                battery,
+                spacing = 20,
+                forced_width = 400,
+                layout = wibox.layout.flex.vertical,
+            },
+            top = 30,
+            bottom = 30,
+            left = 80,
+            right = 80,
+            widget = wibox.container.margin,
+        },
+        shape = gears.shape.rounded_rect,
+        bg = '#181818',
+        widget = wibox.container.background,
     },
+    widget = wibox.container.place,
+})
 
+-- grid:add_widget_at(sliders, 5, 1, 3, 1)
+
+--------------------------------------------------------------------------------
+-- DATETIME
+--------------------------------------------------------------------------------
+
+local time = wibox.widget({
+    format = "<span color='#ff0000'>%H</span><span color='#00ff00'>%M</span>",
+    font = 'Titan One 50',
+    widget = awful.widget.textclock,
+})
+
+local date = wibox.widget({
+    format = "<span>%a %b %d, %Y</span>",
+    font = 'Titan One 15',
+    widget = awful.widget.textclock,
+})
+
+local separator = wibox.widget({
+    {
+        {
+            color = '#ff0000',
+            shape = gears.shape.rounded_bar,
+            forced_width = 100,
+            forced_height = 5,
+            widget = wibox.widget.separator,
+        },
+        widget = wibox.container.place,
+    },
+    {
+        {
+            markup = 'h',
+            widget = wibox.widget.textbox,
+        },
+        widget = wibox.container.place,
+    },
+    {
+        {
+            color = '#ff0000',
+            shape = gears.shape.rounded_bar,
+            forced_width = 100,
+            forced_height = 5,
+            widget = wibox.widget.separator,
+        },
+        widget = wibox.container.place,
+    },
+    spacing = 15,
+    layout = wibox.layout.fixed.horizontal,
+})
+
+local datetime = wibox.widget({
+    {
+        {
+            {
+                {
+                    time,
+                    widget = wibox.container.place,
+                },
+                {
+                    date,
+                    widget = wibox.container.place,
+                },
+                {
+                    separator,
+                    widget = wibox.container.place,
+                },
+                {
+                    sliders,
+                    widget = wibox.container.place,
+                },
+                spacing = 0,
+                layout = wibox.layout.fixed.vertical,
+            },
+            top = 30,
+            bottom = 30,
+            left = 80,
+            right = 80,
+            widget = wibox.container.margin,
+        },
+        shape = gears.shape.rounded_rect,
+        bg = '#181818',
+        widget = wibox.container.background,
+    },
+    widget = wibox.container.place,
+})
+
+grid:add_widget_at(datetime, 1, 1, 6, 1)
+
+--------------------------------------------------------------------------------
+-- TABBED CONTAINERS
+--------------------------------------------------------------------------------
+
+function newtab(markup)
+    return {
+        {
+            {
+                markup = markup,
+                widget = wibox.widget.textbox,
+            },
+            widget = wibox.container.place,
+        },
+        bg = '#181818',
+        widget = wibox.container.background,
+    }
+end
+
+local tabs_content = wibox.widget({
+    {
+        fill_vertical = true,
+        content_fill_vertical = true,
+        widget = wibox.container.place,
+    },
+    bg = '#ff0000',
+    widget = wibox.container.background,
+})
+
+local tabs = wibox.widget({
+    {
+        newtab('h'),
+        newtab('b'),
+        spacing = 0,
+        layout = wibox.layout.flex.horizontal,
+    },
+    tabs_content,
+    layout = wibox.layout.align.vertical,
+})
+
+grid:add_widget_at(tabs, 6, 2, 6, 1)
+
+--------------------------------------------------------------------------------
+-- POPUP
+--------------------------------------------------------------------------------
+
+local popup = awful.popup({
+    widget = {
+        grid,
+        left = 50,
+        right = 50,
+        top = 50,
+        bottom = 50,
+        widget = wibox.container.margin,
+    },
     ontop = true,
     visible = false,
     bg = '#000000cc',
 })
 
-db.widget:add_widget_at(volume, 7, 19, 8, 1)
-db.widget:add_widget_at(brightness, 7, 18, 8, 1)
-
----------------------------------------
--- API
----------------------------------------
-
-function db:focus(w)
-    if self.focused_widget then
-        self.focused_widget.shape_border_color = beautiful.colors.dark_grey
-    end
-
-    w.shape_border_color = beautiful.colors.green
-    self.focused_widget = w
-end
-
-function db:show()
-    self.screen = awful.screen.focused()
-    self.widget.forced_width = self.screen.geometry.width
-    self.widget.forced_height = self.screen.geometry.height
-    self.visible = true
-end
-
-function db:hide()
-    self.visible = false
-end
-
-function db:focus_by_direction(dir)
-    local rows, cols = self.widget:get_dimension()
-    local wpos = self.widget:get_widget_position(self.focused_widget)
-    local wnew, start, limit, inc, getw
-
-    if (dir == 'left') then
-        start = wpos.col - 1
-        inc = -1
-        limit = 0
-        getw = function(i) return self.widget:get_widgets_at(wpos.row, i) end
-    elseif (dir == 'right') then
-        start = wpos.col + 1
-        inc = 1
-        limit = cols
-        getw = function(i) return self.widget:get_widgets_at(wpos.row, i) end
-    elseif (dir == 'up') then
-        start = wpos.row - 1
-        inc = -1
-        limit = 0
-        getw = function(i) return self.widget:get_widgets_at(i, wpos.col) end
-    elseif (dir == 'down') then
-        start = wpos.row + 1
-        inc = 1
-        limit = rows
-        getw = function(i) return self.widget:get_widgets_at(i, wpos.col) end
+function popup:toggle()
+    if not self.visible then
+        self.screen = awful.screen.focused()
+        self.widget.forced_width = self.screen.geometry.width
+        self.widget.forced_height = self.screen.geometry.height
+        self.visible = true
     else
-        return
-    end
-
-    for i = start, limit, inc do
-        wnew = getw(i)
-        if wnew ~= nil then
-            self:focus(wnew[1])
-            return
-        end
+        self.visible = false
     end
 end
-
----------------------------------------
--- KEYGRABBER
----------------------------------------
-
-local modkey = 'Mod4'
-
-db.kg = awful.keygrabber({
-    keybindings = {
-        {{ modkey }, 'h', function() db:focus_by_direction('left') end},
-        {{ modkey }, 'j', function() db:focus_by_direction('down') end},
-        {{ modkey }, 'k', function() db:focus_by_direction('up') end},
-        {{ modkey }, 'l', function() db:focus_by_direction('right') end},
-    },
-
-    start_callback = function() db:show() end,
-    stop_callback = function() db:hide() end,
-
-    keypressed_callback = function(self, mods, k)
-        if k == 'bracketleft' and #mods then
-            for _, mod in ipairs(mods) do
-                if mod ~= 'Control' then
-                    goto process_key
-                end
-            end
-
-            db.kg:stop()
-            return
-        end
-
-        ::process_key::
-
-        if db.focused_widget.keys then
-            hkeys.keypress(db.focused_widget.keys, mods, k)
-        end
-    end,
-})
 
 ---------------------------------------
 -- RETURN
 ---------------------------------------
 
--- Default focus
-db:focus(volume)
-
-return db
+return popup

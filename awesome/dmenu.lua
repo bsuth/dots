@@ -13,34 +13,6 @@ local wgrid = require('widgets.grid')
 
 local commands = {
     {
-        alias = 'music',
-        callback = function()
-			for s in screen do
-				local music_tag = awful.tag.find_by_name(s, 'music')
-				local music_clients = {
-					['st-256color'] = 'st -e cava',
-					['Google-chrome'] = 'google-chrome-stable --app="https://music.youtube.com"',
-				}
-
-				if music_tag ~= nil then
-					local clients = music_tag:clients()
-
-					for _, existing_client in ipairs(music_tag:clients()) do
-						music_clients[existing_client.class] = nil
-					end
-
-					for _, missing_client in pairs(music_clients) do
-						awful.spawn(missing_client)
-					end
-
-					music_tag.screen = awful.screen.focused()
-					music_tag:view_only()
-					return
-				end
-			end
-        end,
-    },
-    {
         alias = 'db',
         callback = function()
             awful.spawn('st -e nvim -c ":DBUI"')
