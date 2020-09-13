@@ -37,10 +37,10 @@ local weather = wibox.widget({
 -- RETURN
 --------------------------------------------------------------------------------
 
-awful.spawn.easy_async(curl, function(stdout, stderr, exitreason, exitcode)
-    local weather_data = cjson.decode(stdout)
-    local current_condition = weather_data.current_condition[1]
-    current_weather.markup = current_condition.temp_C
-end)
+-- awful.spawn.easy_async(curl, function(stdout, stderr, exitreason, exitcode)
+--     local weather_data = cjson.decode(stdout)
+--     local current_condition = weather_data.current_condition[1]
+--     current_weather.markup = current_condition.temp_C
+-- end)
 
 return weather

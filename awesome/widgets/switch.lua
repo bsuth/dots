@@ -15,28 +15,29 @@ local switch = {}
 --------------------------------------------------------------------------------
 
 function switch:fit(_, width, height)
-    return width, height
+    local m = math.min(width, height)
+    return 2*m, m
 end
 
 function switch:draw(_, cr, width, height)
-    local rs = math.min(width, height)
+    local m = math.min(width, height)
 
     if self._private.checked then
         cr:set_source_rgb(0, 0, 1)
-        gears.shape.rounded_bar(cr, 2*rs, rs)
+        gears.shape.rounded_bar(cr, 2*m, m)
         cr:fill()
 
         cr:set_source_rgb(0, 1, 0)
-        cr:move_to(2*rs, rs/2)
-        cr:arc((3/2)*rs, rs/2, rs/2, 0, 2*math.pi)
+        cr:move_to(2*m, m/2)
+        cr:arc((3/2)*m, m/2, m/2, 0, 2*math.pi)
     else
         cr:set_source_rgb(1, 0, 0)
-        gears.shape.rounded_bar(cr, 2*rs, rs)
+        gears.shape.rounded_bar(cr, 2*m, m)
         cr:fill()
 
         cr:set_source_rgb(0, 1, 0)
-        cr:move_to(rs, rs/2)
-        cr:arc(rs/2, rs/2, rs/2, 0, 2*math.pi)
+        cr:move_to(m, m/2)
+        cr:arc(m/2, m/2, m/2, 0, 2*math.pi)
     end
 
     cr:fill()
