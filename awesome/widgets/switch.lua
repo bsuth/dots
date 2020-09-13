@@ -1,7 +1,4 @@
-local awful = require 'awful' 
-local beautiful = require 'beautiful' 
 local gears = require 'gears' 
-local naughty = require 'naughty' 
 local wibox = require 'wibox' 
 
 --------------------------------------------------------------------------------
@@ -11,7 +8,7 @@ local wibox = require 'wibox'
 local switch = {}
 
 --------------------------------------------------------------------------------
--- SWITCH: API
+-- API
 --------------------------------------------------------------------------------
 
 function switch:fit(_, width, height)
@@ -22,7 +19,7 @@ end
 function switch:draw(_, cr, width, height)
     local m = math.min(width, height)
 
-    if self._private.checked then
+    if self.checked then
         cr:set_source_rgb(0, 0, 1)
         gears.shape.rounded_bar(cr, 2*m, m)
         cr:fill()
@@ -44,23 +41,22 @@ function switch:draw(_, cr, width, height)
     cr:stroke()
 end
 
----------------------------------------
+--------------------------------------------------------------------------------
 -- RETURN
----------------------------------------
+--------------------------------------------------------------------------------
 
 return setmetatable(switch, {
-    __call = function(self, args)
+    __call = function(self)
         local newswitch = wibox.widget.base.make_widget(nil, nil, {
             enable_properties = true,
         })
 
         -- Must use crush here! The table from make_widget already has a
         -- metatable set!
-        gears.table.crush(newswitch._private, args or {})
         gears.table.crush(newswitch, switch, true)
 
         newswitch:connect_signal('button::release', function(self)
-            self._private.checked = not self._private.checked
+            self.checked = not self.checked
             self:emit_signal('widget::redraw_needed')
         end)
 

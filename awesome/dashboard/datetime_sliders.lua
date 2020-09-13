@@ -63,16 +63,16 @@ local separator = wibox.widget({
 -- SLIDERS
 --------------------------------------------------------------------------------
 
-local volume_slider = slider({ icon = 'vol', value = 50, })
-local brightness_slider = slider({ icon = 'br', value = 50, })
-local battery_slider = slider({ icon = 'bat', value = 50, })
+-- local volume_slider = slider({ icon = 'vol', value = 50, })
+-- local brightness_slider = slider({ icon = 'br', value = 50, })
+-- local battery_slider = slider({ icon = 'bat', value = 50, })
 
 local sliders = wibox.widget({
     {
         {
-            volume_slider,
-            brightness_slider,
-            battery_slider,
+            slider({ icon = 'vol', value = 50 }),
+            slider({ icon = 'br', value = 50 }),
+            slider({ icon = 'bat', value = 50 }),
             spacing = 20,
             forced_width = 200,
             forced_height = 100,

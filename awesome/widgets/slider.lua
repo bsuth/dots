@@ -1,5 +1,3 @@
-local awful = require 'awful' 
-local beautiful = require 'beautiful' 
 local gears = require 'gears' 
 local naughty = require 'naughty' 
 local wibox = require 'wibox' 
@@ -10,23 +8,9 @@ local wibox = require 'wibox'
 
 local slider = {}
 
-local gradient = { 
-    type = 'linear',
-    from = { 0, 0 },
-    to = { 100, 0 },
-    stops = {
-        { 0, '#70fabc' },
-        { 1, '#78f597' },
-    },
-}
-
 --------------------------------------------------------------------------------
--- SLIDER: API
+-- API
 --------------------------------------------------------------------------------
-
-function slider:set(value)
-    self.progressbar:set_value(value)
-end
 
 ---------------------------------------
 -- RETURN
@@ -37,19 +21,17 @@ return setmetatable(slider, {
         local newslider = wibox.widget({
             {
                 {
-                    text   = string.format('%-5s', args.icon or ''),
+                    text = string.format('%-5s', args and args.icon or ''),
                     widget = wibox.widget.textbox,
                 },
                 widget = wibox.container.place,
             },
             {
                 {
-                    background_color = beautiful.colors.black,
-                    color = gradient,
-
-                    value = args.value or 0,
+                    background_color = '#080808',
+                    color = '#ff0000',
+                    value = args and args.value or 0,
                     max_value = 100,
-
                     shape = gears.shape.rounded_bar,
                     bar_shape = gears.shape.rounded_bar,
                     widget = wibox.widget.progressbar,
@@ -60,6 +42,9 @@ return setmetatable(slider, {
             layout = wibox.layout.fixed.horizontal,
         })
 
-        return setmetatable(newslider, { __index = self })
-    end
+        gears.table.crush(newslider._private, args or {}, true)
+        gears.table.crush(newslider, slider, true)
+
+        return newslider
+    end,
 })

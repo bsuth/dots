@@ -1,12 +1,11 @@
 local awful = require 'awful' 
 local beautiful = require 'beautiful' 
 local dpi = require('beautiful.xresources').apply_dpi
-local gears = require 'gears' 
 local naughty = require 'naughty' 
 
----------------------------------------
+--------------------------------------------------------------------------------
 -- COLORSCHEME: ONEDARK
----------------------------------------
+--------------------------------------------------------------------------------
 
 local colors = {
     black = '#282c34',
@@ -22,9 +21,19 @@ local colors = {
     light_grey = '#c8ccd4',
 }
 
----------------------------------------
+-- local gradient = { 
+--     type = 'linear',
+--     from = { 0, 0 },
+--     to = { 100, 0 },
+--     stops = {
+--         { 0, '#70fabc' },
+--         { 1, '#78f597' },
+--     },
+-- }
+
+--------------------------------------------------------------------------------
 -- THEME
----------------------------------------
+--------------------------------------------------------------------------------
 
 beautiful.init({
     colors = colors,
@@ -56,9 +65,9 @@ naughty.config.defaults.margin = 15
 naughty.config.defaults.border_width = dpi(25)
 naughty.config.defaults.position = 'bottom_right'
 
----------------------------------------
+--------------------------------------------------------------------------------
 -- WALLPAPER
----------------------------------------
+--------------------------------------------------------------------------------
 
 local set_wallpaper = require('__config/wallpaper')
 

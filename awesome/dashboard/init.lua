@@ -10,7 +10,7 @@ local tabs = require 'dashboard/tabs'
 --------------------------------------------------------------------------------
 
 local grid = wibox.widget({
-    forced_num_rows = 12,
+    forced_num_rows = 14,
     forced_num_cols = 2,
     spacing = 20,
     expand = true,
@@ -18,8 +18,8 @@ local grid = wibox.widget({
     layout = wibox.layout.grid,
 })
 
-grid:add_widget_at(datetime_sliders, 1, 1, 5, 1)
-grid:add_widget_at(notifications, 6, 1, 7, 1)
+grid:add_widget_at(datetime_sliders, 2, 1, 6, 1)
+grid:add_widget_at(notifications, 8, 1, 6, 1)
 grid:add_widget_at(tabs, 3, 2, 8, 1)
 
 --------------------------------------------------------------------------------
@@ -37,7 +37,7 @@ local popup = awful.popup({
     },
     ontop = true,
     visible = false,
-    bg = '#000000cc',
+    bg = '#00000088',
 })
 
 --------------------------------------------------------------------------------
