@@ -1,5 +1,5 @@
-local awful = require('awful')
-local naughty = require('naughty')
+local awful = require 'awful' 
+local naughty = require 'naughty' 
 
 --------------------------------------------------------------------------------
 -- INIT

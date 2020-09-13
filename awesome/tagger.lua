@@ -1,9 +1,9 @@
-local awful = require('awful')
-local beautiful = require('beautiful')
-local gears = require('gears')
-local wibox = require('wibox')
+local awful = require 'awful' 
+local beautiful = require 'beautiful' 
+local gears = require 'gears' 
+local wibox = require 'wibox' 
 
-local wgrid = require('widgets.grid')
+local wgrid = require 'widgets.grid' 
 
 ---------------------------------------
 -- TAGGER

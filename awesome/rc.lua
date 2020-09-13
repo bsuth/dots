@@ -1,20 +1,20 @@
-local awful = require('awful')
-local beautiful = require('beautiful')
-local gears = require('gears')
-local naughty = require('naughty')
-local wibox = require('wibox')
+local awful = require 'awful' 
+local beautiful = require 'beautiful' 
+local gears = require 'gears' 
+local naughty = require 'naughty' 
+local wibox = require 'wibox' 
 
-require('theme')
-local keys = require('keys')
-local mouse = require('mouse')
-local layouts = require('layouts')
-local tagger = require('tagger')
-local db = require('dashboard')
+require 'theme' 
+local keys = require 'keys' 
+local mouse = require 'mouse' 
+local layouts = require 'layouts' 
+local tagger = require 'tagger' 
+local db = require 'dashboard' 
 
 -- Enable hotkeys help widget for VIM and other apps
 -- when client with a matching name is opened:
 -- require('awful.hotkeys_popup.keys')
-require('awful.autofocus')
+require 'awful.autofocus' 
 
 --------------------------------------------------------------------------------
 -- ERROR HANDLING

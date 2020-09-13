@@ -1,5 +1,5 @@
-local beautiful = require('beautiful')
-local wibox = require('wibox')
+local beautiful = require 'beautiful' 
+local wibox = require 'wibox' 
 
 ---------------------------------------
 -- WGRID

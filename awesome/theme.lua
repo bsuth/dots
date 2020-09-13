@@ -1,8 +1,8 @@
-local awful = require('awful')
-local beautiful = require('beautiful')
+local awful = require 'awful' 
+local beautiful = require 'beautiful' 
 local dpi = require('beautiful.xresources').apply_dpi
-local gears = require('gears')
-local naughty = require('naughty')
+local gears = require 'gears' 
+local naughty = require 'naughty' 
 
 ---------------------------------------
 -- COLORSCHEME: ONEDARK

@@ -1,10 +1,14 @@
-local awful = require('awful')
-local beautiful = require('beautiful')
-local gears = require('gears')
-local naughty = require('naughty')
-local wibox = require('wibox')
+local awful = require 'awful'
+local beautiful = require 'beautiful' 
+local gears = require 'gears' 
+local naughty = require 'naughty' 
+local naughty_dbus = require 'naughty/dbus'
+local wibox = require 'wibox' 
 
-local slider = require('widgets/slider')
+local slider = require 'widgets/slider' 
+local switch = require 'widgets/switch' 
+
+local weather = require 'dashboard/weather'
 
 --------------------------------------------------------------------------------
 -- GRID
@@ -20,41 +24,7 @@ local grid = wibox.widget({
 })
 
 --------------------------------------------------------------------------------
--- SLIDERS
---------------------------------------------------------------------------------
-
-local volume = slider({ icon = 'vol', value = 50, })
-local brightness = slider({ icon = 'br', value = 50, })
-local battery = slider({ icon = 'bat', value = 50, })
-
-local sliders = wibox.widget({
-    {
-        {
-            {
-                volume,
-                brightness,
-                battery,
-                spacing = 20,
-                forced_width = 400,
-                layout = wibox.layout.flex.vertical,
-            },
-            top = 30,
-            bottom = 30,
-            left = 80,
-            right = 80,
-            widget = wibox.container.margin,
-        },
-        shape = gears.shape.rounded_rect,
-        bg = '#181818',
-        widget = wibox.container.background,
-    },
-    widget = wibox.container.place,
-})
-
--- grid:add_widget_at(sliders, 5, 1, 3, 1)
-
---------------------------------------------------------------------------------
--- DATETIME
+-- DATETIME + SLIDERS
 --------------------------------------------------------------------------------
 
 local time = wibox.widget({
@@ -101,7 +71,30 @@ local separator = wibox.widget({
     layout = wibox.layout.fixed.horizontal,
 })
 
-local datetime = wibox.widget({
+local volume_slider = slider({ icon = 'vol', value = 50, })
+local brightness_slider = slider({ icon = 'br', value = 50, })
+local battery_slider = slider({ icon = 'bat', value = 50, })
+
+local sliders = wibox.widget({
+    {
+        {
+            volume_slider,
+            brightness_slider,
+            battery_slider,
+            spacing = 20,
+            forced_width = 400,
+            layout = wibox.layout.flex.vertical,
+        },
+        top = 30,
+        bottom = 30,
+        left = 80,
+        right = 80,
+        widget = wibox.container.margin,
+    },
+    widget = wibox.container.place,
+})
+
+grid:add_widget_at(wibox.widget({
     {
         {
             {
@@ -124,20 +117,61 @@ local datetime = wibox.widget({
                 spacing = 0,
                 layout = wibox.layout.fixed.vertical,
             },
-            top = 30,
-            bottom = 30,
-            left = 80,
-            right = 80,
+            top = 20,
+            bottom = 20,
+            left = 50,
+            right = 50,
             widget = wibox.container.margin,
         },
-        shape = gears.shape.rounded_rect,
+        shape = gears.shape.rectangle,
+        shape_border_color = '#d8d8d8',
+        shape_border_width = 2,
         bg = '#181818',
         widget = wibox.container.background,
     },
     widget = wibox.container.place,
+}) , 1, 1, 5, 1)
+
+--------------------------------------------------------------------------------
+-- NOTIFICATIONS
+--------------------------------------------------------------------------------
+
+local notifications_bar = wibox.widget({
+    {
+        markup = 'Notifications',
+        widget = wibox.widget.textbox,
+    },
+    {
+        checked = false,
+        forced_height = 40,
+        widget = switch,
+    },
+    layout = wibox.layout.flex.horizontal,
 })
 
-grid:add_widget_at(datetime, 1, 1, 6, 1)
+grid:add_widget_at(wibox.widget({
+    {
+        notifications_bar,
+        {
+            {
+                markup = 'h',
+                widget = wibox.widget.textbox,
+            },
+            top = 20,
+            bottom = 20,
+            left = 50,
+            right = 50,
+            widget = wibox.container.margin,
+        },
+        shape = gears.shape.rectangle,
+        shape_border_color = '#d8d8d8',
+        shape_border_width = 2,
+        bg = '#181818',
+        forced_width = 400,
+        widget = wibox.container.background,
+    },
+    widget = wibox.container.place,
+}), 6, 1, 7, 1)
 
 --------------------------------------------------------------------------------
 -- TABBED CONTAINERS

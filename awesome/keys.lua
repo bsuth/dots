@@ -1,12 +1,12 @@
-local awful = require('awful')
-local gears = require('gears')
-local naughty = require('naughty')
-local wibox = require('wibox')
+local awful = require 'awful' 
+local gears = require 'gears' 
+local naughty = require 'naughty' 
+local wibox = require 'wibox' 
 
-local dashboard = require('dashboard')
-local dmenu = require('dmenu')
-local notifier = require('widgets.notifier')
-local tag_history = require('tag/history')
+local dashboard = require 'dashboard' 
+local dmenu = require 'dmenu' 
+local notifier = require 'widgets.notifier' 
+local tag_history = require 'tag/history' 
 
 --------------------------------------------------------------------------------
 -- INIT/STATE
