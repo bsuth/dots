@@ -119,7 +119,10 @@ tagger.kg = awful.keygrabber({
         awful.screen.focused().tagger.popup.visible = true
     end,
     stop_callback = function() 
-        awful.screen.focused().tagger.popup.visible = false
+        local s = awful.screen.focused()
+		local popup = awful.screen.focused().tagger.popup
+        popup.screen = s
+        popup.visible = false
     end,
 })
 
