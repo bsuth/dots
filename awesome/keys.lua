@@ -8,6 +8,9 @@ local dmenu = require 'dmenu'
 local notifier = require 'widgets.notifier' 
 local tag_history = require 'tag/history' 
 
+local volume = require 'singletons/volume'
+local brightness = require 'singletons/brightness'
+
 --------------------------------------------------------------------------------
 -- INIT/STATE
 --------------------------------------------------------------------------------
@@ -27,69 +30,15 @@ keys.global = gears.table.join(
     -- System
     -- -------------------------------------------------------------------------
     
-    awful.key({ modkey, 'Shift' }, 'r', 
-        function()
-            awesome.restart()
-        end,
-    {description = 'reload awesome'}),
+    awful.key({ modkey, 'Shift' }, 'r', function() awesome.restart() end),
+    awful.key({ modkey, 'Shift' }, 'Escape', function() awesome.quit() end),
 
-    awful.key({ modkey, 'Shift' }, 'Escape',
-        function()
-            awesome.quit()
-        end,
-    {description = 'quit awesome'}),
+    awful.key({ }, 'XF86AudioLowerVolume', function() volume:shift(-5) end),
+    awful.key({ }, 'XF86AudioRaiseVolume', function() volume:shift(5) end),
+    awful.key({ }, 'XF86AudioMute', function() volume:toggle() end),
 
-    -- -------------------------------------------------------------------------
-    -- Volume
-    -- -------------------------------------------------------------------------
-
-    awful.key({ }, 'XF86AudioLowerVolume', 
-        function()
-            local set_vol_cmd = [[ amixer sset -D pulse Master 6%- ]]
-            awful.spawn.easy_async_with_shell(set_vol_cmd, function()
-                notifier:volume()
-            end)
-        end,
-    {description = 'lower volume'}),
-
-    awful.key({ }, 'XF86AudioRaiseVolume',
-        function()
-            local set_vol_cmd = [[ amixer sset -D pulse Master 6%+ ]]
-            awful.spawn.easy_async_with_shell(set_vol_cmd, function()
-                notifier:volume()
-            end)
-        end,
-    {description = 'raise volume'}),
-
-    awful.key({ }, 'XF86AudioMute',
-        function()
-            awful.spawn.with_shell('amixer -D pulse set Master 1+ toggle')
-            notifier:volume()
-        end,
-    {description = 'toggle mute volume'}),
-
-    -- -------------------------------------------------------------------------
-    -- Brightness
-    -- ----------
-    -- Note: xbacklight is SLOW. If we wait for xbacklight to finish before
-    -- sending the notification, there is a considerable amount of lag. Thus,
-    -- we precompute the new brightness percentage when sending the notification
-    -- and only change it after.
-    -- -------------------------------------------------------------------------
-
-    awful.key({ }, 'XF86MonBrightnessDown',
-        function()
-            notifier:brightness('-', 6)
-            awful.spawn.with_shell([[ xbacklight -6 ]])
-        end,
-    {description = 'lower brightness'}),
-
-    awful.key({ }, 'XF86MonBrightnessUp',
-        function()
-            notifier:brightness('+', 6)
-            awful.spawn.with_shell([[ xbacklight +6 ]])
-        end,
-    {description = 'raise brightness'}),
+    awful.key({ }, 'XF86MonBrightnessDown', function() brightness:shift(-5) end),
+    awful.key({ }, 'XF86MonBrightnessUp', function() brightness:shift(5) end),
 
     -- -------------------------------------------------------------------------
     -- Keyboard
@@ -265,7 +214,7 @@ keys.global = gears.table.join(
                     local music_tag = awful.tag.find_by_name(s, 'music')
                     local music_clients = {
                         ['st-256color'] = 'st -e cava',
-                        ['Google-chrome'] = 'google-chrome-stable --app="https://music.youtube.com"',
+                        ['Google-chrome'] = 'google-chrome-stable --app="https://open.spotify.com"',
                     }
 
                     if music_tag ~= nil then

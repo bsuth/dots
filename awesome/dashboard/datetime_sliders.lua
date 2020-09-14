@@ -1,6 +1,9 @@
+local awful = require 'awful' 
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
+local volume = require 'singletons/volume'
+local brightness = require 'singletons/brightness'
 local slider = require 'widgets/slider' 
 
 --------------------------------------------------------------------------------
@@ -63,15 +66,35 @@ local separator = wibox.widget({
 -- SLIDERS
 --------------------------------------------------------------------------------
 
--- local volume_slider = slider({ icon = 'vol', value = 50, })
--- local brightness_slider = slider({ icon = 'br', value = 50, })
--- local battery_slider = slider({ icon = 'bat', value = 50, })
+local volume_slider = slider({
+    icon = 'vol',
+    init = function(self)
+        self:set_value(volume:get())
+        volume:connect_signal('update', function()
+            self:set_value(volume:get())
+        end)
+    end,
+    scroll_up = function(self) volume:shift(5) end,
+    scroll_down = function(self) volume:shift(-5) end,
+})
+
+local brightness_slider = slider({
+    icon = 'br',
+    init = function(self)
+        self:set_value(brightness:get())
+        brightness:connect_signal('update', function()
+            self:set_value(brightness:get())
+        end)
+    end,
+    scroll_up = function(self) brightness:shift(5) end,
+    scroll_down = function(self) brightness:shift(-5) end,
+})
 
 local sliders = wibox.widget({
     {
         {
-            slider({ icon = 'vol', value = 50 }),
-            slider({ icon = 'br', value = 50 }),
+            volume_slider,
+            brightness_slider,
             slider({ icon = 'bat', value = 50 }),
             spacing = 20,
             forced_width = 200,
