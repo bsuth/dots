@@ -1,10 +1,10 @@
-local awful = require 'awful' 
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
 local volume = require 'singletons/volume'
 local brightness = require 'singletons/brightness'
 local battery = require 'singletons/battery'
+
 local slider = require 'widgets/slider' 
 
 --------------------------------------------------------------------------------

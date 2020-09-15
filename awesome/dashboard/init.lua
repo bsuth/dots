@@ -20,7 +20,7 @@ local grid = wibox.widget({
 
 grid:add_widget_at(datetime_sliders, 2, 1, 6, 1)
 grid:add_widget_at(notifications, 8, 1, 6, 1)
-grid:add_widget_at(tabs, 3, 2, 8, 1)
+grid:add_widget_at(tabs, 3, 2, 10, 1)
 
 --------------------------------------------------------------------------------
 -- POPUP

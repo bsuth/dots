@@ -1,6 +1,6 @@
-local awful = require 'awful'
-local naughty = require 'naughty'
 local wibox = require 'wibox' 
+
+local system = require 'dashboard/tabs/system'
 
 --------------------------------------------------------------------------------
 -- HEAD
@@ -21,12 +21,21 @@ local body = wibox.widget({
 })
 
 --------------------------------------------------------------------------------
+-- FOOT
+--------------------------------------------------------------------------------
+
+local foot = wibox.widget({
+    spacing = 0,
+    layout = wibox.layout.flex.horizontal,
+})
+
+--------------------------------------------------------------------------------
 -- HELPERS
 --------------------------------------------------------------------------------
 
-local function add(title, content)
-    local head_children = head:get_children()
-    table.insert(head_children, wibox.widget({
+local function add(title, bar, content)
+    local bar_children = bar:get_children()
+    table.insert(bar_children, wibox.widget({
         {
             {
                 markup = title,
@@ -37,7 +46,7 @@ local function add(title, content)
         bg = '#181818',
         widget = wibox.container.background,
     }))
-    head:set_children(head_children)
+    bar:set_children(bar_children)
 
     local body_children = body:get_children()
     table.insert(body_children, content)
@@ -48,12 +57,20 @@ end
 -- RETURN
 --------------------------------------------------------------------------------
 
-add('a', nil)
-add('b', nil)
+add('weather', head, nil)
+add('mail', head, nil)
+add('bluez', foot, nil)
+add('wifi', foot, nil)
+add('system', foot, system)
 
 return wibox.widget({
     head,
-    body,
+    {
+        body,
+        bg = '#181818',
+        widget = wibox.container.background,
+    },
+    foot,
     fill_vertical = true,
     content_fill_vertical = true,
     layout = wibox.layout.align.vertical,

@@ -1,12 +1,8 @@
 local awful = require 'awful'
-local beautiful = require 'beautiful'
 local gears = require 'gears'
-local naughty = require 'naughty'
 local wibox = require 'wibox'
 
 local cjson = require 'cjson'
-
-local slider = require 'widgets/slider' 
 
 --------------------------------------------------------------------------------
 -- INIT STATE
