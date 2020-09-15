@@ -37,8 +37,8 @@ keys.global = gears.table.join(
     awful.key({ }, 'XF86AudioRaiseVolume', function() volume:shift(5) end),
     awful.key({ }, 'XF86AudioMute', function() volume:toggle() end),
 
-    awful.key({ }, 'XF86MonBrightnessDown', function() brightness:shift(-5) end),
-    awful.key({ }, 'XF86MonBrightnessUp', function() brightness:shift(5) end),
+    awful.key({ }, 'XF86MonBrightnessDown', function() brightness:shift(-8) end),
+    awful.key({ }, 'XF86MonBrightnessUp', function() brightness:shift(8) end),
 
     -- -------------------------------------------------------------------------
     -- Keyboard

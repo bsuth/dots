@@ -4,6 +4,7 @@ local wibox = require 'wibox'
 
 local volume = require 'singletons/volume'
 local brightness = require 'singletons/brightness'
+local battery = require 'singletons/battery'
 local slider = require 'widgets/slider' 
 
 --------------------------------------------------------------------------------
@@ -90,12 +91,22 @@ local brightness_slider = slider({
     scroll_down = function(self) brightness:shift(-5) end,
 })
 
+local battery_slider = slider({
+    icon = 'bat',
+    init = function(self)
+        self:set_value(battery:get())
+        battery:connect_signal('update', function()
+            self:set_value(battery:get())
+        end)
+    end,
+})
+
 local sliders = wibox.widget({
     {
         {
             volume_slider,
             brightness_slider,
-            slider({ icon = 'bat', value = 50 }),
+            battery_slider,
             spacing = 20,
             forced_width = 200,
             forced_height = 100,
