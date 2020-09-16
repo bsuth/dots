@@ -21,16 +21,6 @@ local colors = {
     light_grey = '#c8ccd4',
 }
 
--- local gradient = { 
---     type = 'linear',
---     from = { 0, 0 },
---     to = { 100, 0 },
---     stops = {
---         { 0, '#70fabc' },
---         { 1, '#78f597' },
---     },
--- }
-
 --------------------------------------------------------------------------------
 -- THEME
 --------------------------------------------------------------------------------
@@ -64,6 +54,14 @@ beautiful.init({
 naughty.config.defaults.margin = 15
 naughty.config.defaults.border_width = dpi(25)
 naughty.config.defaults.position = 'bottom_right'
+
+--------------------------------------------------------------------------------
+-- HELPERS
+--------------------------------------------------------------------------------
+
+function beautiful.icon(icon)
+    return '/usr/share/icons/Papirus/128x128/' .. icon
+end
 
 --------------------------------------------------------------------------------
 -- WALLPAPER

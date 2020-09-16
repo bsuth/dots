@@ -12,7 +12,6 @@ export QUTEBROWSER="$DOTS/qutebrowser"
 export NVIM="$DOTS/nvim"
 export VIFM="$DOTS/vifm"
 export ZSH="$DOTS/zsh"
-export ICONS="$HOME/tools/candy-icons/apps/scalable"
 
 export HISTFILE=~/.histfile
 export HISTSIZE=1000

@@ -1,4 +1,5 @@
 local awful = require 'awful'
+local beautiful = require 'beautiful'
 local gears = require 'gears'
 local wibox = require 'wibox'
 
@@ -6,15 +7,27 @@ local wibox = require 'wibox'
 -- HELPERS
 --------------------------------------------------------------------------------
 
-local function button(icon, click)
-    local button = wibox.widget({
-        markup = icon,
-        widget = wibox.widget.textbox,
+local function add(args)
+    local widget = wibox.widget({
+        {
+            {
+                forced_width = 100,
+                image = args.icon,
+                widget = wibox.widget.imagebox,
+            },
+            {
+                markup = args.label,
+                align = 'center',
+                widget = wibox.widget.textbox,
+            },
+            fill_space = false,
+            layout = wibox.layout.fixed.vertical,
+        },
+        widget = wibox.container.place,
     })
 
-    button:connect_signal('button::press', click)
-
-    return button
+    widget:connect_signal('button::press', args.callback)
+    return widget
 end
 
 --------------------------------------------------------------------------------
@@ -23,16 +36,31 @@ end
 
 local system = wibox.widget({
     {
-        button('reboot', function() awful.spawn('reboot') end),
-        button('logout', function() awful.quit() end),
+        add({
+            label = 'logout',
+            icon = beautiful.icon('apps/system-log-out.svg'),
+            callback = function() awful.quit() end,
+            test = true,
+        }),
+        add({
+            label = 'suspend',
+            icon = beautiful.icon('apps/system-suspend.svg'),
+            callback = function() awful.spawn('systemctl suspend') end,
+        }),
+        add({
+            label = 'reboot',
+            icon = beautiful.icon('apps/system-reboot.svg'),
+            callback = function() awful.spawn('reboot') end,
+        }),
+        add({
+            label = 'poweroff',
+            icon = beautiful.icon('apps/system-shutdown.svg'),
+            callback = function() awful.spawn('poweroff') end,
+        }),
+        spacing = 20,
         layout = wibox.layout.flex.horizontal,
     },
-    {
-        button('sleep', function() awful.spawn('systemctl suspend') end),
-        button('shutdown', function() awful.spawn('poweroff') end),
-        layout = wibox.layout.flex.horizontal,
-    },
-    layout = wibox.layout.flex.vertical,
+    widget = wibox.container.place,
 })
 
 --------------------------------------------------------------------------------

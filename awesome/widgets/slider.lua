@@ -37,8 +37,8 @@ return setmetatable(slider, {
         args = args or {}
 
         local progressbar = wibox.widget({
-            background_color = '#080808',
-            color = '#ff0000',
+            background_color = args.bg or '#0d0d0d',
+            color = args.color or '#ff0000',
             value = args.value or 0,
             max_value = 100,
             shape = gears.shape.rounded_bar,
@@ -49,8 +49,10 @@ return setmetatable(slider, {
         local newslider = wibox.widget({
             {
                 {
-                    text = string.format('%-5s', args.icon or ''),
-                    widget = wibox.widget.textbox,
+                    image = args.icon,
+                    forced_width = 20,
+                    forced_height = 20,
+                    widget = wibox.widget.imagebox,
                 },
                 widget = wibox.container.place,
             },
@@ -58,7 +60,7 @@ return setmetatable(slider, {
                 progressbar,
                 widget = wibox.container.place,
             },
-
+            spacing = 10,
             layout = wibox.layout.fixed.horizontal,
         })
 

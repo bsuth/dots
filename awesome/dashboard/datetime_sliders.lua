@@ -1,3 +1,4 @@
+local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
@@ -12,7 +13,9 @@ local slider = require 'widgets/slider'
 --------------------------------------------------------------------------------
 
 local time = wibox.widget({
-    format = "<span color='#ff0000'>%H</span><span color='#00ff00'>%M</span>",
+    format = ("<span color='%s'>%%H</span><span color='%s'>%%M</span>"):format(
+        beautiful.colors.white, beautiful.colors.cyan
+    ),
     font = 'Titan One 50',
     widget = wibox.widget.textclock,
 })
@@ -34,7 +37,7 @@ local date = wibox.widget({
 local separator = wibox.widget({
     {
         {
-            color = '#ff0000',
+            color = beautiful.colors.cyan,
             shape = gears.shape.rounded_bar,
             forced_width = 100,
             forced_height = 5,
@@ -44,14 +47,16 @@ local separator = wibox.widget({
     },
     {
         {
-            markup = 'h',
-            widget = wibox.widget.textbox,
+            image = beautiful.icon('apps/cs-date-time.svg'),
+            forced_width = 30,
+            forced_height = 30,
+            widget = wibox.widget.imagebox,
         },
         widget = wibox.container.place,
     },
     {
         {
-            color = '#ff0000',
+            color = beautiful.colors.cyan,
             shape = gears.shape.rounded_bar,
             forced_width = 100,
             forced_height = 5,
@@ -68,7 +73,8 @@ local separator = wibox.widget({
 --------------------------------------------------------------------------------
 
 local volume_slider = slider({
-    icon = 'vol',
+    icon = beautiful.icon('apps/cs-sound.svg'),
+    color = beautiful.colors.green,
     init = function(self)
         self:set_value(volume:get())
         volume:connect_signal('update', function()
@@ -80,7 +86,8 @@ local volume_slider = slider({
 })
 
 local brightness_slider = slider({
-    icon = 'br',
+    icon = beautiful.icon('apps/display-brightness.svg'),
+    color = beautiful.colors.yellow,
     init = function(self)
         self:set_value(brightness:get())
         brightness:connect_signal('update', function()
@@ -92,7 +99,8 @@ local brightness_slider = slider({
 })
 
 local battery_slider = slider({
-    icon = 'bat',
+    icon = beautiful.icon('apps/cs-power.svg'),
+    color = beautiful.colors.red,
     init = function(self)
         self:set_value(battery:get())
         battery:connect_signal('update', function()
@@ -136,7 +144,11 @@ return wibox.widget({
                     widget = wibox.container.place,
                 },
                 {
-                    separator,
+                    {
+                        separator,
+                        top = 10,
+                        widget = wibox.container.margin,
+                    },
                     widget = wibox.container.place,
                 },
                 {
@@ -153,7 +165,7 @@ return wibox.widget({
             widget = wibox.container.margin,
         },
         shape = gears.shape.rectangle,
-        shape_border_color = '#d8d8d8',
+        shape_border_color = beautiful.colors.cyan,
         shape_border_width = 2,
         bg = '#181818',
         widget = wibox.container.background,
