@@ -12,6 +12,15 @@ local switch = {}
 -- API
 --------------------------------------------------------------------------------
 
+local function _hex2rgb(hex)
+    hex = hex:gsub('#','')
+    return {
+        tonumber('0x' .. hex:sub(1,2)) / 255,
+        tonumber('0x' .. hex:sub(3,4)) / 255,
+        tonumber('0x' .. hex:sub(5,6)) / 255,
+    }
+end
+
 function switch:fit(_, width, height)
     local m = math.min(width, height)
     return 2*m, m
@@ -20,20 +29,19 @@ end
 function switch:draw(_, cr, width, height)
     local m = math.min(width, height)
 
-    if self.checked then
-        cr:set_source_rgb(0, 0, 1)
-        gears.shape.rounded_bar(cr, 2*m, m)
-        cr:fill()
+    local bg = _hex2rgb(beautiful.colors.blacker)
+    cr:set_source_rgb(bg[1], bg[2], bg[3])
+    gears.shape.rounded_bar(cr, 2*m, m)
+    cr:fill()
 
-        cr:set_source_rgb(0, 1, 0)
+    if self.checked then
+        local fg = _hex2rgb(beautiful.colors.green)
+        cr:set_source_rgb(fg[1], fg[2], fg[3])
         cr:move_to(2*m, m/2)
         cr:arc((3/2)*m, m/2, m/2, 0, 2*math.pi)
     else
-        cr:set_source_rgb(1, 0, 0)
-        gears.shape.rounded_bar(cr, 2*m, m)
-        cr:fill()
-
-        cr:set_source_rgb(0, 1, 0)
+        local fg = _hex2rgb(beautiful.colors.red)
+        cr:set_source_rgb(fg[1], fg[2], fg[3])
         cr:move_to(m, m/2)
         cr:arc(m/2, m/2, m/2, 0, 2*math.pi)
     end

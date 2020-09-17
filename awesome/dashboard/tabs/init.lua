@@ -1,7 +1,9 @@
 local beautiful = require 'beautiful'
 local wibox = require 'wibox' 
 
+local popup = require 'dashboard/popup'
 local system = require 'dashboard/tabs/system'
+local weather = require 'dashboard/tabs/weather'
 
 --------------------------------------------------------------------------------
 -- HEAD
@@ -35,8 +37,7 @@ local foot = wibox.widget({
 --------------------------------------------------------------------------------
 
 local function add(title, bar, content)
-    local bar_children = bar:get_children()
-    table.insert(bar_children, wibox.widget({
+    local tab = wibox.widget({
         {
             {
                 markup = title,
@@ -46,22 +47,31 @@ local function add(title, bar, content)
         },
         bg = beautiful.colors.black,
         widget = wibox.container.background,
-    }))
-    bar:set_children(bar_children)
+    })
 
-    local body_children = body:get_children()
-    table.insert(body_children, content)
-    body:set_children(body_children)
+    popup:register_hover(tab)
+
+    tab:connect_signal('button::press', function(_, _, _, button, _, _)
+        if button == 1 then
+            body:set(1, content)
+        end
+    end)
+
+    local bar_children = bar:get_children()
+    table.insert(bar_children, tab)
+    bar:set_children(bar_children)
+    body:insert(1, content)
 end
 
 --------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------
 
-add('weather', head, nil)
-add('mail', head, nil)
-add('bluez', foot, nil)
-add('wifi', foot, nil)
+-- add('weather', head, nil)
+-- add('mail', head, nil)
+-- add('bluez', foot, nil)
+-- add('wifi', foot, nil)
+add('weather', head, weather)
 add('system', foot, system)
 
 return wibox.widget({

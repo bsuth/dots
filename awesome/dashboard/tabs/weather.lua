@@ -1,4 +1,5 @@
 local awful = require 'awful'
+local beautiful = require 'beautiful'
 local gears = require 'gears'
 local wibox = require 'wibox'
 
@@ -23,7 +24,7 @@ local weather = wibox.widget({
     {
         current_weather,
         shape = gears.shape.rounded_rect,
-        bg = '#181818',
+        bg = beautiful.colors.blacker,
         widget = wibox.container.background,
     },
     widget = wibox.container.place,

@@ -3,6 +3,8 @@ local beautiful = require 'beautiful'
 local gears = require 'gears'
 local wibox = require 'wibox'
 
+local popup = require 'dashboard/popup'
+
 --------------------------------------------------------------------------------
 -- HELPERS
 --------------------------------------------------------------------------------
@@ -26,6 +28,7 @@ local function add(args)
         widget = wibox.container.place,
     })
 
+    popup:register_hover(widget)
     widget:connect_signal('button::press', args.callback)
     return widget
 end

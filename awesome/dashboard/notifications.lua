@@ -2,23 +2,29 @@ local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
+local popup = require 'dashboard/popup'
 local switch = require 'widgets/switch' 
 
 --------------------------------------------------------------------------------
 -- HEAD
 --------------------------------------------------------------------------------
 
+local do_not_disturb = wibox.widget({
+    checked = false,
+    forced_height = 20,
+    widget = switch,
+})
+
+popup:register_hover(do_not_disturb)
+
 local head = wibox.widget({
     {
         markup = 'Notifications',
+        font = 'Titan One 20',
         widget = wibox.widget.textbox,
     },
     nil,
-    {
-        checked = false,
-        forced_height = 20,
-        widget = switch,
-    },
+    do_not_disturb,
     layout = wibox.layout.align.horizontal,
 })
 

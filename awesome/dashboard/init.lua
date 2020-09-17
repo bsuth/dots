@@ -1,6 +1,7 @@
 local awful = require 'awful'
 local wibox = require 'wibox' 
 
+local popup = require 'dashboard/popup'
 local datetime_sliders = require 'dashboard/datetime_sliders'
 local notifications = require 'dashboard/notifications'
 local tabs = require 'dashboard/tabs'
@@ -23,40 +24,8 @@ grid:add_widget_at(notifications, 8, 1, 6, 1)
 grid:add_widget_at(tabs, 3, 2, 10, 1)
 
 --------------------------------------------------------------------------------
--- POPUP
---------------------------------------------------------------------------------
-
-local popup = awful.popup({
-    widget = {
-        grid,
-        left = 50,
-        right = 50,
-        top = 50,
-        bottom = 50,
-        widget = wibox.container.margin,
-    },
-    ontop = true,
-    visible = false,
-    bg = '#00000088',
-})
-
---------------------------------------------------------------------------------
--- API
---------------------------------------------------------------------------------
-
-function popup:toggle()
-    if not self.visible then
-        self.screen = awful.screen.focused()
-        self.widget.forced_width = self.screen.geometry.width
-        self.widget.forced_height = self.screen.geometry.height
-        self.visible = true
-    else
-        self.visible = false
-    end
-end
-
---------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------
 
+popup:set(grid)
 return popup
