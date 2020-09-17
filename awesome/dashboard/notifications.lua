@@ -1,3 +1,4 @@
+local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
@@ -56,7 +57,7 @@ local function add(title, description)
             widget = wibox.container.margin,
         },
         shape = gears.shape.rounded_rect,
-        bg = '#080808',
+        bg = beautiful.colors.blacker,
         widget = wibox.container.background,
     }))
     body:set_children(body_children)
@@ -86,9 +87,9 @@ return wibox.widget({
             widget = wibox.container.margin,
         },
         shape = gears.shape.rectangle,
-        shape_border_color = '#d8d8d8',
+        shape_border_color = beautiful.colors.cyan,
         shape_border_width = 2,
-        bg = '#181818',
+        bg = beautiful.colors.black,
         forced_width = 500,
         widget = wibox.container.background,
     },

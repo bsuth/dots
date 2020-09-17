@@ -168,7 +168,7 @@ return wibox.widget({
         shape = gears.shape.rectangle,
         shape_border_color = beautiful.colors.cyan,
         shape_border_width = 2,
-        bg = '#181818',
+        bg = beautiful.colors.black,
         widget = wibox.container.background,
     },
     widget = wibox.container.place,

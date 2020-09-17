@@ -1,3 +1,4 @@
+local beautiful = require 'beautiful'
 local wibox = require 'wibox' 
 
 local system = require 'dashboard/tabs/system'
@@ -43,7 +44,7 @@ local function add(title, bar, content)
             },
             widget = wibox.container.place,
         },
-        bg = '#181818',
+        bg = beautiful.colors.black,
         widget = wibox.container.background,
     }))
     bar:set_children(bar_children)
@@ -67,7 +68,7 @@ return wibox.widget({
     head,
     {
         body,
-        bg = '#181818',
+        bg = beautiful.colors.black,
         widget = wibox.container.background,
     },
     foot,

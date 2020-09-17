@@ -1,3 +1,4 @@
+local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
@@ -50,8 +51,8 @@ return setmetatable(slider, {
         })
 
         local progressbar = wibox.widget({
-            background_color = args.bg or '#0d0d0d',
-            color = args.color or '#ff0000',
+            background_color = args.bg or beautiful.colors.blacker,
+            color = args.color or beautiful.colors.red,
             value = args.value or 0,
             max_value = 100,
             shape = gears.shape.rounded_bar,

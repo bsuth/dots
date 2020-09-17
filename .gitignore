@@ -11,10 +11,3 @@ bundle/
 # vifm
 vifminfo*
 vifm-help.txt
-
-# qutebrowser
-__pycache__
-qsettings
-autoconfig.yml
-bookmarks/
-quickmarks
