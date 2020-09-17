@@ -99,12 +99,13 @@ local brightness_slider = slider({
 })
 
 local battery_slider = slider({
-    icon = beautiful.icon('apps/cs-power.svg'),
+    icon = beautiful.icon('devices/battery.svg'),
     color = beautiful.colors.red,
     init = function(self)
         self:set_value(battery:get())
         battery:connect_signal('update', function()
             self:set_value(battery:get())
+            self:set_icon(battery:get('status_icon'))
         end)
     end,
 })

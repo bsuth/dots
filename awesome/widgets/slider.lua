@@ -1,6 +1,8 @@
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
+local naughty = require 'naughty' 
+
 --------------------------------------------------------------------------------
 -- SLIDER
 --------------------------------------------------------------------------------
@@ -11,13 +13,17 @@ local slider = {}
 -- API
 --------------------------------------------------------------------------------
 
+function slider:set_icon(icon)
+    self._icon:set_image(icon)
+end
+
 function slider:set_value(val)
-    self.value = math.min(math.max(0, val), 100)
-    self.progressbar:set_value(self.value)
+    self._value = math.min(math.max(0, val), 100)
+    self._progressbar:set_value(self._value)
 end
 
 function slider:shift(dval)
-    self:set_value(self.value + dval)
+    self:set_value(self._value + dval)
 end
 
 function slider:scroll(_, _, button, _, _)
@@ -36,6 +42,13 @@ return setmetatable(slider, {
     __call = function(self, args)
         args = args or {}
 
+        local icon = wibox.widget({
+            image = args.icon,
+            forced_width = 20,
+            forced_height = 20,
+            widget = wibox.widget.imagebox,
+        })
+
         local progressbar = wibox.widget({
             background_color = args.bg or '#0d0d0d',
             color = args.color or '#ff0000',
@@ -48,12 +61,7 @@ return setmetatable(slider, {
 
         local newslider = wibox.widget({
             {
-                {
-                    image = args.icon,
-                    forced_width = 20,
-                    forced_height = 20,
-                    widget = wibox.widget.imagebox,
-                },
+                icon,
                 widget = wibox.container.place,
             },
             {
@@ -64,8 +72,10 @@ return setmetatable(slider, {
             layout = wibox.layout.fixed.horizontal,
         })
 
-        newslider.value = args.value or 0
-        newslider.progressbar = progressbar
+        newslider._value = args.value or 0
+        newslider._icon = icon
+        newslider._progressbar = progressbar
+
         gears.table.crush(newslider, args, true)
         gears.table.crush(newslider, slider, true)
 

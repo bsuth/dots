@@ -6,34 +6,36 @@ local gears = require 'gears'
 --------------------------------------------------------------------------------
 
 local brightness = gears.object()
-gears.table.crush(brightness, { value = 0 }, true)
 
-awful.spawn.easy_async_with_shell(
-    [[ echo $(( 100 * $(brightnessctl get) / $(brightnessctl max) )) ]],
-    function(stdout, _, _, _) brightness:set(tonumber(stdout)) end
-)
+local _private = {
+    value = 0,
+}
 
 --------------------------------------------------------------------------------
 -- API
 --------------------------------------------------------------------------------
 
-function brightness:get()
-    return self.value
+function brightness:get(param)
+    return param and _private[param] or _private.value
 end
 
 function brightness:set(value)
-    value = math.min(math.max(0, value), 100)
-    awful.spawn(('brightnessctl set %s%%'):format(value))
-    self.value = value
-    self:emit_signal('update', value)
+    _private.value = math.min(math.max(0, value), 100)
+    awful.spawn(('brightnessctl set %s%%'):format(_private.value))
+    self:emit_signal('update')
 end
 
 function brightness:shift(dvalue)
-    self:set(self.value + dvalue)
+    self:set(_private.value + dvalue)
 end
 
 --------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------
+
+awful.spawn.easy_async_with_shell(
+    [[ echo $(( 100 * $(brightnessctl get) / $(brightnessctl max) )) ]],
+    function(stdout, _, _, _) brightness:set(tonumber(stdout)) end
+)
 
 return brightness
