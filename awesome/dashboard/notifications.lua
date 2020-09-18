@@ -1,5 +1,6 @@
 local beautiful = require 'beautiful'
 local gears = require 'gears' 
+local naughty = require 'naughty'
 local wibox = require 'wibox' 
 
 local popup = require 'dashboard/popup'
@@ -42,20 +43,40 @@ local body = wibox.widget({
 --------------------------------------------------------------------------------
 
 local function add(title, description)
+	local exit = wibox.widget({
+		forced_height = 40,
+		image = beautiful.icon('../24x24/actions/dialog-close.svg'),
+		widget = wibox.widget.imagebox,
+	})
+
+	popup:register_hover(exit)
+
+	exit:connect_signal('button::press', function(_, _, _, button, _, _)
+		if button == 1 then
+			naughty.notify({text = 'pressed'})
+		end
+	end)
+
     local body_children = body:get_children()
     table.insert(body_children, wibox.widget({
         {
-            {
-                {
-                    markup = title,
-                    widget = wibox.widget.textbox,
-                },
-                {
-                    markup = description,
-                    widget = wibox.widget.textbox,
-                },
-                layout = wibox.layout.flex.vertical,
-            },
+			{
+				{
+					{
+						markup = title,
+						font = 'Titan One 12',
+						widget = wibox.widget.textbox,
+					},
+					{
+						markup = description,
+						widget = wibox.widget.textbox,
+					},
+					layout = wibox.layout.flex.vertical,
+				},
+				nil,
+				exit,
+				layout = wibox.layout.align.horizontal,
+			},
             top = 10,
             bottom = 10,
             left = 10,
