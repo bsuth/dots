@@ -27,17 +27,13 @@ local plugins = {
 	[[ Plug 'tpope/vim-commentary' ]],
 	[[ Plug 'junegunn/fzf' ]],
 	[[ Plug 'junegunn/fzf.vim' ]],
+    [[ Plug 'sheerun/vim-polyglot' ]],
 
 	-- unstable
     [[ Plug 'tpope/vim-dadbod' ]],
     [[ Plug 'kristijanhusak/vim-dadbod-ui' ]],
     [[ Plug 'Shougo/neco-vim' ]],
     [[ Plug 'neoclide/coc-neco' ]],
-	[[ Plug 'vimwiki/vimwiki' ]],
-
-	-- Had conflicts with coc-vetur that caused inconsistent highlighting and
-	-- extremely slow startup
-    [[ Plug 'sheerun/vim-polyglot' ]],
 }
 
 nvim.nvim_call_function('plug#begin', { '$DOTS/nvim/bundle' })
