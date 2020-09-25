@@ -1,52 +1,24 @@
 #!/usr/bin/env bash
 
 # ------------------------------------------------------------------------------
-# - ENVIRONMENT
-# - Note: this is necessary if we haven't linked our zshrc or zprofile yet!
+# SYMBOLIC LINKS
+#
+# Note: Use absolute paths here, as any custom environment variables may not be
+# setup yet (when installing on a new system, for example).
 # ------------------------------------------------------------------------------
 
-DOTS="$HOME/dots"
+ln -sf "$HOME/dots/Xmodmap" "$HOME/.Xmodmap"
+ln -sf "$HOME/dots/xinitrc" "$HOME/.xinitrc"
 
-# -------------------------------------
-# - X11
-# -------------------------------------
+ln -sf "$HOME/dots/zsh/zprofile" "$HOME/.zprofile"
+ln -sf "$HOME/dots/zsh/zshrc" "$HOME/.zshrc"
 
-ln -sf "$DOTS/Xmodmap" "$HOME/.Xmodmap"
-ln -sf "$DOTS/xinitrc" "$HOME/.xinitrc"
+ln -sfn "$HOME/dots/awesome" "$HOME/.config/awesome"
 
-# -------------------------------------
-# - ZSH
-# -------------------------------------
+ln -sfn "$HOME/dots/nvim" "$HOME/.config/nvim"
 
-ln -sf "$DOTS/zsh/zprofile" "$HOME/.zprofile"
-ln -sf "$DOTS/zsh/zshrc" "$HOME/.zshrc"
+ln -sfn "$HOME/dots/vifm" "$HOME/.config/vifm"
 
-# ------------------------------------------------------------------------------
-# - AWESOME
-# ------------------------------------------------------------------------------
+ln -sf "$HOME/dots/picom.conf" "$HOME/.config/picom.conf"
 
-ln -sfn "$DOTS/awesome" "$XDG_CONFIG_HOME/awesome"
-
-# ------------------------------------------------------------------------------
-# - NVIM
-# ------------------------------------------------------------------------------
-
-ln -sfn "$DOTS/nvim" "$XDG_CONFIG_HOME/nvim"
-
-# ------------------------------------------------------------------------------
-# - VIFM
-# ------------------------------------------------------------------------------
-
-ln -sfn "$DOTS/vifm" "$XDG_CONFIG_HOME/vifm"
-
-# -------------------------------------
-# - ZSH
-# -------------------------------------
-
-ln -sf "$DOTS/picom.conf" "$XDG_CONFIG_HOME/picom.conf"
-
-# -------------------------------------
-# - SYSTEMD UNITS
-# -------------------------------------
-
-sudo ln -sf "$DOTS/services/physlock.service" "/etc/systemd/system/physlock.service"
+sudo ln -sf "$HOME/dots/services/physlock.service" "/etc/systemd/system/physlock.service"

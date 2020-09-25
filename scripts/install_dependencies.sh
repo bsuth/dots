@@ -14,13 +14,11 @@
 # -------------------------------------------------------
 
 PACKAGES=(
-    # Auto-mount usbs
+    # System
+    xorg
+    pulseaudio
     udisks2
     udiskie 
-
-    # Network
-    iwd
-    dhcpcd5
 
     # Utilities
     acpi
@@ -37,12 +35,13 @@ PACKAGES=(
     luarocks
 
     # Environment
-    papirus-icon-theme
-    compton
-    physlock
+    awesome
+    vifm
     pass
     zsh
-    vifm
+    compton
+    physlock
+    papirus-icon-theme
 )
 
 apt install "${PACKAGES[@]}"
