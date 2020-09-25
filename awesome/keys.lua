@@ -213,7 +213,6 @@ keys.global = gears.table.join(
                 for s in screen do
                     local music_tag = awful.tag.find_by_name(s, 'music')
                     local music_clients = {
-                        ['st-256color'] = 'st -e cava',
                         ['Google-chrome'] = 'google-chrome-stable --app="https://open.spotify.com"',
                     }
 

@@ -50,7 +50,7 @@ nvim.nvim_command([[ colorscheme onedark ]])
 -- POLYGLOT
 -- -----------------------------------------------------------------------------
 
-nvim.nvim_set_var('vue_pre_processors', { 'typescript', 'pug', 'scss' })
+nvim.nvim_set_var('vue_pre_processors', { 'typescript', 'scss' })
 
 -- -----------------------------------------------------------------------------
 -- VIM-DADBOD-UI
