@@ -18,26 +18,26 @@ ln -sf "$DOTS/xinitrc" "$HOME/.xinitrc"
 # - ZSH
 # -------------------------------------
 
-ln -sf "$ZSH/zprofile" "$HOME/.zprofile"
-ln -sf "$ZSH/zshrc" "$HOME/.zshrc"
+ln -sf "$DOTS/zsh/zprofile" "$HOME/.zprofile"
+ln -sf "$DOTS/zsh/zshrc" "$HOME/.zshrc"
 
 # ------------------------------------------------------------------------------
 # - AWESOME
 # ------------------------------------------------------------------------------
 
-ln -sfn "$AWESOME" "$XDG_CONFIG_HOME/awesome"
+ln -sfn "$DOTS/awesome" "$XDG_CONFIG_HOME/awesome"
 
 # ------------------------------------------------------------------------------
 # - NVIM
 # ------------------------------------------------------------------------------
 
-ln -sfn "$NVIM" "$XDG_CONFIG_HOME/nvim"
+ln -sfn "$DOTS/nvim" "$XDG_CONFIG_HOME/nvim"
 
 # ------------------------------------------------------------------------------
 # - VIFM
 # ------------------------------------------------------------------------------
 
-ln -sfn "$VIFM" "$XDG_CONFIG_HOME/vifm"
+ln -sfn "$DOTS/vifm" "$XDG_CONFIG_HOME/vifm"
 
 # -------------------------------------
 # - ZSH

@@ -36,6 +36,6 @@ fi
 
 fcitx &
 udiskie &
-picom -b
+compton -b
 eval $(ssh-agent)
-exec awesome
+exec awesome -c ~/.config/awesome/rc.lua
