@@ -18,24 +18,6 @@ local commands = {
             awful.spawn('st -e nvim -c ":DBUI"')
         end,
     },
-    {
-        alias = 'sleep',
-        callback = function()
-            awful.spawn('systemctl suspend')
-        end,
-    },
-    {
-        alias = 'reboot',
-        callback = function()
-            awful.spawn('reboot')
-        end,
-    },
-    {
-        alias = 'poweroff',
-        callback = function()
-            awful.spawn('poweroff')
-        end,
-    },
 }
 
 for _, command in ipairs(require('__config/dmenu')) do

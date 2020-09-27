@@ -1,4 +1,5 @@
 local beautiful = require 'beautiful'
+local gears = require 'gears'
 local wibox = require 'wibox' 
 
 local popup = require 'dashboard/popup'
@@ -75,14 +76,17 @@ add('weather', head, weather)
 add('system', foot, system)
 
 return wibox.widget({
-    head,
     {
+        head,
         body,
-        bg = beautiful.colors.black,
-        widget = wibox.container.background,
+        foot,
+        fill_vertical = true,
+        content_fill_vertical = true,
+        layout = wibox.layout.align.vertical,
     },
-    foot,
-    fill_vertical = true,
-    content_fill_vertical = true,
-    layout = wibox.layout.align.vertical,
+    shape = gears.shape.rectangle,
+    shape_border_color = beautiful.colors.cyan,
+    shape_border_width = 2,
+    bg = beautiful.colors.black,
+    widget = wibox.container.background,
 })

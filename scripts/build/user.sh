@@ -91,3 +91,11 @@ sudo ln -sf "$HOME/dots/services/physlock.service" "/etc/systemd/system/physlock
 
 echo -e "${GREEN}=== Changing user shell to zsh ===${NC}\n"
 sudo chsh -s /bin/zsh bsuth
+
+# --------------------------------------
+# Configure git
+# --------------------------------------
+
+# --------------------------------------
+# Install NeoVim
+# --------------------------------------
