@@ -3,8 +3,9 @@ local gears = require 'gears'
 local wibox = require 'wibox' 
 
 local popup = require 'dashboard/popup'
-local system = require 'dashboard/tabs/system'
+local notifications = require 'dashboard/tabs/notifications'
 local weather = require 'dashboard/tabs/weather'
+local system = require 'dashboard/tabs/system'
 
 --------------------------------------------------------------------------------
 -- HEAD
@@ -68,17 +69,20 @@ end
 -- RETURN
 --------------------------------------------------------------------------------
 
--- add('weather', head, nil)
--- add('mail', head, nil)
 -- add('bluez', foot, nil)
 -- add('wifi', foot, nil)
+add('notifications', head, notifications)
 add('weather', head, weather)
 add('system', foot, system)
 
 return wibox.widget({
     {
         head,
-        body,
+        {
+            body,
+            margins = 50,
+            widget = wibox.container.margin,
+        },
         foot,
         fill_vertical = true,
         content_fill_vertical = true,

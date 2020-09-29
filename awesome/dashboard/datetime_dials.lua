@@ -1,0 +1,192 @@
+local beautiful = require 'beautiful'
+local gears = require 'gears' 
+local wibox = require 'wibox' 
+
+local volume = require 'singletons/volume'
+local brightness = require 'singletons/brightness'
+local battery = require 'singletons/battery'
+
+local dial = require 'widgets/dial' 
+
+--------------------------------------------------------------------------------
+-- TIME
+--------------------------------------------------------------------------------
+
+local time = wibox.widget({
+    {
+        format = ("<span color='%s'>%%H</span><span color='%s'>%%M</span>"):format(
+            beautiful.colors.white, beautiful.colors.cyan
+        ),
+        font = 'Titan One 50',
+        widget = wibox.widget.textclock,
+    },
+    widget = wibox.container.place,
+})
+
+--------------------------------------------------------------------------------
+-- DATE
+--------------------------------------------------------------------------------
+
+local date = wibox.widget({
+    {
+        format = "<span>%a %b %d, %Y</span>",
+        font = 'Titan One 15',
+        widget = wibox.widget.textclock,
+    },
+    widget = wibox.container.place,
+})
+
+--------------------------------------------------------------------------------
+-- SEPARATOR
+--------------------------------------------------------------------------------
+
+local separator = wibox.widget({
+    {
+        {
+            {
+                color = beautiful.colors.cyan,
+                shape = gears.shape.rounded_bar,
+                forced_width = 100,
+                forced_height = 5,
+                widget = wibox.widget.separator,
+            },
+            widget = wibox.container.place,
+        },
+        {
+            {
+                image = beautiful.icon('apps/cs-date-time.svg'),
+                forced_width = 30,
+                forced_height = 30,
+                widget = wibox.widget.imagebox,
+            },
+            widget = wibox.container.place,
+        },
+        {
+            {
+                color = beautiful.colors.cyan,
+                shape = gears.shape.rounded_bar,
+                forced_width = 100,
+                forced_height = 5,
+                widget = wibox.widget.separator,
+            },
+            widget = wibox.container.place,
+        },
+        spacing = 15,
+        layout = wibox.layout.fixed.horizontal,
+    },
+    widget = wibox.container.place,
+})
+
+--------------------------------------------------------------------------------
+-- DIALS
+--------------------------------------------------------------------------------
+
+-- local volume_slider = slider({
+--     icon = beautiful.icon('apps/cs-sound.svg'),
+--     color = beautiful.colors.green,
+--     init = function(self)
+--         self:set_value(volume:get())
+--         volume:connect_signal('update', function()
+--             self:set_value(volume:get())
+--         end)
+--     end,
+--     scroll_up = function(self) volume:shift(5) end,
+--     scroll_down = function(self) volume:shift(-5) end,
+-- })
+
+-- local brightness_slider = slider({
+--     icon = beautiful.icon('apps/display-brightness.svg'),
+--     color = beautiful.colors.yellow,
+--     init = function(self)
+--         self:set_value(brightness:get())
+--         brightness:connect_signal('update', function()
+--             self:set_value(brightness:get())
+--         end)
+--     end,
+--     scroll_up = function(self) brightness:shift(5) end,
+--     scroll_down = function(self) brightness:shift(-5) end,
+-- })
+
+-- local battery_slider = slider({
+--     icon = beautiful.icon('devices/battery.svg'),
+--     color = beautiful.colors.red,
+--     init = function(self)
+--         self:set_value(battery:get())
+--         battery:connect_signal('update', function()
+--             self:set_value(battery:get())
+--             self:set_icon(battery:get('status_icon'))
+--         end)
+--     end,
+-- })
+
+local dials = wibox.widget({
+    {
+        {
+            {
+                {
+                    forced_width = 70,
+                    forced_height = 70,
+                    icon = beautiful.icon('apps/cs-sound.svg'),
+                    color = beautiful.colors.green,
+                    percent = 25,
+                    widget = dial,
+                },
+                {
+                    forced_width = 70,
+                    forced_height = 70,
+                    icon = beautiful.icon('apps/display-brightness.svg'),
+                    color = beautiful.colors.yellow,
+                    percent = 50,
+                    widget = dial,
+                },
+                spacing = 50,
+                layout = wibox.layout.flex.horizontal,
+            },
+            {
+                {
+                    forced_width = 70,
+                    forced_height = 70,
+                    icon = beautiful.icon('devices/battery.svg'),
+                    color = beautiful.colors.red,
+                    percent = 80,
+                    widget = dial,
+                },
+                widget = wibox.container.place,
+            },
+            layout = wibox.layout.flex.vertical,
+        },
+        top = 10,
+        widget = wibox.container.margin,
+    },
+    widget = wibox.container.place,
+})
+
+--------------------------------------------------------------------------------
+-- RETURN
+--------------------------------------------------------------------------------
+
+return wibox.widget({
+    {
+        {
+            {
+                time,
+                date,
+                {
+                    separator,
+                    top = 10,
+                    widget = wibox.container.margin,
+                },
+                dials,
+                layout = wibox.layout.fixed.vertical,
+            },
+            margins = 50,
+            widget = wibox.container.margin,
+        },
+        shape = gears.shape.circle,
+        shape_border_color = beautiful.colors.cyan,
+        shape_border_width = 5,
+        bg = beautiful.colors.black,
+        widget = wibox.container.background,
+    },
+    widget = wibox.container.place,
+})
