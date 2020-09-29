@@ -163,10 +163,7 @@ end
 
 local nmap = {
 	['<leader>sv'] = ':source $MYVIMRC<cr>',
-	['<leader>?'] = ':help ',
-	['<leader>v?'] = ':vert :help ',
 	['<leader>/'] = ':nohlsearch<cr><c-l>',
-
 	['<c-_>'] = ':Commentary<cr>',
 
 	-- Open console in current directory
@@ -182,13 +179,21 @@ local nmap = {
 	['<leader><c-j>'] = '<c-w>J',
 	['<leader><c-k>'] = '<c-w>K',
 	['<leader><c-l>'] = '<c-w>L',
-	['<leader>cl'] = ':sp|:term<cr>',
-	['<leader>vcl'] = ':vsp|:term<cr>',
 
 	-- Buffers
 	['<c-w>'] = ':bd<cr>',
 	['<Tab>'] = ':bn<cr>',
 	['<s-Tab>'] = ':bp<cr>',
+
+	-- Help
+	['<leader><leader>?'] = ':help  | :wincmd o' .. ('<left>'):rep(12),
+	['<leader>?'] = ':help ',
+	['<leader>v?'] = ':vert :help ',
+
+	-- Term
+	['<leader><leader><cr>'] = ':term<cr>:startinsert<cr>',
+	['<leader><cr>'] = ':sp|:term<cr>:startinsert<cr>',
+	['<leader>v<cr>'] = ':vsp|:term<cr>:startinsert<cr>',
 
 	-- Dirvish
 	['<leader>ev'] = ':Dirvish ~/dots/nvim<cr>',

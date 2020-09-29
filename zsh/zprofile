@@ -22,7 +22,7 @@ export QT_IM_MODULE=fcitx
 export QT5_IM_MODULE=fcitx
 export QT_QPA_PLATFORMTHEME=qt5ct
 
-export FZF_DEFAULT_COMMAND='rg --files'
+export FZF_DEFAULT_COMMAND='rg --files -L'
 export FZF_DEFAULT_OPTS='--exact'
 
 export SPACESHIP_PROMPT_ORDER=(
