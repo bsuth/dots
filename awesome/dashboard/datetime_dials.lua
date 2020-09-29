@@ -81,76 +81,72 @@ local separator = wibox.widget({
 -- DIALS
 --------------------------------------------------------------------------------
 
--- local volume_slider = slider({
---     icon = beautiful.icon('apps/cs-sound.svg'),
---     color = beautiful.colors.green,
---     init = function(self)
---         self:set_value(volume:get())
---         volume:connect_signal('update', function()
---             self:set_value(volume:get())
---         end)
---     end,
---     scroll_up = function(self) volume:shift(5) end,
---     scroll_down = function(self) volume:shift(-5) end,
--- })
+local volume_dial = wibox.widget({
+    forced_width = 70,
+    forced_height = 70,
 
--- local brightness_slider = slider({
---     icon = beautiful.icon('apps/display-brightness.svg'),
---     color = beautiful.colors.yellow,
---     init = function(self)
---         self:set_value(brightness:get())
---         brightness:connect_signal('update', function()
---             self:set_value(brightness:get())
---         end)
---     end,
---     scroll_up = function(self) brightness:shift(5) end,
---     scroll_down = function(self) brightness:shift(-5) end,
--- })
+    icon = beautiful.icon('apps/cs-sound.svg'),
+    color = beautiful.colors.green,
+    percent = volume:get(),
 
--- local battery_slider = slider({
---     icon = beautiful.icon('devices/battery.svg'),
---     color = beautiful.colors.red,
---     init = function(self)
---         self:set_value(battery:get())
---         battery:connect_signal('update', function()
---             self:set_value(battery:get())
---             self:set_icon(battery:get('status_icon'))
---         end)
---     end,
--- })
+    onscrollup = function(self) volume:shift(5) end,
+    onscrolldown = function(self) volume:shift(-5) end,
+
+    widget = dial,
+})
+
+volume:connect_signal('update', function()
+    volume_dial.percent = volume:get()
+    volume_dial:emit_signal('widget::redraw_needed')
+end)
+
+local brightness_dial = wibox.widget({
+    forced_width = 70,
+    forced_height = 70,
+
+    icon = beautiful.icon('apps/display-brightness.svg'),
+    color = beautiful.colors.yellow,
+    percent = brightness:get(),
+
+    onscrollup = function(self) brightness:shift(5) end,
+    onscrolldown = function(self) brightness:shift(-5) end,
+
+    widget = dial,
+})
+
+brightness:connect_signal('update', function()
+    brightness_dial.percent = brightness:get()
+    brightness_dial:emit_signal('widget::redraw_needed')
+end)
+
+local battery_dial = wibox.widget({
+    forced_width = 70,
+    forced_height = 70,
+
+    icon = beautiful.icon('devices/battery.svg'),
+    color = beautiful.colors.red,
+    percent = battery:get(),
+
+    widget = dial,
+})
+
+battery:connect_signal('update', function()
+    battery_dial.percent = battery:get()
+    battery.icon = battery:get('status_icon')
+    brightness_dial:emit_signal('widget::redraw_needed')
+end)
 
 local dials = wibox.widget({
     {
         {
             {
-                {
-                    forced_width = 70,
-                    forced_height = 70,
-                    icon = beautiful.icon('apps/cs-sound.svg'),
-                    color = beautiful.colors.green,
-                    percent = 25,
-                    widget = dial,
-                },
-                {
-                    forced_width = 70,
-                    forced_height = 70,
-                    icon = beautiful.icon('apps/display-brightness.svg'),
-                    color = beautiful.colors.yellow,
-                    percent = 50,
-                    widget = dial,
-                },
+                volume_dial,
+                brightness_dial,
                 spacing = 50,
                 layout = wibox.layout.flex.horizontal,
             },
             {
-                {
-                    forced_width = 70,
-                    forced_height = 70,
-                    icon = beautiful.icon('devices/battery.svg'),
-                    color = beautiful.colors.red,
-                    percent = 80,
-                    widget = dial,
-                },
+                battery_dial,
                 widget = wibox.container.place,
             },
             layout = wibox.layout.flex.vertical,

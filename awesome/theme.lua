@@ -1,6 +1,7 @@
 local awful = require 'awful' 
 local beautiful = require 'beautiful' 
 local dpi = require('beautiful.xresources').apply_dpi
+local gears = require 'gears'
 local naughty = require 'naughty' 
 
 --------------------------------------------------------------------------------
@@ -77,7 +78,9 @@ end
 -- WALLPAPER
 --------------------------------------------------------------------------------
 
-local set_wallpaper = require('__config/wallpaper')
+local function set_wallpaper(screen)
+    gears.wallpaper.maximized(os.getenv('AWESOME') .. '/wallpaper.png')
+end
 
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
 screen.connect_signal('property::geometry', set_wallpaper)

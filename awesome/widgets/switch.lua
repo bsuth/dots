@@ -41,6 +41,11 @@ function switch:draw(_, cr, width, height)
     cr:stroke()
 end
 
+function switch:onclick()
+    self.checked = not self.checked
+    self:emit_signal('widget::redraw_needed')
+end
+
 --------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------
@@ -55,11 +60,7 @@ return setmetatable(switch, {
         -- metatable set!
         gears.table.crush(newswitch, switch, true)
 
-        newswitch:connect_signal('button::release', function(self)
-            self.checked = not self.checked
-            self:emit_signal('widget::redraw_needed')
-        end)
-
+        newswitch:connect_signal('button::release', switch.onclick)
         return newswitch
     end,
 })
