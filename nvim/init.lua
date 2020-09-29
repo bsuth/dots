@@ -2,15 +2,15 @@
 -- INIT
 -- -----------------------------------------------------------------------------
 
-DOTS = os.getenv('DOTS')
-package.path = package.path .. (';%s/nvim/?.lua'):format(DOTS)
+ROOT = '/home/bsuth/dots/nvim'
+package.path = package.path .. (';%s/?.lua'):format(ROOT)
 nvim = vim.api
 
 -- -----------------------------------------------------------------------------
 -- AUTOINSTALL VIM-PLUG
 -- -----------------------------------------------------------------------------
 
-local vim_plug_install_path = '/home/bsuth/nvim/autoload/plug.vim'
+local vim_plug_install_path = ROOT .. '/autoload/plug.vim'
 local f = io.open(vim_plug_install_path, 'r')
 
 if f == nil then
@@ -45,7 +45,7 @@ local plugins = {
     [[ Plug 'neoclide/coc-neco' ]],
 }
 
-nvim.nvim_call_function('plug#begin', { '$DOTS/nvim/bundle' })
+nvim.nvim_call_function('plug#begin', { ROOT .. '/bundle' })
 for _, plugin in ipairs(plugins) do
 	nvim.nvim_command(plugin)
 end
@@ -147,7 +147,7 @@ local augroups = {
 		'FileType dirvish silent! :cd %',
 
 		-- Hide dot files
-		[[ FileType dirvish silent keeppatterns g@\v/\.[^\/]+/?$@d _ ]],
+		-- [[ FileType dirvish silent keeppatterns g@\v/\.[^\/]+/?$@d _ ]],
 	},
 }
 
@@ -227,24 +227,8 @@ end
 -- CONFIG
 -- -----------------------------------------------------------------------------
 
-local config = {
-	'globals',
-}
-
-local missing_configs = {}
-
-for _, path in ipairs(config) do
-	if not pcall(require, '__config/' .. path) then
-		table.insert(missing_configs, path)
-	end
-end
-
-if #missing_configs > 0 then
-	local msg = 'Missing Config Files:'
-
-	for _, path in ipairs(missing_configs) do
-		msg = ('%s\n%s'):format(msg, path)
-	end
-
-	nvim.nvim_call_function('confirm', { msg, '&confirm', 1 })
+local f = io.open(ROOT .. '/__init.lua', 'r')
+if f ~= nil then
+	require '__init'
+	f:close()
 end

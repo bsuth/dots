@@ -8,9 +8,7 @@ export EDITOR=nvim
 export XDG_CONFIG_HOME="$HOME/.config"
 export DOTS="$HOME/dots"
 export AWESOME="$DOTS/awesome"
-export QUTEBROWSER="$DOTS/qutebrowser"
 export NVIM="$DOTS/nvim"
-export VIFM="$DOTS/vifm"
 export ZSH="$DOTS/zsh"
 
 export HISTFILE=~/.histfile
@@ -18,18 +16,14 @@ export HISTSIZE=1000
 export SAVEHIST=1000
 
 export LC_ALL=en_US.UTF-8
-
 export XMODIFIERS="@im=fcitx"
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export QT5_IM_MODULE=fcitx
 export QT_QPA_PLATFORMTHEME=qt5ct
 
-export PATH="$HOME/.local/bin:$PATH"
-
-# ------------------------------------------------------------------------------
-# SPACESHIP-PROMPT
-# ------------------------------------------------------------------------------
+export FZF_DEFAULT_COMMAND='rg --files'
+export FZF_DEFAULT_OPTS='--exact'
 
 export SPACESHIP_PROMPT_ORDER=(
   time          # Time stamps section
@@ -49,25 +43,27 @@ export SPACESHIP_PROMPT_ORDER=(
 )
 
 # ------------------------------------------------------------------------------
-# FZF
+# PATH
 # ------------------------------------------------------------------------------
 
-export FZF_DEFAULT_COMMAND='rg --files'
-export FZF_DEFAULT_OPTS='--exact'
+MYPATHS=(
+	"$HOME/.local/bin"
+)
+
+for path in "${MYPATHS[@]}"; do
+	[[ -d $path ]] && PATH="$PATH:$path"
+done
 
 # ------------------------------------------------------------------------------
 # CONFIG
 # ------------------------------------------------------------------------------
 
-if [[ -f $ZSH/__config/zprofile ]]; then
-	source $ZSH/__config/zprofile
-fi
+[[ -f $ZSH/__zprofile ]] && source $ZSH/__zprofile
 
 # ------------------------------------------------------------------------------
 # STARTUP
 # ------------------------------------------------------------------------------
 
-# run startx on login
 if systemctl -q is-active graphical.target && [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
 	exec startx
 fi
