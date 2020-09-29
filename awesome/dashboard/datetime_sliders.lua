@@ -156,7 +156,6 @@ return wibox.widget({
                     sliders,
                     widget = wibox.container.place,
                 },
-                spacing = 0,
                 layout = wibox.layout.fixed.vertical,
             },
             top = 20,

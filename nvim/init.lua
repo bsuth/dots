@@ -143,6 +143,12 @@ local augroups = {
 	term = {
 		'TermOpen term://* setlocal nonumber',
 	},
+	dirvish = {
+		'FileType dirvish silent! :cd %',
+
+		-- Hide dot files
+		[[ FileType dirvish silent keeppatterns g@\v/\.[^\/]+/?$@d _ ]],
+	},
 }
 
 for augroup, autocmds in pairs(augroups) do
