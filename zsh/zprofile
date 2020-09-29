@@ -47,11 +47,11 @@ export SPACESHIP_PROMPT_ORDER=(
 # ------------------------------------------------------------------------------
 
 MYPATHS=(
-	"$HOME/.local/bin"
+	#"$HOME/.local/bin"
 )
 
 for path in "${MYPATHS[@]}"; do
-	[[ -d $path ]] && PATH="$PATH:$path"
+    if [[ -d $path ]]; then export PATH="$PATH:$path"; fi
 done
 
 # ------------------------------------------------------------------------------
