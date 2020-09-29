@@ -1,5 +1,15 @@
 {
 	"python.jediEnabled": true,
 	"python.jediPath": "/usr/lib/python3.8/site-packages",
-	"python.pythonPath": "~/projects/mujin/venv/bin/python"
+	"python.pythonPath": "~/projects/mujin/venv/bin/python",
+	"languageserver": {
+		"elmLS": {
+			"command": "elm-language-server",
+			"filetypes": ["elm"],
+			"rootPatterns": ["elm.json"],
+			"initializationOptions": {
+				"elmAnalyseTrigger": "never"
+			}
+		}
+	}
 }

@@ -1,16 +1,11 @@
 luafile $DOTS/nvim/init.lua
 
-" Local plugins
-set rtp+=$HOME/projects/nvim-platinum
+" Autogroups are a huge PITA in lua, so just do them here. Still need to have
+" this file anyways
 
-" ------------------------------------------------------------------------------
-" TERMINAL AUGROUP
-" 1) Don't use numbers in terminal mode
-" 2/3) Start the terminal in insert mode
-" ------------------------------------------------------------------------------
-
-augroup bsuth-terminal
-    au TermOpen term://* setlocal nonumber
-    au TermOpen term://* startinsert
-    au BufEnter term://* startinsert
+augroup dirvish-au
+    autocmd!
+    autocmd FileType dirvish silent! :cd %
+    " Hide dot files
+    autocmd FileType dirvish silent keeppatterns g@\v/\.[^\/]+/?$@d _
 augroup END

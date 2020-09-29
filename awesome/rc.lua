@@ -54,7 +54,6 @@ end
 awful.layout.layouts = {
     awful.layout.suit.tile,
     layouts.music,
-    layouts.dual,
 }
 
 root.keys(keys.global)

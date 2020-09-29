@@ -195,7 +195,7 @@ keys.global = gears.table.join(
 
     awful.key({ modkey }, 'Return',
         function()
-            awful.spawn('st -e nvim -c ":term"')
+            awful.spawn('st -e nvim -c ":Dirvish"')
         end,
     {description = 'open terminal'}),
 
