@@ -18,11 +18,15 @@ local commands = {
             awful.spawn('st -e nvim -c ":DBUI"')
         end,
     },
+	{
+		alias = 'poweroff',
+        callback = function() awful.spawn('poweroff') end,
+	},
 }
 
-for _, command in ipairs(require('__config/dmenu')) do
-	table.insert(commands, command)
-end
+-- for _, command in ipairs(require('__config/dmenu')) do
+-- 	table.insert(commands, command)
+-- end
 
 local command_widgets = {}
 
@@ -30,13 +34,13 @@ local command_widgets = {}
 -- FILTER
 --------------------------------------------------------------------------------
 
-local filter = wibox.widget({
-    markup = '',
-    forced_height = 100,
-    align  = 'center',
-    valign = 'center',
-    widget = wibox.widget.textbox,
-})
+-- local filter = wibox.widget({
+--     markup = '',
+--     forced_height = 100,
+--     align  = 'center',
+--     valign = 'center',
+--     widget = wibox.widget.textbox,
+-- })
 
 --------------------------------------------------------------------------------
 -- GRID
@@ -104,7 +108,7 @@ local content = wibox.widget({
 
 local popup = awful.popup({
     widget = {
-        content,
+        grid,
         valign = 'center',
         halign = 'center',
         widget = wibox.container.place,
@@ -112,7 +116,7 @@ local popup = awful.popup({
 
     ontop = true,
     visible = false,
-    bg = '#000000e8',
+    bg = '#00000088',
 })
 
 --------------------------------------------------------------------------------
