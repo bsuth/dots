@@ -203,7 +203,7 @@ local nmap = {
 
 	-- FZF
 	['<leader>fd'] = ':Files<cr>',
-	['<leader>cd'] = ':call fzf#run(fzf#wrap({"source": "fd --type d"}))<cr>',
+	['<leader>cd'] = ':call fzf#run(fzf#wrap({"source": "fd -L --type d"}))<cr>',
 	['<leader>rg'] = ':Rg<cr>',
 	['<leader>ls'] = ':Buffers<cr>',
 }
