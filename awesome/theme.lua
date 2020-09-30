@@ -79,7 +79,7 @@ end
 --------------------------------------------------------------------------------
 
 local function set_wallpaper(screen)
-    gears.wallpaper.maximized(os.getenv('AWESOME') .. '/wallpaper.png')
+    gears.wallpaper.maximized(os.getenv('AWESOME') .. '/wallpaper.png', screen)
 end
 
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
