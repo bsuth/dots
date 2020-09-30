@@ -31,9 +31,18 @@ function dial:draw(_, cr, width, height)
         cr:set_source_rgb(fg[1], fg[2], fg[3])
 
         if self.percent < 100 then
+            -- If (theta_end - theta_start) is too small, then cairo will shift
+            -- theta_end slightly in an attempt to draw something over nothing.
+            -- This causes a sort of "jump" when the percent gets to low, so to
+            -- avoid this, we always draw a small circle centered at theta_end
+            -- to mimic the rounded end, and just draw a rounded start for the
+            -- actual arc.
+            cr:arc(m / 2, thickness / 2, thickness / 2, 0, 2*math.pi)
+            cr:fill()
+
             local theta_end = 3 * math.pi / 2
             local theta_start = theta_end - (self.percent / 100) * (2 * math.pi)
-            gears.shape.arc(cr, m, m, thickness, theta_start, theta_end, true, true)
+            gears.shape.arc(cr, m, m, thickness, theta_start, theta_end, true, false)
         else
             gears.shape.arc(cr, m, m, thickness, 0, 2 * math.pi)
         end
