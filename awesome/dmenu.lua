@@ -5,102 +5,105 @@ local naughty = require 'naughty'
 local wibox = require 'wibox' 
 
 local layouts = require 'layouts' 
-local wgrid = require 'widgets.grid' 
 
 --------------------------------------------------------------------------------
--- COMMANDS
+-- STATE
 --------------------------------------------------------------------------------
 
-local commands = {
-    {
-        alias = 'db',
-        callback = function()
-            awful.spawn('st -e nvim -c ":DBUI"')
-        end,
-    },
-	{
-		alias = 'poweroff',
-        callback = function() awful.spawn('poweroff') end,
+local state = {
+	filter = '',
+	selected = nil,
+	commands = {
+		{
+			alias = 'db',
+			icon = beautiful.icon('apps/cs-sound.svg'),
+			callback = function()
+				awful.spawn('st -e nvim -c ":DBUI"')
+			end,
+		},
+		{
+			alias = 'poweroff',
+			icon = beautiful.icon('apps/cs-sound.svg'),
+			callback = function() awful.spawn('poweroff') end,
+		},
 	},
 }
 
--- for _, command in ipairs(require('__config/dmenu')) do
--- 	table.insert(commands, command)
--- end
-
-local command_widgets = {}
-
---------------------------------------------------------------------------------
--- FILTER
---------------------------------------------------------------------------------
-
--- local filter = wibox.widget({
---     markup = '',
---     forced_height = 100,
---     align  = 'center',
---     valign = 'center',
---     widget = wibox.widget.textbox,
--- })
-
---------------------------------------------------------------------------------
--- GRID
---------------------------------------------------------------------------------
-
-local grid = wgrid.grid({
-    forced_num_cols = 3,
-    expand = true,
-    vertical_expand = false,
-    spacing = 10,
-    homogeneous = true,
-})
-
-for _, command in ipairs(commands) do
-    local w = wibox.widget({
-        {
-            markup = command.alias,
-            align  = 'center',
-            valign = 'center',
-            widget = wibox.widget.textbox,
-        },
-
-        forced_height = 100,
-
-        shape = gears.shape.rectangle,
-        shape_border_width = 5,
-        shape_border_color = beautiful.colors.dark_grey,
-
-        filter = command.alias,
-        callback = command.callback,
-        widget = wibox.container.background,
-    })
-
-    grid:add(w)
-    table.insert(command_widgets, w)
+for _, command in ipairs(require('__config/dmenu')) do
+	table.insert(state.commands, command)
 end
 
 --------------------------------------------------------------------------------
--- CONTENT (FILTER + GRID WRAPPER)
+-- LIST
 --------------------------------------------------------------------------------
 
-local content = wibox.widget({
-    filter,
-    {
-        {
-            span_ratio = 0.5,
-            forced_height = 5,
-            thickness = 5,
-            color = beautiful.colors.dark_grey,
-            widget = wibox.widget.separator,
-        },
+function list_item_factory(command)
+	local textbox = wibox.widget({
+		markup = command.alias,
+        font = 'Titan One 16',
+		valign = 'center',
+		widget = wibox.widget.textbox,
+	})
 
-        bottom = 50,
-        layout = wibox.container.margin,
-    },
-    grid,
+	local arrow = wibox.widget({
+		forced_width = 30,
+		forced_height= 30,
+		image = beautiful.icon('../16x16/actions/arrow-left.svg'),
+		visible = false,
+		widget = wibox.widget.imagebox,
+	})
 
-    expand = 'outside',
-    layout = wibox.layout.fixed.vertical,
+	return {
+		alias = command.alias,
+		callback = command.callback,
+		filtered = false,
+
+		textbox = textbox,
+		arrow = arrow ,
+		widget = wibox.widget({
+			{
+				{
+					{
+						forced_width = 30,
+						forced_height= 30,
+						image = command.icon,
+						widget = wibox.widget.imagebox,
+					},
+					widget = wibox.container.place,
+				},
+				{
+					textbox,
+					left = 20,
+					right = 20,
+					widget = wibox.container.margin,
+				},
+				{
+					arrow,
+					widget = wibox.container.place,
+				},
+				layout = wibox.layout.align.horizontal,
+			},
+			top = 10,
+			bottom = 10,
+			left = 20,
+			right = 20,
+			widget = wibox.container.margin,
+		}),
+	}
+end
+
+local list = wibox.widget({
+	forced_width = 500,
+	spacing = 10,
+	layout = wibox.layout.flex.vertical,
 })
+
+local list_items = {}
+for _, command in ipairs(state.commands) do
+	local list_item = list_item_factory(command)
+    list:add(list_item.widget)
+	table.insert(list_items, list_item)
+end
 
 --------------------------------------------------------------------------------
 -- POPUP (MAIN WRAPPER)
@@ -108,9 +111,18 @@ local content = wibox.widget({
 
 local popup = awful.popup({
     widget = {
-        grid,
-        valign = 'center',
-        halign = 'center',
+		{
+			{
+				list,
+				margins = 50,
+				widget = wibox.container.margin,
+			},
+			shape = gears.shape.rounded_rect,
+			shape_border_width = 5,
+			shape_border_color = beautiful.colors.cyan,
+			bg = beautiful.colors.black,
+			widget = wibox.container.background,
+		},
         widget = wibox.container.place,
     },
 
@@ -120,19 +132,54 @@ local popup = awful.popup({
 })
 
 --------------------------------------------------------------------------------
--- HELPERS
+-- FILTER
 --------------------------------------------------------------------------------
 
-local function apply_filter()
-    grid:reset()
+local function unselect()
+	if state.selected ~= nil then
+		list_items[state.selected].arrow.visible = false
+		state.selected = nil
+	end
+end
 
-    for _, w in pairs(command_widgets) do
-        if w.filter:sub(1, #filter.markup) == filter.markup then
-            grid:add(w)
+local function select(index)
+	unselect()
+	state.selected = index
+	list_items[index].arrow.visible = true
+end
+
+local function shift_selected(shift)
+	local limit = shift > 0 and #list_items or 1
+
+    for i = state.selected + shift, limit, shift do
+		if list_items[i].filtered ~= true then
+			select(i)
+			break
+		end
+	end
+end
+
+local function apply_filter()
+	list:reset()
+	unselect()
+
+    for i, list_item in ipairs(list_items) do
+        if list_item.alias:sub(1, #state.filter) == state.filter then
+			list_item.textbox.markup = ("<span color='%s'>%s</span>%s"):format(
+				beautiful.colors.cyan,
+				state.filter,
+				list_item.alias:sub(#state.filter + 1)
+			)
+
+			if state.selected == nil then select(i) end
+			list_item.filtered = false
+			list:add(list_item.widget)
+		else
+			list_item.filtered = true
         end
     end
 
-    grid:default_focus()
+	list:emit_signal('widget::redraw_needed')
 end
 
 --------------------------------------------------------------------------------
@@ -141,49 +188,48 @@ end
 
 local modkey = 'Mod4'
 
+apply_filter()
+
 return awful.keygrabber({
     keybindings = {
-        {{ modkey }, 'h', function() grid:focus_by_direction('left') end},
-        {{ modkey }, 'j', function() grid:focus_by_direction('down') end},
-        {{ modkey }, 'k', function() grid:focus_by_direction('up') end},
-        {{ modkey }, 'l', function() grid:focus_by_direction('right') end},
         {{ modkey }, 'd', function(self) self:stop() end},
-        {{ 'Control' }, 'u', function() filter.markup = ''; apply_filter(true) end},
         {{ 'Control' }, 'bracketleft', function(self) self:stop() end},
         {{ }, 'Escape', function(self) self:stop() end},
+        {{ 'Control' }, 'p', function(self) shift_selected(-1) end},
+        {{ 'Control' }, 'n', function(self) shift_selected(1) end},
         {{ }, 'Return', function(self)
-			popup.visible = false -- need this for flameshot
-			grid.focused_widget.callback()
+			popup.visible = false -- need to do this first for flameshot
+
+			local selected_list_item = list_items[state.selected]
+			if selected_list_item and selected_list_item.callback then
+				(selected_list_item.callback)()
+			end
+
 			self:stop()
 		end},
     },
 
     start_callback = function()
         local s = awful.screen.focused()
-
         popup.screen = s
         popup.minimum_width = s.geometry.width
         popup.minimum_height = s.geometry.height
         popup.visible = true
-
-        content.forced_width = 0.6 * s.geometry.width
-        content.forced_height = 0.6 * s.geometry.height
-
-        grid:default_focus()
     end,
 
     stop_callback = function()
         popup.visible = false
-        filter.markup = ''
-        apply_filter()
+		unselect()
+		state.filter = ''
+		apply_filter()
     end,
 
     keypressed_callback = function(self, mods, key)
-        if key == 'BackSpace' and #filter.markup > 0 then
-            filter.markup = filter.markup:sub(1, #filter.markup - 1)
+        if #mods == 0 and key:match('^[a-zA-Z ]$') then
+			state.filter = state.filter .. key
             apply_filter()
-        elseif #mods == 0 and key:match('^[a-zA-Z ]$') then
-            filter.markup = filter.markup .. key
+		elseif key == 'BackSpace' and #state.filter > 0 then
+            state.filter = state.filter:sub(1, #state.filter - 1)
             apply_filter()
         end
     end,
