@@ -3,7 +3,7 @@ local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
-local wgrid = require 'widgets.grid' 
+local wgrid = require 'widgets/grid' 
 
 ---------------------------------------
 -- TAGGER
@@ -42,7 +42,7 @@ function tagger:new(s, taglayout)
             widget = wibox.container.place,
         },
 
-        bg = '#000000e8',
+        bg = beautiful.colors.dimmed,
         placement = awful.placement.centered,
         ontop = true,
         visible = false,

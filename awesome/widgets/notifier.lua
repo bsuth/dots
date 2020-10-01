@@ -17,7 +17,6 @@ local notifier = {
     keyboard_id = 1,
 }
 
-
 ---------------------------------------
 -- HELPERS
 ---------------------------------------
@@ -33,55 +32,6 @@ function fread(file)
 
     return value
 end
-
-
----------------------------------------
--- VOLUME
----------------------------------------
-
-function notifier:volume()
-    local get_vol_cmd = [[ awk -F"[][]" 'END { print $2 }' <(amixer sget -D pulse Master) ]]
-
-    awful.spawn.easy_async_with_shell(get_vol_cmd, function(stdout)
-        self.ids.system = naughty.notify({
-            text = string.gsub(stdout, "\n", ""), -- remove empty new line
-            timeout = 2,
-            replaces_id = self.ids.system,
-        }).id
-    end)
-end
-
-
----------------------------------------
--- BRIGHTNESS
--- ----------
--- Note: The arguments here are used to precompute new brightness percentages
--- before they actually take effect. To see why we do this, refer the following
--- keybindings in keys.lua:
---      XF86MonBrightnessDown
---      XF86MonBrightnessUp
----------------------------------------
-
-function notifier:brightness(plus_minus, diff)
-    local br_dir = '/sys/class/backlight/intel_backlight/'
-
-    local curr_br = tonumber(fread(br_dir .. 'brightness'))
-    local max_br = tonumber(fread(br_dir .. 'max_brightness'))
-    local br_percent = math.floor(100 * curr_br / max_br)
-
-    if plus_minus == '+' then
-        br_percent = math.min(br_percent + diff, 100)
-    else
-        br_percent = math.max(br_percent - diff, 0)
-    end
-
-    self.ids.system = naughty.notify({
-        text = tostring(br_percent) .. '%',
-        timeout = 2,
-        replaces_id = self.ids.system,
-    }).id
-end
-
 
 ---------------------------------------
 -- KEYBOARD
@@ -156,7 +106,6 @@ gears.timer({
     end,
 })
 
-
 ---------------------------------------
 -- RAM (daemon)
 ---------------------------------------
@@ -184,7 +133,6 @@ gears.timer({
         end)
     end,
 })
-
 
 ---------------------------------------
 -- RETURN

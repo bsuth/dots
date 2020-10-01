@@ -22,6 +22,16 @@ local state = {
 			end,
 		},
 		{
+			alias = 'sleep',
+			icon = beautiful.icon('apps/cs-sound.svg'),
+			callback = function() awful.spawn('systemctl suspend') end,
+		},
+		{
+			alias = 'reboot',
+			icon = beautiful.icon('apps/cs-sound.svg'),
+			callback = function() awful.spawn('reboot') end,
+		},
+		{
 			alias = 'poweroff',
 			icon = beautiful.icon('apps/cs-sound.svg'),
 			callback = function() awful.spawn('poweroff') end,
@@ -40,7 +50,6 @@ end
 function list_item_factory(command)
 	local textbox = wibox.widget({
 		markup = command.alias,
-        font = 'Titan One 16',
 		valign = 'center',
 		widget = wibox.widget.textbox,
 	})
@@ -128,7 +137,7 @@ local popup = awful.popup({
 
     ontop = true,
     visible = false,
-    bg = '#00000088',
+    bg = beautiful.colors.dimmed,
 })
 
 --------------------------------------------------------------------------------

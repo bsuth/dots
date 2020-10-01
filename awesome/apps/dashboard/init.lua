@@ -1,3 +1,4 @@
+local awful = require 'awful'
 local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
@@ -6,10 +7,14 @@ local volume = require 'singletons/volume'
 local brightness = require 'singletons/brightness'
 local battery = require 'singletons/battery'
 
+local tab_notifications = require 'apps/dashboard/tab_notifications'
+local tab_weather = require 'apps/dashboard/tab_weather'
+
+local popup = require 'apps/dashboard/popup'
 local dial = require 'widgets/dial' 
 
 --------------------------------------------------------------------------------
--- TIME
+-- DATETIME + DIALS
 --------------------------------------------------------------------------------
 
 local time = wibox.widget({
@@ -23,22 +28,13 @@ local time = wibox.widget({
     widget = wibox.container.place,
 })
 
---------------------------------------------------------------------------------
--- DATE
---------------------------------------------------------------------------------
-
 local date = wibox.widget({
     {
         format = "<span>%a %b %d, %Y</span>",
-        font = 'Titan One 15',
         widget = wibox.widget.textclock,
     },
     widget = wibox.container.place,
 })
-
---------------------------------------------------------------------------------
--- SEPARATOR
---------------------------------------------------------------------------------
 
 local separator = wibox.widget({
     {
@@ -76,10 +72,6 @@ local separator = wibox.widget({
     },
     widget = wibox.container.place,
 })
-
---------------------------------------------------------------------------------
--- DIALS
---------------------------------------------------------------------------------
 
 local volume_dial = wibox.widget({
     forced_width = 70,
@@ -157,11 +149,7 @@ local dials = wibox.widget({
     widget = wibox.container.place,
 })
 
---------------------------------------------------------------------------------
--- RETURN
---------------------------------------------------------------------------------
-
-return wibox.widget({
+local datetime_dials = wibox.widget({
     {
         {
             {
@@ -186,3 +174,91 @@ return wibox.widget({
     },
     widget = wibox.container.place,
 })
+
+--------------------------------------------------------------------------------
+-- TABS
+--------------------------------------------------------------------------------
+
+local tabs_head = wibox.widget({
+    spacing = 0,
+    layout = wibox.layout.flex.horizontal,
+})
+
+local tabs_body = wibox.widget({
+    top_only = true,
+    layout = wibox.layout.stack,
+})
+
+local tabs_foot = wibox.widget({
+    spacing = 0,
+    layout = wibox.layout.flex.horizontal,
+})
+
+local tabs = wibox.widget({
+    {
+        tabs_head,
+        {
+            tabs_body,
+            margins = 50,
+            widget = wibox.container.margin,
+        },
+        tabs_foot,
+        fill_vertical = true,
+        content_fill_vertical = true,
+        layout = wibox.layout.align.vertical,
+    },
+    shape = gears.shape.rectangle,
+    shape_border_color = beautiful.colors.cyan,
+    shape_border_width = 2,
+    bg = beautiful.colors.black,
+    widget = wibox.container.background,
+})
+
+local function addTab(title, bar, content)
+    local tab = wibox.widget({
+        {
+            {
+                markup = title,
+                widget = wibox.widget.textbox,
+            },
+            widget = wibox.container.place,
+        },
+        bg = beautiful.colors.black,
+        widget = wibox.container.background,
+    })
+
+    popup:register_hover(tab)
+
+    tab:connect_signal('button::press', function(_, _, _, button, _, _)
+        if button == 1 then
+            tabs_body:set(1, content)
+        end
+    end)
+
+    local bar_children = bar:get_children()
+    table.insert(bar_children, tab)
+    bar:set_children(bar_children)
+    tabs_body:insert(1, content)
+end
+
+--------------------------------------------------------------------------------
+-- RETURN
+--
+-- Note: Return the popup here, since we only need to access the popup's toggle
+-- method externally.
+--------------------------------------------------------------------------------
+
+addTab('notifications', tabs_head, tab_notifications)
+addTab('weather', tabs_head, tab_weather)
+
+popup:set(wibox.widget({
+    {
+        datetime_dials,
+        tabs,
+        spacing = 200,
+        layout = wibox.layout.fixed.horizontal,
+    },
+    widget = wibox.container.place,
+}))
+
+return popup

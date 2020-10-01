@@ -1,20 +1,14 @@
 local awful = require 'awful' 
 local beautiful = require 'beautiful' 
-local gears = require 'gears' 
 local naughty = require 'naughty' 
-local wibox = require 'wibox' 
 
 require 'theme' 
-local keys = require 'keys' 
-local mouse = require 'mouse' 
+local bindings = require 'bindings' 
 local layouts = require 'layouts' 
-local tagger = require 'tagger' 
-local db = require 'dashboard' 
+local tagger = require 'apps/tagger' 
 
--- Enable hotkeys help widget for VIM and other apps
--- when client with a matching name is opened:
--- require('awful.hotkeys_popup.keys')
-require 'awful.autofocus' 
+-- Autofocus another client when the current one is closed
+require('awful.autofocus')
 
 --------------------------------------------------------------------------------
 -- ERROR HANDLING
@@ -56,7 +50,7 @@ awful.layout.layouts = {
     layouts.music,
 }
 
-root.keys(keys.global)
+root.keys(bindings.globalkeys)
 
 --------------------------------------------------------------------------------
 -- SCREEN SETUP
@@ -99,8 +93,8 @@ awful.rules.rules = {
             border_color = beautiful.border_normal,
             focus = awful.client.focus.filter,
             raise = true,
-            keys = keys.client,
-            buttons = mouse.client,
+            keys = bindings.clientkeys,
+            buttons = bindings.clientbuttons,
             screen = awful.screen.preferred,
             placement = awful.placement.no_overlap+awful.placement.no_offscreen
         }

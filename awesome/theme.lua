@@ -1,6 +1,6 @@
 local awful = require 'awful' 
 local beautiful = require 'beautiful' 
-local dpi = require('beautiful.xresources').apply_dpi
+local dpi = require('beautiful/xresources').apply_dpi
 local gears = require 'gears'
 local naughty = require 'naughty' 
 
@@ -21,6 +21,8 @@ local colors = {
     dark_grey = '#545862',
     light_grey = '#c8ccd4',
     blacker = '#181818',
+
+    dimmed = '#00000088',
 }
 
 --------------------------------------------------------------------------------
@@ -30,7 +32,7 @@ local colors = {
 beautiful.init({
     colors = colors,
 
-    font = 'Quicksand Medium 15',
+    font = 'Titan One 16',
 
     fg_normal = colors.white,
     bg_focus = colors.white,
@@ -42,7 +44,7 @@ beautiful.init({
     border_focus = colors.green,
     border_marked = colors.red,
 
-    notification_font = 'Quicksand Medium 15',
+    notification_font = 'Quicksand Medium 16',
     notification_bg = '#181818',
     notification_fg = colors.purple,
     notification_margin = 15,

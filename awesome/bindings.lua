@@ -3,10 +3,10 @@ local gears = require 'gears'
 local naughty = require 'naughty' 
 local wibox = require 'wibox' 
 
-local dashboard = require 'dashboard' 
-local dmenu = require 'dmenu' 
-local notifier = require 'widgets.notifier' 
-local tag_history = require 'tag/history' 
+local dashboard = require 'apps/dashboard' 
+local dmenu = require 'apps/dmenu' 
+local notifier = require 'widgets/notifier' 
+local tag_history = require 'apps/tag_history' 
 
 local volume = require 'singletons/volume'
 local brightness = require 'singletons/brightness'
@@ -15,7 +15,7 @@ local brightness = require 'singletons/brightness'
 -- INIT/STATE
 --------------------------------------------------------------------------------
 
-local keys = {}
+local bindings = {}
 local modkey = 'Mod4'
 
 local clientbuffer = {}
@@ -24,7 +24,7 @@ local clientbuffer = {}
 -- GLOBAL KEYS
 --------------------------------------------------------------------------------
 
-keys.global = gears.table.join(
+bindings.globalkeys = gears.table.join(
     
     -- -------------------------------------------------------------------------
     -- System
@@ -244,7 +244,7 @@ keys.global = gears.table.join(
 --------------------------------------------------------------------------------
 
 for i = 1, 9 do
-    keys.global = gears.table.join(keys.global,
+    bindings.globalkeys = gears.table.join(bindings.globalkeys,
         awful.key({ modkey }, i,
             function ()
                 local tag = awful.screen.focused().tags[i]
@@ -265,7 +265,7 @@ end
 -- CLIENT KEYS
 --------------------------------------------------------------------------------
 
-keys.client = gears.table.join(
+bindings.clientkeys = gears.table.join(
 
     -- -------------------------------------------------------------------------
     -- System
@@ -297,7 +297,39 @@ keys.client = gears.table.join(
 )
 
 --------------------------------------------------------------------------------
+-- GLOBAL BUTTONS
+--------------------------------------------------------------------------------
+
+bindings.globalbuttons = gears.table.join(
+)
+
+--------------------------------------------------------------------------------
+-- CLIENT BUTTONS
+--------------------------------------------------------------------------------
+
+bindings.clientbuttons = gears.table.join(
+
+    -- -------------------------------------------------------------------------
+    -- Move/Resize
+    -- -------------------------------------------------------------------------
+
+    awful.button({ }, 1, function (c)
+        c:emit_signal('request::activate', 'mouse_click', {raise = true})
+    end),
+
+    awful.button({ 'Shift' }, 1, function (c)
+        c:emit_signal('request::activate', 'mouse_click', {raise = true})
+        awful.mouse.client.move(c)
+    end),
+
+    awful.button({ 'Control', 'Shift' }, 1, function (c)
+        c:emit_signal('request::activate', 'mouse_click', {raise = true})
+        awful.mouse.client.resize(c)
+    end)
+)
+
+--------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------
 
-return keys
+return bindings

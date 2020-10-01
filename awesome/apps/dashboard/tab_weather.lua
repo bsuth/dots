@@ -2,7 +2,7 @@ local beautiful = require 'beautiful'
 local gears = require 'gears'
 local wibox = require 'wibox'
 
-local popup = require 'dashboard/popup'
+local popup = require 'apps/dashboard/popup'
 local weather = require 'singletons/weather'
 
 --------------------------------------------------------------------------------
@@ -15,7 +15,6 @@ local unit_C = wibox.widget({
     {
         {
             markup = 'C',
-            font = 'Titan One 20',
             widget = wibox.widget.textbox,
         },
         top = 10,
@@ -34,7 +33,6 @@ local unit_F = wibox.widget({
     {
         {
             markup = 'F',
-            font = 'Titan One 20',
             widget = wibox.widget.textbox,
         },
         top = 10,
@@ -73,14 +71,12 @@ local icon = wibox.widget({
 
 local maxmin = wibox.widget({
     markup = '',
-    font = 'Titan One 20',
     align = 'center',
     widget = wibox.widget.textbox,
 })
 
 local temp = wibox.widget({
     markup = '',
-    font = 'Titan One 20',
     align = 'center',
     valign = 'center',
     widget = wibox.widget.textbox,
@@ -88,14 +84,12 @@ local temp = wibox.widget({
 
 local feel = wibox.widget({
     markup = '',
-    font = 'Titan One 20',
     align = 'center',
     widget = wibox.widget.textbox,
 })
 
 local humidity = wibox.widget({
     markup = '',
-    font = 'Titan One 20',
     align = 'center',
     widget = wibox.widget.textbox,
 })

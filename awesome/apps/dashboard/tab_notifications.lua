@@ -3,7 +3,7 @@ local gears = require 'gears'
 local naughty = require 'naughty'
 local wibox = require 'wibox' 
 
-local popup = require 'dashboard/popup'
+local popup = require 'apps/dashboard/popup'
 local switch = require 'widgets/switch' 
 
 --------------------------------------------------------------------------------
@@ -21,7 +21,6 @@ popup:register_hover(do_not_disturb)
 local head = wibox.widget({
     {
         markup = 'Notifications',
-        font = 'Titan One 20',
         widget = wibox.widget.textbox,
     },
     nil,
@@ -64,11 +63,11 @@ local function add(title, description)
 				{
 					{
 						markup = title,
-						font = 'Titan One 12',
 						widget = wibox.widget.textbox,
 					},
 					{
 						markup = description,
+                        font = beautiful.notification_font,
 						widget = wibox.widget.textbox,
 					},
 					layout = wibox.layout.flex.vertical,

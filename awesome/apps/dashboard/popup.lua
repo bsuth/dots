@@ -1,4 +1,5 @@
 local awful = require 'awful'
+local beautiful = require 'beautiful'
 local wibox = require 'wibox' 
 
 --------------------------------------------------------------------------------
@@ -12,7 +13,7 @@ local popup = awful.popup({
     },
     ontop = true,
     visible = false,
-    bg = '#00000088',
+    bg = beautiful.colors.dimmed,
 })
 
 --------------------------------------------------------------------------------
@@ -41,9 +42,9 @@ function popup:toggle()
     end
 end
 
-function popup:register_hover(widget)
+function popup:register_hover(widget, cursor)
     widget:connect_signal('mouse::enter', function()
-        popup.cursor = 'hand2' 
+        popup.cursor = cursor or 'hand2' 
     end)
 
     widget:connect_signal('mouse::leave', function()

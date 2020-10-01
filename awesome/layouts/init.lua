@@ -1,3 +1,3 @@
 return {
-    music = require('layouts.music'),
+    music = require('layouts/music'),
 }

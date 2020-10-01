@@ -30,7 +30,9 @@ function dial:draw(_, cr, width, height)
         local fg = beautiful.hex2rgb(self.color or beautiful.colors.green)
         cr:set_source_rgb(fg[1], fg[2], fg[3])
 
-        if self.percent < 100 then
+        -- 98 is close enough so round (plus, battery percent never reaches
+        -- 100% on some computers)
+        if self.percent < 98 then
             -- If (theta_end - theta_start) is too small, then cairo will shift
             -- theta_end slightly in an attempt to draw something over nothing.
             -- This causes a sort of "jump" when the percent gets to low, so to
