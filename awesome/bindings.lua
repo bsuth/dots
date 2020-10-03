@@ -15,8 +15,8 @@ local brightness = require 'singletons/brightness'
 -- INIT/STATE
 --------------------------------------------------------------------------------
 
-local bindings = {}
 local modkey = 'Mod4'
+local bindings = { modkey = modkey }
 
 local clientbuffer = {}
 
