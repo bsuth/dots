@@ -91,7 +91,7 @@ awful.screen.connect_for_each_screen(function(s)
 
     for _, name in ipairs({ '1', '2', '3' }) do
         table.insert(taglist, {
-            tag = awful.tag.add('1', {
+            tag = awful.tag.add(name, {
                 screen = s,
                 layout = awful.layout.suit.tile,
             }),

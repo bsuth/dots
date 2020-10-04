@@ -13,12 +13,13 @@ local volume = require 'singletons/volume'
 local brightness = require 'singletons/brightness'
 
 --------------------------------------------------------------------------------
--- INIT/STATE
+-- INIT STATE
 --------------------------------------------------------------------------------
 
 local modkey = 'Mod4'
 local bindings = { modkey = modkey }
 
+local restore_tag = nil
 local clientbuffer = {}
 
 --------------------------------------------------------------------------------
@@ -141,13 +142,15 @@ bindings.globalkeys = gears.table.join(
                             awful.spawn(missing_client)
                         end
 
+                        restore_tag = current_screen.selected_tag
                         music_tag.screen = current_screen 
                         music_tag:view_only()
-                        return
+                        break
                     end
                 end
-            else
-			    tag_history:back()
+            elseif restore_tag ~= nil then
+                restore_tag:view_only()
+                restore_tag = nil
             end
         end,
     {description = 'toggle music'})
@@ -159,19 +162,10 @@ bindings.globalkeys = gears.table.join(
 
 for i = 1, 9 do
     bindings.globalkeys = gears.table.join(bindings.globalkeys,
-        awful.key({ modkey }, i,
-            function ()
-                local tag = awful.screen.focused().tags[i]
-                if tag then tag:view_only() end
-            end,
-        {description = 'view tag'}),
-
-        awful.key({ modkey, 'Shift' }, i,
-            function ()
-                local tag = awful.screen.focused().tags[i]
-                if tag then awful.tag.viewtoggle(tag) end
-            end,
-        {description = 'toggle tag'})
+        awful.key({ modkey }, i, function ()
+            local tag = awful.screen.focused().tags[i]
+            if tag then tag:view_only() end
+        end)
     )
 end
 
