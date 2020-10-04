@@ -5,8 +5,9 @@ local wibox = require 'wibox'
 
 local dashboard = require 'apps/dashboard' 
 local dmenu = require 'apps/dmenu' 
+local tag_manager = require 'apps/tag_manager' 
+
 local notifier = require 'widgets/notifier' 
-local tag_history = require 'apps/tag_history' 
 
 local volume = require 'singletons/volume'
 local brightness = require 'singletons/brightness'
@@ -54,89 +55,20 @@ bindings.globalkeys = gears.table.join(
     -- Movement
     -- -------------------------------------------------------------------------
     
-    awful.key({ modkey }, 'h',
-        function()
-            awful.client.focus.bydirection('left')
-        end,
-    {description = 'focus client left'}),
+    awful.key({ modkey }, 'h', function() awful.client.focus.bydirection('left') end),
+    awful.key({ modkey }, 'j', function() awful.client.focus.bydirection('down') end),
+    awful.key({ modkey }, 'k', function() awful.client.focus.bydirection('up') end),
+    awful.key({ modkey }, 'l', function() awful.client.focus.bydirection('right') end),
 
-    awful.key({ modkey }, 'j',
-        function()
-            awful.client.focus.bydirection('down')
-        end,
-    {description = 'focus client down'}),
+    awful.key({ modkey, 'Shift' }, 'h', function() awful.client.swap.bydirection('left') end),
+    awful.key({ modkey, 'Shift' }, 'j', function() awful.client.swap.bydirection('down') end),
+    awful.key({ modkey, 'Shift' }, 'k', function() awful.client.swap.bydirection('up') end),
+    awful.key({ modkey, 'Shift' }, 'l', function() awful.client.swap.bydirection('right') end),
 
-    awful.key({ modkey }, 'k',
-        function()
-            awful.client.focus.bydirection('up')
-        end,
-    {description = 'focus client up'}),
-
-    awful.key({ modkey }, 'l',
-        function()
-            awful.client.focus.bydirection('right')
-        end,
-    {description = 'focus client right'}),
-
-    awful.key({ modkey, 'Shift' }, 'h',
-        function()
-            awful.client.swap.bydirection('left')
-        end,
-    {description = 'swap client left'}),
-
-    awful.key({ modkey, 'Shift' }, 'j',
-        function()
-            awful.client.swap.bydirection('down')
-        end,
-    {description = 'swap client down'}),
-
-    awful.key({ modkey, 'Shift' }, 'k',
-        function()
-            awful.client.swap.bydirection('up')
-        end,
-    {description = 'swap client up'}),
-
-    awful.key({ modkey, 'Shift' }, 'l',
-        function()
-            awful.client.swap.bydirection('right')
-        end,
-    {description = 'swap client right'}),
-
-    awful.key({ modkey, 'Control' }, 'h',
-        function()
-            awful.screen.focus_bydirection('left')
-        end,
-    {description = 'focus screen left'}),
-
-    awful.key({ modkey, 'Control' }, 'j',
-        function()
-            awful.screen.focus_bydirection('down')
-        end,
-    {description = 'focus screen down'}),
-
-    awful.key({ modkey, 'Control' }, 'k',
-        function()
-            awful.screen.focus_bydirection('up')
-        end,
-    {description = 'focus screen up'}),
-
-    awful.key({ modkey, 'Control' }, 'l',
-        function()
-            awful.screen.focus_bydirection('right')
-        end,
-    {description = 'focus screen right'}),
-
-    awful.key({ modkey }, 'i',
-        function()
-			tag_history:forward()
-        end,
-    {description = 'focus screen right'}),
-
-    awful.key({ modkey }, 'o',
-        function()
-			tag_history:back()
-        end,
-    {description = 'focus screen right'}),
+    awful.key({ modkey, 'Control' }, 'h', function() awful.screen.focus_bydirection('left') end),
+    awful.key({ modkey, 'Control' }, 'j', function() awful.screen.focus_bydirection('down') end),
+    awful.key({ modkey, 'Control' }, 'k', function() awful.screen.focus_bydirection('up') end),
+    awful.key({ modkey, 'Control' }, 'l', function() awful.screen.focus_bydirection('right') end),
 
     -- -------------------------------------------------------------------------
     -- Layout
@@ -174,36 +106,18 @@ bindings.globalkeys = gears.table.join(
     -- -------------------------------------------------------------------------
     -- Spawners
     -- -------------------------------------------------------------------------
+    
+    awful.key({ modkey }, 'd', function() dmenu:start() end),
+    awful.key({ modkey }, ' ', function() dashboard:toggle() end),
+    awful.key({ modkey }, 'Return', function() awful.spawn('st -e nvim -c ":Dirvish"') end),
+    awful.key({ modkey }, "'", function() awful.spawn('google-chrome-stable') end),
 
     awful.key({ modkey }, 'Alt_L',
         function()
-            awful.screen.focused().tagger.kg:start()
+            -- awful.screen.focused().tagger.kg:start()
+            tag_manager:start()
         end,
     {description = 'spawn tagger'}),
-    
-    awful.key({ modkey }, 'd',
-        function()
-            dmenu:start()
-        end,
-    {description = 'spawn custom dmenu'}),
-
-    awful.key({ modkey }, ' ',
-        function()
-            dashboard:toggle()
-        end,
-    {description = 'toggle dashboard'}),
-
-    awful.key({ modkey }, 'Return',
-        function()
-            awful.spawn('st -e nvim -c ":Dirvish"')
-        end,
-    {description = 'open terminal'}),
-
-    awful.key({ modkey }, "'",
-        function()
-            awful.spawn('google-chrome-stable')
-        end,
-    {description = 'open browser'}),
 
     awful.key({ modkey }, ";",
         function()
@@ -271,11 +185,7 @@ bindings.clientkeys = gears.table.join(
     -- System
     -- -------------------------------------------------------------------------
 
-    awful.key({ modkey, 'Shift' }, 'q',
-        function(c)
-            c:kill()
-        end,
-    {description = 'close client'}),
+    awful.key({ modkey, 'Shift' }, 'q', function(c) c:kill() end),
 
     -- -------------------------------------------------------------------------
     -- Layout

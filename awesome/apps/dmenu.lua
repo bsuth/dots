@@ -99,8 +99,6 @@ local function _button_factory(widget)
             widget = wibox.container.place,
         },
 		shape = gears.shape.circle,
-		shape_border_width = 5,
-		shape_border_color = beautiful.colors.cyan,
 		bg = beautiful.colors.black,
 		widget = wibox.container.background,
 	})

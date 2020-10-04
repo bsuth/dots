@@ -5,7 +5,6 @@ local naughty = require 'naughty'
 require 'theme' 
 local bindings = require 'bindings' 
 local layouts = require 'layouts' 
-local tagger = require 'apps/tagger' 
 
 -- Autofocus another client when the current one is closed
 require('awful.autofocus')
@@ -51,18 +50,6 @@ awful.layout.layouts = {
 }
 
 root.keys(bindings.globalkeys)
-
---------------------------------------------------------------------------------
--- SCREEN SETUP
---------------------------------------------------------------------------------
-
-awful.screen.connect_for_each_screen(function(s)
-    tagger:new(s, {
-        { '1', '2', '3' },
-        { '4', '5', '6' },
-        { '7', '8', '9' },
-    })
-end)
 
 --------------------------------------------------------------------------------
 -- UNIVERSAL TAGS
