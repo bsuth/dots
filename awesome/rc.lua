@@ -91,24 +91,24 @@ awful.rules.rules = {
     { 
         rule_any = {
             instance = {
-                'copyq',  -- Includes session name in class.
+                -- 'copyq',  -- Includes session name in class.
             },
             class = {
-                'Arandr',
-                'Gpick',
-                'Kruler',
-                'MessageWin',  -- kalarm.
-                'Sxiv',
-                'Wpa_gui',
-                'pinentry',
-                'veromix',
-                'xtightvncviewer',
+                -- 'Arandr',
+                -- 'Gpick',
+                -- 'Kruler',
+                -- 'MessageWin',  -- kalarm.
+                -- 'Sxiv',
+                -- 'Wpa_gui',
+                -- 'pinentry',
+                -- 'veromix',
+                -- 'xtightvncviewer',
             },
             name = {
-                'Event Tester',  -- xev.
+                -- 'Event Tester',  -- xev.
             },
             role = {
-                'AlarmWindow',  -- Thunderbird's calendar.
+                -- 'AlarmWindow',  -- Thunderbird's calendar.
                 -- 'pop-up',       -- e.g. Google Chrome's (detached) Developer Tools.
             }
         }, 

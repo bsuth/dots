@@ -55,8 +55,11 @@ end
 
 local function _refresh()
     local s = awful.screen.focused()
+    _list:reset()
 
     for _, tag in pairs(_state.taglists[s.index]) do
+        _list:add(tag.widget)
+
         if tag.tag == s.selected_tag then
             tag.widget.shape_border_color = beautiful.colors.cyan
         else
@@ -89,13 +92,13 @@ gears.table.crush(_state, {
 awful.screen.connect_for_each_screen(function(s)
     local taglist = {}
 
-    for _, name in ipairs({ '1', '2', '3' }) do
+    for i, name in ipairs({ '1', '2', '3' }) do
         table.insert(taglist, {
             tag = awful.tag.add(name, {
                 screen = s,
                 layout = awful.layout.suit.tile,
             }),
-            widget = nil,
+            widget = _tag_factory(i),
         })
     end
     
@@ -111,13 +114,6 @@ _list = wibox.widget({
 	spacing = 10,
 	layout = wibox.layout.flex.vertical,
 })
-
-for _, taglist in pairs(_state.taglists) do
-    for i, tag in ipairs(taglist) do
-        tag.widget = _tag_factory(i)
-        _list:add(tag.widget)
-    end
-end
 
 --------------------------------------------------------------------------------
 -- WIDGET: POPUP
