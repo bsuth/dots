@@ -27,11 +27,20 @@ local _state = {}
 local _list = {}
 local _popup = {}
 
+-- Other --
+
+local keygrabber = {}
+local api = {}
+
 --------------------------------------------------------------------------------
 -- HELPERS
 --------------------------------------------------------------------------------
 
 local function _tag_factory(color_index)
+    while color_index > #_TAG_COLORS do
+        color_index = color_index - #_TAG_COLORS
+    end
+
     return wibox.widget({
         {
             {
@@ -40,7 +49,7 @@ local function _tag_factory(color_index)
                     widget = wibox.container.margin,
                 },
                 shape = gears.shape.circle,
-                bg = _TAG_COLORS[color_index or 1],
+                bg = _TAG_COLORS[color_index],
                 widget = wibox.container.background,
             },
             margins = 10,
@@ -82,28 +91,55 @@ local function _shift(dir)
 end
 
 --------------------------------------------------------------------------------
+-- API
+--------------------------------------------------------------------------------
+
+function api.add(focus, screen)
+    s = screen or awful.screen.focused()
+    local counter = _state.counters[s.index] + 1
+    local taglist = _state.taglists[s.index]
+
+    table.insert(taglist, {
+        tag = awful.tag.add(tostring(counter), {
+            screen = s,
+            layout = awful.layout.suit.tile,
+        }),
+        widget = _tag_factory(counter),
+    })
+
+    if focus then taglist[counter].tag:view_only() end
+    _state.counters[s.index] = counter
+end
+
+--------------------------------------------------------------------------------
 -- INIT STATE
 --------------------------------------------------------------------------------
 
 gears.table.crush(_state, {
     taglists = {},
+    counters = {},
 })
 
 awful.screen.connect_for_each_screen(function(s)
     local taglist = {}
 
-    for i, name in ipairs({ '1', '2', '3' }) do
-        table.insert(taglist, {
-            tag = awful.tag.add(name, {
-                screen = s,
-                layout = awful.layout.suit.tile,
-            }),
-            widget = _tag_factory(i),
-        })
-    end
-    
-    taglist[1].tag:view_only()
     _state.taglists[s.index] = taglist
+    _state.counters[s.index] = 0
+
+    for i = 1, 2 do api.add() end
+    taglist[1].tag:view_only()
+
+    s:connect_signal('tag::history::update', function()
+        local last_tag = taglist[#taglist].tag
+        if s.selected_tag == last_tag then return end
+
+        if #last_tag:clients() == 0 then
+            _state.counters[s.index] = _state.counters[s.index] - 1
+            last_tag:delete()
+            taglist[#taglist] = nil
+            _refresh()
+        end
+    end)
 end)
 
 --------------------------------------------------------------------------------
@@ -173,4 +209,7 @@ keygrabber = awful.keygrabber({
 -- RETURN
 --------------------------------------------------------------------------------
 
-return keygrabber
+return {
+    keygrabber = keygrabber,
+    api = api,
+}

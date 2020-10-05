@@ -260,6 +260,7 @@ for alias, command in pairs(_state.commands) do
 
     list_item.widget:connect_signal('mouse::enter', function()
         _select(list_item_index)
+        _refresh()
     end)
 
     _list:add(list_item.widget)

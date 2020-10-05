@@ -42,15 +42,7 @@ bindings.globalkeys = gears.table.join(
     awful.key({ }, 'XF86MonBrightnessDown', function() brightness:shift(-8) end),
     awful.key({ }, 'XF86MonBrightnessUp', function() brightness:shift(8) end),
 
-    -- -------------------------------------------------------------------------
-    -- Keyboard
-    -- -------------------------------------------------------------------------
-
-    awful.key({ 'Control' }, ' ', 
-        function()
-            notifier:keyboard()
-        end,
-    {description = 'change keyboard'}),
+    awful.key({ 'Control' }, ' ', function() notifier:keyboard() end),
 
     -- -------------------------------------------------------------------------
     -- Movement
@@ -70,55 +62,6 @@ bindings.globalkeys = gears.table.join(
     awful.key({ modkey, 'Control' }, 'j', function() awful.screen.focus_bydirection('down') end),
     awful.key({ modkey, 'Control' }, 'k', function() awful.screen.focus_bydirection('up') end),
     awful.key({ modkey, 'Control' }, 'l', function() awful.screen.focus_bydirection('right') end),
-
-    -- -------------------------------------------------------------------------
-    -- Layout
-    -- -------------------------------------------------------------------------
-
-    awful.key({ modkey, 'Shift', 'Control' }, 'h',
-        function()
-            awful.tag.incmwfact(-0.05)
-        end,
-    {description = 'decrease master width'}),
-
-    awful.key({ modkey, 'Shift', 'Control' }, 'l',
-        function()
-            awful.tag.incmwfact(0.05)
-        end,
-    {description = 'increase master width'}),
-
-    awful.key({ modkey }, ',', 
-        function ()
-            awful.layout.inc(1)
-        end,
-    {description = 'next layout'}),
-
-    awful.key({ modkey, 'Shift' }, 'm',
-        function()
-            if #clientbuffer > 0 then
-                local c = table.remove(clientbuffer)
-                c:move_to_tag(awful.screen.focused().selected_tag)
-                c.minimized = false
-                client.focus = c
-            end
-        end,
-    {description = 'restore client'}),
-
-    -- -------------------------------------------------------------------------
-    -- Spawners
-    -- -------------------------------------------------------------------------
-    
-    awful.key({ modkey }, 'd', function() dmenu:start() end),
-    awful.key({ modkey }, ' ', function() dashboard:toggle() end),
-    awful.key({ modkey }, 'Return', function() awful.spawn('st -e nvim -c ":Dirvish"') end),
-    awful.key({ modkey }, "'", function() awful.spawn('google-chrome-stable') end),
-
-    awful.key({ modkey }, 'Alt_L',
-        function()
-            -- awful.screen.focused().tagger.kg:start()
-            tag_manager:start()
-        end,
-    {description = 'spawn tagger'}),
 
     awful.key({ modkey }, ";",
         function()
@@ -153,21 +96,44 @@ bindings.globalkeys = gears.table.join(
                 restore_tag = nil
             end
         end,
-    {description = 'toggle music'})
+    {description = 'toggle music'}),
+
+    -- -------------------------------------------------------------------------
+    -- Layout
+    -- -------------------------------------------------------------------------
+
+    awful.key({ modkey, 'Shift', 'Control' }, 'h', function() awful.tag.incmwfact(-0.05) end),
+    awful.key({ modkey, 'Shift', 'Control' }, 'l', function() awful.tag.incmwfact(0.05) end),
+    awful.key({ modkey }, ',', function () awful.layout.inc(1) end),
+
+    awful.key({ modkey, 'Shift' }, 'm',
+        function()
+            if #clientbuffer > 0 then
+                local c = table.remove(clientbuffer)
+                c:move_to_tag(awful.screen.focused().selected_tag)
+                c.minimized = false
+                client.focus = c
+            end
+        end,
+    {description = 'restore client'}),
+
+    -- -------------------------------------------------------------------------
+    -- Apps
+    -- -------------------------------------------------------------------------
+
+    awful.key({ modkey }, 'd', function() dmenu:start() end),
+    awful.key({ modkey }, ' ', function() dashboard:toggle() end),
+    awful.key({ modkey }, 'Alt_L', function() tag_manager.keygrabber:start() end),
+    awful.key({ modkey, 'Shift' }, '=', function() tag_manager.api.add(true) end),
+    awful.key({ modkey }, '-', function() tag_manager.api.remove() end),
+
+    -- -------------------------------------------------------------------------
+    -- Spawners
+    -- -------------------------------------------------------------------------
+    
+    awful.key({ modkey }, 'Return', function() awful.spawn('st -e nvim -c ":Dirvish"') end),
+    awful.key({ modkey }, "'", function() awful.spawn('google-chrome-stable') end)
 )
-
---------------------------------------------------------------------------------
--- TAG KEYS
---------------------------------------------------------------------------------
-
-for i = 1, 9 do
-    bindings.globalkeys = gears.table.join(bindings.globalkeys,
-        awful.key({ modkey }, i, function ()
-            local tag = awful.screen.focused().tags[i]
-            if tag then tag:view_only() end
-        end)
-    )
-end
 
 --------------------------------------------------------------------------------
 -- CLIENT KEYS

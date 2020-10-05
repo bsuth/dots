@@ -5,7 +5,7 @@ local gears = require 'gears'
 local cjson = require 'cjson'
 
 --------------------------------------------------------------------------------
--- WEATHER
+-- INIT
 --------------------------------------------------------------------------------
 
 local weather = gears.object()
@@ -45,7 +45,7 @@ local ICON_DATA = {
 }
 
 --------------------------------------------------------------------------------
--- API
+-- HELPERS
 --------------------------------------------------------------------------------
 
 local function getIcon(code)
@@ -71,6 +71,10 @@ local function extractWeatherData(data, current)
         icon = getIcon(tonumber(data.weatherCode)),
     }
 end
+
+--------------------------------------------------------------------------------
+-- METHODS
+--------------------------------------------------------------------------------
 
 function weather:get(param, forecast_hour)
     if forecast_hour ~= nil then
