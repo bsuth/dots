@@ -50,6 +50,12 @@ function battery:update()
     ]], function(stdout)
         _private.value = tonumber(stdout)
         self:emit_signal('update')
+
+        if _private.value < 20 then
+            self:emit_signal('warning_low')
+        else
+            self:emit_signal('no_warning')
+        end
     end)
 end
 
@@ -58,7 +64,8 @@ end
 --------------------------------------------------------------------------------
 
 gears.timer({
-    timeout = 5,
+    timeout = 60,
+    call_now = true,
     autostart = true,
     callback = function() battery:update() end,
 })
@@ -67,5 +74,4 @@ gears.timer({
 -- RETURN
 --------------------------------------------------------------------------------
 
-battery:update()
 return battery
