@@ -170,7 +170,6 @@ _popup = awful.popup({
         left = 30,
         widget = wibox.container.margin,
     },
-
     placement = awful.placement.left,
     ontop = true,
     visible = false,
@@ -194,8 +193,7 @@ keygrabber = awful.keygrabber({
     stop_event = 'release',
 
     start_callback = function() 
-        local s = awful.screen.focused()
-        _popup.screen = s
+        _popup.screen = awful.screen.focused()
         _popup.visible = true
         _refresh()
     end,

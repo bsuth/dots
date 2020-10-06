@@ -117,14 +117,11 @@ _icon = wibox.widget({
 _bar = wibox.widget({
     value = 0,
     max_value = 100,
-
     forced_height = 30,
     forced_width  = 200,
-
     bar_shape = gears.shape.rounded_bar,
     shape = gears.shape.rounded_bar,
     background_color = beautiful.colors.black,
-
     widget = wibox.widget.progressbar,
 })
 
@@ -159,7 +156,6 @@ _popup = awful.popup({
         right = 30,
         widget = wibox.container.margin,
     },
-
     placement = awful.placement.right,
     ontop = true,
     visible = false,

@@ -6,8 +6,7 @@ local wibox = require 'wibox'
 local dashboard = require 'apps/dashboard' 
 local dmenu = require 'apps/dmenu' 
 local tag_manager = require 'apps/tag_manager' 
-
-local notifier = require 'widgets/notifier' 
+local kb_switcher = require 'apps/kb_switcher' 
 
 local volume = require 'singletons/volume'
 local brightness = require 'singletons/brightness'
@@ -42,7 +41,7 @@ bindings.globalkeys = gears.table.join(
     awful.key({ }, 'XF86MonBrightnessDown', function() brightness:shift(-8) end),
     awful.key({ }, 'XF86MonBrightnessUp', function() brightness:shift(8) end),
 
-    awful.key({ 'Control' }, ' ', function() notifier:keyboard() end),
+    awful.key({ 'Control' }, 'space', function() kb_switcher:start() end),
 
     -- -------------------------------------------------------------------------
     -- Movement
