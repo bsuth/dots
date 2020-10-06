@@ -3,6 +3,7 @@ local beautiful = require 'beautiful'
 local naughty = require 'naughty' 
 
 require 'theme' 
+require 'apps/bar_manager'
 local bindings = require 'bindings' 
 local layouts = require 'layouts' 
 

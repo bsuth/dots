@@ -191,15 +191,16 @@ local nmap = {
 	['<leader>v?'] = ':vert :help ',
 
 	-- Term
-	['<leader><leader><cr>'] = ':term<cr>:startinsert<cr>',
-	['<leader><cr>'] = ':sp|:term<cr>:startinsert<cr>',
-	['<leader>v<cr>'] = ':vsp|:term<cr>:startinsert<cr>',
+	["<leader><leader>'"] = ':term<cr>:startinsert<cr>',
+	["<leader>'"] = ':sp|:term<cr>:startinsert<cr>',
+	["<leader>v'"] = ':vsp|:term<cr>:startinsert<cr>',
 
 	-- Dirvish
 	['<leader>ev'] = ':Dirvish ~/dots/nvim<cr>',
 	['<c-t>'] = ':Dirvish<cr>',
-	['<leader>sp'] = ':sp|:Dirvish<cr>',
-	['<leader>vsp'] = ':vsp|:Dirvish<cr>',
+	['<leader><leader><cr>'] = ':Dirvish | :wincmd o<cr>',
+	['<leader><cr>'] = ':sp|:Dirvish<cr>',
+	['<leader>v<cr>'] = ':vsp|:Dirvish<cr>',
 
 	-- FZF
 	['<leader>fd'] = ':Files<cr>',

@@ -126,7 +126,7 @@ awful.screen.connect_for_each_screen(function(s)
     _state.taglists[s.index] = taglist
     _state.counters[s.index] = 0
 
-    for i = 1, 2 do api.add() end
+    api.add()
     taglist[1].tag:view_only()
 
     s:connect_signal('tag::history::update', function()
