@@ -95,7 +95,7 @@ end
 --------------------------------------------------------------------------------
 
 function api.add(focus, screen)
-    s = screen or awful.screen.focused()
+    local s = screen or awful.screen.focused()
     local counter = _state.counters[s.index] + 1
     local taglist = _state.taglists[s.index]
 

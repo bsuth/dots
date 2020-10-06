@@ -85,7 +85,7 @@ function weather:get(param, forecast_hour)
 end
 
 function weather:update()
-    awful.spawn.easy_async([[
+    awful.spawn.easy_async_with_shell([[
         curl "wttr.in/~Frankfurt+Hauptbahnhof?format=j1"
     ]], function(stdout)
         local weather_data = cjson.decode(stdout)

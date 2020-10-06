@@ -1,7 +1,6 @@
 local awful = require 'awful' 
 local gears = require 'gears' 
 local naughty = require 'naughty' 
-local wibox = require 'wibox' 
 
 local dashboard = require 'apps/dashboard' 
 local dmenu = require 'apps/dmenu' 
@@ -20,6 +19,16 @@ local bindings = { modkey = modkey }
 
 local restore_tag = nil
 local clientbuffer = {}
+
+awesome.connect_signal('startup', function()
+    for s in screen do
+        for _, c in ipairs(s.tags[1]:clients()) do
+            if c.minimized == true then
+                table.insert(clientbuffer, c)
+            end
+        end
+    end
+end)
 
 --------------------------------------------------------------------------------
 -- GLOBAL KEYS
@@ -161,6 +170,9 @@ bindings.clientkeys = gears.table.join(
         function(c)
             table.insert(clientbuffer, c)
             c.minimized = true
+
+            -- Move to first tag to properly allow for automatic tag removal
+            c:move_to_tag(awful.screen.focused().tags[1])
         end,
     {description = 'store client'})
 )
