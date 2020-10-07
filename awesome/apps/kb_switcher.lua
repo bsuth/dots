@@ -72,7 +72,7 @@ _popup = awful.popup({
             widget = wibox.container.margin,
         },
         shape = gears.shape.circle,
-        shape_border_color = beautiful.colors.cyan,
+        shape_border_color = beautiful.colors.purple,
         shape_border_width = 5,
         bg = beautiful.colors.black,
         widget = wibox.container.background,
