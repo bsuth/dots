@@ -185,22 +185,17 @@ local nmap = {
 	['<Tab>'] = ':bn<cr>',
 	['<s-Tab>'] = ':bp<cr>',
 
-	-- Help
-	['<leader><leader>?'] = ':help  | :wincmd o' .. ('<left>'):rep(12),
-	['<leader>?'] = ':help ',
-	['<leader>v?'] = ':vert :help ',
-
-	-- Term
-	["<leader><leader>'"] = ':term<cr>:startinsert<cr>',
-	["<leader>'"] = ':sp|:term<cr>:startinsert<cr>',
-	["<leader>v'"] = ':vsp|:term<cr>:startinsert<cr>',
-
 	-- Dirvish
 	['<leader>ev'] = ':Dirvish ~/dots/nvim<cr>',
 	['<c-t>'] = ':Dirvish<cr>',
 	['<leader><leader><cr>'] = ':Dirvish | :wincmd o<cr>',
 	['<leader><cr>'] = ':sp|:Dirvish<cr>',
 	['<leader>v<cr>'] = ':vsp|:Dirvish<cr>',
+
+	-- External Programs
+	["<leader>'"] = ':term<cr>:startinsert<cr>',
+	["<leader>help"] = ':help ',
+	["<leader>man"] = ':Man ',
 
 	-- FZF
 	['<leader>fd'] = ':Files<cr>',

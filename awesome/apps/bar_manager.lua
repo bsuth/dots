@@ -33,6 +33,7 @@ local function _notify(callback)
 
     (callback)()
 
+    _popup.screen = awful.screen.focused()
     _popup.visible = true
     _state.timer:again()
 end
