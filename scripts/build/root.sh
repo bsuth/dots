@@ -29,8 +29,7 @@ function _report_status_() {
 
 function _yesno_() {
     while true; do
-        printf "$1 (y/n): "
-        read yn
+        read -p "$1 (y/n): " yn
 
         case "$yn" in
             y|Y) return 0 ;;
