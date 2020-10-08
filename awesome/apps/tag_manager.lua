@@ -77,17 +77,46 @@ local function _refresh()
     end
 end
 
-local function _shift(dir)
+local function _focus(reversed)
     local s = awful.screen.focused()
     local taglist = _state.taglists[s.index]
-    local wrap_tag = dir > 0 and taglist[1] or taglist[#taglist]
+
+    local increment = reversed and -1 or 1
+    local wrap_tag = reversed and taglist[#taglist] or taglist[1]
 
     for i, tag in pairs(taglist) do
         if tag.tag == s.selected_tag then
-            (taglist[i + dir] or wrap_tag).tag:view_only()
+            (taglist[i + increment] or wrap_tag).tag:view_only()
             break
         end
     end
+
+    _refresh()
+end
+
+local function _shift(reversed)
+    local s = awful.screen.focused()
+    local taglist = _state.taglists[s.index]
+
+    for i, tag in pairs(taglist) do
+        if tag.tag == s.selected_tag then
+            if i == 1 and reversed then
+                table.remove(taglist, i)
+                table.insert(taglist, tag)
+            elseif i == #taglist and not reversed then
+                table.remove(taglist, i)
+                table.insert(taglist, 1, tag)
+            else
+                local swap_index = i + (reversed and -1 or 1)
+                taglist[i] = taglist[swap_index]
+                taglist[swap_index] = tag
+            end
+
+            break
+        end
+    end
+
+    _refresh()
 end
 
 --------------------------------------------------------------------------------
@@ -189,8 +218,10 @@ local submodkey = 'Mod1'
 
 keygrabber = awful.keygrabber({
     keybindings = {
-        { { submodkey }, 'Tab', function() _shift(1); _refresh() end },
-        { { submodkey, 'Shift' }, 'Tab', function() _shift(-1); _refresh() end },
+        { { submodkey }, 'Tab', function() _focus() end },
+        { { submodkey, 'Shift' }, 'Tab', function() _focus(true) end },
+        { { modkey, submodkey }, 'Tab', function() _shift() end },
+        { { modkey, submodkey, 'Shift' }, 'Tab', function() _shift(true) end },
     },
 
     stop_key = submodkey,
