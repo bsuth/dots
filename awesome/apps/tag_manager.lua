@@ -133,10 +133,14 @@ awful.screen.connect_for_each_screen(function(s)
         local last_tag = taglist[#taglist].tag
         if s.selected_tag == last_tag then return end
 
-        if #last_tag:clients() == 0 then
-            _state.counters[s.index] = _state.counters[s.index] - 1
-            last_tag:delete()
-            taglist[#taglist] = nil
+        if #taglist > 1 and #last_tag:clients() == 0 then
+            while #last_tag:clients() == 0 do
+                _state.counters[s.index] = _state.counters[s.index] - 1
+                last_tag:delete()
+                taglist[#taglist] = nil
+                last_tag = taglist[#taglist].tag
+            end
+
             _refresh()
         end
     end)

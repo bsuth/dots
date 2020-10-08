@@ -102,7 +102,7 @@ end
 local vars = {
 	mapleader = ' ',
 
-	vue_pre_processors = { 'typescript', 'scss' },
+	vue_pre_processors = { 'scss' },
 
 	fzf_layout =  { down = '50%' },
 	fzf_preview_window = 'right:60%',
