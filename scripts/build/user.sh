@@ -7,10 +7,10 @@
 # that the current user is `bsuth`.
 # ------------------------------------------------------------------------------
 
-# ------------------------------------------------------------------------------
-# ANSI COLOR CODES
-# ------------------------------------------------------------------------------
+# Status
+status=0
 
+# ANSI color codes
 RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
 NC="$(tput sgr0)"
@@ -18,6 +18,14 @@ NC="$(tput sgr0)"
 # ------------------------------------------------------------------------------
 # HELPERS
 # ------------------------------------------------------------------------------
+
+function _report_status_() {
+    case $status in
+	0) echo -e "\n${GREEN}--> Success! <--${NC}\n" ;;
+	1) echo -e "\n${RED}--> Failed <--${NC}\n" ;;
+	2|*) echo -e "\n${RED}--> Skipped <--${NC}\n" ;;
+    esac	    
+}
 
 function _yesno_() {
     while true; do
@@ -32,6 +40,15 @@ function _yesno_() {
     done
 }
 
+function _prompt_continue_() {
+	if ! _yesno_ "Continue?"; then
+		status=1; _report_status_
+		exit 0
+	else
+		status=2
+	fi
+}
+
 # ------------------------------------------------------------------------------
 # MAIN
 # ------------------------------------------------------------------------------
@@ -41,61 +58,162 @@ if [[ $UID == 0 ]]; then
     exit 1
 fi
 
-echo -e "${GREEN}================================${NC}"
-echo -e "${GREEN}========== User Setup ==========${NC}"
-echo -e "${GREEN}================================${NC}\n"
+cd $HOME; 
+echo # Newline for readability
 
-# --------------------------------------
-# Create Home Folders
-# --------------------------------------
+## Create Home Folders ##
 
-echo -e "${GREEN}=== Creating home folders ===${NC}\n"
-! [[ -d $HOME/.config ]] && mkdir $HOME/.config
-! [[ -d $HOME/tools ]] && mkdir $HOME/tools
+function _create_dirs_() {
+	declare -a directories=(
+		.config
+		tools
+	)
 
-# --------------------------------------
-# Clone Dots Repo
-# --------------------------------------
+	declare -a failed=()
 
-echo -e "${GREEN}=== Cloning dots repo ===${NC}\n"
-cd $HOME; git clone https://github.com/bsuth/dots.git; cd $HOME/dots
+	for directory in ${directories[@]}; do
+		if ! [[ -d $directory ]]; then
+			printf "Creating ~/$directory..."
+			if ! mkdir -p "$HOME/$directory"; then
+				printf "${RED}failed${NC}"
+				failed+=($directory)
+			else
+				echo "${GREEN}done${NC}"
+			fi
+		else
+			echo "Found $directory"
+		fi
+	done
 
-# --------------------------------------
-# Setup Symbolic Links
-#
-# Note: Use absolute paths here, since custom environment variables will not be
-# setup yet (zprofile not loaded).
-# --------------------------------------
+	if [[ ${#failed[@]} > 0 ]]; then
+		echo "${RED}Failed to create the following directories:${NC}"
+		for directory in ${failed[@]}; do
+			echo "${RED}$directory${NC}"
+		done
+		_prompt_continue_
+	else
+		status=0
+	fi
+}
 
-echo -e "${GREEN}=== Setting up symbolic links ===${NC}\n"
+echo -e "${GREEN}=== Creating directories ===${NC}\n"
+_create_dirs_
+_report_status_
 
-ln -sf "$HOME/dots/Xmodmap" "$HOME/.Xmodmap"
-ln -sf "$HOME/dots/xinitrc" "$HOME/.xinitrc"
+## Setup dots ##
 
-ln -sf "$HOME/dots/zsh/zprofile" "$HOME/.zprofile"
-ln -sf "$HOME/dots/zsh/zshrc" "$HOME/.zshrc"
+function _setup_dots_() {
+	if ! [[ -d $HOME/dots ]]; then
+		printf "Cloning repo..."
+		if ! git clone https://github.com/bsuth/dots.git >/dev/null 2>&1; then
+			echo "${RED}failed${NC}"
+			_prompt_continue_
+		else
+			echo "${GREEN}done${NC}"
+		fi
+	else
+		printf "Found dots directory. Pulling..."
+		cd $HOME/dots
 
-ln -sfn "$HOME/dots/awesome" "$HOME/.config/awesome"
+		if ! git pull >/dev/null 2>&1; then
+			echo "${RED}failed${NC}"
+			_prompt_continue_
+		else
+			echo "${GREEN}done${NC}"
+		fi
 
-ln -sfn "$HOME/dots/nvim" "$HOME/.config/nvim"
+		cd $HOME
+	fi
 
-ln -sfn "$HOME/dots/vifm" "$HOME/.config/vifm"
+	echo
 
-ln -sf "$HOME/dots/picom.conf" "$HOME/.config/picom.conf"
+	declare -A symlinks=(
+		["Xmodmap"]=".Xmodmap"
+		["xinitrc"]=".xinitrc"
+		["zsh/zprofile"]=".zprofile"
+		["zsh/zshrc"]=".zshrc"
+		["awesome"]=".config/awesome"
+		["nvim"]=".config/nvim"
+		["picom.conf"]=".config/picom.conf"
+	)
 
-sudo ln -sf "$HOME/dots/services/physlock.service" "/etc/systemd/system/physlock.service"
+	declare -A sudosymlinks=(
+		["services/physlock.service"]="/etc/systemd/system/physlock.service"
+	)
 
-# --------------------------------------
-# Change Shell
-# --------------------------------------
+	failedsymlinks=0
 
-echo -e "${GREEN}=== Changing user shell to zsh ===${NC}\n"
-sudo chsh -s /bin/zsh bsuth
+	for symlink in ${!symlinks[@]}; do
+		printf "Linking ~/dots/${symlink} -> ~/${symlinks[$symlink]}..."
+		if ! ln -sfn "$HOME/dots/$symlink" "$HOME/${symlinks[$symlink]}" 2>/dev/null; then
+			echo "${RED}failed${NC}"
+			(( failedsymlinks+=1 ))
+		else
+			echo "${GREEN}done${NC}"
+		fi
+	done
 
-# --------------------------------------
-# Configure git
-# --------------------------------------
+	echo
+	echo "sudo required for system-level symlinks"
+	sudo echo ""
 
-# --------------------------------------
-# Install NeoVim
-# --------------------------------------
+	for symlink in ${!sudosymlinks[@]}; do
+		printf "Sudo linking ~/dots/$symlink -> ${sudosymlinks[$symlink]}..."
+		if ! sudo ln -sfn "$HOME/dots/$symlink" "${sudosymlinks[$symlink]}" 2>/dev/null; then
+			echo "${RED}failed${NC}"
+			(( failedsymlinks+=1 ))
+		else
+			echo "${GREEN}done${NC}"
+		fi
+	done
+
+	if [[ $failedsymlinks > 0 ]]; then
+		echo
+		echo "${RED}Failed to create $failedsymlinks symlinks${NC}"
+		_prompt_continue_
+	else
+		status=0
+	fi
+}
+
+echo -e "${GREEN}=== Setting up dots ===${NC}\n"
+_setup_dots_
+_report_status_
+
+## Change Shell ##
+
+function _change_shell_() {
+	printf "Changing shell for bsuth to zsh..."
+	if ! sudo chsh -s /bin/zsh bsuth; then
+		echo "${GREEN}failed${NC}"
+		_prompt_continue_
+	else
+		echo "${GREEN}done${NC}"
+		status=0
+	fi
+}
+
+echo -e "${GREEN}=== Changing shell ===${NC}\n"
+_change_shell_
+_report_status_
+
+## Configure git ##
+
+function _configure_git_() {
+	printf "Configuring git..."
+
+	git config --global pull.rebase false
+	git config --global user.name 'bsuth'
+	git config --global user.email 'bsuth701@gmail.com'
+
+	echo "${GREEN}done${NC}"
+	status=0
+}
+
+echo -e "${GREEN}=== Configuring git ===${NC}\n"
+_configure_git_
+_report_status_
+
+## Neovim ##
+
+# ./neovim.sh

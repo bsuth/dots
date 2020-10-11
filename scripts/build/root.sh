@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------ 
 # README
-
 # This is a script to setup my daily driver environment on a machine. It assumes
 # that the current user is `root`.
 # ------------------------------------------------------------------------------
@@ -20,23 +19,33 @@ NC="$(tput sgr0)"
 # ------------------------------------------------------------------------------
 
 function _report_status_() {
-    case $status in
-	0) echo -e "\n${GREEN}--> Success! <--${NC}\n" ;;
-	1) echo -e "\n${RED}--> Failed <--${NC}\n" ;;
-	2|*) echo -e "\n${RED}--> Skipped <--${NC}\n" ;;
-    esac	    
+	case $status in
+		0) echo -e "\n${GREEN}--> Success! <--${NC}\n" ;;
+		1) echo -e "\n${RED}--> Failed <--${NC}\n" ;;
+		2|*) echo -e "\n${RED}--> Skipped <--${NC}\n" ;;
+	esac	    
 }
 
 function _yesno_() {
-    while true; do
-        read -p "$1 (y/n): " yn
+	while true; do
+		printf "$1 (y/n): "
+		read yn
 
-        case "$yn" in
-            y|Y) return 0 ;;
-            n|N) return 1 ;;
-            *) echo -e "${RED}Invalid input${NC}\n"
-        esac
-    done
+		case "$yn" in
+			y|Y) return 0 ;;
+			n|N) return 1 ;;
+			*) echo -e "${RED}Invalid input${NC}\n"
+		esac
+	done
+}
+
+function _prompt_continue_() {
+	if ! _yesno_ "Continue?"; then
+		status=1; _report_status_
+		exit 0
+	else
+		status=2
+	fi
 }
 
 # ------------------------------------------------------------------------------
@@ -44,155 +53,173 @@ function _yesno_() {
 # ------------------------------------------------------------------------------
 
 if [[ $UID != 0 ]]; then
-    echo "${RED}This script must be run as root.${NC}"
-    exit 1
+	echo "${RED}This script must be run as root.${NC}"
+	exit 1
 fi
 
-# Newline for readability
 echo
 
-# --------------------------------------
-# Setup Wifi
-# --------------------------------------
+## Setup services ## 
+
+function _setup_services_() {
+	services=(
+		systemd-networkd
+		systemd-resolved
+	)
+
+	for service in ${services[@]}; do
+		systemctl enable "$service.service"
+		systemctl start "$service.service"
+	done
+
+	status=0
+}
+
+echo -e "${GREEN}=== Setting up services ===${NC}"
+_setup_services_
+_report_status_
+
+## Setup Wifi ## 
 
 function _setup_wifi_() {
-    if ! _yesno_ "Setup wifi?"; then status=2; return; fi
+	if ! _yesno_ "Setup wifi?"; then status=2; return; fi
 
-    # See here for a list of all interface prefixes:
-    # https://www.freedesktop.org/software/systemd/man/systemd.net-naming-scheme.html
-    found_interface=0
+	# See here for a list of all interface prefixes:
+	# https://www.freedesktop.org/software/systemd/man/systemd.net-naming-scheme.html
+	found_interface=0
 
-    for interface in $(ls /sys/class/net); do
-        if [[ ${interface:0:2} == "wl" ]]; then
-            echo -e "\nFound WLAN interface: $interface"
-            if ! _yesno_ "Use this?"; then continue; fi 
+	for interface in $(ls /sys/class/net); do
+		if [[ ${interface:0:2} == "wl" ]]; then
+			echo -e "\nFound WLAN interface: $interface"
+			if ! _yesno_ "Use this?"; then continue; fi 
 
-	    while : ; do
-		echo
-                read -p "SSID: " ssid
-                read -p "Password: " -s pass
-		echo -e "\n"
+			while : ; do
+				echo
+				read -p "SSID: " ssid
+				read -p "Password: " -s pass
+				echo -e "\n"
 
-		if wpa_passphrase "$ssid" "$pass" >/dev/null; then
-		    printf "Saving configuration and setting up service..."
-                    wpa_passphrase "$ssid" "$pass" > "/etc/wpa_supplicant/wpa_supplicant-${interface}.conf"
-                    systemctl enable "wpa_supplicant@${interface}.service" >/dev/null 2>&1
-                    systemctl restart "wpa_supplicant@${interface}.service" >/dev/null 2>&1
-		    echo "${GREEN}done${NC}"
+				if wpa_passphrase "$ssid" "$pass" >/dev/null; then
+					printf "Saving configuration and setting up service..."
+					wpa_passphrase "$ssid" "$pass" > "/etc/wpa_supplicant/wpa_supplicant-${interface}.conf"
+					systemctl enable "wpa_supplicant@${interface}.service" >/dev/null 2>&1
+					systemctl restart "wpa_supplicant@${interface}.service" >/dev/null 2>&1
+					echo -e "[Match]\nName=$interface\n[Network]\nDHCP=yes" > /etc/systemd/network/1-wireless.network
+					systemctl restart "systemd-networkd.service" >/dev/null 2>&1
+					echo "${GREEN}done${NC}"
 
-		    while : ; do
-		        printf "Checking connection..."
+					while : ; do
+						printf "Checking connection..."
 
-			# Give some time for the network to connect
-			sleep 2
+						# Give some time for the network to connect
+						sleep 2
 
-		        if ping -c 1 8.8.8.8 -W 10 >/dev/null 2>&1; then
-		    	    echo "${GREEN}done${NC}"
-		            status=0
-		            return
-		        fi
-    
-		    	echo "${RED}failed${NC}"
-		        echo -e "\n${RED}Failed to ping 8.8.8.8${NC}"
-		    	if ! _yesno_ "Try again?"; then break; fi
-		    done
+						if ping -c 1 8.8.8.8 -W 50 >/dev/null 2>&1; then
+							echo "${GREEN}done${NC}"
+							status=0
+							return
+						fi
 
-		    echo
-		    printf "Configuration aborted. Reverting changes..."
-                    rm "/etc/wpa_supplicant/wpa_supplicant-${interface}.conf"
-                    systemctl stop "wpa_supplicant@${interface}.service" >/dev/null 2>&1
-                    systemctl disable "wpa_supplicant@${interface}.service" >/dev/null 2>&1
-		    echo "${GREEN}done${NC}"
+						echo "${RED}failed${NC}"
+						echo -e "\n${RED}Failed to ping 8.8.8.8${NC}"
+						if ! _yesno_ "Try again?"; then
+							if _yesno_ "Use anyways?"; then
+								status=0
+								return
+							else
+								break
+							fi
+						fi
+					done
 
-		    if ! _yesno_ "Try different credentials?"; then break; fi
-		else
-		    echo "${RED}Invalid parameters (wpa_passphrase returned non-zero exit status)${NC}"
-		    if ! _yesno_ "Try again?"; then break; fi
+					printf "Configuration aborted. Reverting changes..."
+					rm "/etc/wpa_supplicant/wpa_supplicant-${interface}.conf"
+					systemctl stop "wpa_supplicant@${interface}.service" >/dev/null 2>&1
+					systemctl disable "wpa_supplicant@${interface}.service" >/dev/null 2>&1
+					echo "${GREEN}done${NC}"
+
+					if ! _yesno_ "Try different credentials?"; then
+						status=1
+						break
+					fi
+				else
+					echo "${RED}Invalid parameters (wpa_passphrase returned non-zero exit status)${NC}"
+					status=1
+					if ! _yesno_ "Try again?"; then break; fi
+				fi
+			done
 		fi
-	    done
-        fi
-    done
+	done
 
-    echo -e "\n${RED}Error: Failed to find WLAN interface.${NC}"
+	echo -e "\n${RED}Error: Failed to find WLAN interface.${NC}"
 
-    if ! _yesno_ "Continue?"; then
-	status=1; _report_status_
-	exit 0
-    else
-	status=2
-    fi
+	_prompt_continue_
 }
 
 echo -e "${GREEN}=== Setting up wifi ===${NC}\n"
 _setup_wifi_
 _report_status_
 
-# --------------------------------------
-# Install Packages
-# --------------------------------------
-
-PACKAGES=(
-    # System
-    xorg
-    pulseaudio
-    udisks2
-    udiskie 
-
-    # Utilities
-    pass
-    physlock
-    acpi
-    fd-find
-    fzf
-    ripgrep
-    flameshot
-    deepin-image-viewer
-
-    # Development
-    make
-    pkg-config
-    clang
-    nodejs
-    luajit
-    luarocks
-
-    # Environment
-    awesome
-    papirus-icon-theme
-    vifm
-    zsh
-    compton
-)
+## Install Packages ## 
 
 function _install_packages_() {
-    if ! _yesno_ "Install packages?"; then status=2; return; fi
+	declare -a packages=(
+		# System
+		sudo
+		xorg
+		pulseaudio
+		udisks2
+		udiskie 
 
-    while : ; do
-        if apt install "${PACKAGES[@]}"; then
-	    status=0
-	    return
-        else
-	    if ! _yesno_ "Try again?"; then break; fi
-        fi
-    done
+		# Utilities
+		pass
+		physlock
+		acpi
+		fd-find
+		fzf
+		ripgrep
+		flameshot
+		deepin-image-viewer
 
-    status=2
+		# Development
+		make
+		pkg-config
+		clang
+		nodejs
+		luajit
+
+		# Environment
+		papirus-icon-theme
+		zsh
+		compton
+	)
+
+	if ! _yesno_ "Install packages?"; then status=2; return; fi
+
+	while : ; do
+		if apt install "${packages[@]}"; then
+			status=0
+			return
+		else
+			if ! _yesno_ "Try again?"; then break; fi
+		fi
+	done
+
+	status=2
 }
 
 echo -e "${GREEN}=== Installing packages ===${NC}\n"
 _install_packages_
 _report_status_
 
-# --------------------------------------
-# Update sudoers
-# --------------------------------------
+## Update sudoers ## 
 
 function _setup_sudoers_() {
-    if usermod -a -G sudo bsuth; then
-        status=0
-    else
-        status=1
-    fi
+	if usermod -a -G sudo bsuth; then
+		status=0
+	else
+		status=1
+	fi
 }
 
 echo -e "${GREEN}=== Adding bsuth to sudoers ===${NC}"

@@ -5,14 +5,14 @@ RESTORE_DIR="$(pwd)"
 if ! command -v nvim &> /dev/null; then
     DEPENDENCIES=(
         ninja-build
-	gettext
-	libtool
-	libtool-bin
-	autoconf
-	cmake
-	clang
-	pkg-config
-	unzip
+		gettext
+		libtool
+		libtool-bin
+		autoconf
+		cmake
+		clang
+		pkg-config
+		unzip
     )
 
     sudo apt install "${DEPENDENCIES[@]}"
