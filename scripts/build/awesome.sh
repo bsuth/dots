@@ -2,13 +2,15 @@
 
 # ------------------------------------------------------------------------------ 
 # README
-# This is a script to build and install neovim from the latest stable branch.
+# This is a script to build and install awesome using luajit.
 # ------------------------------------------------------------------------------
 
 # ANSI color codes
 RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
 NC="$(tput sgr0)"
+
+VERSION="4.3"
 
 # ------------------------------------------------------------------------------
 # HELPERS
@@ -33,36 +35,30 @@ function _yesno_() {
 
 RESTORE_DIR="$(pwd)"
 
-if ! command -v nvim &> /dev/null; then
-    dependencies=(
-        ninja-build
-		gettext
-		libtool
-		libtool-bin
-		autoconf
-		cmake
-		clang
-		pkg-config
-		unzip
-    )
-
+if ! command -v awesome &> /dev/null; then
 	echo -e "${GREEN}=== Installing dependencies ===${NC}\n"
-    sudo apt install "${dependencies[@]}"
+	sudo apt build-dep awesome liblua5.3-0-
 
-	if ! [[ -d $HOME/tools/neovim ]]; then
-		echo -e "${GREEN}=== Cloning repo ===${NC}\n"
-		cd $HOME/tools
-		git clone https://github.com/neovim/neovim
+	if ! [[ -d $HOME/tools/awesome ]]; then
+		echo -e "${GREEN}=== Fetching source files ===${NC}\n"
+		wget "https://github.com/awesomeWM/awesome-releases/raw/master/awesome-$VERSION.tar.bz2"
+		tar --extract --bzip2 --file="awesome-$VERSION.tar.bz2"
+		rm "awesome-$VERSION.tar.bz2"
 	fi
 fi
 
-echo -e "${GREEN}=== Building ===${NC}\n"
+echo -e "${GREEN}=== Installing / Uninstalling ===${NC}\n"
 
-if _yesno_ "Pull and make install?"; then
-	cd $HOME/tools/neovim
-	git checkout -b origin/stable
-	git pull
-	sudo make CMAKE_BUILD_TYPE=Release install
+if _yesno_ "Build awesome?"; then
+	cd $HOME/tools/awesome-$VERSION/build
+	cmake .. \
+		-DCMAKE_BUILD_TYPE=RELEASE \
+		-DLUA_INCLUDE_DIR=/usr/include/luajit-2.0 \
+		-DLUA_LIBRARY=/usr/lib/libluajit-5.1.so
+	make package
+	sudo dpkg -i "awesome-$VERSION.deb"
+elif _yesno_ "Uninstall awesome?"; then
+	sudo apt purge awesome
 fi
 
 cd $RESTORE_DIR
