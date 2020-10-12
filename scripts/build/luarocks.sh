@@ -34,6 +34,8 @@ function _yesno_() {
 # ------------------------------------------------------------------------------
 
 RESTORE_DIR="$(pwd)"
+cd $HOME/tools
+echo
 
 if ! command -v luarocks &> /dev/null; then
 	dependencies=(
@@ -43,12 +45,14 @@ if ! command -v luarocks &> /dev/null; then
 
 	echo -e "${GREEN}=== Installing dependencies ===${NC}\n"
 	sudo apt install "${dependencies[@]}"
+	echo
 
 	if ! [[ -d $HOME/tools/luarocks-$VERSION ]]; then
 		echo -e "${GREEN}=== Fetching source files ===${NC}\n"
 		wget "https://luarocks.org/releases/luarocks-$VERSION.tar.gz"
 		tar --extract --gunzip --preserve-permissions --file="luarocks-$VERSION.tar.gz"
 		rm "luarocks-$VERSION.tar.gz"
+		echo
 	fi
 fi
 
@@ -56,11 +60,17 @@ echo -e "${GREEN}=== Installing / Uninstalling ===${NC}\n"
 
 if _yesno_ "Build luarocks?"; then
 	cd $HOME/tools/luarocks-$VERSION
-	./configure --with-lua-include=/usr/local/include
+	./configure --with-lua-include=/usr/include/luajit-2.1
 	make
 	sudo make install
 elif _yesno_ "Uninstall luarocks?"; then
 	sudo rm -rf /usr/local/bin/luarocks* /usr/local/lib/luarocks
+fi
+
+echo -e "${GREEN}=== Installing packages ===${NC}\n"
+
+if _yesno_ "Install standard packages?"; then
+	luarocks install lua-cjson busted
 fi
 
 cd $RESTORE_DIR

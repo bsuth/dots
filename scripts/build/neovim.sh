@@ -32,6 +32,7 @@ function _yesno_() {
 # ------------------------------------------------------------------------------
 
 RESTORE_DIR="$(pwd)"
+echo
 
 if ! command -v nvim &> /dev/null; then
     dependencies=(
@@ -47,7 +48,8 @@ if ! command -v nvim &> /dev/null; then
     )
 
 	echo -e "${GREEN}=== Installing dependencies ===${NC}\n"
-    sudo apt install "${dependencies[@]}"
+    	sudo apt install "${dependencies[@]}" 
+	echo
 
 	if ! [[ -d $HOME/tools/neovim ]]; then
 		echo -e "${GREEN}=== Cloning repo ===${NC}\n"

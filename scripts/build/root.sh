@@ -170,11 +170,12 @@ function _install_packages_() {
 		pulseaudio
 		udisks2
 		udiskie 
+		acpi
 
 		# Utilities
+		curl
 		pass
 		physlock
-		acpi
 		fd-find
 		fzf
 		ripgrep
@@ -224,4 +225,36 @@ function _setup_sudoers_() {
 
 echo -e "${GREEN}=== Adding bsuth to sudoers ===${NC}"
 _setup_sudoers_
+_report_status_
+
+## Setup symlinks ## 
+
+function _setup_symlinks_() {
+	declare -A symlinks=(
+		["/usr/bin/luajit"]="/usr/bin/lua"
+	)
+
+	failedsymlinks=0
+
+	for symlink in ${!symlinks[@]}; do
+		printf "Linking ${symlink} -> ${symlinks[$symlink]}..."
+		if ! ln -sfn "$symlink" "${symlinks[$symlink]}" 2>/dev/null; then
+			echo "${RED}failed${NC}"
+			(( failedsymlinks+=1 ))
+		else
+			echo "${GREEN}done${NC}"
+		fi
+	done
+
+	if [[ $failedsymlinks > 0 ]]; then
+		echo
+		echo "${RED}Failed to create $failedsymlinks symlinks${NC}"
+		_prompt_continue_
+	else
+		status=0
+	fi
+}
+
+echo -e "${GREEN}=== Setting up symlinks ===${NC}"
+_setup_symlinks_
 _report_status_

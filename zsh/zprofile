@@ -21,6 +21,7 @@ export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export QT5_IM_MODULE=fcitx
 export QT_QPA_PLATFORMTHEME=qt5ct
+export XIM_PROGRAM=/usr/bin/fcitx
 
 export FZF_DEFAULT_COMMAND='rg --files -L'
 export FZF_DEFAULT_OPTS='--exact'

@@ -34,10 +34,48 @@ function _yesno_() {
 # ------------------------------------------------------------------------------
 
 RESTORE_DIR="$(pwd)"
+cd $HOME/tools
+echo
 
 if ! command -v awesome &> /dev/null; then
+	# https://packages.debian.org/buster/awesome
+	dependencies=(
+		dbus-session-bus
+		gir1.2-freedesktop
+		gir1.2-gdkpixbuf-2.0
+		gir1.2-glib-2.0
+		gir1.2-pango-1.0
+		libc6
+		libcairo-gobject2
+		libcairo2
+		libdbus-1-3
+		libgdk-pixbuf2.0-0
+		libglib2.0-0
+		liblua5.3-0
+		libstartup-notification0 (>= 0.10)
+		libx11-6
+		libxcb-cursor0
+		libxcb-icccm4
+		libxcb-keysyms1
+		libxcb-randr0
+		libxcb-render0
+		libxcb-shape0
+		libxcb-util0
+		libxcb-xinerama0
+		libxcb-xkb1
+		libxcb-xrm0
+		libxcb-xtest0
+		libxcb1
+		libxdg-basedir1
+		libxkbcommon-x11-0
+		libxkbcommon0
+		lua-lgi
+		menu
+	)
+
 	echo -e "${GREEN}=== Installing dependencies ===${NC}\n"
-	sudo apt build-dep awesome liblua5.3-0-
+	sudo apt install "${dependencies[@]}"
+	echo
 
 	if ! [[ -d $HOME/tools/awesome ]]; then
 		echo -e "${GREEN}=== Fetching source files ===${NC}\n"
@@ -50,11 +88,16 @@ fi
 echo -e "${GREEN}=== Installing / Uninstalling ===${NC}\n"
 
 if _yesno_ "Build awesome?"; then
+	if ! [[ -d $HOME/tools/awesome-$VERSION/build ]]; then
+		mkdir -p $HOME/tools/awesome-$VERSION/build
+	fi
 	cd $HOME/tools/awesome-$VERSION/build
+
 	cmake .. \
 		-DCMAKE_BUILD_TYPE=RELEASE \
-		-DLUA_INCLUDE_DIR=/usr/include/luajit-2.0 \
-		-DLUA_LIBRARY=/usr/lib/libluajit-5.1.so
+		-DLUA_INCLUDE_DIR=/usr/include/luajit-2.1 \
+		-DLUA_LIBRARY=/usr/lib/i386-linux-gnu/libluajit-5.1.so.2 \
+		-DGENERATE_DOC=OFF
 	make package
 	sudo dpkg -i "awesome-$VERSION.deb"
 elif _yesno_ "Uninstall awesome?"; then
