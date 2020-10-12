@@ -192,10 +192,13 @@ local nmap = {
 	-- External Programs
 	["<leader>,"] = ':sp | :term<cr>:startinsert<cr>',
 	["<leader>v,"] = ':vsp | :term<cr>:startinsert<cr>',
+	["<leader><leader>,"] = ':term<cr>:startinsert | :wincmd o<cr>',
 	["<leader>?"] = ':help ',
 	["<leader>v?"] = ':vert :help ',
+	["<leader><leader>?"] = ':help  | :wincmd o' .. ('<left>'):rep(12),
 	["<leader>M"] = ':Man ',
 	["<leader>vM"] = ':vert :Man ',
+	["<leader><leader>M"] = ':Man  | :wincmd o' .. ('<left>'):rep(12),
 
 	-- FZF
 	['<leader>fd'] = ':Files<cr>',
