@@ -166,9 +166,6 @@ local nmap = {
 	['<leader>/'] = ':nohlsearch<cr><c-l>',
 	['<c-_>'] = ':Commentary<cr>',
 
-	-- Open console in current directory
-	['<leader><cr>'] = ':silent !st -e nvim -c ":term" 2>/dev/null & disown<cr>',
-
 	-- Window
 	['<leader>w'] = '<c-w>',
 	['<c-h>'] = '<c-w>h',
@@ -193,9 +190,12 @@ local nmap = {
 	['<leader>v<cr>'] = ':vsp|:Dirvish<cr>',
 
 	-- External Programs
-	["<leader>'"] = ':term<cr>:startinsert<cr>',
-	["<leader>help"] = ':help ',
-	["<leader>man"] = ':Man ',
+	["<leader>,"] = ':sp | :term<cr>:startinsert<cr>',
+	["<leader>v,"] = ':vsp | :term<cr>:startinsert<cr>',
+	["<leader>?"] = ':help ',
+	["<leader>v?"] = ':vert :help ',
+	["<leader>M"] = ':Man ',
+	["<leader>vM"] = ':vert :Man ',
 
 	-- FZF
 	['<leader>fd'] = ':Files<cr>',
