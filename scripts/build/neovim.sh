@@ -58,10 +58,11 @@ if ! command -v nvim &> /dev/null; then
 	fi
 fi
 
+cd $HOME/tools/neovim
+
 echo -e "${GREEN}=== Building ===${NC}\n"
 
 if _yesno_ "Pull and make install?"; then
-	cd $HOME/tools/neovim
 	git checkout -b origin/stable
 	git pull
 	sudo make CMAKE_BUILD_TYPE=Release install

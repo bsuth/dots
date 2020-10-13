@@ -87,7 +87,7 @@ fi
 
 echo -e "${GREEN}=== Installing / Uninstalling ===${NC}\n"
 
-if _yesno_ "Build awesome?"; then
+if _yesno_ "Build + install awesome?"; then
 	if ! [[ -d $HOME/tools/awesome-$VERSION/build ]]; then
 		mkdir -p $HOME/tools/awesome-$VERSION/build
 	fi

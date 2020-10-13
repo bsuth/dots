@@ -2,15 +2,13 @@
 
 # ------------------------------------------------------------------------------ 
 # README
-# This is a script to build and install luarocks using luajit.
+# This is a script to build and install my fork of st.
 # ------------------------------------------------------------------------------
 
 # ANSI color codes
 RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
 NC="$(tput sgr0)"
-
-VERSION="3.3.1"
 
 # ------------------------------------------------------------------------------
 # HELPERS
@@ -37,41 +35,23 @@ RESTORE_DIR="$(pwd)"
 cd $HOME/tools
 echo
 
-if ! command -v luarocks &> /dev/null; then
-	dependencies=(
-		build-essential
-		libreadline-dev
-	)
-
-	echo -e "${GREEN}=== Installing dependencies ===${NC}\n"
-	sudo apt install "${dependencies[@]}"
-	echo
-
-	if ! [[ -d $HOME/tools/luarocks-$VERSION ]]; then
-		echo -e "${GREEN}=== Fetching source files ===${NC}\n"
-		wget "https://luarocks.org/releases/luarocks-$VERSION.tar.gz"
-		tar --extract --gunzip --preserve-permissions --file="luarocks-$VERSION.tar.gz"
-		rm "luarocks-$VERSION.tar.gz"
+if ! command -v st &> /dev/null; then
+	if ! [[ -d $HOME/tools/st ]]; then
+		echo -e "${GREEN}=== Cloning repo ===${NC}\n"
+		git clone https://github.com/bsuth/st.git
 		echo
 	fi
 fi
 
-cd $HOME/tools/luarocks-$VERSION
+cd $HOME/tools/st
 
 echo -e "${GREEN}=== Installing / Uninstalling ===${NC}\n"
 
-if _yesno_ "Build + install luarocks?"; then
-	./configure --with-lua-include=/usr/include/luajit-2.1
+if _yesno_ "Build + install st?"; then
 	make
 	sudo make install
 elif _yesno_ "Uninstall luarocks?"; then
-	sudo rm -rf /usr/local/bin/luarocks* /usr/local/lib/luarocks
-fi
-
-echo -e "${GREEN}=== Installing packages ===${NC}\n"
-
-if _yesno_ "Install standard packages?"; then
-	luarocks install lua-cjson busted
+	sudo make uninstall
 fi
 
 cd $RESTORE_DIR
