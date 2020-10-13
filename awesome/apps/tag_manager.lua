@@ -36,38 +36,13 @@ local api = {}
 -- HELPERS
 --------------------------------------------------------------------------------
 
-local function _tag_factory(color_index)
-    while color_index > #_TAG_COLORS do
-        color_index = color_index - #_TAG_COLORS
-    end
-
-    return wibox.widget({
-        {
-            {
-                {
-                    margins = 10,
-                    widget = wibox.container.margin,
-                },
-                shape = gears.shape.circle,
-                bg = _TAG_COLORS[color_index],
-                widget = wibox.container.background,
-            },
-            margins = 10,
-            widget = wibox.container.margin,
-        },
-        shape = gears.shape.circle,
-		shape_border_width = 5,
-		shape_border_color = beautiful.colors.cyan,
-        widget = wibox.container.background,
-    })
-end
-
 local function _refresh()
     local s = awful.screen.focused()
     _list:reset()
 
-    for _, tag in pairs(_state.taglists[s.index]) do
+    for i, tag in pairs(_state.taglists[s.index]) do
         _list:add(tag.widget)
+        tag.circle_widget.bg = _TAG_COLORS[i]
 
         if tag.tag == s.selected_tag then
             tag.widget.shape_border_color = beautiful.colors.cyan
@@ -128,12 +103,35 @@ function api.add(focus, screen)
     local counter = _state.counters[s.index] + 1
     local taglist = _state.taglists[s.index]
 
+    local circle_widget = wibox.widget({
+        {
+            margins = 10,
+            widget = wibox.container.margin,
+        },
+        shape = gears.shape.circle,
+        bg = _TAG_COLORS[1],
+        widget = wibox.container.background,
+    })
+
+    local widget = wibox.widget({
+        {
+            circle_widget,
+            margins = 10,
+            widget = wibox.container.margin,
+        },
+        shape = gears.shape.circle,
+		shape_border_width = 5,
+		shape_border_color = beautiful.colors.cyan,
+        widget = wibox.container.background,
+    })
+
     table.insert(taglist, {
         tag = awful.tag.add(tostring(counter), {
             screen = s,
             layout = awful.layout.suit.tile,
         }),
-        widget = _tag_factory(counter),
+        circle_widget = circle_widget,
+        widget = widget,
     })
 
     if focus then taglist[counter].tag:view_only() end

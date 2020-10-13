@@ -11,7 +11,7 @@ local dial = require 'widgets/dial'
 
 -- Constants --
 
-local _MAX_LIST_ITEMS = 4
+local _MAX_LIST_ITEMS = 3
 
 -- State --
 
