@@ -58,8 +58,8 @@ if [[ $UID == 0 ]]; then
     exit 1
 fi
 
+RESTORE_DIR="$(pwd)"
 cd $HOME; 
-echo # Newline for readability
 
 ## Create Home Folders ##
 
@@ -96,7 +96,7 @@ function _create_dirs_() {
 	fi
 }
 
-echo -e "${GREEN}=== Creating directories ===${NC}\n"
+echo -e "\n${GREEN}=== Creating directories ===${NC}\n"
 _create_dirs_
 _report_status_
 
@@ -214,22 +214,10 @@ echo -e "${GREEN}=== Configuring git ===${NC}\n"
 _configure_git_
 _report_status_
 
-## Install custom packages ##
+## Complete! ##
 
-function _install_custom_packages_() {
-	install_scripts=(
-		neovim.sh
-		awesome.sh
-		luarocks.sh
-		st.sh
-	)
-
-	build_dir=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
-	for install_script in ${install_scripts[@]}; do
-		source $build_dir/$install_script
-	done
-}
-
-echo -e "${GREEN}=== Installing custom packages ===${NC}\n"
-_install_custom_packages_
-_report_status_
+echo -e "${GREEN}=== COMPLETE ===${NC}\n"
+echo "Setup completed. Things to do from here:"
+echo "1) Open nvim and run :PlugInstall"
+echo "2) Logout and log back in to init zsh"
+echo "3) Run the install scripts for manually built packages"

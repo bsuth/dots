@@ -188,6 +188,7 @@ function _install_packages_() {
 		clang
 		nodejs
 		luajit
+		libluajit-5.1-dev
 
 		# Environment
 		papirus-icon-theme
@@ -255,6 +256,6 @@ function _setup_symlinks_() {
 	fi
 }
 
-echo -e "${GREEN}=== Setting up symlinks ===${NC}"
+echo -e "${GREEN}=== Setting up symlinks ===${NC}\n"
 _setup_symlinks_
 _report_status_

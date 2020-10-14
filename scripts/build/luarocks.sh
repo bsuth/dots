@@ -37,13 +37,18 @@ RESTORE_DIR="$(pwd)"
 cd $HOME/tools
 echo
 
+echo -e "${GREEN}=== Installing / Uninstalling ===${NC}\n"
+
 if ! command -v luarocks &> /dev/null; then
+	echo "${RED}luarocks executable not found${NC}"
+	if ! _yesno_ "Install luarocks?"; then exit 0; fi
+	echo
+
 	dependencies=(
 		build-essential
 		libreadline-dev
 	)
 
-	echo -e "${GREEN}=== Installing dependencies ===${NC}\n"
 	sudo apt install "${dependencies[@]}"
 	echo
 
@@ -54,21 +59,23 @@ if ! command -v luarocks &> /dev/null; then
 		rm "luarocks-$VERSION.tar.gz"
 		echo
 	fi
-fi
 
-cd $HOME/tools/luarocks-$VERSION
-
-echo -e "${GREEN}=== Installing / Uninstalling ===${NC}\n"
-
-if _yesno_ "Build + install luarocks?"; then
+	cd $HOME/tools/luarocks-$VERSION
 	./configure --with-lua-include=/usr/include/luajit-2.1
 	make
 	sudo make install
-elif _yesno_ "Uninstall luarocks?"; then
-	sudo rm -rf /usr/local/bin/luarocks* /usr/local/lib/luarocks
+else
+	echo "${GREEN}luarocks executable found${NC}"
+	if _yesno_ "Uninstall luarocks?"; then
+		sudo rm -rf /usr/local/bin/luarocks* /usr/local/lib/luarocks
+		exit 0
+	fi
 fi
 
-echo -e "${GREEN}=== Installing packages ===${NC}\n"
+# cd to ensure we use the system-level executable
+# (over the locally built one in the tools/luarocks repo)
+cd $HOME 
+echo -e "\n${GREEN}=== Installing rocks ===${NC}\n"
 
 if _yesno_ "Install standard rocks?"; then
 	rocks=(
@@ -77,7 +84,9 @@ if _yesno_ "Install standard rocks?"; then
 		luafilesystem
 	)
 
-	luarocks install "${rocks[@]}"
+	for rock in "${rocks[@]}"; do
+		sudo luarocks install "$rock"
+	done
 fi
 
 cd $RESTORE_DIR

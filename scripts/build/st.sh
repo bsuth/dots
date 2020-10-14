@@ -27,31 +27,44 @@ function _yesno_() {
 	done
 }
 
+function _update_st_() {
+	cd $HOME/tools/st
+	git pull
+	make
+	sudo make install
+	cd - >/dev/null
+}
+
 # ------------------------------------------------------------------------------
 # MAIN
 # ------------------------------------------------------------------------------
 
 RESTORE_DIR="$(pwd)"
-cd $HOME/tools
-echo
+
+echo -e "\n${GREEN}=== Installing / Uninstalling ===${NC}\n"
 
 if ! command -v st &> /dev/null; then
+	echo "${RED}st executable not found${NC}"
+	if ! _yesno_ "Install st?"; then exit 0; fi
+	echo
+
 	if ! [[ -d $HOME/tools/st ]]; then
-		echo -e "${GREEN}=== Cloning repo ===${NC}\n"
+		cd $HOME/tools
 		git clone https://github.com/bsuth/st.git
 		echo
 	fi
-fi
 
-cd $HOME/tools/st
+	_update_st_
+else
+	echo "${GREEN}st executable found${NC}"
 
-echo -e "${GREEN}=== Installing / Uninstalling ===${NC}\n"
-
-if _yesno_ "Build + install st?"; then
-	make
-	sudo make install
-elif _yesno_ "Uninstall luarocks?"; then
-	sudo make uninstall
+	if _yesno_ "Pull and remake st?"; then
+		echo
+		_update_st_
+	elif _yesno_ "Uninstall st?"; then
+		sudo make uninstall
+		rm -rf $HOME/tools/st
+	fi
 fi
 
 cd $RESTORE_DIR

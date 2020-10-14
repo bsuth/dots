@@ -27,14 +27,27 @@ function _yesno_() {
 	done
 }
 
+function _update_nvim_() {
+	cd $HOME/tools/neovim
+	git checkout -b origin/stable 2>/dev/null
+	git pull
+	sudo make CMAKE_BUILD_TYPE=Release install
+	cd - >/dev/null
+}
+
 # ------------------------------------------------------------------------------
 # MAIN
 # ------------------------------------------------------------------------------
 
 RESTORE_DIR="$(pwd)"
-echo
+
+echo -e "\n${GREEN}=== Installation ===${NC}\n"
 
 if ! command -v nvim &> /dev/null; then
+	echo "${RED}nvim executable not found${NC}"
+	if ! _yesno_ "Install neovim?"; then exit 0; fi
+	echo
+
     dependencies=(
         ninja-build
 		gettext
@@ -47,25 +60,21 @@ if ! command -v nvim &> /dev/null; then
 		unzip
     )
 
-	echo -e "${GREEN}=== Installing dependencies ===${NC}\n"
-    	sudo apt install "${dependencies[@]}" 
+    sudo apt install "${dependencies[@]}" 
 	echo
 
 	if ! [[ -d $HOME/tools/neovim ]]; then
-		echo -e "${GREEN}=== Cloning repo ===${NC}\n"
 		cd $HOME/tools
 		git clone https://github.com/neovim/neovim
+		echo
 	fi
-fi
 
-cd $HOME/tools/neovim
-
-echo -e "${GREEN}=== Building ===${NC}\n"
-
-if _yesno_ "Pull and make install?"; then
-	git checkout -b origin/stable
-	git pull
-	sudo make CMAKE_BUILD_TYPE=Release install
+	_update_nvim_
+else
+	echo "${GREEN}nvim executable found${NC}"
+	if ! _yesno_ "Pull and remake neovim?"; then exit 0; fi
+	echo
+	_update_nvim_
 fi
 
 cd $RESTORE_DIR

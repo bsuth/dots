@@ -40,7 +40,7 @@ echo
 if ! command -v awesome &> /dev/null; then
 	# https://packages.debian.org/buster/awesome
 	dependencies=(
-		dbus-session-bus
+		dbus-x11
 		gir1.2-freedesktop
 		gir1.2-gdkpixbuf-2.0
 		gir1.2-glib-2.0
@@ -52,7 +52,7 @@ if ! command -v awesome &> /dev/null; then
 		libgdk-pixbuf2.0-0
 		libglib2.0-0
 		liblua5.3-0
-		libstartup-notification0 (>= 0.10)
+		libstartup-notification0
 		libx11-6
 		libxcb-cursor0
 		libxcb-icccm4
