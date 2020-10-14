@@ -70,8 +70,14 @@ fi
 
 echo -e "${GREEN}=== Installing packages ===${NC}\n"
 
-if _yesno_ "Install standard packages?"; then
-	luarocks install lua-cjson busted
+if _yesno_ "Install standard rocks?"; then
+	rocks=(
+		lua-cjson
+		busted
+		luafilesystem
+	)
+
+	luarocks install "${rocks[@]}"
 fi
 
 cd $RESTORE_DIR

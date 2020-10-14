@@ -235,8 +235,14 @@ gears.table.crush(_state, {
 	},
 })
 
-for alias, command in pairs(require('__config/dmenu')) do
-	_state.commands[alias] = command
+local dmenu_config_file = io.open('/home/bsuth/dots/awesome/__config/dmenu.lua', 'r')
+
+if dmenu_config_file ~= nil then
+    io.close(dmenu_config_file)
+
+    for alias, command in pairs(require('__config/dmenu')) do
+        _state.commands[alias] = command
+    end
 end
 
 --------------------------------------------------------------------------------

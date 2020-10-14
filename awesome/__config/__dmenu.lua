@@ -1,10 +1,19 @@
-local awful = require 'awful' 
+local awful = require 'awful'
 
 return {
-    {
-        alias = 'db',
-        callback = function()
-            awful.spawn('st -e nvim -c ":DBUI"')
-        end,
+    anki = {
+        callback = function() awful.spawn('anki') end,
+    },
+    discord = {
+        callback = function() awful.spawn('discord') end,
+    },
+    gimp = {
+        callback = function() awful.spawn('gimp') end,
+    },
+    inkscape = {
+        callback = function() awful.spawn('inkscape') end,
+    },
+    kcharselect = {
+        callback = function() awful.spawn('kcharselect') end,
     },
 }
