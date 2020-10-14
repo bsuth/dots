@@ -48,6 +48,14 @@ if ! command -v st &> /dev/null; then
 	if ! _yesno_ "Install st?"; then exit 0; fi
 	echo
 
+    dependencies=(
+		libx11-dev
+		libxft-dev
+    )
+
+    sudo apt install "${dependencies[@]}" 
+	echo
+
 	if ! [[ -d $HOME/tools/st ]]; then
 		cd $HOME/tools
 		git clone https://github.com/bsuth/st.git
@@ -62,8 +70,9 @@ else
 		echo
 		_update_st_
 	elif _yesno_ "Uninstall st?"; then
+		cd $HOME/tools/st
 		sudo make uninstall
-		rm -rf $HOME/tools/st
+		[[ -d $HOME/tools/st ]] && rm -rf $HOME/tools/st
 	fi
 fi
 

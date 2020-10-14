@@ -184,6 +184,7 @@ function _install_packages_() {
 
 		# Development
 		make
+		cmake
 		pkg-config
 		clang
 		nodejs
@@ -191,6 +192,7 @@ function _install_packages_() {
 		libluajit-5.1-dev
 
 		# Environment
+		chromium
 		papirus-icon-theme
 		zsh
 		compton

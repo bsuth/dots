@@ -35,62 +35,53 @@ function _yesno_() {
 
 RESTORE_DIR="$(pwd)"
 cd $HOME/tools
-echo
+
+echo -e "\n${GREEN}=== Installation ===${NC}\n"
 
 if ! command -v awesome &> /dev/null; then
-	# https://packages.debian.org/buster/awesome
+	echo "${RED}awesome executable not found${NC}"
+	if ! _yesno_ "Install awesome?"; then exit 0; fi
+	echo
+
+	# apt-cache showsrc awesome
 	dependencies=(
-		dbus-x11
-		gir1.2-freedesktop
-		gir1.2-gdkpixbuf-2.0
-		gir1.2-glib-2.0
-		gir1.2-pango-1.0
-		libc6
-		libcairo-gobject2
-		libcairo2
-		libdbus-1-3
-		libgdk-pixbuf2.0-0
-		libglib2.0-0
-		liblua5.3-0
-		libstartup-notification0
-		libx11-6
-		libxcb-cursor0
-		libxcb-icccm4
-		libxcb-keysyms1
-		libxcb-randr0
-		libxcb-render0
-		libxcb-shape0
-		libxcb-util0
-		libxcb-xinerama0
-		libxcb-xkb1
-		libxcb-xrm0
-		libxcb-xtest0
-		libxcb1
-		libxdg-basedir1
-		libxkbcommon-x11-0
-		libxkbcommon0
-		lua-lgi
-		menu
+		imagemagick
+		libcairo2-dev
+		libdbus-1-dev
+		libgdk-pixbuf2.0-dev
+		libglib2.0-dev
+		libpango1.0-dev
+		libstartup-notification0-dev
+		libx11-xcb-dev
+		libxcb-cursor-dev
+		libxcb-icccm4-dev
+		libxcb-keysyms1-dev
+		libxcb-randr0-dev
+		libxcb-shape0-dev
+		libxcb-util0-dev
+		libxcb-xinerama0-dev
+		libxcb-xkb-dev
+		libxcb-xrm-dev
+		libxcb-xtest0-dev
+		libxdg-basedir-dev
+		libxkbcommon-dev
+		libxkbcommon-x11-dev
+		x11proto-core-dev
 	)
 
-	echo -e "${GREEN}=== Installing dependencies ===${NC}\n"
 	sudo apt install "${dependencies[@]}"
 	echo
 
-	if ! [[ -d $HOME/tools/awesome ]]; then
-		echo -e "${GREEN}=== Fetching source files ===${NC}\n"
+	if ! [[ -d $HOME/tools/awesome-$VERSION ]]; then
 		wget "https://github.com/awesomeWM/awesome-releases/raw/master/awesome-$VERSION.tar.bz2"
 		tar --extract --bzip2 --file="awesome-$VERSION.tar.bz2"
 		rm "awesome-$VERSION.tar.bz2"
 	fi
-fi
 
-echo -e "${GREEN}=== Installing / Uninstalling ===${NC}\n"
-
-if _yesno_ "Build + install awesome?"; then
 	if ! [[ -d $HOME/tools/awesome-$VERSION/build ]]; then
 		mkdir -p $HOME/tools/awesome-$VERSION/build
 	fi
+
 	cd $HOME/tools/awesome-$VERSION/build
 
 	cmake .. \
@@ -99,9 +90,13 @@ if _yesno_ "Build + install awesome?"; then
 		-DLUA_LIBRARY=/usr/lib/i386-linux-gnu/libluajit-5.1.so.2 \
 		-DGENERATE_DOC=OFF
 	make package
-	sudo dpkg -i "awesome-$VERSION.deb"
-elif _yesno_ "Uninstall awesome?"; then
-	sudo apt purge awesome
+	sudo dpkg -i *.deb
+else
+	echo "${GREEN}awesome executable found${NC}"
+	if _yesno_ "Uninstall awesome?"; then
+		sudo apt purge awesome
+		[[ -d $HOME/tools/awesome-$VERSION ]] && rm -rf $HOME/tools/awesome-$VERSION
+	fi
 fi
 
 cd $RESTORE_DIR
