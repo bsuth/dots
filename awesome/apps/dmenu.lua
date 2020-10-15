@@ -226,11 +226,11 @@ gears.table.crush(_state, {
 		reboot = {
 			alias = 'reboot',
 			icon = beautiful.icon('apps/cs-sound.svg'),
-			callback = function() awful.spawn('reboot') end,
+			callback = function() awful.spawn('/sbin/reboot') end,
 		},
 		poweroff = {
 			icon = beautiful.icon('apps/cs-sound.svg'),
-			callback = function() awful.spawn('poweroff') end,
+			callback = function() awful.spawn('/sbin/poweroff') end,
 		},
 	},
 })
