@@ -171,6 +171,7 @@ function _install_packages_() {
 		udisks2
 		udiskie 
 		acpi
+		brightnessctl
 
 		# Utilities
 		curl

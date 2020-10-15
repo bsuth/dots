@@ -77,4 +77,5 @@ else
 	_update_nvim_
 fi
 
+echo
 cd $RESTORE_DIR

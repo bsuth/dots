@@ -69,6 +69,7 @@ else
 	if _yesno_ "Uninstall luarocks?"; then
 		sudo rm -rf /usr/local/bin/luarocks* /usr/local/lib/luarocks
 		[[ -d $HOME/tools/luarocks-$VERSION ]] && rm -rf $HOME/tools/luarocks-$VERSION
+		echo
 		exit 0
 	fi
 fi

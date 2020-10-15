@@ -67,10 +67,18 @@ if ! command -v awesome &> /dev/null; then
 		libxkbcommon-dev
 		libxkbcommon-x11-dev
 		x11proto-core-dev
+		libgirepository1.0-dev # required for lgi
 	)
 
 	sudo apt install "${dependencies[@]}"
 	echo
+
+	if ! command -v luarocks; then
+		echo "${RED}luarocks must be installed to install lgi${NC}"
+		exit 0
+	else
+		sudo luarocks install lgi
+	fi
 
 	if ! [[ -d $HOME/tools/awesome-$VERSION ]]; then
 		wget "https://github.com/awesomeWM/awesome-releases/raw/master/awesome-$VERSION.tar.bz2"
