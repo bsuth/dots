@@ -20,9 +20,9 @@ local popup = awful.popup({
 -- API
 --------------------------------------------------------------------------------
 
-function popup:set(content)
+function popup:init(widget)
     popup.widget = wibox.widget({
-        content,
+        widget,
         left = 50,
         right = 50,
         top = 50,
@@ -31,15 +31,15 @@ function popup:set(content)
     })
 end
 
-function popup:toggle()
-    if not self.visible then
-        self.screen = awful.screen.focused()
-        self.widget.forced_width = self.screen.geometry.width
-        self.widget.forced_height = self.screen.geometry.height
-        self.visible = true
-    else
-        self.visible = false
-    end
+function popup:start()
+    self.screen = awful.screen.focused()
+    self.widget.forced_width = self.screen.geometry.width
+    self.widget.forced_height = self.screen.geometry.height
+    self.visible = true
+end
+
+function popup:stop()
+    self.visible = false
 end
 
 function popup:register_hover(widget, cursor)

@@ -130,7 +130,7 @@ bindings.globalkeys = gears.table.join(
     -- -------------------------------------------------------------------------
 
     awful.key({ modkey }, 'd', function() dmenu:start() end),
-    awful.key({ modkey }, ' ', function() dashboard:toggle() end),
+    awful.key({ modkey }, 'space', function() dashboard.start() end),
     awful.key({ modkey }, 'Alt_L', function() tag_manager.keygrabber:start() end),
     awful.key({ modkey, 'Shift' }, '=', function() tag_manager.api.add(true) end),
     awful.key({ modkey }, '-', function() tag_manager.api.remove() end),

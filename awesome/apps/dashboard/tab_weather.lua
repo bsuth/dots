@@ -190,55 +190,59 @@ weather:connect_signal('update', update)
 -- RETURN
 --------------------------------------------------------------------------------
 
-return wibox.widget({
-    {
-        unit_picker,
+return {
+    icon = beautiful.icon('todo'),
+    keygrabber = {},
+    widget = wibox.widget({
         {
+            unit_picker,
             {
                 {
                     {
-                        icon,
-                        maxmin,
-                        layout = wibox.layout.fixed.vertical,
-                    },
-                    right = 50,
-                    widget = wibox.container.margin,
-                },
-                {
-                    {
                         {
-                            markup = '',
-                            font = 'Weather Icons 20',
-                            widget = wibox.widget.textbox,
+                            icon,
+                            maxmin,
+                            layout = wibox.layout.fixed.vertical,
                         },
-                        {
-                            markup = '',
-                            font = 'Weather Icons 20',
-                            widget = wibox.widget.textbox,
-                        },
-                        {
-                            markup = '',
-                            font = 'Weather Icons 20',
-                            widget = wibox.widget.textbox,
-                        },
-                        layout = wibox.layout.flex.vertical,
+                        right = 50,
+                        widget = wibox.container.margin,
                     },
                     {
-                        temp,
-                        feel,
-                        humidity,
-                        layout = wibox.layout.flex.vertical,
+                        {
+                            {
+                                markup = '',
+                                font = 'Weather Icons 20',
+                                widget = wibox.widget.textbox,
+                            },
+                            {
+                                markup = '',
+                                font = 'Weather Icons 20',
+                                widget = wibox.widget.textbox,
+                            },
+                            {
+                                markup = '',
+                                font = 'Weather Icons 20',
+                                widget = wibox.widget.textbox,
+                            },
+                            layout = wibox.layout.flex.vertical,
+                        },
+                        {
+                            temp,
+                            feel,
+                            humidity,
+                            layout = wibox.layout.flex.vertical,
+                        },
+                        layout = wibox.layout.fixed.horizontal,
                     },
+                    spacing = 50,
                     layout = wibox.layout.fixed.horizontal,
                 },
-                spacing = 50,
-                layout = wibox.layout.fixed.horizontal,
+                widget = wibox.container.place,
             },
-            widget = wibox.container.place,
+            forecast,
+            spacing = 50,
+            layout = wibox.layout.fixed.vertical,
         },
-        forecast,
-        spacing = 50,
-        layout = wibox.layout.fixed.vertical,
-    },
-    widget = wibox.container.place,
-})
+        widget = wibox.container.place,
+    }),
+}

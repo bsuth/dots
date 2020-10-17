@@ -97,27 +97,31 @@ end
 add('Dummy', 'This is a dummy message')
 add('Change Me', 'dummy message 2')
 
-return wibox.widget({
-    {
+return {
+    icon = beautiful.icon('todo'),
+    keygrabber = {},
+    widget = wibox.widget({
         {
             {
-                head,
-                body,
-                spacing = 20,
-                layout = wibox.layout.fixed.vertical,
+                {
+                    head,
+                    body,
+                    spacing = 20,
+                    layout = wibox.layout.fixed.vertical,
+                },
+                top = 20,
+                bottom = 20,
+                left = 20,
+                right = 20,
+                widget = wibox.container.margin,
             },
-            top = 20,
-            bottom = 20,
-            left = 20,
-            right = 20,
-            widget = wibox.container.margin,
+            shape = gears.shape.rectangle,
+            shape_border_color = beautiful.colors.cyan,
+            shape_border_width = 2,
+            bg = beautiful.colors.black,
+            forced_width = 500,
+            widget = wibox.container.background,
         },
-        shape = gears.shape.rectangle,
-        shape_border_color = beautiful.colors.cyan,
-        shape_border_width = 2,
-        bg = beautiful.colors.black,
-        forced_width = 500,
-        widget = wibox.container.background,
-    },
-    widget = wibox.container.place,
-})
+        widget = wibox.container.place,
+    }),
+}

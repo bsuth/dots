@@ -3,262 +3,202 @@ local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
-local volume = require 'singletons/volume'
-local brightness = require 'singletons/brightness'
-local battery = require 'singletons/battery'
-
+local tab_bluetooth = require 'apps/dashboard/tab_bluetooth'
+local tab_datetime = require 'apps/dashboard/tab_datetime'
+local tab_dmenu = require 'apps/dashboard/tab_dmenu'
 local tab_notifications = require 'apps/dashboard/tab_notifications'
+local tab_printer = require 'apps/dashboard/tab_printer'
+local tab_todo = require 'apps/dashboard/tab_todo'
 local tab_weather = require 'apps/dashboard/tab_weather'
+local tab_wifi = require 'apps/dashboard/tab_wifi'
 
 local popup = require 'apps/dashboard/popup'
-local dial = require 'widgets/dial' 
 
 --------------------------------------------------------------------------------
--- DATETIME + DIALS
+-- DECLARATIONS
 --------------------------------------------------------------------------------
 
-local time = wibox.widget({
-    {
-        format = ("<span color='%s'>%%H</span><span color='%s'>%%M</span>"):format(
-            beautiful.colors.white, beautiful.colors.cyan
+-- State --
+
+local _state = {}
+
+-- Widgets --
+
+local _tabs_left = {}
+local _tabs_right = {}
+local _tab_content = {}
+
+-- Other --
+
+local modkey = 'Mod4'
+local api = {}
+
+--------------------------------------------------------------------------------
+-- HELPERS
+--------------------------------------------------------------------------------
+
+local function _update()
+    for _, tab in ipairs(_state.tabs) do
+        tab.button.shape_border_color = beautiful.colors.transparent
+    end
+
+    _state.focused_tab.button.shape_border_color = beautiful.colors.cyan
+    _tab_content:set(1, _state.focused_tab.widget)
+
+    local keygrabber = awful.keygrabber({
+        keybindings = gears.table.join(
+            _state.focused_tab.keygrabber.keybindings or {},
+            _state.core_keybindings
         ),
-        font = 'Titan One 50',
-        widget = wibox.widget.textclock,
-    },
-    widget = wibox.container.place,
-})
 
-local date = wibox.widget({
-    {
-        format = "<span>%a %b %d, %Y</span>",
-        widget = wibox.widget.textclock,
-    },
-    widget = wibox.container.place,
-})
+        -- start_callback = function() popup:toggle() end,
+        -- stop_callback = function() end,
+        -- keypressed_callback = function(mods, key) end,
+    })
 
-local separator = wibox.widget({
-    {
+    _state.keygrabber:stop()
+    keygrabber:start()
+    _state.keygrabber = keygrabber
+end
+
+local function _register_tab(tab)
+    tab.button = wibox.widget({
         {
             {
-                color = beautiful.colors.cyan,
-                shape = gears.shape.rounded_bar,
-                forced_width = 100,
-                forced_height = 5,
-                widget = wibox.widget.separator,
-            },
-            widget = wibox.container.place,
-        },
-        {
-            {
-                image = beautiful.icon('apps/cs-date-time.svg'),
-                forced_width = 30,
-                forced_height = 30,
-                widget = wibox.widget.imagebox,
-            },
-            widget = wibox.container.place,
-        },
-        {
-            {
-                color = beautiful.colors.cyan,
-                shape = gears.shape.rounded_bar,
-                forced_width = 100,
-                forced_height = 5,
-                widget = wibox.widget.separator,
-            },
-            widget = wibox.container.place,
-        },
-        spacing = 15,
-        layout = wibox.layout.fixed.horizontal,
-    },
-    widget = wibox.container.place,
-})
-
-local volume_dial = wibox.widget({
-    forced_width = 70,
-    forced_height = 70,
-
-    icon = beautiful.icon('apps/cs-sound.svg'),
-    color = beautiful.colors.green,
-    percent = volume:get(),
-
-    onscrollup = function(self) volume:shift(5) end,
-    onscrolldown = function(self) volume:shift(-5) end,
-
-    widget = dial,
-})
-
-volume:connect_signal('update', function()
-    volume_dial.percent = volume:get()
-    volume_dial:emit_signal('widget::redraw_needed')
-end)
-
-local brightness_dial = wibox.widget({
-    forced_width = 70,
-    forced_height = 70,
-
-    icon = beautiful.icon('apps/display-brightness.svg'),
-    color = beautiful.colors.yellow,
-    percent = brightness:get(),
-
-    onscrollup = function(self) brightness:shift(5) end,
-    onscrolldown = function(self) brightness:shift(-5) end,
-
-    widget = dial,
-})
-
-brightness:connect_signal('update', function()
-    brightness_dial.percent = brightness:get()
-    brightness_dial:emit_signal('widget::redraw_needed')
-end)
-
-local battery_dial = wibox.widget({
-    forced_width = 70,
-    forced_height = 70,
-
-    icon = beautiful.icon('devices/battery.svg'),
-    color = beautiful.colors.red,
-    percent = battery:get(),
-
-    widget = dial,
-})
-
-battery:connect_signal('update', function()
-    battery_dial.percent = battery:get()
-    battery.icon = battery:get('status_icon')
-    brightness_dial:emit_signal('widget::redraw_needed')
-end)
-
-local dials = wibox.widget({
-    {
-        {
-            {
-                volume_dial,
-                brightness_dial,
-                spacing = 50,
-                layout = wibox.layout.flex.horizontal,
-            },
-            {
-                battery_dial,
+                {
+                    forced_width = 50,
+                    forced_height = 50,
+                    image = beautiful.icon('apps/cs-date-time.svg'), -- TODO
+                    widget = wibox.widget.imagebox,
+                },
                 widget = wibox.container.place,
             },
-            layout = wibox.layout.flex.vertical,
-        },
-        top = 10,
-        widget = wibox.container.margin,
-    },
-    widget = wibox.container.place,
-})
-
-local datetime_dials = wibox.widget({
-    {
-        {
-            {
-                time,
-                date,
-                {
-                    separator,
-                    top = 10,
-                    widget = wibox.container.margin,
-                },
-                dials,
-                layout = wibox.layout.fixed.vertical,
-            },
-            margins = 50,
+            margins = 10,
             widget = wibox.container.margin,
         },
         shape = gears.shape.circle,
-        shape_border_color = beautiful.colors.cyan,
-        shape_border_width = 5,
         bg = beautiful.colors.black,
+		shape_border_width = 5,
+		shape_border_color = beautiful.colors.transparent,
         widget = wibox.container.background,
+    })
+
+    tab.button:connect_signal('button::press', function(_, _, _, button, _, _)
+        if button == 1 then
+            _state.focused_tab = tab
+            _update()
+        end
+    end)
+
+    popup:register_hover(tab.button)
+    table.insert(_state.tabs, tab)
+
+    return wibox.widget({
+        tab.button,
+        widget = wibox.container.place,
+    })
+end
+
+--------------------------------------------------------------------------------
+-- API
+--------------------------------------------------------------------------------
+
+function api.start()
+    _state.keygrabber:start()
+    popup:start()
+end
+
+function api.stop()
+    _state.keygrabber:stop()
+    popup:stop()
+end
+
+--------------------------------------------------------------------------------
+-- INIT STATE
+--------------------------------------------------------------------------------
+
+gears.table.crush(_state, {
+    focused_tab = tab_datetime,
+    tabs = {},
+    keygrabber = awful.keygrabber({}),
+    core_keybindings = {
+        {{ modkey }, ' ', function() api.stop() end},
+        {{ 'Control' }, 'bracketleft', function() api.stop() end},
+        {{ }, 'Escape', function() api.stop() end},
     },
-    widget = wibox.container.place,
 })
 
 --------------------------------------------------------------------------------
--- TABS
+-- WIDGET: TABS LEFT
 --------------------------------------------------------------------------------
 
-local tabs_head = wibox.widget({
-    spacing = 0,
-    layout = wibox.layout.flex.horizontal,
+_tabs_left = wibox.widget({
+    _register_tab(tab_datetime),
+    _register_tab(tab_todo),
+    _register_tab(tab_dmenu),
+    _register_tab(tab_weather),
+    spacing = 50,
+    layout = wibox.layout.flex.vertical,
 })
 
-local tabs_body = wibox.widget({
+--------------------------------------------------------------------------------
+-- WIDGET: TABS RIGHT
+--------------------------------------------------------------------------------
+
+_tabs_right = wibox.widget({
+    _register_tab(tab_notifications),
+    _register_tab(tab_bluetooth),
+    _register_tab(tab_wifi),
+    _register_tab(tab_printer),
+    spacing = 50,
+    layout = wibox.layout.flex.vertical,
+})
+
+--------------------------------------------------------------------------------
+-- WIDGET: TAB CONTENT
+--------------------------------------------------------------------------------
+
+_tab_content = wibox.widget({
+    tab_datetime.widget,
     top_only = true,
     layout = wibox.layout.stack,
 })
 
-local tabs_foot = wibox.widget({
-    spacing = 0,
-    layout = wibox.layout.flex.horizontal,
-})
+--------------------------------------------------------------------------------
+-- POPUP
+--------------------------------------------------------------------------------
 
-local tabs = wibox.widget({
+popup:init(wibox.widget({
     {
-        tabs_head,
+        _tabs_left,
+        top = 100,
+        bottom = 100,
+        left = 50,
+        right = 100, 
+        widget = wibox.container.margin,
+    },
+    {
         {
-            tabs_body,
+            _tab_content,
             margins = 50,
             widget = wibox.container.margin,
         },
-        tabs_foot,
-        fill_vertical = true,
-        content_fill_vertical = true,
-        layout = wibox.layout.align.vertical,
+        widget = wibox.container.place,
     },
-    shape = gears.shape.rectangle,
-    shape_border_color = beautiful.colors.cyan,
-    shape_border_width = 2,
-    bg = beautiful.colors.black,
-    widget = wibox.container.background,
-})
-
-local function addTab(title, bar, content)
-    local tab = wibox.widget({
-        {
-            {
-                markup = title,
-                widget = wibox.widget.textbox,
-            },
-            widget = wibox.container.place,
-        },
-        bg = beautiful.colors.black,
-        widget = wibox.container.background,
-    })
-
-    popup:register_hover(tab)
-
-    tab:connect_signal('button::press', function(_, _, _, button, _, _)
-        if button == 1 then
-            tabs_body:set(1, content)
-        end
-    end)
-
-    local bar_children = bar:get_children()
-    table.insert(bar_children, tab)
-    bar:set_children(bar_children)
-    tabs_body:insert(1, content)
-end
+    {
+        _tabs_right,
+        top = 100,
+        bottom = 100,
+        left = 100, 
+        right = 50,
+        widget = wibox.container.margin,
+    },
+    layout = wibox.layout.align.horizontal,
+}))
 
 --------------------------------------------------------------------------------
 -- RETURN
---
--- Note: Return the popup here, since we only need to access the popup's toggle
--- method externally.
 --------------------------------------------------------------------------------
 
-addTab('notifications', tabs_head, tab_notifications)
-addTab('weather', tabs_head, tab_weather)
-
-popup:set(wibox.widget({
-    {
-        datetime_dials,
-        tabs,
-        spacing = 200,
-        layout = wibox.layout.fixed.horizontal,
-    },
-    widget = wibox.container.place,
-}))
-
-return popup
+_update()
+return api
