@@ -37,28 +37,30 @@ local api = {}
 -- HELPERS
 --------------------------------------------------------------------------------
 
-local function _update()
-    for _, tab in ipairs(_state.tabs) do
-        tab.button.shape_border_color = beautiful.colors.transparent
+local function _set_focused_tab(tab, skip_keygrabber)
+    for _, _tab in ipairs(_state.tabs) do
+        _tab.button.shape_border_color = beautiful.colors.transparent
     end
 
-    _state.focused_tab.button.shape_border_color = beautiful.colors.cyan
-    _tab_content:set(1, _state.focused_tab.widget)
-
-    local keygrabber = awful.keygrabber({
+    _state.keygrabber:stop()
+    _state.keygrabber = awful.keygrabber({
         keybindings = gears.table.join(
-            _state.focused_tab.keygrabber.keybindings or {},
+            tab.keygrabber.keybindings or {},
             _state.core_keybindings
         ),
 
-        -- start_callback = function() popup:toggle() end,
-        -- stop_callback = function() end,
-        -- keypressed_callback = function(mods, key) end,
+        start_callback = tab.keygrabber.start_callback,
+        stop_callback = tab.keygrabber.stop_callback,
+        keypressed_callback = tab.keygrabber.keypressed_callback,
     })
 
-    _state.keygrabber:stop()
-    keygrabber:start()
-    _state.keygrabber = keygrabber
+    if not skip_keygrabber then
+        _state.keygrabber:start()
+    end
+
+    tab.button.shape_border_color = beautiful.colors.cyan
+    _tab_content:set(1, tab.widget)
+    _state.focused_tab = tab
 end
 
 local function _register_tab(tab)
@@ -84,10 +86,7 @@ local function _register_tab(tab)
     })
 
     tab.button:connect_signal('button::press', function(_, _, _, button, _, _)
-        if button == 1 then
-            _state.focused_tab = tab
-            _update()
-        end
+        if button == 1 then _set_focused_tab(tab) end
     end)
 
     popup:register_hover(tab.button)
@@ -120,7 +119,7 @@ end
 gears.table.crush(_state, {
     focused_tab = tab_datetime,
     tabs = {},
-    keygrabber = awful.keygrabber({}),
+    keygrabber = awful.keygrabber(),
     core_keybindings = {
         {{ modkey }, ' ', function() api.stop() end},
         {{ 'Control' }, 'bracketleft', function() api.stop() end},
@@ -200,5 +199,5 @@ popup:init(wibox.widget({
 -- RETURN
 --------------------------------------------------------------------------------
 
-_update()
+_set_focused_tab(tab_datetime, true)
 return api

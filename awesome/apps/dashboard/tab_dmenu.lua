@@ -301,7 +301,7 @@ return {
             _refresh(true)
         end,
 
-        keypressed_callback = function(mods, key)
+        keypressed_callback = function(_, mods, key)
             if #mods == 0 and key:match('^[a-zA-Z -]$') then
                 _state.filter = _state.filter .. key
                 _refresh(true)
