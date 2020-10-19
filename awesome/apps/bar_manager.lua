@@ -29,7 +29,7 @@ local _popup = {}
 --------------------------------------------------------------------------------
 
 local function _notify(callback)
-    if dashboard.visible == true then return end
+    if dashboard.is_active() then return end
 
     (callback)()
 
