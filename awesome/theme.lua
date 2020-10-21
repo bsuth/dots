@@ -61,7 +61,7 @@ naughty.config.defaults.border_width = dpi(25)
 naughty.config.defaults.position = 'bottom_right'
 
 --------------------------------------------------------------------------------
--- HELPERS
+-- FUNCTIONS
 --------------------------------------------------------------------------------
 
 function beautiful.icon(icon)

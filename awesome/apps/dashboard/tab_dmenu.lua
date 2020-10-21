@@ -25,7 +25,7 @@ local _list = {}
 local _scroll_dial = {}
 
 --------------------------------------------------------------------------------
--- HELPERS
+-- LOCAL FUNCTIONS
 --------------------------------------------------------------------------------
 
 local function _list_item_factory(alias, command)
@@ -293,7 +293,10 @@ return {
         keybindings = {
             {{ 'Control' }, 'p', function() _shift_list(-1) end},
             {{ 'Control' }, 'n', function() _shift_list(1) end},
-            {{ }, 'Return', function() _commit(_list_items[_state.selected]) end},
+            {{ }, 'Return', function(self)
+				_commit(_list_items[_state.selected])
+				self:emit_signal('close_dashboard')
+			end},
         },
 
         stop_callback = function()

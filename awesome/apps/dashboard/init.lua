@@ -3,6 +3,9 @@ local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
+local volume = require 'singletons/volume'
+local brightness = require 'singletons/brightness'
+
 local tab_bluetooth = require 'apps/dashboard/tab_bluetooth'
 local tab_datetime = require 'apps/dashboard/tab_datetime'
 local tab_dmenu = require 'apps/dashboard/tab_dmenu'
@@ -34,7 +37,7 @@ local modkey = 'Mod4'
 local api = {}
 
 --------------------------------------------------------------------------------
--- HELPERS
+-- LOCAL FUNCTIONS
 --------------------------------------------------------------------------------
 
 local function _set_focused_tab(tab, skip_keygrabber)
@@ -53,6 +56,8 @@ local function _set_focused_tab(tab, skip_keygrabber)
         stop_callback = tab.keygrabber.stop_callback,
         keypressed_callback = tab.keygrabber.keypressed_callback,
     })
+
+    _state.keygrabber:connect_signal('close_dashboard', api.stop)
 
     if not skip_keygrabber then
         _state.keygrabber:start()
@@ -128,6 +133,13 @@ gears.table.crush(_state, {
         {{ modkey }, ' ', function() api.stop() end},
         {{ 'Control' }, 'bracketleft', function() api.stop() end},
         {{ }, 'Escape', function() api.stop() end},
+
+        {{ }, 'XF86AudioLowerVolume', function() volume:shift(-5) end},
+        {{ }, 'XF86AudioRaiseVolume', function() volume:shift(5) end},
+        {{ }, 'XF86AudioMute', function() volume:toggle() end},
+
+        {{ }, 'XF86MonBrightnessDown', function() brightness:shift(-8) end},
+        {{ }, 'XF86MonBrightnessUp', function() brightness:shift(8) end},
     },
 })
 

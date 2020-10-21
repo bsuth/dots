@@ -30,7 +30,7 @@ local _popup = {}
 local keygrabber = {}
 
 --------------------------------------------------------------------------------
--- HELPERS
+-- LOCAL FUNCTIONS
 --------------------------------------------------------------------------------
 
 local function _list_item_factory(alias, command)

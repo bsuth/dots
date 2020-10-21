@@ -25,10 +25,10 @@ local _popup = {}
 local keygrabber = {}
 
 --------------------------------------------------------------------------------
--- HELPERS
+-- LOCAL FUNCTIONS
 --------------------------------------------------------------------------------
 
-function _next()
+local function _next()
     local layout = _state.layout == #_LAYOUTS and 1 or (_state.layout + 1)
 
     awful.spawn.easy_async_with_shell(([[
