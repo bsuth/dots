@@ -140,6 +140,15 @@ gears.table.crush(_state, {
 
         {{ }, 'XF86MonBrightnessDown', function() brightness:shift(-8) end},
         {{ }, 'XF86MonBrightnessUp', function() brightness:shift(8) end},
+
+        {{ modkey }, 'f', function() _set_focused_tab(tab_datetime) end},
+        {{ modkey }, 'd', function() _set_focused_tab(tab_dmenu) end},
+        {{ modkey }, 's', function() _set_focused_tab(tab_todo) end},
+        {{ modkey }, 'a', function() _set_focused_tab(tab_weather) end},
+        {{ modkey }, 'j', function() _set_focused_tab(tab_notifications) end},
+        {{ modkey }, 'k', function() _set_focused_tab(tab_bluetooth) end},
+        {{ modkey }, 'l', function() _set_focused_tab(tab_wifi) end},
+        {{ modkey }, ';', function() _set_focused_tab(tab_printer) end},
     },
 })
 
@@ -149,8 +158,8 @@ gears.table.crush(_state, {
 
 _tabs_left = wibox.widget({
     _register_tab(tab_datetime),
-    _register_tab(tab_todo),
     _register_tab(tab_dmenu),
+    _register_tab(tab_todo),
     _register_tab(tab_weather),
     spacing = 50,
     layout = wibox.layout.flex.vertical,
