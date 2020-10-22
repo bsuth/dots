@@ -17,6 +17,7 @@ require('awful.autofocus')
 awful.layout.layouts = {
     awful.layout.suit.tile,
     layouts.music,
+    layouts.square_grid,
 }
 
 root.keys(bindings.globalkeys)
