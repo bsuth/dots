@@ -56,20 +56,15 @@ bindings.globalkeys = gears.table.join(
     -- Movement
     -- -------------------------------------------------------------------------
     
-    awful.key({ modkey }, 'h', function() awful.client.focus.bydirection('left') end),
-    awful.key({ modkey }, 'j', function() awful.client.focus.bydirection('down') end),
-    awful.key({ modkey }, 'k', function() awful.client.focus.bydirection('up') end),
-    awful.key({ modkey }, 'l', function() awful.client.focus.bydirection('right') end),
+    awful.key({ modkey }, 'h', function() awful.client.focus.global_bydirection('left') end),
+    awful.key({ modkey }, 'j', function() awful.client.focus.global_bydirection('down') end),
+    awful.key({ modkey }, 'k', function() awful.client.focus.global_bydirection('up') end),
+    awful.key({ modkey }, 'l', function() awful.client.focus.global_bydirection('right') end),
 
-    awful.key({ modkey, 'Shift' }, 'h', function() awful.client.swap.bydirection('left') end),
-    awful.key({ modkey, 'Shift' }, 'j', function() awful.client.swap.bydirection('down') end),
-    awful.key({ modkey, 'Shift' }, 'k', function() awful.client.swap.bydirection('up') end),
-    awful.key({ modkey, 'Shift' }, 'l', function() awful.client.swap.bydirection('right') end),
-
-    awful.key({ modkey, 'Control' }, 'h', function() awful.screen.focus_bydirection('left') end),
-    awful.key({ modkey, 'Control' }, 'j', function() awful.screen.focus_bydirection('down') end),
-    awful.key({ modkey, 'Control' }, 'k', function() awful.screen.focus_bydirection('up') end),
-    awful.key({ modkey, 'Control' }, 'l', function() awful.screen.focus_bydirection('right') end),
+    awful.key({ modkey, 'Shift' }, 'h', function() awful.client.swap.global_bydirection('left') end),
+    awful.key({ modkey, 'Shift' }, 'j', function() awful.client.swap.global_bydirection('down') end),
+    awful.key({ modkey, 'Shift' }, 'k', function() awful.client.swap.global_bydirection('up') end),
+    awful.key({ modkey, 'Shift' }, 'l', function() awful.client.swap.global_bydirection('right') end),
 
     awful.key({ modkey }, ";",
         function()
