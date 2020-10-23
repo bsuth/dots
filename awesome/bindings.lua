@@ -3,7 +3,6 @@ local gears = require 'gears'
 local naughty = require 'naughty' 
 
 local dashboard = require 'apps/dashboard' 
-local dmenu = require 'apps/dmenu' 
 local tag_manager = require 'apps/tag_manager' 
 local kb_switcher = require 'apps/kb_switcher' 
 
@@ -124,7 +123,6 @@ bindings.globalkeys = gears.table.join(
     -- Apps
     -- -------------------------------------------------------------------------
 
-    awful.key({ modkey }, 'd', function() dmenu:start() end),
     awful.key({ modkey }, 'space', function() dashboard.start() end),
     awful.key({ modkey }, 'Alt_L', function() tag_manager.keygrabber:start() end),
     awful.key({ modkey, 'Shift' }, '=', function() tag_manager.api.add(true) end),
