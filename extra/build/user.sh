@@ -141,7 +141,7 @@ function _setup_dots_() {
 	)
 
 	declare -A sudosymlinks=(
-		["services/physlock.service"]="/etc/systemd/system/physlock.service"
+		["extra/services/physlock.service"]="/etc/systemd/system/physlock.service"
 	)
 
 	failedsymlinks=0

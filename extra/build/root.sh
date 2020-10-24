@@ -168,6 +168,7 @@ function _install_packages_() {
 		sudo
 		xorg
 		pulseaudio
+		alsa-utils
 		udisks2
 		udiskie 
 		acpi

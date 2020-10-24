@@ -18,7 +18,7 @@ fi
 xmodmap "$HOME/.Xmodmap"
 fcitx &
 udiskie &
-compton -b
+compton --daemon
 eval $(ssh-agent)
 
 # ------------------------------------------------------------------------------
