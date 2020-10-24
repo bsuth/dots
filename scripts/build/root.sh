@@ -189,6 +189,7 @@ function _install_packages_() {
 		pkg-config
 		clang
 		nodejs
+		npm
 		luajit
 		libluajit-5.1-dev
 

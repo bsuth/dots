@@ -218,7 +218,3 @@ _report_status_
 ## Complete! ##
 
 echo -e "${GREEN}=== COMPLETE ===${NC}\n"
-echo "Setup completed. Things to do from here:"
-echo "1) Open nvim and run :PlugInstall"
-echo "2) Run the install scripts for manually built packages"
-echo "3) Logout and log back in to init zsh"
