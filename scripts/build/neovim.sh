@@ -72,7 +72,11 @@ if ! command -v nvim &> /dev/null; then
 	_update_nvim_
 else
 	echo "${GREEN}nvim executable found${NC}"
-	if ! _yesno_ "Pull and remake neovim?"; then exit 0; fi
+	if ! _yesno_ "Pull and remake neovim?"; then
+		cd $RESTORE_DIR
+		exit 0
+	fi
+
 	echo
 	_update_nvim_
 fi

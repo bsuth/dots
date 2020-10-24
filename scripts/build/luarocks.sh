@@ -70,6 +70,7 @@ else
 		sudo rm -rf /usr/local/bin/luarocks* /usr/local/lib/luarocks
 		[[ -d $HOME/tools/luarocks-$VERSION ]] && rm -rf $HOME/tools/luarocks-$VERSION
 		echo
+		cd RESTORE_DIR
 		exit 0
 	fi
 fi

@@ -15,6 +15,8 @@ RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
 NC="$(tput sgr0)"
 
+RESTORE_DIR="$(pwd)"
+
 # ------------------------------------------------------------------------------
 # HELPERS
 # ------------------------------------------------------------------------------
@@ -43,6 +45,7 @@ function _yesno_() {
 function _prompt_continue_() {
 	if ! _yesno_ "Continue?"; then
 		status=1; _report_status_
+		cd $RESTORE_DIR
 		exit 0
 	else
 		status=2
@@ -58,7 +61,6 @@ if [[ $UID == 0 ]]; then
     exit 1
 fi
 
-RESTORE_DIR="$(pwd)"
 cd $HOME; 
 
 ## Create Home Folders ##
@@ -218,3 +220,4 @@ _report_status_
 ## Complete! ##
 
 echo -e "${GREEN}=== COMPLETE ===${NC}\n"
+cd $RESTORE_DIR
