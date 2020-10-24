@@ -219,5 +219,4 @@ _report_status_
 
 ## Complete! ##
 
-echo -e "${GREEN}=== COMPLETE ===${NC}\n"
 cd $RESTORE_DIR

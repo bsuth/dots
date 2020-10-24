@@ -69,6 +69,7 @@ if ! command -v nvim &> /dev/null; then
 		echo
 	fi
 
+	pip3 install pynvim
 	_update_nvim_
 else
 	echo "${GREEN}nvim executable found${NC}"

@@ -173,9 +173,10 @@ function _install_packages_() {
 		udiskie 
 		acpi
 		brightnessctl
+		software-properties-common
+		curl
 
 		# Utilities
-		curl
 		pass
 		physlock
 		fd-find
@@ -193,6 +194,7 @@ function _install_packages_() {
 		npm
 		luajit
 		libluajit-5.1-dev
+		python3-pip
 
 		# Environment
 		chromium
@@ -262,4 +264,22 @@ function _setup_symlinks_() {
 
 echo -e "${GREEN}=== Setting up symlinks ===${NC}\n"
 _setup_symlinks_
+_report_status_
+
+## Install gh-cli ## 
+
+function _install_gh_cli_() {
+	if _yesno_ "Install gh-cli?"; then
+		apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+		apt-add-repository https://cli.github.com/packages
+		apt update
+		apt install gh
+		status=1
+	else
+		status=2
+	fi
+}
+
+echo -e "${GREEN}=== Install gh-cli ===${NC}\n"
+_install_gh_cli_
 _report_status_
