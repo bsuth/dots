@@ -195,7 +195,6 @@ function _install_packages_() {
 
 		# Environment
 		chromium
-		papirus-icon-theme
 		zsh
 		compton
 	)

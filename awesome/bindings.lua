@@ -133,7 +133,7 @@ bindings.globalkeys = gears.table.join(
     -- -------------------------------------------------------------------------
     
     awful.key({ modkey }, 'Return', function() awful.spawn('st -e nvim -c ":Dirvish"') end),
-    awful.key({ modkey }, "'", function() awful.spawn('google-chrome-stable') end)
+    awful.key({ modkey }, "'", function() awful.spawn('chromium') end)
 )
 
 --------------------------------------------------------------------------------

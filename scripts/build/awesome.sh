@@ -107,4 +107,5 @@ else
 	fi
 fi
 
+echo
 cd $RESTORE_DIR
