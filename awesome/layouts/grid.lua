@@ -78,7 +78,7 @@ gears.table.crush(_state, {
 --------------------------------------------------------------------------------
 
 return {
-    name = 'square_grid', -- required
+    name = 'grid', -- required
     arrange = arrange,
     arrange_client = arrange_client,
 }

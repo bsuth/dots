@@ -17,17 +17,40 @@ local modkey = 'Mod4'
 local bindings = { modkey = modkey }
 
 local restore_tag = nil
+
 local clientbuffer = {}
 
 awesome.connect_signal('startup', function()
     for s in screen do
-        for _, c in ipairs(s.tags[1]:clients()) do
-            if c.minimized == true then
-                table.insert(clientbuffer, c)
-            end
-        end
+        for _, tag in ipairs(s.tags) do
+			for _, c in ipairs(tag:clients()) do
+				if c.minimized then
+					table.insert(_state.clients, c)
+				end
+			end
+		end
     end
 end)
+
+--------------------------------------------------------------------------------
+-- ALT TAB
+--------------------------------------------------------------------------------
+
+awful.keygrabber({
+    keybindings = {
+        {{ 'Mod1' }, 'Tab', function() awful.client.focus.byidx(1) end},
+        {{ 'Mod1', 'Shift' }, 'Tab', function() awful.client.focus.byidx(-1) end},
+    },
+
+    -- Note that it is using the key name and not the modifier name.
+    stop_key = 'Mod1',
+    stop_event = 'release',
+
+    start_callback = awful.client.focus.history.disable_tracking,
+    stop_callback = awful.client.focus.history.enable_tracking,
+
+    export_keybindings = true,
+})
 
 --------------------------------------------------------------------------------
 -- GLOBAL KEYS
@@ -65,40 +88,25 @@ bindings.globalkeys = gears.table.join(
     awful.key({ modkey, 'Shift' }, 'k', function() awful.client.swap.global_bydirection('up') end),
     awful.key({ modkey, 'Shift' }, 'l', function() awful.client.swap.global_bydirection('right') end),
 
-    awful.key({ modkey }, ";",
-        function()
-            local current_screen = awful.screen.focused()
+    awful.key({ modkey }, ";", function()
+		local current_screen = awful.screen.focused()
 
-            if current_screen.selected_tag.name ~= 'music' then
-                for s in screen do
-                    local music_tag = awful.tag.find_by_name(s, 'music')
-                    local music_clients = {
-                        ['Google-chrome'] = 'google-chrome-stable --app="https://open.spotify.com"',
-                    }
+		if current_screen.selected_tag.name ~= 'scratchpad' then
+			for s in screen do
+				local scratchpad = awful.tag.find_by_name(s, 'scratchpad')
 
-                    if music_tag ~= nil then
-                        local clients = music_tag:clients()
-
-                        for _, existing_client in ipairs(music_tag:clients()) do
-                            music_clients[existing_client.class] = nil
-                        end
-
-                        for _, missing_client in pairs(music_clients) do
-                            awful.spawn(missing_client)
-                        end
-
-                        restore_tag = current_screen.selected_tag
-                        music_tag.screen = current_screen 
-                        music_tag:view_only()
-                        break
-                    end
-                end
-            elseif restore_tag ~= nil then
-                restore_tag:view_only()
-                restore_tag = nil
-            end
-        end,
-    {description = 'toggle music'}),
+				if scratchpad ~= nil then
+					restore_tag = current_screen.selected_tag
+					scratchpad.screen = current_screen 
+					scratchpad:view_only()
+					break
+				end
+			end
+		elseif restore_tag ~= nil then
+			restore_tag:view_only()
+			restore_tag = nil
+		end
+	end),
 
     -- -------------------------------------------------------------------------
     -- Layout
@@ -107,17 +115,14 @@ bindings.globalkeys = gears.table.join(
     awful.key({ modkey, 'Shift', 'Control' }, 'h', function() awful.tag.incmwfact(-0.05) end),
     awful.key({ modkey, 'Shift', 'Control' }, 'l', function() awful.tag.incmwfact(0.05) end),
     awful.key({ modkey }, ',', function () awful.layout.inc(1) end),
-
-    awful.key({ modkey, 'Shift' }, 'm',
-        function()
-            if #clientbuffer > 0 then
-                local c = table.remove(clientbuffer)
-                c:move_to_tag(awful.screen.focused().selected_tag)
-                c.minimized = false
-                client.focus = c
-            end
-        end,
-    {description = 'restore client'}),
+    awful.key({ modkey, 'Shift' }, 'm', function()
+		if #clientbuffer > 0 then
+			local c = table.remove(clientbuffer)
+			c:move_to_tag(awful.screen.focused().selected_tag)
+			c.minimized = false
+			client.focus = c
+		end
+	end),
 
     -- -------------------------------------------------------------------------
     -- Apps
@@ -133,7 +138,7 @@ bindings.globalkeys = gears.table.join(
     -- -------------------------------------------------------------------------
     
     awful.key({ modkey }, 'Return', function() awful.spawn('st -e nvim -c ":Dirvish"') end),
-    awful.key({ modkey }, "'", function() awful.spawn('chromium') end)
+    awful.key({ modkey }, "'", function() awful.spawn('vivaldi') end)
 )
 
 --------------------------------------------------------------------------------
@@ -159,15 +164,13 @@ bindings.clientkeys = gears.table.join(
         end,
     {description = 'toggle fullscreen'}),
 
-    awful.key({ modkey }, 'm',
-        function(c)
-            table.insert(clientbuffer, c)
-            c.minimized = true
+    awful.key({ modkey }, 'm', function(c)
+		table.insert(clientbuffer, c)
+		c.minimized = true
 
-            -- Move to first tag to properly allow for automatic tag removal
-            c:move_to_tag(awful.screen.focused().tags[1])
-        end,
-    {description = 'store client'})
+		-- Move to first tag to properly allow for automatic tag removal
+		c:move_to_tag(awful.screen.focused().tags[1])
+	end)
 )
 
 --------------------------------------------------------------------------------

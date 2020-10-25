@@ -5,7 +5,7 @@ local naughty = require 'naughty'
 require 'theme' 
 require 'apps/bar_manager'
 local bindings = require 'bindings' 
-local layouts = require 'layouts' 
+local layouts = require 'layouts'
 
 -- Autofocus another client when the current one is closed
 require('awful.autofocus')
@@ -15,33 +15,24 @@ require('awful.autofocus')
 --------------------------------------------------------------------------------
 
 awful.layout.layouts = {
-    awful.layout.suit.tile,
-    layouts.music,
-    layouts.square_grid,
+	awful.layout.suit.floating,
 }
 
 root.keys(bindings.globalkeys)
 
 --------------------------------------------------------------------------------
--- UNIVERSAL TAGS
+-- SCRATCHPAD
 --------------------------------------------------------------------------------
 
-local universal_tags = {
-	'music',
-}
-
-for _, tag_name in ipairs(universal_tags) do
-	awful.tag.add(tag_name, {
-		layout = layouts.music,
-		screen = awful.screen.focused(),
-	})
-end
+local scratchpad = awful.tag.add('scratchpad', {
+	layout = layouts.grid,
+	screen = awful.screen.focused(),
+})
 
 --------------------------------------------------------------------------------
 -- RULES
 --------------------------------------------------------------------------------
 
--- Rules to apply to new clients (through the 'manage' signal).
 awful.rules.rules = {
     -- All clients will match this rule.
     { 
@@ -49,41 +40,23 @@ awful.rules.rules = {
         properties = {
             border_width = beautiful.border_width,
             border_color = beautiful.border_normal,
-            focus = awful.client.focus.filter,
-            raise = true,
+
             keys = bindings.clientkeys,
             buttons = bindings.clientbuttons,
-            screen = awful.screen.preferred,
-            placement = awful.placement.no_overlap+awful.placement.no_offscreen
-        }
-    },
 
-    -- Floating clients.
-    { 
-        rule_any = {
-            instance = {
-                -- 'copyq',  -- Includes session name in class.
-            },
-            class = {
-                -- 'Arandr',
-                -- 'Gpick',
-                -- 'Kruler',
-                -- 'MessageWin',  -- kalarm.
-                -- 'Sxiv',
-                -- 'Wpa_gui',
-                -- 'pinentry',
-                -- 'veromix',
-                -- 'xtightvncviewer',
-            },
-            name = {
-                -- 'Event Tester',  -- xev.
-            },
-            role = {
-                -- 'AlarmWindow',  -- Thunderbird's calendar.
-                -- 'pop-up',       -- e.g. Google Chrome's (detached) Developer Tools.
-            }
-        }, 
-        properties = { floating = true }
+            raise = true,
+			floating = true,
+
+            focus = awful.client.focus.filter,
+            screen = awful.screen.preferred,
+            placement = awful.placement.no_overlap+awful.placement.no_offscreen,
+
+			callback = function(c)
+				if awful.screen.focused().selected_tag == scratchpad then
+					c.floating = false
+				end
+			end,
+        },
     },
 }
 
