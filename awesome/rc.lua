@@ -46,6 +46,7 @@ awful.rules.rules = {
 
             raise = true,
 			floating = true,
+			maximized = false,
 
             focus = awful.client.focus.filter,
             screen = awful.screen.preferred,

@@ -274,7 +274,7 @@ function _install_gh_cli_() {
 		apt-add-repository https://cli.github.com/packages
 		apt update
 		apt install gh
-		status=1
+		status=0
 	else
 		status=2
 	fi
@@ -282,4 +282,22 @@ function _install_gh_cli_() {
 
 echo -e "${GREEN}=== Install gh-cli ===${NC}\n"
 _install_gh_cli_
+_report_status_
+
+## Install Vivaldi ## 
+
+function _install_vivaldi_() {
+	if _yesno_ "Install Vivaldi?"; then
+		wget -qO- https://repo.vivaldi.com/archive/linux_signing_key.pub | apt-key add -
+		add-apt-repository 'deb https://repo.vivaldi.com/archive/deb/ stable main'
+		apt update
+		apt install vivaldi-stable
+		status=0
+	else
+		status=2
+	fi
+}
+
+echo -e "${GREEN}=== Install Vivaldi ===${NC}\n"
+_install_vivaldi_
 _report_status_

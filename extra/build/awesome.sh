@@ -95,7 +95,7 @@ if ! command -v awesome &> /dev/null; then
 	cmake .. \
 		-DCMAKE_BUILD_TYPE=RELEASE \
 		-DLUA_INCLUDE_DIR=/usr/include/luajit-2.1 \
-		-DLUA_LIBRARY=/usr/lib/i386-linux-gnu/libluajit-5.1.so.2 \
+		-DLUA_LIBRARY=/usr/lib/x86_64-linux-gnu/libluajit-5.1.so.2 \
 		-DGENERATE_DOC=OFF
 	make package
 	sudo dpkg -i *.deb
