@@ -180,10 +180,10 @@ function _install_packages_() {
 		pass
 		physlock
 		fd-find
-		fzf
-		ripgrep
 		flameshot
 		deepin-image-viewer
+		fcitx
+		fcitx-mozc
 
 		# Development
 		make
@@ -203,17 +203,24 @@ function _install_packages_() {
 	)
 
 	if ! _yesno_ "Install packages?"; then status=2; return; fi
+	apt install "${packages[@]}"
 
-	while : ; do
-		if apt install "${packages[@]}"; then
-			status=0
-			return
-		else
-			if ! _yesno_ "Try again?"; then break; fi
-		fi
-	done
+	# ripgrep
+	curl -LO https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep_11.0.2_amd64.deb
+	sudo dpkg -i ripgrep_11.0.2_amd64.deb
+	rm ripgrep_11.0.2_amd64.deb
 
-	status=2
+	# gh-cli
+	apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
+	apt-add-repository https://cli.github.com/packages
+
+	# vivaldi
+	wget -qO- https://repo.vivaldi.com/archive/linux_signing_key.pub | apt-key add -
+	add-apt-repository 'deb https://repo.vivaldi.com/archive/deb/ stable main'
+	
+	apt update
+	apt install gh vivaldi-stable
+	status=0
 }
 
 echo -e "${GREEN}=== Installing packages ===${NC}\n"
@@ -264,40 +271,4 @@ function _setup_symlinks_() {
 
 echo -e "${GREEN}=== Setting up symlinks ===${NC}\n"
 _setup_symlinks_
-_report_status_
-
-## Install gh-cli ## 
-
-function _install_gh_cli_() {
-	if _yesno_ "Install gh-cli?"; then
-		apt-key adv --keyserver keyserver.ubuntu.com --recv-key C99B11DEB97541F0
-		apt-add-repository https://cli.github.com/packages
-		apt update
-		apt install gh
-		status=0
-	else
-		status=2
-	fi
-}
-
-echo -e "${GREEN}=== Install gh-cli ===${NC}\n"
-_install_gh_cli_
-_report_status_
-
-## Install Vivaldi ## 
-
-function _install_vivaldi_() {
-	if _yesno_ "Install Vivaldi?"; then
-		wget -qO- https://repo.vivaldi.com/archive/linux_signing_key.pub | apt-key add -
-		add-apt-repository 'deb https://repo.vivaldi.com/archive/deb/ stable main'
-		apt update
-		apt install vivaldi-stable
-		status=0
-	else
-		status=2
-	fi
-}
-
-echo -e "${GREEN}=== Install Vivaldi ===${NC}\n"
-_install_vivaldi_
 _report_status_

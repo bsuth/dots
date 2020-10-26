@@ -34,7 +34,7 @@ local plugins = {
 	[[ Plug 'tpope/vim-commentary' ]],
     [[ Plug 'tpope/vim-eunuch' ]],
     [[ Plug 'justinmk/vim-dirvish' ]],
-	[[ Plug 'junegunn/fzf' ]],
+	[[ Plug 'junegunn/fzf', { 'do': { -> fzf#install() } } ]],
 	[[ Plug 'junegunn/fzf.vim' ]],
     [[ Plug 'sheerun/vim-polyglot' ]],
 
@@ -139,13 +139,22 @@ nvim.nvim_call_function('coc#add_extension', {
 -- AUGROUPS
 -- -----------------------------------------------------------------------------
 
-local augroups = {
-	term = {
-		'TermOpen term://* setlocal nonumber',
-	},
-	dirvish = {
-		'FileType dirvish silent! :cd %',
+function bsuth_bufenter()
+	local bufname = nvim.nvim_call_function('bufname', {})
+	local bufdir = nvim.nvim_call_function('fnamemodify', {bufname, ':p:h'})
+	local bufft = nvim.nvim_buf_get_option(0, 'filetype')
 
+	if not bufname:match('^term://*') then 
+		nvim.nvim_command('cd ' .. bufdir)
+		if bufft == 'dirvish' then nvim.nvim_command('Dirvish') end
+	end
+end
+
+local augroups = {
+	general = {
+		'BufEnter * lua bsuth_bufenter()',
+		'TermOpen term://* setlocal nonumber',
+		
 		-- Hide dot files
 		-- [[ FileType dirvish silent keeppatterns g@\v/\.[^\/]+/?$@d _ ]],
 	},
@@ -162,9 +171,12 @@ end
 -- -----------------------------------------------------------------------------
 
 local nmap = {
+	-- General
+	['<leader>ev'] = ':Dirvish ~/dots/nvim<cr>',
 	['<leader>sv'] = ':source $MYVIMRC<cr>',
 	['<leader>/'] = ':nohlsearch<cr><c-l>',
 	['<c-_>'] = ':Commentary<cr>',
+	['<c-t>'] = ':Dirvish<cr>',
 
 	-- Window
 	['<leader>w'] = '<c-w>',
@@ -172,33 +184,26 @@ local nmap = {
 	['<c-j>'] = '<c-w>j',
 	['<c-k>'] = '<c-w>k',
 	['<c-l>'] = '<c-w>l',
-	['<leader><c-h>'] = '<c-w>H',
-	['<leader><c-j>'] = '<c-w>J',
-	['<leader><c-k>'] = '<c-w>K',
-	['<leader><c-l>'] = '<c-w>L',
+
+	['<leader><c-l>'] = ':rightbelow :vsp|:Dirvish<cr>',
+	['<leader><c-k>'] = ':aboveleft :sp|:Dirvish<cr>',
+	['<leader><c-j>'] = ':rightbelow :sp|:Dirvish<cr>',
+	['<leader><c-h>'] = ':aboveleft :vsp|:Dirvish<cr>',
+
+	['<c-Left>'] = '<c-w>H',
+	['<c-Down>'] = '<c-w>J',
+	['<c-Up>'] = '<c-w>K',
+	['<c-Right>'] = '<c-w>L',
 
 	-- Buffers
 	['<c-w>'] = ':bd<cr>',
 	['<Tab>'] = ':bn<cr>',
 	['<s-Tab>'] = ':bp<cr>',
 
-	-- Dirvish
-	['<leader>ev'] = ':Dirvish ~/dots/nvim<cr>',
-	['<c-t>'] = ':Dirvish<cr>',
-	['<leader><leader><cr>'] = ':Dirvish | :wincmd o<cr>',
-	['<leader><cr>'] = ':sp|:Dirvish<cr>',
-	['<leader>v<cr>'] = ':vsp|:Dirvish<cr>',
-
 	-- External Programs
-	["<leader>,"] = ':sp | :term<cr>:startinsert<cr>',
-	["<leader>v,"] = ':vsp | :term<cr>:startinsert<cr>',
-	["<leader><leader>,"] = ':term<cr>:startinsert | :wincmd o<cr>',
-	["<leader>?"] = ':help ',
-	["<leader>v?"] = ':vert :help ',
-	["<leader><leader>?"] = ':help  | :wincmd o' .. ('<left>'):rep(12),
-	["<leader>M"] = ':Man ',
-	["<leader>vM"] = ':vert :Man ',
-	["<leader><leader>M"] = ':Man  | :wincmd o' .. ('<left>'):rep(12),
+	['<c-space>'] = ':term<cr>:startinsert<cr>',
+	['<leader>?'] = ':help ',
+	['<leader>v?'] = ':vert :help ',
 
 	-- FZF
 	['<leader>fd'] = ':Files<cr>',

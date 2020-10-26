@@ -89,7 +89,7 @@ _popup = awful.popup({
 
 keygrabber = awful.keygrabber({
     keybindings = {
-        {{ 'Control' }, 'space', function() _next() end},
+        {{ 'Mod4', 'Control' }, 'space', function() _next() end},
     },
 
     stop_key = 'Control',

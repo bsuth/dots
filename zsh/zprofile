@@ -15,13 +15,11 @@ export HISTFILE=~/.histfile
 export HISTSIZE=1000
 export SAVEHIST=1000
 
-export LC_ALL=en_US.UTF-8
 export XMODIFIERS="@im=fcitx"
 export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export QT5_IM_MODULE=fcitx
-export QT_QPA_PLATFORMTHEME=qt5ct
-export XIM_PROGRAM=/usr/bin/fcitx
+# export XIM_PROGRAM=/usr/bin/fcitx
 
 export FZF_DEFAULT_COMMAND='rg --files -L'
 export FZF_DEFAULT_OPTS='--exact'

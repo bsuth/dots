@@ -72,7 +72,7 @@ bindings.globalkeys = gears.table.join(
     awful.key({ }, 'XF86MonBrightnessDown', function() brightness:shift(-8) end),
     awful.key({ }, 'XF86MonBrightnessUp', function() brightness:shift(8) end),
 
-    awful.key({ 'Control' }, 'space', function() kb_switcher:start() end),
+    awful.key({ modkey, 'Control' }, 'space', function() kb_switcher:start() end),
 
     -- -------------------------------------------------------------------------
     -- Movement
