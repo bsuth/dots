@@ -4,12 +4,6 @@ return {
     anki = {
         callback = function() awful.spawn('anki') end,
     },
-    discord = {
-        callback = function() awful.spawn('discord') end,
-    },
-    gimp = {
-        callback = function() awful.spawn('gimp') end,
-    },
     inkscape = {
         callback = function() awful.spawn('inkscape') end,
     },

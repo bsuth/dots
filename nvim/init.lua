@@ -139,6 +139,28 @@ nvim.nvim_call_function('coc#add_extension', {
 -- AUGROUPS
 -- -----------------------------------------------------------------------------
 
+local XDG_EXTS = {
+	images = {
+		png = true,
+		jpeg = true,
+		jpg = true,
+	},
+}
+
+
+function bsuth_dirvish_xdg_open()
+	local file = nvim.nvim_call_function('expand', {'<cWORD>'})
+	local basename = file:match('([^/]+)$')
+	local ext = basename and basename:match('.+%.(.+)$')
+
+	-- directory
+	if XDG_EXTS['images'][ext] then
+		nvim.nvim_command(('silent !gthumb %s & disown'):format(file))
+	else
+		nvim.nvim_call_function('dirvish#open', {'edit', 0})
+	end
+end
+
 function bsuth_bufenter()
 	local bufname = nvim.nvim_call_function('bufname', {})
 	local bufdir = nvim.nvim_call_function('fnamemodify', {bufname, ':p:h'})
@@ -146,7 +168,9 @@ function bsuth_bufenter()
 
 	if not bufname:match('^term://*') then 
 		nvim.nvim_command('cd ' .. bufdir)
-		if bufft == 'dirvish' then nvim.nvim_command('Dirvish') end
+		if bufft == 'dirvish' then
+			nvim.nvim_command('Dirvish')
+		end
 	end
 end
 
@@ -154,6 +178,7 @@ local augroups = {
 	general = {
 		'BufEnter * lua bsuth_bufenter()',
 		'TermOpen term://* setlocal nonumber',
+		'FileType dirvish nnoremap <buffer><silent> <cr> :lua bsuth_dirvish_xdg_open()<cr>',
 		
 		-- Hide dot files
 		-- [[ FileType dirvish silent keeppatterns g@\v/\.[^\/]+/?$@d _ ]],

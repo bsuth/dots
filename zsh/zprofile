@@ -15,10 +15,9 @@ export HISTFILE=~/.histfile
 export HISTSIZE=1000
 export SAVEHIST=1000
 
-export XMODIFIERS="@im=fcitx"
-export GTK_IM_MODULE=fcitx
+export XMODIFIERS=@im=fcitx
+export GTK_IM_MODULE=xim
 export QT_IM_MODULE=fcitx
-export QT5_IM_MODULE=fcitx
 # export XIM_PROGRAM=/usr/bin/fcitx
 
 export FZF_DEFAULT_COMMAND='rg --files -L'
@@ -47,10 +46,11 @@ export SPACESHIP_PROMPT_ORDER=(
 
 MYPATHS=(
 	#"$HOME/.local/bin"
+	"/usr/lib/x86_64-linux-gnu/libgtk-3-0"
 )
 
-for path in "${MYPATHS[@]}"; do
-    if [[ -d $path ]]; then export PATH="$PATH:$path"; fi
+for p in "${MYPATHS[@]}"; do
+    if [[ -d $p ]]; then export PATH="$PATH:$p"; fi
 done
 
 # ------------------------------------------------------------------------------
