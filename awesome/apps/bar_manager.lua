@@ -39,27 +39,27 @@ local function _notify(callback)
 end
 
 local function _volume()
-    _icon.image = beautiful.icon('apps/cs-sound.svg')
+    _icon.image = beautiful.icon('volume')
     _bar.value = volume:get()
     _bar.color = beautiful.colors.green
 end
 
 local function _brightness()
-    _icon.image = beautiful.icon('apps/display-brightness.svg')
+    _icon.image = beautiful.icon('brightness')
     _bar.value = brightness:get()
     _bar.color = beautiful.colors.yellow
 end
 
 local function _battery_warning_low()
     _state.low_battery = true
-    _icon.image = beautiful.icon('devices/battery.svg')
+    _icon.image = battery:get('battery_warning')
     _bar.value = battery:get()
     _bar.color = beautiful.colors.red
 end
 
 local function _ram_warning_high()
     _state.high_ram = true
-    _icon.image = beautiful.icon('devices/cpu.svg')
+    _icon.image = beautiful.icon('TODO') -- TODO
     _bar.value = ram:get()
     _bar.color = beautiful.colors.purple
 end

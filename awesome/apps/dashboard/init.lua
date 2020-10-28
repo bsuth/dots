@@ -42,7 +42,7 @@ local api = {}
 
 local function _set_focused_tab(tab, skip_keygrabber)
     for _, _tab in ipairs(_state.tabs) do
-        _tab.button.shape_border_color = beautiful.colors.transparent
+        _tab.button.shape_border_color = beautiful.colors.blacker
     end
 
     _state.keygrabber:stop()
@@ -73,9 +73,9 @@ local function _register_tab(tab)
         {
             {
                 {
-                    forced_width = 50,
-                    forced_height = 50,
-                    image = beautiful.icon('apps/cs-date-time.svg'), -- TODO
+                    forced_width = 75,
+                    forced_height = 75,
+                    image = tab.icon,
                     widget = wibox.widget.imagebox,
                 },
                 widget = wibox.container.place,
@@ -85,7 +85,7 @@ local function _register_tab(tab)
         },
         shape = gears.shape.circle,
         bg = beautiful.colors.black,
-		shape_border_width = 5,
+		shape_border_width = 8,
 		shape_border_color = beautiful.colors.transparent,
         widget = wibox.container.background,
     })

@@ -13,7 +13,7 @@ local popup = awful.popup({
     },
     ontop = true,
     visible = false,
-    bg = beautiful.colors.dimmed,
+    bg = beautiful.colors.black,
 })
 
 --------------------------------------------------------------------------------

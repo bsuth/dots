@@ -48,6 +48,11 @@ awful.rules.rules = {
 			floating = true,
 			maximized = false,
 
+			x = 100,
+			y = 75,
+			width = 1400,
+			height = 750,
+
             focus = awful.client.focus.filter,
             screen = awful.screen.preferred,
             placement = awful.placement.no_overlap+awful.placement.no_offscreen,

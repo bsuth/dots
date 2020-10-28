@@ -23,10 +23,10 @@ local _battery = {}
 --------------------------------------------------------------------------------
 
 _volume = wibox.widget({
-    forced_width = 70,
-    forced_height = 70,
+    forced_width = 100,
+    forced_height = 100,
 
-    icon = beautiful.icon('apps/cs-sound.svg'),
+    icon = beautiful.icon('volume'),
     color = beautiful.colors.green,
     percent = volume:get(),
 
@@ -46,10 +46,10 @@ end)
 --------------------------------------------------------------------------------
 
 _brightness = wibox.widget({
-    forced_width = 70,
-    forced_height = 70,
+    forced_width = 100,
+    forced_height = 100,
 
-    icon = beautiful.icon('apps/display-brightness.svg'),
+    icon = beautiful.icon('brightness'),
     color = beautiful.colors.yellow,
     percent = brightness:get(),
 
@@ -69,10 +69,10 @@ end)
 --------------------------------------------------------------------------------
 
 _battery = wibox.widget({
-    forced_width = 70,
-    forced_height = 70,
+    forced_width = 100,
+    forced_height = 100,
 
-    icon = beautiful.icon('devices/battery.svg'),
+    icon = battery:get('icon'),
     color = beautiful.colors.red,
     percent = battery:get(),
 
@@ -81,7 +81,7 @@ _battery = wibox.widget({
 
 battery:connect_signal('update', function()
     _battery.percent = battery:get()
-    _battery.icon = battery:get('status_icon')
+    _battery.icon = battery:get('icon')
     _battery:emit_signal('widget::redraw_needed')
 end)
 
@@ -90,98 +90,90 @@ end)
 --------------------------------------------------------------------------------
 
 return {
-    icon = beautiful.icon('todo'),
+    icon = beautiful.icon('clock'),
     keygrabber = {},
     widget = wibox.widget({
-        {
-            {
-                {
-                    {
-                        {
-                            format = ("<span color='%s'>%%H</span><span color='%s'>%%M</span>"):format(
-                                beautiful.colors.white, beautiful.colors.cyan
-                            ),
-                            font = 'Titan One 50',
-                            widget = wibox.widget.textclock,
-                        },
-                        widget = wibox.container.place,
-                    },
-                    {
-                        {
-                            format = "<span>%a %b %d, %Y</span>",
-                            widget = wibox.widget.textclock,
-                        },
-                        widget = wibox.container.place,
-                    },
-                    {
-                        {
-                            {
-                                {
-                                    {
-                                        color = beautiful.colors.cyan,
-                                        shape = gears.shape.rounded_bar,
-                                        forced_width = 100,
-                                        forced_height = 5,
-                                        widget = wibox.widget.separator,
-                                    },
-                                    widget = wibox.container.place,
-                                },
-                                {
-                                    {
-                                        image = beautiful.icon('apps/cs-date-time.svg'),
-                                        forced_width = 30,
-                                        forced_height = 30,
-                                        widget = wibox.widget.imagebox,
-                                    },
-                                    widget = wibox.container.place,
-                                },
-                                {
-                                    {
-                                        color = beautiful.colors.cyan,
-                                        shape = gears.shape.rounded_bar,
-                                        forced_width = 100,
-                                        forced_height = 5,
-                                        widget = wibox.widget.separator,
-                                    },
-                                    widget = wibox.container.place,
-                                },
-                                spacing = 15,
-                                layout = wibox.layout.fixed.horizontal,
-                            },
-                            widget = wibox.container.place,
-                        },
-                        top = 10,
-                        widget = wibox.container.margin,
-                    },
-                    {
-                        {
-                            {
-                                {
-                                    _volume,
-                                    _brightness,
-                                    spacing = 50,
-                                    layout = wibox.layout.flex.horizontal,
-                                },
-                                {
-                                    _battery,
-                                    widget = wibox.container.place,
-                                },
-                                layout = wibox.layout.flex.vertical,
-                            },
-                            top = 10,
-                            widget = wibox.container.margin,
-                        },
-                        widget = wibox.container.place,
-                    },
-                    layout = wibox.layout.fixed.vertical,
-                },
-                margins = 50,
-                widget = wibox.container.margin,
-            },
-            shape = gears.shape.circle,
-            bg = beautiful.colors.black,
-            widget = wibox.container.background,
-        },
+		{
+			{
+				{
+					format = ("<span color='%s'>%%H</span><span color='%s'>%%M</span>"):format(
+						beautiful.colors.white, beautiful.colors.cyan
+					),
+					font = 'Titan One 75',
+					widget = wibox.widget.textclock,
+				},
+				widget = wibox.container.place,
+			},
+			{
+				{
+					format = "<span>%a %b %d, %Y</span>",
+					widget = wibox.widget.textclock,
+				},
+				widget = wibox.container.place,
+			},
+			{
+				{
+					{
+						{
+							{
+								color = beautiful.colors.cyan,
+								shape = gears.shape.rounded_bar,
+								forced_width = 225,
+								forced_height = 7,
+								widget = wibox.widget.separator,
+							},
+							widget = wibox.container.place,
+						},
+						{
+							{
+								image = beautiful.icon('clock'),
+								forced_width = 50,
+								forced_height = 50,
+								widget = wibox.widget.imagebox,
+							},
+							widget = wibox.container.place,
+						},
+						{
+							{
+								color = beautiful.colors.cyan,
+								shape = gears.shape.rounded_bar,
+								forced_width = 225,
+								forced_height = 7,
+								widget = wibox.widget.separator,
+							},
+							widget = wibox.container.place,
+						},
+						spacing = 30,
+						layout = wibox.layout.fixed.horizontal,
+					},
+					widget = wibox.container.place,
+				},
+				top = 30,
+				bottom = 20,
+				widget = wibox.container.margin,
+			},
+			{
+				{
+					{
+						{
+							_volume,
+							_brightness,
+							spacing = 50,
+							layout = wibox.layout.flex.horizontal,
+						},
+						{
+							_battery,
+							widget = wibox.container.place,
+						},
+						layout = wibox.layout.flex.vertical,
+					},
+					top = 10,
+					widget = wibox.container.margin,
+				},
+				widget = wibox.container.place,
+			},
+			layout = wibox.layout.fixed.vertical,
+		},
         widget = wibox.container.place,
     }),
 }

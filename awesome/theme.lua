@@ -65,7 +65,7 @@ naughty.config.defaults.position = 'bottom_right'
 --------------------------------------------------------------------------------
 
 function beautiful.icon(icon)
-    return '/usr/share/icons/Papirus/128x128/' .. icon
+    return ('/home/bsuth/dots/awesome/icons/%s.svg'):format(icon)
 end
 
 function beautiful.hex2rgb(hex)
