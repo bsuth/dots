@@ -12,7 +12,7 @@ local dial = require 'widgets/dial'
 
 -- Constants --
 
-local _MAX_LIST_ITEMS = 3
+local _MAX_LIST_ITEMS = 8
 
 -- State --
 
@@ -38,7 +38,7 @@ local function _list_item_factory(alias, command)
 	local arrow = wibox.widget({
 		forced_width = 30,
 		forced_height= 30,
-		image = beautiful.icon('../16x16/actions/arrow-left.svg'),
+		image = beautiful.icon('arrow-left'),
 		visible = false,
 		widget = wibox.widget.imagebox,
 	})
@@ -59,6 +59,7 @@ local function _list_item_factory(alias, command)
 					right = 20,
 					widget = wibox.container.margin,
 				},
+				nil,
 				{
 					arrow,
 					widget = wibox.container.place,
@@ -274,7 +275,7 @@ popup:register_hover(_scroll_dial, 'dot')
 _refresh()
 
 return {
-    icon = beautiful.icon('todo'),
+    icon = beautiful.icon('spaceship'),
     keygrabber = {
         keybindings = {
             {{ 'Control' }, 'p', function() _shift_list(-1) end},
@@ -302,16 +303,11 @@ return {
     },
     widget = wibox.widget({
         _button_factory(_scroll_dial),
-        {
-            {
-                _list,
-                margins = 50,
-                widget = wibox.container.margin,
-            },
-            shape = gears.shape.rounded_rect,
-            bg = beautiful.colors.black,
-            widget = wibox.container.background,
-        },
+		{
+			_list,
+			margins = 50,
+			widget = wibox.container.margin,
+		},
         spacing = 15,
         layout = wibox.layout.fixed.horizontal,
     }),
