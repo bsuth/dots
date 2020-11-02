@@ -33,7 +33,7 @@ function battery:update()
 			fi
 		done
 	]], function(stdout, _, _, exitcode)
-		_private.charging = exitcode == 0
+		_private.charging = (exitcode == 0)
 	end)
 
     awful.spawn.easy_async_with_shell([[

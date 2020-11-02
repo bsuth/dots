@@ -54,15 +54,6 @@ local function _list_item_factory(alias, command)
 		widget = wibox.widget({
 			{
 				{
-					{
-						forced_width = 30,
-						forced_height= 30,
-						image = command.icon,
-						widget = wibox.widget.imagebox,
-					},
-					widget = wibox.container.place,
-				},
-				{
 					textbox,
 					left = 20,
 					right = 20,
@@ -194,23 +185,18 @@ gears.table.crush(_state, {
 	scroll_offset = 0,
 
 	commands = {
-		db = {
-			icon = beautiful.icon('apps/cs-sound.svg'),
+		flameshot = {
 			callback = function()
-				awful.spawn('st -e nvim -c ":DBUI"')
+				awful.spawn('flameshot gui')
 			end,
 		},
 		sleep = {
-			icon = beautiful.icon('apps/cs-sound.svg'),
 			callback = function() awful.spawn('systemctl suspend') end,
 		},
 		reboot = {
-			alias = 'reboot',
-			icon = beautiful.icon('apps/cs-sound.svg'),
 			callback = function() awful.spawn('/sbin/reboot') end,
 		},
 		poweroff = {
-			icon = beautiful.icon('apps/cs-sound.svg'),
 			callback = function() awful.spawn('/sbin/poweroff') end,
 		},
 	},

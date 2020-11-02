@@ -150,14 +150,15 @@ local XDG_EXTS = {
 
 function bsuth_dirvish_xdg_open()
 	local file = nvim.nvim_call_function('expand', {'<cWORD>'})
+	local dir = nvim.nvim_call_function('fnamemodify', {file, ':p:h'})
 	local basename = file:match('([^/]+)$')
 	local ext = basename and basename:match('.+%.(.+)$')
 
-	-- directory
 	if XDG_EXTS['images'][ext] then
 		nvim.nvim_command(('silent !gthumb %s & disown'):format(file))
 	else
 		nvim.nvim_call_function('dirvish#open', {'edit', 0})
+		nvim.nvim_command('cd ' .. dir)
 	end
 end
 
@@ -183,6 +184,9 @@ local augroups = {
 		-- Hide dot files
 		-- [[ FileType dirvish silent keeppatterns g@\v/\.[^\/]+/?$@d _ ]],
 	},
+	languages = {
+		'FileType html,scss,css,vue setlocal shiftwidth=2 tabstop=2 softtabstop=2',
+	}
 }
 
 for augroup, autocmds in pairs(augroups) do
@@ -232,7 +236,7 @@ local nmap = {
 
 	-- FZF
 	['<leader>fd'] = ':Files<cr>',
-	['<leader>cd'] = ':call fzf#run(fzf#wrap({"source": "fd -L --type d"}))<cr>',
+	['<leader>cd'] = ':call fzf#run(fzf#wrap({"source": "fdfind -L --type d"}))<cr>',
 	['<leader>rg'] = ':Rg<cr>',
 	['<leader>ls'] = ':Buffers<cr>',
 }

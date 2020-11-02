@@ -82,6 +82,9 @@ _battery = wibox.widget({
 battery:connect_signal('update', function()
     _battery.percent = battery:get()
     _battery.icon = battery:get('icon')
+
+	-- layout_changed needed to update icon
+    _battery:emit_signal('widget::layout_changed')
     _battery:emit_signal('widget::redraw_needed')
 end)
 
