@@ -3,57 +3,26 @@ local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
+local kb_layout_model = require 'models/kb_layout'
+
 --------------------------------------------------------------------------------
 -- DECLARATIONS
 --------------------------------------------------------------------------------
 
--- Constants --
-
-local _LAYOUTS = { 'fcitx-keyboard-us', 'mozc' }
-
--- State --
-
-local _state = {}
-
 -- Widgets --
 
-local _kb = {}
-local _popup = {}
+local kb_widget = {}
 
 -- Other --
 
+local popup = {}
 local keygrabber = {}
-
---------------------------------------------------------------------------------
--- LOCAL FUNCTIONS
---------------------------------------------------------------------------------
-
-local function _next()
-    local layout = _state.layout == #_LAYOUTS and 1 or (_state.layout + 1)
-
-    awful.spawn.easy_async_with_shell(([[
-        fcitx-remote -s %s
-    ]]):format(_LAYOUTS[layout]), function(_, _, _, exit_code)
-        if exit_code == 0 then
-            _state.layout = layout
-            _kb.markup = _LAYOUTS[_state.layout]
-        end
-    end)
-end
-
---------------------------------------------------------------------------------
--- INIT STATE
---------------------------------------------------------------------------------
-
-gears.table.crush(_state, {
-    layout = 1,
-})
 
 --------------------------------------------------------------------------------
 -- WIDGET: KB
 --------------------------------------------------------------------------------
 
-_kb = wibox.widget({
+kb_widget = wibox.widget({
     forced_width = 100,
     forced_height = 100,
     markup = '',
@@ -61,13 +30,13 @@ _kb = wibox.widget({
 })
 
 --------------------------------------------------------------------------------
--- WIDGET: POPUP
+-- POPUP
 --------------------------------------------------------------------------------
 
-_popup = awful.popup({
+popup = awful.popup({
     widget = {
         {
-            _kb,
+            kb_widget,
             margins = 10,
             widget = wibox.container.margin,
         },
@@ -89,22 +58,30 @@ _popup = awful.popup({
 
 keygrabber = awful.keygrabber({
     keybindings = {
-        {{ 'Mod4', 'Control' }, 'space', function() _next() end},
+        {{ 'Mod4', 'Control' }, 'space', function() kb_layout_model:next() end},
     },
 
     stop_key = 'Control',
     stop_event = 'release',
 
     start_callback = function()
-        _next()
-        _popup.screen = awful.screen.focused()
-        _popup.visible = true
+		kb_layout_model:next()
+        popup.screen = awful.screen.focused()
+        popup.visible = true
     end,
 
     stop_callback = function()
-        _popup.visible = false
+        popup.visible = false
     end,
 })
+
+--------------------------------------------------------------------------------
+-- SIGNALS
+--------------------------------------------------------------------------------
+
+kb_layout_model:connect_signal('update', function()
+    kb_widget.markup = kb_layout_model.layout_name
+end)
 
 --------------------------------------------------------------------------------
 -- RETURN

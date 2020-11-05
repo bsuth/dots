@@ -16,104 +16,76 @@ local dashboard = require 'apps/dashboard'
 
 -- State --
 
-local _state = {}
+local state = {}
 
 -- Widgets --
 
-local _icon = {}
-local _bar = {}
-local _popup = {}
+local icon_widget = {}
+local bar_widget = {}
+
+-- Other --
+
+local popup = {}
 
 --------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
 --------------------------------------------------------------------------------
 
-local function _notify(callback)
-    if dashboard.is_active() then return end
+local function show_battery_warning()
+    icon_widget.image = battery_model.icon
+    bar_widget.value = battery_model.percent
+    bar_widget.color = beautiful.colors.red
+end
+
+local function show_ram_warning()
+    icon_widget.image = beautiful.icon('TODO') -- TODO
+    bar_widget.value = ram_model.percent
+    bar_widget.color = beautiful.colors.purple
+end
+
+local function notify(callback)
+    if dashboard.is_active() then
+		local urgent = gears.table.hasitem({
+			show_ram_warning,
+			show_battery_warning
+		}, callback) ~= nil
+
+		if not urgent then return end
+	end
 
     (callback)()
 
-    _popup.screen = awful.screen.focused()
-    _popup.visible = true
-    _state.timer:again()
-end
-
-local function _volume()
-    _icon.image = beautiful.icon('volume')
-    _bar.value = volume_model.percent
-    _bar.color = beautiful.colors.green
-end
-
-local function _brightness()
-    _icon.image = beautiful.icon('brightness')
-    _bar.value = brightness_model.percent
-    _bar.color = beautiful.colors.yellow
-end
-
-local function _battery_warning_low()
-    _state.low_battery = true
-    _icon.image = battery_model.icon
-    _bar.value = battery_model.percent
-    _bar.color = beautiful.colors.red
-end
-
-local function _ram_warning_high()
-    _state.high_ram = true
-    _icon.image = beautiful.icon('TODO') -- TODO
-    _bar.value = ram_model.percent
-    _bar.color = beautiful.colors.purple
+    popup.screen = awful.screen.focused()
+    popup.visible = true
+    state.timer:again()
 end
 
 --------------------------------------------------------------------------------
 -- INIT STATE
 --------------------------------------------------------------------------------
 
-gears.table.crush(_state, {
-    low_battery = false,
-    high_ram = false,
+gears.table.crush(state, {
+    battery_warning = false,
+    ram_warning = false,
     timer = gears.timer({
         timeout = 1,
         callback = function()
-            if _state.high_ram then
-                _ram_warning_high()
-            elseif _state.low_battery then
-                _battery_warning_low()
+            if state.ram_warning then
+                show_ram_warning()
+            elseif state.battery_warning then
+                show_battery_warning()
             else
-                _popup.visible = false
+                popup.visible = false
             end
         end,
     })
 })
 
-volume_model:connect_signal('update', function()
-	_notify(_volume)
-end)
-
-brightness_model:connect_signal('update', function()
-	_notify(_brightness)
-end)
-
-battery_model:connect_signal('warning', function()
-	_notify(_battery_warning_low)
-end)
-battery_model:connect_signal('clear_warning', function()
-    _state.low_battery = false
-    _popup.visible = false
-end)
-
-ram_model:connect_signal('warning', function()
-	_notify(_ram_warning_high)
-end)
-ram_model:connect_signal('clear_warning', function()
-    _state.high_ram = false
-    _popup.visible = false
-end)
-
 --------------------------------------------------------------------------------
 -- WIDGET: ICON
 --------------------------------------------------------------------------------
 
-_icon = wibox.widget({
+icon_widget = wibox.widget({
     forced_width = 30,
     forced_height = 30,
     image = '',
@@ -124,7 +96,7 @@ _icon = wibox.widget({
 -- WIDGET: BAR
 --------------------------------------------------------------------------------
 
-_bar = wibox.widget({
+bar_widget = wibox.widget({
     value = 0,
     max_value = 100,
     forced_height = 30,
@@ -136,15 +108,15 @@ _bar = wibox.widget({
 })
 
 --------------------------------------------------------------------------------
--- WIDGET: POPUP
+-- POPUP
 --------------------------------------------------------------------------------
 
-_popup = awful.popup({
+popup = awful.popup({
     widget = {
         {
             {
                 {
-                    _bar,
+                    bar_widget,
                     direction = 'east',
                     widget = wibox.container.rotate,
                 },
@@ -152,7 +124,7 @@ _popup = awful.popup({
             },
             {
                 {
-                    _icon,
+                    icon_widget,
                     margins = 10,
                     widget = wibox.container.margin,
                 },
@@ -171,6 +143,46 @@ _popup = awful.popup({
     visible = false,
     bg = beautiful.colors.transparent,
 })
+
+--------------------------------------------------------------------------------
+-- SIGNALS
+--------------------------------------------------------------------------------
+
+volume_model:connect_signal('update', function()
+	notify(function()
+		icon_widget.image = beautiful.icon('volume')
+		bar_widget.value = volume_model.percent
+		bar_widget.color = beautiful.colors.green
+	end)
+end)
+
+brightness_model:connect_signal('update', function()
+	notify(function()
+		icon_widget.image = beautiful.icon('brightness')
+		bar_widget.value = brightness_model.percent
+		bar_widget.color = beautiful.colors.yellow
+	end)
+end)
+
+battery_model:connect_signal('warning', function()
+    state.battery_warning = true
+	notify(show_battery_warning)
+end)
+
+battery_model:connect_signal('clear_warning', function()
+    state.battery_warning = false
+    popup.visible = false
+end)
+
+ram_model:connect_signal('warning', function()
+    state.ram_warning = true
+	notify(_ram_warning_high)
+end)
+
+ram_model:connect_signal('clear_warning', function()
+    state.ram_warning = false
+    popup.visible = false
+end)
 
 --------------------------------------------------------------------------------
 -- RETURN

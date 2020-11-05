@@ -3,8 +3,10 @@ local gears = require 'gears'
 local naughty = require 'naughty' 
 
 local dashboard = require 'apps/dashboard' 
-local tag_manager = require 'apps/tag_manager' 
 local kb_switcher = require 'apps/kb_switcher' 
+
+local tag_manager_view = require 'apps/tag_manager' 
+local tag_manager_model = require 'models/tag_manager' 
 
 local volume = require 'models/volume'
 local brightness = require 'models/brightness'
@@ -129,9 +131,8 @@ bindings.globalkeys = gears.table.join(
     -- -------------------------------------------------------------------------
 
     awful.key({ modkey }, 'space', function() dashboard.start() end),
-    awful.key({ modkey }, 'Alt_L', function() tag_manager.keygrabber:start() end),
-    awful.key({ modkey, 'Shift' }, '=', function() tag_manager.api.add(true) end),
-    awful.key({ modkey }, '-', function() tag_manager.api.remove() end),
+    awful.key({ modkey }, 'Alt_L', function() tag_manager_view:start() end),
+    awful.key({ modkey, 'Shift' }, '=', function() tag_manager_model:add(true) end),
 
     -- -------------------------------------------------------------------------
     -- Spawners
