@@ -1,5 +1,6 @@
 # workstation-specific config
 **/__config/*
+**/__storage/*
 !**/__config/__*
 __*
 

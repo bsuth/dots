@@ -3,8 +3,8 @@ local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
-local volume = require 'singletons/volume'
-local brightness = require 'singletons/brightness'
+local volume = require 'models/volume'
+local brightness = require 'models/brightness'
 
 local tab_bluetooth = require 'apps/dashboard/tab_bluetooth'
 local tab_datetime = require 'apps/dashboard/tab_datetime'
@@ -63,7 +63,7 @@ local function _set_focused_tab(tab, skip_keygrabber)
         _state.keygrabber:start()
     end
 
-    tab.button.shape_border_color = beautiful.colors.cyan
+    tab.button.shape_border_color = beautiful.colors.white
     _tab_content:set(1, tab.widget)
     _state.focused_tab = tab
 end
@@ -73,8 +73,8 @@ local function _register_tab(tab)
         {
             {
                 {
-                    forced_width = 75,
-                    forced_height = 75,
+                    forced_width = 70,
+                    forced_height = 70,
                     image = tab.icon,
                     widget = wibox.widget.imagebox,
                 },
@@ -99,7 +99,7 @@ local function _register_tab(tab)
 
     return wibox.widget({
         tab.button,
-        widget = wibox.container.place,
+        widget = wibox.container.background,
     })
 end
 
@@ -195,10 +195,10 @@ _tab_content = wibox.widget({
 popup:init(wibox.widget({
     {
         _tabs_left,
-        top = 100,
-        bottom = 100,
+        top = 50,
+        bottom = 50,
         left = 50,
-        right = 100, 
+        right = 50, 
         widget = wibox.container.margin,
     },
     {
@@ -211,9 +211,9 @@ popup:init(wibox.widget({
     },
     {
         _tabs_right,
-        top = 100,
-        bottom = 100,
-        left = 100, 
+        top = 50,
+        bottom = 50,
+        left = 50, 
         right = 50,
         widget = wibox.container.margin,
     },

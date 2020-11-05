@@ -1,5 +1,6 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
+local gears = require 'gears'
 local wibox = require 'wibox' 
 
 --------------------------------------------------------------------------------
@@ -22,19 +23,28 @@ local popup = awful.popup({
 
 function popup:init(widget)
     popup.widget = wibox.widget({
-        widget,
-        left = 50,
-        right = 50,
-        top = 50,
-        bottom = 50,
-        widget = wibox.container.margin,
+		{
+			widget,
+			left = 50,
+			right = 50,
+			top = 50,
+			bottom = 50,
+			widget = wibox.container.margin,
+		},
+		shape = gears.shape.rounded_rect,
+		shape_border_width = 10,
+		widget = wibox.container.background,
     })
 end
 
 function popup:start()
     self.screen = awful.screen.focused()
-    self.widget.forced_width = self.screen.geometry.width
-    self.widget.forced_height = self.screen.geometry.height
+
+	self.x = self.screen.geometry.width * 0.1
+	self.y = self.screen.geometry.height * 0.1
+    self.widget.forced_width = self.screen.geometry.width * 0.8
+    self.widget.forced_height = self.screen.geometry.height * 0.8
+
     self.visible = true
 end
 

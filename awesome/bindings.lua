@@ -6,8 +6,8 @@ local dashboard = require 'apps/dashboard'
 local tag_manager = require 'apps/tag_manager' 
 local kb_switcher = require 'apps/kb_switcher' 
 
-local volume = require 'singletons/volume'
-local brightness = require 'singletons/brightness'
+local volume = require 'models/volume'
+local brightness = require 'models/brightness'
 
 --------------------------------------------------------------------------------
 -- INIT STATE

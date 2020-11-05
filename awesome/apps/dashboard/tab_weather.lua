@@ -3,7 +3,7 @@ local gears = require 'gears'
 local wibox = require 'wibox'
 
 local popup = require 'apps/dashboard/popup'
-local weather = require 'singletons/weather'
+local weather = require 'models/weather'
 
 --------------------------------------------------------------------------------
 -- UNIT PICKER

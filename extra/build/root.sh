@@ -176,6 +176,7 @@ function _install_packages_() {
 		brightnessctl
 		software-properties-common
 		curl
+		libupower-glib-dev
 
 		# Utilities
 		pass

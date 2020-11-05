@@ -3,10 +3,10 @@ local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
-local volume = require 'singletons/volume'
-local brightness = require 'singletons/brightness'
-local battery = require 'singletons/battery'
-local ram = require 'singletons/ram'
+local volume_model = require 'models/volume'
+local brightness_model = require 'models/brightness'
+local battery_model = require 'models/battery'
+local ram_model = require 'models/ram'
 
 local dashboard = require 'apps/dashboard'
 
@@ -40,27 +40,27 @@ end
 
 local function _volume()
     _icon.image = beautiful.icon('volume')
-    _bar.value = volume:get()
+    _bar.value = volume_model.percent
     _bar.color = beautiful.colors.green
 end
 
 local function _brightness()
     _icon.image = beautiful.icon('brightness')
-    _bar.value = brightness:get()
+    _bar.value = brightness_model.percent
     _bar.color = beautiful.colors.yellow
 end
 
 local function _battery_warning_low()
     _state.low_battery = true
-    _icon.image = battery:get('battery_warning')
-    _bar.value = battery:get()
+    _icon.image = battery_model.icon
+    _bar.value = battery_model.percent
     _bar.color = beautiful.colors.red
 end
 
 local function _ram_warning_high()
     _state.high_ram = true
     _icon.image = beautiful.icon('TODO') -- TODO
-    _bar.value = ram:get()
+    _bar.value = ram_model.percent
     _bar.color = beautiful.colors.purple
 end
 
@@ -85,17 +85,26 @@ gears.table.crush(_state, {
     })
 })
 
-volume:connect_signal('update', function() _notify(_volume) end)
-brightness:connect_signal('update', function() _notify(_brightness) end)
+volume_model:connect_signal('update', function()
+	_notify(_volume)
+end)
 
-battery:connect_signal('warning_low', function() _notify(_battery_warning_low) end)
-battery:connect_signal('no_warning', function()
+brightness_model:connect_signal('update', function()
+	_notify(_brightness)
+end)
+
+battery_model:connect_signal('warning', function()
+	_notify(_battery_warning_low)
+end)
+battery_model:connect_signal('clear_warning', function()
     _state.low_battery = false
     _popup.visible = false
 end)
 
-ram:connect_signal('warning_high', function() _notify(_ram_warning_high) end)
-ram:connect_signal('no_warning', function()
+ram_model:connect_signal('warning', function()
+	_notify(_ram_warning_high)
+end)
+ram_model:connect_signal('clear_warning', function()
     _state.high_ram = false
     _popup.visible = false
 end)

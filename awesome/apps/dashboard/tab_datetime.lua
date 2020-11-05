@@ -2,9 +2,9 @@ local beautiful = require 'beautiful'
 local gears = require 'gears' 
 local wibox = require 'wibox' 
 
-local volume = require 'singletons/volume'
-local brightness = require 'singletons/brightness'
-local battery = require 'singletons/battery'
+local volume_model = require 'models/volume'
+local brightness_model = require 'models/brightness'
+local battery_model = require 'models/battery'
 
 local dial = require 'widgets/dial' 
 
@@ -28,16 +28,16 @@ _volume = wibox.widget({
 
     icon = beautiful.icon('volume'),
     color = beautiful.colors.green,
-    percent = volume:get(),
+    percent = volume_model.percent,
 
-    onscrollup = function(self) volume:shift(5) end,
-    onscrolldown = function(self) volume:shift(-5) end,
+    onscrollup = function(self) volume_model:shift(5) end,
+    onscrolldown = function(self) volume_model:shift(-5) end,
 
     widget = dial,
 })
 
-volume:connect_signal('update', function()
-    _volume.percent = volume:get()
+volume_model:connect_signal('update', function()
+    _volume.percent = volume_model.percent
     _volume:emit_signal('widget::redraw_needed')
 end)
 
@@ -51,16 +51,16 @@ _brightness = wibox.widget({
 
     icon = beautiful.icon('brightness'),
     color = beautiful.colors.yellow,
-    percent = brightness:get(),
+    percent = brightness_model.percent,
 
-    onscrollup = function(self) brightness:shift(5) end,
-    onscrolldown = function(self) brightness:shift(-5) end,
+    onscrollup = function(self) brightness_model:shift(5) end,
+    onscrolldown = function(self) brightness_model:shift(-5) end,
 
     widget = dial,
 })
 
-brightness:connect_signal('update', function()
-    _brightness.percent = brightness:get()
+brightness_model:connect_signal('update', function()
+    _brightness.percent = brightness_model.percent
     _brightness:emit_signal('widget::redraw_needed')
 end)
 
@@ -72,16 +72,16 @@ _battery = wibox.widget({
     forced_width = 100,
     forced_height = 100,
 
-    icon = battery:get('icon'),
+    icon = battery_model.icon,
     color = beautiful.colors.red,
-    percent = battery:get(),
+    percent = battery_model.percent,
 
     widget = dial,
 })
 
-battery:connect_signal('update', function()
-    _battery.percent = battery:get()
-    _battery.icon = battery:get('icon')
+battery_model:connect_signal('update', function()
+    _battery.percent = battery_model.percent
+    _battery.icon = battery_model.icon
 
 	-- layout_changed needed to update icon
     _battery:emit_signal('widget::layout_changed')
