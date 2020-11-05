@@ -8,8 +8,8 @@ local kb_switcher = require 'apps/kb_switcher'
 local tag_manager_view = require 'apps/tag_manager' 
 local tag_manager_model = require 'models/tag_manager' 
 
-local volume = require 'models/volume'
-local brightness = require 'models/brightness'
+local volume_model = require 'models/volume'
+local brightness_model = require 'models/brightness'
 
 --------------------------------------------------------------------------------
 -- INIT STATE
@@ -67,12 +67,12 @@ bindings.globalkeys = gears.table.join(
     awful.key({ modkey, 'Shift' }, 'r', function() awesome.restart() end),
     awful.key({ modkey, 'Shift' }, 'Escape', function() awesome.quit() end),
 
-    awful.key({ }, 'XF86AudioLowerVolume', function() volume:shift(-5) end),
-    awful.key({ }, 'XF86AudioRaiseVolume', function() volume:shift(5) end),
-    awful.key({ }, 'XF86AudioMute', function() volume:toggle() end),
+    awful.key({ }, 'XF86AudioLowerVolume', function() volume_model:shift(-5) end),
+    awful.key({ }, 'XF86AudioRaiseVolume', function() volume_model:shift(5) end),
+    awful.key({ }, 'XF86AudioMute', function() volume_model:toggle() end),
 
-    awful.key({ }, 'XF86MonBrightnessDown', function() brightness:shift(-8) end),
-    awful.key({ }, 'XF86MonBrightnessUp', function() brightness:shift(8) end),
+    awful.key({ }, 'XF86MonBrightnessDown', function() brightness_model:shift(-8) end),
+    awful.key({ }, 'XF86MonBrightnessUp', function() brightness_model:shift(8) end),
 
     awful.key({ modkey, 'Control' }, 'space', function() kb_switcher:start() end),
 

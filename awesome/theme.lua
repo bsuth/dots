@@ -77,17 +77,23 @@ function beautiful.hex2rgb(hex)
     }
 end
 
---------------------------------------------------------------------------------
--- WALLPAPER
---------------------------------------------------------------------------------
-
-local function set_wallpaper(screen)
+function beautiful.set_wallpaper(screen)
     gears.wallpaper.maximized(os.getenv('AWESOME') .. '/wallpaper.png', screen)
 end
 
+--------------------------------------------------------------------------------
+-- SIGNALS
+--------------------------------------------------------------------------------
+
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
-screen.connect_signal('property::geometry', set_wallpaper)
+screen.connect_signal('property::geometry', beautiful.set_wallpaper)
+
+--------------------------------------------------------------------------------
+-- RETURN
+--------------------------------------------------------------------------------
 
 awful.screen.connect_for_each_screen(function(s)
-    set_wallpaper(s)
+    beautiful.set_wallpaper(s)
 end)
+
+return beautiful
