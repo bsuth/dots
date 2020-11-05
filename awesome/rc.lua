@@ -1,3 +1,14 @@
+--------------------------------------------------------------------------------
+-- GLOBALS
+--------------------------------------------------------------------------------
+
+modkey = 'Mod4'
+submodkey = 'Mod1'
+
+--------------------------------------------------------------------------------
+-- MODULES
+--------------------------------------------------------------------------------
+
 local awful = require 'awful' 
 local beautiful = require 'beautiful' 
 local naughty = require 'naughty' 
@@ -17,8 +28,6 @@ require('awful.autofocus')
 awful.layout.layouts = {
 	awful.layout.suit.floating,
 }
-
-root.keys(bindings.globalkeys)
 
 --------------------------------------------------------------------------------
 -- SCRATCHPAD
@@ -88,7 +97,3 @@ end)
 client.connect_signal('mouse::enter', function(c)
     c:emit_signal('request::activate', 'mouse_enter', { raise = false })
 end)
-
--- Focus changes border color
-client.connect_signal('focus', function(c) c.border_color = beautiful.border_focus end)
-client.connect_signal('unfocus', function(c) c.border_color = beautiful.border_normal end)

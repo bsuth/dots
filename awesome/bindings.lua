@@ -12,15 +12,13 @@ local volume_model = require 'models/volume'
 local brightness_model = require 'models/brightness'
 
 --------------------------------------------------------------------------------
--- INIT STATE
+-- KEYBINDINGS
 --------------------------------------------------------------------------------
 
-local modkey = 'Mod4'
-local bindings = { modkey = modkey }
-
-local restore_tag = nil
-
-local clientbuffer = {}
+local bindings = {
+	clientbuffer = {},
+	restore_tag = nil,
+}
 
 awesome.connect_signal('startup', function()
     for s in screen do
@@ -40,12 +38,11 @@ end)
 
 awful.keygrabber({
     keybindings = {
-        {{ 'Mod1' }, 'Tab', function() awful.client.focus.byidx(1) end},
-        {{ 'Mod1', 'Shift' }, 'Tab', function() awful.client.focus.byidx(-1) end},
+        {{ submodkey }, 'Tab', function() awful.client.focus.byidx(1) end},
+        {{ submodkey, 'Shift' }, 'Tab', function() awful.client.focus.byidx(-1) end},
     },
 
-    -- Note that it is using the key name and not the modifier name.
-    stop_key = 'Mod1',
+    stop_key = submodkey,
     stop_event = 'release',
 
     start_callback = awful.client.focus.history.disable_tracking,
@@ -98,15 +95,15 @@ bindings.globalkeys = gears.table.join(
 				local scratchpad = awful.tag.find_by_name(s, 'scratchpad')
 
 				if scratchpad ~= nil then
-					restore_tag = current_screen.selected_tag
+					bindings.restore_tag = current_screen.selected_tag
 					scratchpad.screen = current_screen 
 					scratchpad:view_only()
 					break
 				end
 			end
-		elseif restore_tag ~= nil then
-			restore_tag:view_only()
-			restore_tag = nil
+		elseif bindings.restore_tag ~= nil then
+			bindings.restore_tag:view_only()
+			bindings.restore_tag = nil
 		end
 	end),
 
@@ -118,8 +115,8 @@ bindings.globalkeys = gears.table.join(
     awful.key({ modkey, 'Shift', 'Control' }, 'l', function() awful.tag.incmwfact(0.05) end),
     awful.key({ modkey }, ',', function () awful.layout.inc(1) end),
     awful.key({ modkey, 'Shift' }, 'm', function()
-		if #clientbuffer > 0 then
-			local c = table.remove(clientbuffer)
+		if #bindings.clientbuffer > 0 then
+			local c = table.remove(bindings.clientbuffer)
 			c:move_to_tag(awful.screen.focused().selected_tag)
 			c.minimized = false
 			client.focus = c
@@ -166,7 +163,7 @@ bindings.clientkeys = gears.table.join(
     {description = 'toggle fullscreen'}),
 
     awful.key({ modkey }, 'm', function(c)
-		table.insert(clientbuffer, c)
+		table.insert(bindings.clientbuffer, c)
 		c.minimized = true
 
 		-- Move to first tag to properly allow for automatic tag removal
@@ -210,4 +207,5 @@ bindings.clientbuttons = gears.table.join(
 -- RETURN
 --------------------------------------------------------------------------------
 
+root.keys(bindings.globalkeys)
 return bindings

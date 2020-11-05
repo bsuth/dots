@@ -95,9 +95,6 @@ popup = awful.popup({
 -- KEYGRABBER
 --------------------------------------------------------------------------------
 
-local modkey = 'Mod4'
-local submodkey = 'Mod1'
-
 keygrabber = awful.keygrabber({
     keybindings = {
         { { submodkey }, 'Tab', function() tag_manager_model:focus() end },

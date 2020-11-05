@@ -88,6 +88,10 @@ end
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
 screen.connect_signal('property::geometry', beautiful.set_wallpaper)
 
+-- Focus changes border color
+client.connect_signal('focus', function(c) c.border_color = beautiful.border_focus end)
+client.connect_signal('unfocus', function(c) c.border_color = beautiful.border_normal end)
+
 --------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------

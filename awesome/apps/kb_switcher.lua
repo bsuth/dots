@@ -58,7 +58,7 @@ popup = awful.popup({
 
 keygrabber = awful.keygrabber({
     keybindings = {
-        {{ 'Mod4', 'Control' }, 'space', function() kb_layout_model:next() end},
+        {{ modkey, 'Control' }, 'space', function() kb_layout_model:next() end},
     },
 
     stop_key = 'Control',
