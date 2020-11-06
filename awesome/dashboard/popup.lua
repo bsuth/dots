@@ -14,7 +14,7 @@ local popup = awful.popup({
     },
     ontop = true,
     visible = false,
-    bg = beautiful.colors.black,
+    bg = beautiful.colors.dimmed,
 })
 
 --------------------------------------------------------------------------------
@@ -24,27 +24,29 @@ local popup = awful.popup({
 function popup:init(widget)
     popup.widget = wibox.widget({
 		{
-			widget,
-			left = 50,
-			right = 50,
-			top = 50,
-			bottom = 50,
-			widget = wibox.container.margin,
+			{
+				widget,
+				left = 120,
+				right = 120,
+				top = 70,
+				bottom = 70,
+				widget = wibox.container.margin,
+			},
+			forced_width = 1200,
+			forced_height = 700,
+			shape = gears.shape.rounded_rect,
+			shape_border_width = 10,
+			bg = beautiful.colors.black,
+			widget = wibox.container.background,
 		},
-		shape = gears.shape.rounded_rect,
-		shape_border_width = 10,
-		widget = wibox.container.background,
+		widget = wibox.container.place,
     })
 end
 
 function popup:start()
     self.screen = awful.screen.focused()
-
-	self.x = self.screen.geometry.width * 0.1
-	self.y = self.screen.geometry.height * 0.1
-    self.widget.forced_width = self.screen.geometry.width * 0.8
-    self.widget.forced_height = self.screen.geometry.height * 0.8
-
+    self.widget.forced_width = self.screen.geometry.width
+    self.widget.forced_height = self.screen.geometry.height
     self.visible = true
 end
 

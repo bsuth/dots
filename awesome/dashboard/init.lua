@@ -23,13 +23,13 @@ local popup = require 'dashboard/popup'
 
 -- State --
 
-local _state = {}
+local state = {}
 
 -- Widgets --
 
-local _tabs_left = {}
-local _tabs_right = {}
-local _tab_content = {}
+local tabs_left_widget = {}
+local tabs_right_widget = {}
+local tab_content_widget = {}
 
 -- Other --
 
@@ -39,16 +39,16 @@ local api = {}
 -- LOCAL FUNCTIONS
 --------------------------------------------------------------------------------
 
-local function _set_focused_tab(tab, skip_keygrabber)
-    for _, _tab in ipairs(_state.tabs) do
+local function focus(tab, skip_keygrabber)
+    for _, _tab in ipairs(state.tabs) do
         _tab.button.shape_border_color = beautiful.colors.blacker
     end
 
-    _state.keygrabber:stop()
-    _state.keygrabber = awful.keygrabber({
+    state.keygrabber:stop()
+    state.keygrabber = awful.keygrabber({
         keybindings = gears.table.join(
             tab.keygrabber.keybindings or {},
-            _state.core_keybindings
+            state.core_keybindings
         ),
 
         start_callback = tab.keygrabber.start_callback,
@@ -56,18 +56,18 @@ local function _set_focused_tab(tab, skip_keygrabber)
         keypressed_callback = tab.keygrabber.keypressed_callback,
     })
 
-    _state.keygrabber:connect_signal('close_dashboard', api.stop)
+    state.keygrabber:connect_signal('close_dashboard', api.stop)
 
     if not skip_keygrabber then
-        _state.keygrabber:start()
+        state.keygrabber:start()
     end
 
     tab.button.shape_border_color = beautiful.colors.white
-    _tab_content:set(1, tab.widget)
-    _state.focused_tab = tab
+    tab_content_widget:set(1, tab.widget)
+    state.focused_tab = tab
 end
 
-local function _register_tab(tab)
+local function register(tab)
     tab.button = wibox.widget({
         {
             {
@@ -90,11 +90,11 @@ local function _register_tab(tab)
     })
 
     tab.button:connect_signal('button::press', function(_, _, _, button, _, _)
-        if button == 1 then _set_focused_tab(tab) end
+        if button == 1 then focus(tab) end
     end)
 
     popup:register_hover(tab.button)
-    table.insert(_state.tabs, tab)
+    table.insert(state.tabs, tab)
 
     return wibox.widget({
         tab.button,
@@ -107,12 +107,12 @@ end
 --------------------------------------------------------------------------------
 
 function api.start()
-    _state.keygrabber:start()
+    state.keygrabber:start()
     popup:start()
 end
 
 function api.stop()
-    _state.keygrabber:stop()
+    state.keygrabber:stop()
     popup:stop()
 end
 
@@ -124,7 +124,7 @@ end
 -- INIT STATE
 --------------------------------------------------------------------------------
 
-gears.table.crush(_state, {
+gears.table.crush(state, {
     focused_tab = tab_datetime,
     tabs = {},
     keygrabber = awful.keygrabber(),
@@ -140,14 +140,14 @@ gears.table.crush(_state, {
         {{ }, 'XF86MonBrightnessDown', function() brightness:shift(-8) end},
         {{ }, 'XF86MonBrightnessUp', function() brightness:shift(8) end},
 
-        {{ modkey }, 'f', function() _set_focused_tab(tab_datetime) end},
-        {{ modkey }, 'd', function() _set_focused_tab(tab_dmenu) end},
-        {{ modkey }, 's', function() _set_focused_tab(tab_todo) end},
-        {{ modkey }, 'a', function() _set_focused_tab(tab_weather) end},
-        {{ modkey }, 'j', function() _set_focused_tab(tab_notifications) end},
-        {{ modkey }, 'k', function() _set_focused_tab(tab_bluetooth) end},
-        {{ modkey }, 'l', function() _set_focused_tab(tab_wifi) end},
-        {{ modkey }, ';', function() _set_focused_tab(tab_printer) end},
+        {{ modkey }, 'f', function() focus(tab_datetime) end},
+        {{ modkey }, 'd', function() focus(tab_dmenu) end},
+        {{ modkey }, 's', function() focus(tab_todo) end},
+        {{ modkey }, 'a', function() focus(tab_weather) end},
+        {{ modkey }, 'j', function() focus(tab_notifications) end},
+        {{ modkey }, 'k', function() focus(tab_bluetooth) end},
+        {{ modkey }, 'l', function() focus(tab_wifi) end},
+        {{ modkey }, ';', function() focus(tab_printer) end},
     },
 })
 
@@ -155,11 +155,11 @@ gears.table.crush(_state, {
 -- WIDGET: TABS LEFT
 --------------------------------------------------------------------------------
 
-_tabs_left = wibox.widget({
-    _register_tab(tab_datetime),
-    _register_tab(tab_dmenu),
-    _register_tab(tab_todo),
-    _register_tab(tab_weather),
+tabs_left_widget = wibox.widget({
+    register(tab_datetime),
+    register(tab_dmenu),
+    register(tab_todo),
+    register(tab_weather),
     spacing = 50,
     layout = wibox.layout.flex.vertical,
 })
@@ -168,11 +168,11 @@ _tabs_left = wibox.widget({
 -- WIDGET: TABS RIGHT
 --------------------------------------------------------------------------------
 
-_tabs_right = wibox.widget({
-    _register_tab(tab_notifications),
-    _register_tab(tab_bluetooth),
-    _register_tab(tab_wifi),
-    _register_tab(tab_printer),
+tabs_right_widget = wibox.widget({
+    register(tab_notifications),
+    register(tab_bluetooth),
+    register(tab_wifi),
+    register(tab_printer),
     spacing = 50,
     layout = wibox.layout.flex.vertical,
 })
@@ -181,7 +181,7 @@ _tabs_right = wibox.widget({
 -- WIDGET: TAB CONTENT
 --------------------------------------------------------------------------------
 
-_tab_content = wibox.widget({
+tab_content_widget = wibox.widget({
     tab_datetime.widget,
     top_only = true,
     layout = wibox.layout.stack,
@@ -192,30 +192,20 @@ _tab_content = wibox.widget({
 --------------------------------------------------------------------------------
 
 popup:init(wibox.widget({
-    {
-        _tabs_left,
-        top = 50,
-        bottom = 50,
-        left = 50,
-        right = 50, 
+	{
+		tabs_left_widget,
+		right = 50,
         widget = wibox.container.margin,
-    },
+	},
     {
-        {
-            _tab_content,
-            margins = 50,
-            widget = wibox.container.margin,
-        },
+        tab_content_widget,
         widget = wibox.container.place,
     },
-    {
-        _tabs_right,
-        top = 50,
-        bottom = 50,
-        left = 50, 
-        right = 50,
+	{
+		tabs_right_widget,
+		left = 50,
         widget = wibox.container.margin,
-    },
+	},
     layout = wibox.layout.align.horizontal,
 }))
 
@@ -223,5 +213,5 @@ popup:init(wibox.widget({
 -- RETURN
 --------------------------------------------------------------------------------
 
-_set_focused_tab(tab_datetime, true)
+focus(tab_datetime, true)
 return api

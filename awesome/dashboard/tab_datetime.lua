@@ -14,15 +14,15 @@ local dial = require 'widgets/dial'
 
 -- Widgets --
 
-local _volume = {}
-local _brightness = {}
-local _battery = {}
+local volume_widget = {}
+local brightness_widget = {}
+local battery_widget = {}
 
 --------------------------------------------------------------------------------
 -- WIDGET: VOLUME
 --------------------------------------------------------------------------------
 
-_volume = wibox.widget({
+volume_widget = wibox.widget({
     forced_width = 100,
     forced_height = 100,
 
@@ -36,16 +36,11 @@ _volume = wibox.widget({
     widget = dial,
 })
 
-volume_model:connect_signal('update', function()
-    _volume.percent = volume_model.percent
-    _volume:emit_signal('widget::redraw_needed')
-end)
-
 --------------------------------------------------------------------------------
 -- WIDGET: BRIGHTNESS
 --------------------------------------------------------------------------------
 
-_brightness = wibox.widget({
+brightness_widget = wibox.widget({
     forced_width = 100,
     forced_height = 100,
 
@@ -59,16 +54,11 @@ _brightness = wibox.widget({
     widget = dial,
 })
 
-brightness_model:connect_signal('update', function()
-    _brightness.percent = brightness_model.percent
-    _brightness:emit_signal('widget::redraw_needed')
-end)
-
 --------------------------------------------------------------------------------
 -- WIDGET: BATTERY
 --------------------------------------------------------------------------------
 
-_battery = wibox.widget({
+battery_widget = wibox.widget({
     forced_width = 100,
     forced_height = 100,
 
@@ -79,13 +69,27 @@ _battery = wibox.widget({
     widget = dial,
 })
 
+--------------------------------------------------------------------------------
+-- SIGNALS
+--------------------------------------------------------------------------------
+
+volume_model:connect_signal('update', function()
+    volume_widget.percent = volume_model.percent
+    volume_widget:emit_signal('widget::redraw_needed')
+end)
+
+brightness_model:connect_signal('update', function()
+    brightness_widget.percent = brightness_model.percent
+    brightness_widget:emit_signal('widget::redraw_needed')
+end)
+
 battery_model:connect_signal('update', function()
-    _battery.percent = battery_model.percent
-    _battery.icon = battery_model.icon
+    battery_widget.percent = battery_model.percent
+    battery_widget.icon = battery_model.icon
 
 	-- layout_changed needed to update icon
-    _battery:emit_signal('widget::layout_changed')
-    _battery:emit_signal('widget::redraw_needed')
+    battery_widget:emit_signal('widget::layout_changed')
+    battery_widget:emit_signal('widget::redraw_needed')
 end)
 
 --------------------------------------------------------------------------------
@@ -159,13 +163,13 @@ return {
 				{
 					{
 						{
-							_volume,
-							_brightness,
+							volume_widget,
+							brightness_widget,
 							spacing = 50,
 							layout = wibox.layout.flex.horizontal,
 						},
 						{
-							_battery,
+							battery_widget,
 							widget = wibox.container.place,
 						},
 						layout = wibox.layout.flex.vertical,
