@@ -5,6 +5,8 @@ local wibox = require 'wibox'
 local volume_model = require 'models/volume'
 local brightness_model = require 'models/brightness'
 local battery_model = require 'models/battery'
+local ram_model = require 'models/ram'
+local cpu_model = require 'models/cpu'
 
 local dial = require 'widgets/dial' 
 
@@ -17,6 +19,8 @@ local dial = require 'widgets/dial'
 local volume_widget = {}
 local brightness_widget = {}
 local battery_widget = {}
+local ram_widget = {}
+local cpu_widget = {}
 
 --------------------------------------------------------------------------------
 -- WIDGET: VOLUME
@@ -70,6 +74,36 @@ battery_widget = wibox.widget({
 })
 
 --------------------------------------------------------------------------------
+-- WIDGET: RAM
+--------------------------------------------------------------------------------
+
+ram_widget = wibox.widget({
+    forced_width = 100,
+    forced_height = 100,
+
+    icon = beautiful.icon('ram'),
+    color = beautiful.colors.purple,
+    percent = ram_model.percent,
+
+    widget = dial,
+})
+
+--------------------------------------------------------------------------------
+-- WIDGET: CPI
+--------------------------------------------------------------------------------
+
+cpu_widget = wibox.widget({
+    forced_width = 100,
+    forced_height = 100,
+
+    icon = beautiful.icon('cpu'),
+    color = beautiful.colors.blue,
+    percent = cpu_model.percent,
+
+    widget = dial,
+})
+
+--------------------------------------------------------------------------------
 -- SIGNALS
 --------------------------------------------------------------------------------
 
@@ -92,12 +126,22 @@ battery_model:connect_signal('update', function()
     battery_widget:emit_signal('widget::redraw_needed')
 end)
 
+ram_model:connect_signal('update', function()
+    ram_widget.percent = ram_model.percent
+    ram_widget:emit_signal('widget::redraw_needed')
+end)
+
+cpu_model:connect_signal('update', function()
+    cpu_widget.percent = cpu_model.percent
+    cpu_widget:emit_signal('widget::redraw_needed')
+end)
+
 --------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------
 
 return {
-    icon = beautiful.icon('clock'),
+    icon = beautiful.icon('home'),
     keygrabber = {},
     widget = wibox.widget({
 		{
@@ -165,19 +209,25 @@ return {
 						{
 							volume_widget,
 							brightness_widget,
-							spacing = 50,
+							spacing = 75,
 							layout = wibox.layout.flex.horizontal,
 						},
-						{
-							battery_widget,
-							widget = wibox.container.place,
-						},
-						layout = wibox.layout.flex.vertical,
+						widget = wibox.container.place,
 					},
-					top = 10,
-					widget = wibox.container.margin,
+					{
+						{
+							ram_widget,
+							battery_widget,
+							cpu_widget,
+							spacing = 75,
+							layout = wibox.layout.flex.horizontal,
+						},
+						widget = wibox.container.place,
+					},
+					layout = wibox.layout.flex.vertical,
 				},
-				widget = wibox.container.place,
+				top = 10,
+				widget = wibox.container.margin,
 			},
 			layout = wibox.layout.fixed.vertical,
 		},

@@ -7,7 +7,7 @@ local volume = require 'models/volume'
 local brightness = require 'models/brightness'
 
 local tab_bluetooth = require 'dashboard/tab_bluetooth'
-local tab_datetime = require 'dashboard/tab_datetime'
+local tab_home = require 'dashboard/tab_home'
 local tab_dmenu = require 'dashboard/tab_dmenu'
 local tab_notifications = require 'dashboard/tab_notifications'
 local tab_printer = require 'dashboard/tab_printer'
@@ -125,7 +125,7 @@ end
 --------------------------------------------------------------------------------
 
 gears.table.crush(state, {
-    focused_tab = tab_datetime,
+    focused_tab = tab_home,
     tabs = {},
     keygrabber = awful.keygrabber(),
     core_keybindings = {
@@ -140,7 +140,7 @@ gears.table.crush(state, {
         {{ }, 'XF86MonBrightnessDown', function() brightness:shift(-8) end},
         {{ }, 'XF86MonBrightnessUp', function() brightness:shift(8) end},
 
-        {{ modkey }, 'f', function() focus(tab_datetime) end},
+        {{ modkey }, 'f', function() focus(tab_home) end},
         {{ modkey }, 'd', function() focus(tab_dmenu) end},
         {{ modkey }, 's', function() focus(tab_todo) end},
         {{ modkey }, 'a', function() focus(tab_weather) end},
@@ -156,7 +156,7 @@ gears.table.crush(state, {
 --------------------------------------------------------------------------------
 
 tabs_left_widget = wibox.widget({
-    register(tab_datetime),
+    register(tab_home),
     register(tab_dmenu),
     register(tab_todo),
     register(tab_weather),
@@ -182,7 +182,7 @@ tabs_right_widget = wibox.widget({
 --------------------------------------------------------------------------------
 
 tab_content_widget = wibox.widget({
-    tab_datetime.widget,
+    tab_home.widget,
     top_only = true,
     layout = wibox.layout.stack,
 })
@@ -213,5 +213,5 @@ popup:init(wibox.widget({
 -- RETURN
 --------------------------------------------------------------------------------
 
-focus(tab_datetime, true)
+focus(tab_home, true)
 return api
