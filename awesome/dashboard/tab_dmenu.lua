@@ -121,7 +121,7 @@ gears.table.crush(state, {
 	},
 })
 
-local dmenu_config_file = io.open('/home/bsuth/dots/awesome/__config/dmenu.lua', 'r')
+local dmenu_config_file = io.open(ROOT .. '/__config/dmenu.lua', 'r')
 
 if dmenu_config_file ~= nil then
     io.close(dmenu_config_file)

@@ -13,11 +13,13 @@ local model = {
 	new_todo_widget = nil,
 }
 
-local todo_fd = io.open('/home/bsuth/dots/awesome/__storage/todo.json', 'r')
+local todo_fd = io.open(ROOT .. '/__storage/todo.json', 'r')
 
 if todo_fd ~= nil then
 	model.todos = cjson.decode(todo_fd:read())
 	todo_fd:close()
+else
+	require('naughty').notify({text=''})
 end
 
 --------------------------------------------------------------------------------

@@ -1,25 +1,26 @@
+local awful = require 'awful'
+local beautiful = require 'beautiful'
+local gears = require 'gears'
+
+-- Autofocus another client when the current one is closed
+require('awful.autofocus')
+
 --------------------------------------------------------------------------------
 -- GLOBALS
 --------------------------------------------------------------------------------
 
 modkey = 'Mod4'
 submodkey = 'Mod1'
+ROOT = gears.filesystem.get_dir('config')
 
 --------------------------------------------------------------------------------
--- MODULES
+-- MY MODULES
 --------------------------------------------------------------------------------
-
-local awful = require 'awful' 
-local beautiful = require 'beautiful' 
-local naughty = require 'naughty' 
 
 require 'theme' 
 require 'views/meter_notify'
 local bindings = require 'bindings' 
 local layouts = require 'layouts'
-
--- Autofocus another client when the current one is closed
-require('awful.autofocus')
 
 --------------------------------------------------------------------------------
 -- SETTINGS
