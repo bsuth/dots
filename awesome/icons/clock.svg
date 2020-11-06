@@ -34,10 +34,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4"
-     inkscape:cx="82.877827"
-     inkscape:cy="71.821064"
+     inkscape:cx="38.002827"
+     inkscape:cy="51.821064"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g4538"
      showgrid="false"
      units="px"
      inkscape:window-width="1400"
@@ -77,19 +77,22 @@
      transform="translate(0,-263.13334)">
     <g
        id="g4538"
-       transform="matrix(1.9998262,0,0,1.9984174,0.11966095,-296.41041)">
+       transform="matrix(1.9998262,0,0,1.9984174,0.11966095,-296.41041)"
+       inkscape:label="root">
       <circle
          r="7.8531399"
          cy="288.47351"
          cx="8.4068308"
          id="path5199"
-         style="fill:#abb2bf;fill-opacity:1;stroke:#181818;stroke-width:1.22705317;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#abb2bf;fill-opacity:1;stroke:#181818;stroke-width:1.22705317;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:label="clock-bg" />
       <circle
          r="5.1308594"
          cy="288.45853"
          cx="8.3320379"
          id="path5293"
-         style="fill:#181818;fill-opacity:1;stroke:none;stroke-width:1.40229166;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#181818;fill-opacity:1;stroke:none;stroke-width:1.40229166;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:label="clock-fg" />
       <path
          d="m 9.8034254,288.57639 a 1.3367194,1.3367194 0 0 1 -1.4715952,1.09556 1.3367194,1.3367194 0 0 1 -1.1792743,-1.4054 1.3367194,1.3367194 0 0 1 1.3344579,-1.259 l 0,1.33672 z"
          sodipodi:end="4.712389"
@@ -100,19 +103,22 @@
          sodipodi:cx="8.4870138"
          sodipodi:type="arc"
          id="path5291"
-         style="fill:#abb2bf;fill-opacity:1;stroke:none;stroke-width:2.26352239;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#abb2bf;fill-opacity:1;stroke:none;stroke-width:2.26352239;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:label="clock-center" />
       <path
          inkscape:connector-curvature="0"
          id="rect5295"
          d="m 8.4870138,281.37063 c 0.2770892,0 0.5001611,0.23976 0.5001611,0.53758 v 6.18195 c 0,0.29782 -0.2230719,0.53759 -0.5001611,0.53759 -0.2770893,0 -0.5001612,-0.23977 -0.5001612,-0.53759 v -6.18195 c 0,-0.29782 0.2230719,-0.53758 0.5001612,-0.53758 z"
-         style="fill:#181818;fill-opacity:1;stroke:#abb2bf;stroke-width:0.24833079;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#181818;fill-opacity:1;stroke:#abb2bf;stroke-width:0.24833079;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:label="minute-hand" />
       <path
          inkscape:transform-center-x="-2.1196654"
          inkscape:transform-center-y="1.4350268"
          inkscape:connector-curvature="0"
          id="rect5295-7"
          d="m 13.031892,291.34123 c -0.158938,0.23477 -0.446289,0.31586 -0.644291,0.18181 l -4.1099397,-2.78246 c -0.1980017,-0.13404 -0.2294441,-0.43096 -0.070506,-0.66572 0.1589386,-0.23477 0.4462895,-0.31586 0.6442911,-0.18181 l 4.1099406,2.78245 c 0.198001,0.13405 0.229444,0.43097 0.0705,0.66573 z"
-         style="fill:#181818;fill-opacity:1;stroke:#abb2bf;stroke-width:0.2250728;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#181818;fill-opacity:1;stroke:#abb2bf;stroke-width:0.2250728;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:label="hour-hand" />
       <rect
          transform="rotate(-90)"
          rx="0"
@@ -122,7 +128,8 @@
          height="0.75360334"
          width="1.4584806"
          id="rect5355"
-         style="fill:#181818;fill-opacity:1;stroke:none;stroke-width:0.07775485;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:#181818;fill-opacity:1;stroke:none;stroke-width:0.07775485;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:label="hand-connector" />
     </g>
   </g>
 </svg>

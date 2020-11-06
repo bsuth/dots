@@ -1,39 +1,35 @@
-local gears = require 'gears' 
 
 --------------------------------------------------------------------------------
--- DECLARATIONS
+-- LAYOUT
 --------------------------------------------------------------------------------
 
-local _state = {}
-
---------------------------------------------------------------------------------
--- LOCAL FUNCTIONS
---------------------------------------------------------------------------------
-
-local function _refresh_cache(n)
-    local b = math.floor(math.sqrt(n)) 
-    local shortrow_ncols = math.floor(n / b)
-    local longrow_ncols = shortrow_ncols + 1
-    local nlongrows = n % b
-
-    _state.cache = {
-        n = n,
-        b = b,
-        shortrow_ncols = shortrow_ncols,
-        longrow_ncols = longrow_ncols,
-        nlongrows = nlongrows,
-        last_in_longrow = nlongrows * longrow_ncols - 1,
-    }
-end
+local grid = {
+	name = 'grid', -- required
+    cache = {},
+}
 
 --------------------------------------------------------------------------------
 -- FUNCTIONS
 --------------------------------------------------------------------------------
 
-function arrange_client(wa, i, n)
-    if n ~= _state.cache.n then _refresh_cache(n) end
+function grid.arrange_client(wa, i, n)
+    if n ~= grid.cache.n then 
+		local b = math.floor(math.sqrt(n)) 
+		local shortrow_ncols = math.floor(n / b)
+		local longrow_ncols = shortrow_ncols + 1
+		local nlongrows = n % b
 
-    local cache = _state.cache
+		grid.cache = {
+			n = n,
+			b = b,
+			shortrow_ncols = shortrow_ncols,
+			longrow_ncols = longrow_ncols,
+			nlongrows = nlongrows,
+			last_in_longrow = nlongrows * longrow_ncols - 1,
+		}
+	end
+
+    local cache = grid.cache
     local geometry = { height = wa.height / cache.b }
     local z = i - cache.last_in_longrow - 1
 
@@ -56,29 +52,17 @@ function arrange_client(wa, i, n)
     return geometry
 end
 
-function arrange(p)
+function grid.arrange(p)
     local wa = p.workarea
     local cls = p.clients
 
     for i = 1, #cls do
-        p.geometries[cls[i]] = arrange_client(wa, i - 1, #cls)
+        p.geometries[cls[i]] = grid.arrange_client(wa, i - 1, #cls)
     end
 end
-
---------------------------------------------------------------------------------
--- INIT STATE
---------------------------------------------------------------------------------
-
-gears.table.crush(_state, {
-    cache = { n = -1 },
-})
 
 --------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------
 
-return {
-    name = 'grid', -- required
-    arrange = arrange,
-    arrange_client = arrange_client,
-}
+return grid

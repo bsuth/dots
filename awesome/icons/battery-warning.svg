@@ -26,7 +26,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
-     inkscape:cx="47.475547"
+     inkscape:cx="58.659444"
      inkscape:cy="67.356293"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
@@ -45,7 +45,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -56,7 +56,15 @@
      transform="translate(0,-263.13332)">
     <g
        id="g827"
-       transform="translate(0,-0.17443255)">
+       transform="translate(0,-0.17443255)"
+       inkscape:label="exclamation">
+      <circle
+         r="1.3295983"
+         cy="288.25769"
+         cx="17.056114"
+         id="path2081"
+         style="fill:none;fill-opacity:1;stroke:#e06c75;stroke-width:2.63246989;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:label="dot" />
       <rect
          ry="1.1543446"
          y="271.05411"
@@ -64,19 +72,15 @@
          height="11.76551"
          width="2.3407474"
          id="rect2079"
-         style="fill:none;fill-opacity:1;stroke:#e06c75;stroke-width:2.95091915;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-      <circle
-         r="1.3295983"
-         cy="288.25769"
-         cx="17.056114"
-         id="path2081"
-         style="fill:none;fill-opacity:1;stroke:#e06c75;stroke-width:2.63246989;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+         style="fill:none;fill-opacity:1;stroke:#e06c75;stroke-width:2.95091915;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         inkscape:label="bar" />
     </g>
     <circle
        style="fill:none;fill-opacity:1;stroke:#e06c75;stroke-width:2.44996524;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path823"
        cx="16.933334"
        cy="280.06665"
-       r="15.708351" />
+       r="15.708351"
+       inkscape:label="circle" />
   </g>
 </svg>

@@ -1,6 +1,5 @@
 local awful = require 'awful' 
 local gears = require 'gears' 
-local naughty = require 'naughty' 
 
 local dashboard = require 'apps/dashboard' 
 local kb_switcher = require 'apps/kb_switcher' 
