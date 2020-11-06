@@ -8,7 +8,7 @@ local brightness_model = require 'models/brightness'
 local battery_model = require 'models/battery'
 local ram_model = require 'models/ram'
 
-local dashboard = require 'apps/dashboard'
+local dashboard = require 'dashboard'
 
 --------------------------------------------------------------------------------
 -- DECLARATIONS

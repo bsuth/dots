@@ -3,7 +3,7 @@ local gears = require 'gears'
 local naughty = require 'naughty'
 local wibox = require 'wibox' 
 
-local popup = require 'apps/dashboard/popup'
+local popup = require 'dashboard/popup'
 local switch = require 'widgets/switch' 
 
 --------------------------------------------------------------------------------

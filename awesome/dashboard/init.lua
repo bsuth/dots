@@ -6,16 +6,16 @@ local wibox = require 'wibox'
 local volume = require 'models/volume'
 local brightness = require 'models/brightness'
 
-local tab_bluetooth = require 'apps/dashboard/tab_bluetooth'
-local tab_datetime = require 'apps/dashboard/tab_datetime'
-local tab_dmenu = require 'apps/dashboard/tab_dmenu'
-local tab_notifications = require 'apps/dashboard/tab_notifications'
-local tab_printer = require 'apps/dashboard/tab_printer'
-local tab_todo = require 'apps/dashboard/tab_todo'
-local tab_weather = require 'apps/dashboard/tab_weather'
-local tab_wifi = require 'apps/dashboard/tab_wifi'
+local tab_bluetooth = require 'dashboard/tab_bluetooth'
+local tab_datetime = require 'dashboard/tab_datetime'
+local tab_dmenu = require 'dashboard/tab_dmenu'
+local tab_notifications = require 'dashboard/tab_notifications'
+local tab_printer = require 'dashboard/tab_printer'
+local tab_todo = require 'dashboard/tab_todo'
+local tab_weather = require 'dashboard/tab_weather'
+local tab_wifi = require 'dashboard/tab_wifi'
 
-local popup = require 'apps/dashboard/popup'
+local popup = require 'dashboard/popup'
 
 --------------------------------------------------------------------------------
 -- DECLARATIONS

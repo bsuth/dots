@@ -2,7 +2,7 @@ local beautiful = require 'beautiful'
 local gears = require 'gears'
 local wibox = require 'wibox'
 
-local popup = require 'apps/dashboard/popup'
+local popup = require 'dashboard/popup'
 local weather = require 'models/weather'
 
 --------------------------------------------------------------------------------

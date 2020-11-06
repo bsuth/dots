@@ -1,12 +1,10 @@
 local awful = require 'awful' 
 local gears = require 'gears' 
 
-local dashboard = require 'apps/dashboard' 
-local kb_switcher = require 'apps/kb_switcher' 
-
-local tag_manager_view = require 'apps/tag_manager' 
+local dashboard = require 'dashboard' 
+local kb_switcher_view = require 'views/kb_switcher' 
+local tag_manager_view = require 'views/tag_manager' 
 local tag_manager_model = require 'models/tag_manager' 
-
 local volume_model = require 'models/volume'
 local brightness_model = require 'models/brightness'
 
@@ -70,7 +68,7 @@ bindings.globalkeys = gears.table.join(
     awful.key({ }, 'XF86MonBrightnessDown', function() brightness_model:shift(-8) end),
     awful.key({ }, 'XF86MonBrightnessUp', function() brightness_model:shift(8) end),
 
-    awful.key({ modkey, 'Control' }, 'space', function() kb_switcher:start() end),
+    awful.key({ modkey, 'Control' }, 'space', function() kb_switcher_view:start() end),
 
     -- -------------------------------------------------------------------------
     -- Movement

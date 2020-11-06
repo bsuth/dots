@@ -14,7 +14,7 @@ local beautiful = require 'beautiful'
 local naughty = require 'naughty' 
 
 require 'theme' 
-require 'apps/meter_notify'
+require 'views/meter_notify'
 local bindings = require 'bindings' 
 local layouts = require 'layouts'
 
