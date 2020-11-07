@@ -13,8 +13,6 @@ local tab_weather = require 'dashboard/tab_weather'
 
 local tab_tbd_1 = require 'dashboard/tab_tbd_1'
 local tab_tbd_2 = require 'dashboard/tab_tbd_2'
-local tab_tbd_3 = require 'dashboard/tab_tbd_3'
-local tab_tbd_4 = require 'dashboard/tab_tbd_4'
 
 local popup = require 'dashboard/popup'
 
@@ -144,11 +142,9 @@ gears.table.crush(state, {
         {{ modkey }, 'f', function() focus(tab_home) end},
         {{ modkey }, 'd', function() focus(tab_dmenu) end},
         {{ modkey }, 's', function() focus(tab_notifications) end},
-        {{ modkey }, 'a', function() focus(tab_weather) end},
-        {{ modkey }, 'j', function() focus(tab_tbd_1) end},
-        {{ modkey }, 'k', function() focus(tab_tbd_2) end},
-        {{ modkey }, 'l', function() focus(tab_tbd_3) end},
-        {{ modkey }, ';', function() focus(tab_tbd_4) end},
+        {{ modkey }, 'j', function() focus(tab_weather) end},
+        {{ modkey }, 'k', function() focus(tab_tbd_1) end},
+        {{ modkey }, 'l', function() focus(tab_tbd_2) end},
     },
 })
 
@@ -160,7 +156,6 @@ tabs_left_widget = wibox.widget({
     register(tab_home),
     register(tab_dmenu),
     register(tab_notifications),
-    register(tab_weather),
     spacing = 50,
     layout = wibox.layout.flex.vertical,
 })
@@ -170,10 +165,9 @@ tabs_left_widget = wibox.widget({
 --------------------------------------------------------------------------------
 
 tabs_right_widget = wibox.widget({
+    register(tab_weather),
     register(tab_tbd_1),
     register(tab_tbd_2),
-    register(tab_tbd_3),
-    register(tab_tbd_4),
     spacing = 50,
     layout = wibox.layout.flex.vertical,
 })
