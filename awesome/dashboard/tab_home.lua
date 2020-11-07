@@ -9,6 +9,7 @@ local ram_model = require 'models/ram'
 local cpu_model = require 'models/cpu'
 
 local dial = require 'widgets/dial' 
+local popup = require 'dashboard/popup'
 
 --------------------------------------------------------------------------------
 -- DECLARATIONS
@@ -40,6 +41,8 @@ volume_widget = wibox.widget({
     widget = dial,
 })
 
+popup:register_hover(volume_widget, 'dot')
+
 --------------------------------------------------------------------------------
 -- WIDGET: BRIGHTNESS
 --------------------------------------------------------------------------------
@@ -57,6 +60,8 @@ brightness_widget = wibox.widget({
 
     widget = dial,
 })
+
+popup:register_hover(brightness_widget, 'dot')
 
 --------------------------------------------------------------------------------
 -- WIDGET: BATTERY

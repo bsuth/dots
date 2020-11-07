@@ -1,8 +1,6 @@
-# workstation-specific config
-**/__config/*
-**/__storage/*
+# workstation-specific files
+**/__*
 !**/__config/__*
-__*
 
 # nvim
 autoload/

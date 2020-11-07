@@ -8,15 +8,15 @@ local wibox = require 'wibox'
 
 -- Widgets --
 
-local _FIXME = {}
+local tbd_widget = {}
 
 --------------------------------------------------------------------------------
 -- WIDGET: TODO
 --------------------------------------------------------------------------------
 
-_FIXME = wibox.widget({
+tbd_widget = wibox.widget({
     {
-        markup = 'TODO',
+        markup = 'TBD',
         widget = wibox.widget.textbox,
     },
     margins = 100,
@@ -28,12 +28,7 @@ _FIXME = wibox.widget({
 --------------------------------------------------------------------------------
 
 return {
-    icon = beautiful.icon('todo'),
+    icon = beautiful.icon(''),
     keygrabber = {},
-    widget = wibox.widget({
-        _FIXME,
-        shape = gears.shape.rounded_rect,
-        bg = beautiful.colors.black,
-        widget = wibox.container.background,
-    }),
+    widget = tbd_widget,
 }

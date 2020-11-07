@@ -177,6 +177,7 @@ function _install_packages_() {
 		software-properties-common
 		curl
 		libupower-glib-dev
+		sysstat
 
 		# Utilities
 		pass
@@ -186,6 +187,7 @@ function _install_packages_() {
 		deepin-image-viewer
 		fcitx
 		fcitx-mozc
+		htop
 
 		# Development
 		make
