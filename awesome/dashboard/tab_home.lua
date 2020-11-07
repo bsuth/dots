@@ -114,6 +114,10 @@ cpu_widget = wibox.widget({
 
 volume_model:connect_signal('update', function()
     volume_widget.percent = volume_model.percent
+    volume_widget.icon = volume_model.icon
+
+	-- layout_changed needed to update icon
+    volume_widget:emit_signal('widget::layout_changed')
     volume_widget:emit_signal('widget::redraw_needed')
 end)
 

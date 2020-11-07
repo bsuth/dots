@@ -16,7 +16,7 @@ local model = _model.new({
 	percent = device.percentage,
 	discharging = true,
 	warning = false,
-    icon = '',
+    icon = beautiful.icon('battery-charging'),
 })
 
 --------------------------------------------------------------------------------

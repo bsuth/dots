@@ -197,7 +197,7 @@ scroll_dial_widget = wibox.widget({
 	forced_width = 50,
 	forced_height = 50,
 
-	color = beautiful.colors.green,
+	color = beautiful.colors.cyan,
 	percent = 0,
 
 	onscrollup = function(self) scroll(-1) end,
@@ -247,8 +247,10 @@ return {
             {{ 'Control' }, 'p', function() scroll(-1) end},
             {{ 'Control' }, 'n', function() scroll(1) end},
             {{ }, 'Return', function(self)
-				(list_items[state.selected].command)()
-				self:emit_signal('close_dashboard')
+				if state.selected ~= nil then
+					(list_items[state.selected].command)()
+					self:emit_signal('close_dashboard')
+				end
 			end},
         },
 

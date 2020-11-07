@@ -81,19 +81,24 @@ end
 awful.screen.connect_for_each_screen(function(s)
     s:connect_signal('tag::history::update', function()
 		local taglist = model.taglists[s.index]
-        local last_tag = taglist[#taglist].tag
-        if s.selected_tag == last_tag then return end
+        local last_tag = taglist[#taglist]
 
-        if #taglist > 1 and #last_tag:clients() == 0 then
-            while #last_tag:clients() == 0 do
-                model.counters[s.index] = model.counters[s.index] - 1
-                last_tag:delete()
-                taglist[#taglist] = nil
-                last_tag = taglist[#taglist].tag
-            end
+        if (
+			s.selected_tag == last_tag or
+			#taglist == 1 or 
+			#last_tag:clients() ~= 0
+		) then
+			return
+		end
 
-			model:emit_signal('update')
-        end
+		while #last_tag:clients() == 0 do
+			model.counters[s.index] = model.counters[s.index] - 1
+			last_tag:delete()
+			taglist[#taglist] = nil
+			last_tag = taglist[#taglist]
+		end
+
+		model:emit_signal('update')
     end)
 end)
 

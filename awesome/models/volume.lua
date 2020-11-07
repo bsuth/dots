@@ -1,4 +1,5 @@
 local awful = require 'awful' 
+local beautiful = require 'beautiful'
 
 local _model = require 'models/abstract'
 
@@ -10,6 +11,7 @@ local model = _model.new({
 	_modelname = 'volume',
 	percent = 0,
 	mute = false,
+	icon = beautiful.icon('volume'),
 })
 
 awful.spawn.easy_async_with_shell(
@@ -32,8 +34,9 @@ end
 
 function model:toggle()
     self.mute = not self.mute
+	self.icon = beautiful.icon(self.mute and 'volume-mute' or 'volume')
     awful.spawn('amixer sset Master toggle')
-    self:emit_signal('toggle', self.mute)
+    self:emit_signal('update', self.mute)
 end
 
 --------------------------------------------------------------------------------
