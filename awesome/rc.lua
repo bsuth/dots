@@ -27,7 +27,7 @@ local layouts = require 'layouts'
 --------------------------------------------------------------------------------
 
 awful.layout.layouts = {
-	awful.layout.suit.floating,
+	layouts.single,
 }
 
 --------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ awful.rules.rules = {
             buttons = bindings.clientbuttons,
 
             raise = true,
-			floating = true,
+			floating = false,
 			maximized = false,
 
 			x = 100,
@@ -66,12 +66,6 @@ awful.rules.rules = {
             focus = awful.client.focus.filter,
             screen = awful.screen.preferred,
             placement = awful.placement.no_overlap+awful.placement.no_offscreen,
-
-			callback = function(c)
-				if awful.screen.focused().selected_tag == scratchpad then
-					c.floating = false
-				end
-			end,
         },
     },
 }

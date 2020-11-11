@@ -22,7 +22,7 @@ awesome.connect_signal('startup', function()
         for _, tag in ipairs(s.tags) do
 			for _, c in ipairs(tag:clients()) do
 				if c.minimized then
-					table.insert(_state.clients, c)
+					table.insert(bindings.clientbuffer, c)
 				end
 			end
 		end
@@ -189,10 +189,10 @@ bindings.clientbuttons = gears.table.join(
         c:emit_signal('request::activate', 'mouse_click', {raise = true})
     end),
 
-    -- awful.button({ 'Shift' }, 1, function (c)
-    --     c:emit_signal('request::activate', 'mouse_click', {raise = true})
-    --     awful.mouse.client.move(c)
-    -- end),
+    awful.button({ submodkey, 'Control' }, 1, function (c)
+        c:emit_signal('request::activate', 'mouse_click', {raise = true})
+        awful.mouse.client.move(c)
+    end),
 
     awful.button({ 'Control', 'Shift' }, 1, function (c)
         c:emit_signal('request::activate', 'mouse_click', {raise = true})

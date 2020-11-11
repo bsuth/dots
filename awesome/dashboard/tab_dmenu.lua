@@ -114,6 +114,7 @@ gears.table.crush(state, {
 	scroll_offset = 0,
 
 	commands = {
+		vscode = function() awful.spawn('code') end,
 		flameshot = function() awful.spawn('flameshot gui') end,
 		sleep = function() awful.spawn('systemctl suspend') end,
 		reboot = function() awful.spawn('/sbin/reboot') end,

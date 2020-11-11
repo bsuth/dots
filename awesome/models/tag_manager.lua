@@ -22,7 +22,7 @@ function model:add(focus, s)
 
 	local tag = awful.tag.add(tostring(self.counters[s.index]), {
 		screen = s,
-		layout = awful.layout.suit.tile,
+		layout = awful.layout.layouts[1],
 	})
 
     if focus then tag:view_only() end
@@ -84,6 +84,7 @@ awful.screen.connect_for_each_screen(function(s)
         local last_tag = taglist[#taglist]
 
         if (
+			s.selected_tag.name == 'scratchpad' or
 			s.selected_tag == last_tag or
 			#taglist == 1 or 
 			#last_tag:clients() ~= 0

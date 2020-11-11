@@ -5,6 +5,7 @@
 ROOT = '/home/bsuth/dots/nvim'
 package.path = package.path .. (';%s/?.lua'):format(ROOT)
 nvim = vim.api
+default_map_args = { noremap = true }
 
 -- -----------------------------------------------------------------------------
 -- AUTOINSTALL VIM-PLUG
@@ -249,14 +250,12 @@ local tmap = {
 	['<c-[>'] = '<c-\\><c-n>',
 }
 
-local default_args = { noremap = true }
-
 for mode, map in pairs({ n = nmap, v = vmap, t = tmap }) do
 	for from, to in pairs(map) do
 		if type(to) == 'table' then
 			nvim.nvim_set_keymap(mode, from, to[1], to[2])
 		else
-			nvim.nvim_set_keymap(mode, from, to, default_args)
+			nvim.nvim_set_keymap(mode, from, to, default_map_args)
 		end
 	end
 end

@@ -167,6 +167,7 @@ function _install_packages_() {
 		# System
 		sudo
 		xorg
+		xserver-xephyr
 		pulseaudio
 		pulseaudio-module-bluetooth
 		alsa-utils

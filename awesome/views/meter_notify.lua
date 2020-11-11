@@ -200,7 +200,7 @@ cpu_model:connect_signal('warning', function()
 	notify(show_cpu_warning)
 end)
 
-ram_model:connect_signal('clear_warning', function()
+cpu_model:connect_signal('clear_warning', function()
     state.cpu_warning = false
     state.timer:again()
 end)
