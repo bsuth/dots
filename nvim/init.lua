@@ -140,11 +140,12 @@ nvim.nvim_call_function('coc#add_extension', {
 -- AUGROUPS
 -- -----------------------------------------------------------------------------
 
-local XDG_EXTS = {
+local XDG_OPENERS = {
 	images = {
-		png = true,
-		jpeg = true,
-		jpg = true,
+		png = 'nomacs',
+		jpeg = 'nomacs',
+		jpg = 'nomacs',
+		pdf = 'xournal',
 	},
 }
 
@@ -155,8 +156,10 @@ function bsuth_dirvish_xdg_open()
 	local basename = file:match('([^/]+)$')
 	local ext = basename and basename:match('.+%.(.+)$')
 
-	if XDG_EXTS['images'][ext] then
-		nvim.nvim_command(('silent !gthumb %s & disown'):format(file))
+	local img_opener = XDG_OPENERS['images'][ext]
+
+	if img_opener ~= nil then
+		nvim.nvim_command(('silent !nohup %s %s'):format(img_opener, file))
 	else
 		nvim.nvim_call_function('dirvish#open', {'edit', 0})
 		nvim.nvim_command('cd ' .. dir)

@@ -1,10 +1,9 @@
 local awful = require 'awful' 
 local gears = require 'gears' 
+local naughty = require 'naughty' 
 
 local dashboard = require 'dashboard' 
 local kb_switcher_view = require 'views/kb_switcher' 
-local tag_manager_view = require 'views/tag_manager' 
-local tag_manager_model = require 'models/tag_manager' 
 local volume_model = require 'models/volume'
 local brightness_model = require 'models/brightness'
 
@@ -13,7 +12,6 @@ local brightness_model = require 'models/brightness'
 --------------------------------------------------------------------------------
 
 local bindings = {
-	clientbuffer = {},
 	restore_tag = nil,
 }
 
@@ -22,7 +20,7 @@ awesome.connect_signal('startup', function()
         for _, tag in ipairs(s.tags) do
 			for _, c in ipairs(tag:clients()) do
 				if c.minimized then
-					table.insert(bindings.clientbuffer, c)
+			        c:move_to_tag(awful.clientbuffer)
 				end
 			end
 		end
@@ -33,10 +31,32 @@ end)
 -- ALT TAB
 --------------------------------------------------------------------------------
 
+local function alt_tab(idx)
+    client.focus.above = false
+    awful.client.focus.byidx(idx)
+    client.focus.above = true
+end
+
+local function alt_backtick(idx)
+    local s = awful.screen.focused()
+    local n = tonumber(s.selected_tag.name)
+    if n == nil then return end
+
+    for i = idx, 7 * idx, idx do
+        local tag = s.tags[1 + (n - 1 + i) % 9]
+        if #tag:clients() > 0 then
+            tag:view_only()
+            return
+        end
+    end
+end
+
 awful.keygrabber({
     keybindings = {
-        {{ submodkey }, 'Tab', function() awful.client.focus.byidx(1) end},
-        {{ submodkey, 'Shift' }, 'Tab', function() awful.client.focus.byidx(-1) end},
+        {{ submodkey }, 'Tab', function() alt_tab(1) end},
+        {{ submodkey, 'Shift' }, 'Tab', function() alt_tab(-1) end},
+        {{ submodkey }, '`', function() alt_backtick(1) end},
+        {{ submodkey, 'Shift' }, '`', function() alt_backtick(-1) end},
     },
 
     stop_key = submodkey,
@@ -112,8 +132,9 @@ bindings.globalkeys = gears.table.join(
     awful.key({ modkey, 'Shift', 'Control' }, 'l', function() awful.tag.incmwfact(0.05) end),
     awful.key({ modkey }, ',', function () awful.layout.inc(1) end),
     awful.key({ modkey, 'Shift' }, 'm', function()
-		if #bindings.clientbuffer > 0 then
-			local c = table.remove(bindings.clientbuffer)
+        local clients = awful.clientbuffer:clients()
+		if #clients > 0 then
+			local c = clients[#clients]
 			c:move_to_tag(awful.screen.focused().selected_tag)
 			c.minimized = false
 			client.focus = c
@@ -125,8 +146,8 @@ bindings.globalkeys = gears.table.join(
     -- -------------------------------------------------------------------------
 
     awful.key({ modkey }, 'space', function() dashboard.start() end),
-    awful.key({ modkey }, 'Alt_L', function() tag_manager_view:start() end),
-    awful.key({ modkey, 'Shift' }, '=', function() tag_manager_model:add(true) end),
+    -- awful.key({ modkey }, 'Alt_L', function() tag_manager_view:start() end),
+    -- awful.key({ modkey, 'Shift' }, '=', function() tag_manager_model:add(true) end),
 
     -- -------------------------------------------------------------------------
     -- Spawners
@@ -148,6 +169,25 @@ bindings.clientkeys = gears.table.join(
 
     awful.key({ modkey, 'Shift' }, 'q', function(c) c:kill() end),
 
+    awful.key({ modkey, submodkey, 'Shift' }, 'i', function(c)
+        local msg = 'name: ' .. c.name
+
+        local attrs= { 
+            'instance',
+            'class',
+            'role',
+            'type',
+            'floating',
+            'maximized',
+        }
+
+        for i, attr in ipairs(attrs) do
+            msg = ("%s\n%s: %s"):format(msg, attr, c[attr])
+        end
+
+        naughty.notify({text = msg})
+    end),
+
     -- -------------------------------------------------------------------------
     -- Layout
     -- -------------------------------------------------------------------------
@@ -160,11 +200,8 @@ bindings.clientkeys = gears.table.join(
     {description = 'toggle fullscreen'}),
 
     awful.key({ modkey }, 'm', function(c)
-		table.insert(bindings.clientbuffer, c)
+		c:move_to_tag(awful.clientbuffer)
 		c.minimized = true
-
-		-- Move to first tag to properly allow for automatic tag removal
-		c:move_to_tag(awful.screen.focused().tags[1])
 	end)
 )
 
@@ -203,6 +240,27 @@ bindings.clientbuttons = gears.table.join(
 --------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------
+
+-- Bind all key numbers to tags.
+for i = 1, 9 do
+    bindings.globalkeys = gears.table.join(bindings.globalkeys,
+        awful.key({ modkey }, "#" .. i + 9, function ()
+            local screen = awful.screen.focused()
+            local tag = screen.tags[i]
+
+            if tag then
+                tag:view_only()
+            end
+        end),
+        awful.key({ modkey, "Shift" }, "#" .. i + 9, function ()
+            local c = client.focus
+            if c ~= nil then
+                local tag = c.screen.tags[i]
+                if tag then c:move_to_tag(tag) end
+            end
+        end)
+    )
+end
 
 root.keys(bindings.globalkeys)
 return bindings

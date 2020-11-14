@@ -23,18 +23,37 @@ local bindings = require 'bindings'
 local layouts = require 'layouts'
 
 --------------------------------------------------------------------------------
--- SETTINGS
+-- LAYOUTS
 --------------------------------------------------------------------------------
 
 awful.layout.layouts = {
-	layouts.single,
+    awful.layout.suit.max,
 }
 
 --------------------------------------------------------------------------------
--- SCRATCHPAD
+-- TAGS
 --------------------------------------------------------------------------------
 
-local scratchpad = awful.tag.add('scratchpad', {
+awful.screen.connect_for_each_screen(function(s)
+    awful.tag({ '1', '2', '3', '4', '5', '6', '7', '8', '9' }, s, awful.layout.layouts[1])
+
+    s:connect_signal('tag::history::update', function()
+        -- restore focus to above client
+        for _, c in ipairs(s.selected_tag:clients()) do
+            if c.above then
+                c:emit_signal('request::activate')
+                return
+            end
+        end
+    end)
+end)
+
+awful.scratchpad = awful.tag.add('scratchpad', {
+	layout = layouts.grid,
+	screen = awful.screen.focused(),
+})
+
+awful.clientbuffer = awful.tag.add('clientbuffer', {
 	layout = layouts.grid,
 	screen = awful.screen.focused(),
 })
@@ -44,7 +63,6 @@ local scratchpad = awful.tag.add('scratchpad', {
 --------------------------------------------------------------------------------
 
 awful.rules.rules = {
-    -- All clients will match this rule.
     { 
         rule = { },
         properties = {
@@ -58,15 +76,34 @@ awful.rules.rules = {
 			floating = false,
 			maximized = false,
 
-			x = 100,
-			y = 75,
-			width = 1400,
-			height = 750,
-
             focus = awful.client.focus.filter,
             screen = awful.screen.preferred,
             placement = awful.placement.no_overlap+awful.placement.no_offscreen,
         },
+    },
+    
+    { 
+        rule_any = {
+            instance = {
+                "copyq",  -- Includes session name in class.
+                "pinentry",
+            },
+            class = {
+                "Arandr",
+            },
+
+            -- Note that the name property shown in xprop might be set slightly after creation of the client
+            -- and the name shown there might not match defined rules here.
+            name = {
+                "Event Tester",  -- xev.
+            },
+            role = {
+                "pop-up",       -- Google Chrome's (detached) Developer Tools.
+            }
+        },
+        properties = {
+            floating = true,
+        }
     },
 }
 
@@ -83,8 +120,10 @@ client.connect_signal('manage', function (c)
         end
     else
         -- Set the windows at the slave,
-        -- i.e. put it at the end of others instead of setting it master.
+        -- i.e. put it at the end of others instead of setting it as master.
+        client.focus.above = false
         awful.client.setslave(c)
+        c.above = true
     end
 end)
 

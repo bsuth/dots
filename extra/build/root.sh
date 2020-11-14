@@ -185,6 +185,7 @@ function _install_packages_() {
 		physlock
 		fd-find
 		flameshot
+		xournal
 		deepin-image-viewer
 		fcitx
 		fcitx-mozc
