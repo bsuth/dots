@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Exec=/home/bsuth/Documents/scripts/startup
+X-GNOME-Autostart-enabled=true
+NoDisplay=false
+Hidden=false
+Name[en_US]=startup
+Comment[en_US]=No description
+X-GNOME-Autostart-Delay=0

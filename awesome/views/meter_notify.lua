@@ -196,8 +196,8 @@ ram_model:connect_signal('clear_warning', function()
 end)
 
 cpu_model:connect_signal('warning', function()
-    state.cpu_warning = true
-	notify(show_cpu_warning)
+    -- state.cpu_warning = true
+	-- notify(show_cpu_warning)
 end)
 
 cpu_model:connect_signal('clear_warning', function()

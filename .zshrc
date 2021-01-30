@@ -41,17 +41,45 @@ zplugin light zdharma/history-search-multi-word
 zplugin light denysdovhan/spaceship-prompt
 
 # ------------------------------------------------------------------------------
+# ENVIRONMENT
+# ------------------------------------------------------------------------------
+
+export SHELL='/bin/zsh'
+export EDITOR=nvim
+export TMPDIR='/tmp'
+
+export HISTFILE=~/.zsh_history
+export HISTSIZE=10000
+export SAVEHIST=10000
+
+export FZF_DEFAULT_COMMAND='rg --files -L'
+export FZF_DEFAULT_OPTS='--exact'
+
+export SPACESHIP_PROMPT_ORDER=(
+  time          # Time stamps section
+  user          # Username section
+  dir           # Current directory section
+  host          # Hostname section
+  git           # Git section (git_branch + git_status)
+  node          # Node.js section
+  pyenv         # Python
+  venv          # Python venv
+  line_sep      # Line break
+  battery       # Battery level and status
+  vi_mode       # Vi-mode indicator
+  jobs          # Background jobs indicator
+  exit_code     # Exit code section
+  char          # Prompt character
+)
+
+export PATH="$HOME/.local/bin:$PATH"
+
+# ------------------------------------------------------------------------------
 # ALIASES
 # ------------------------------------------------------------------------------
 
 alias l='ls -1 --color=auto --group-directories-first'
 alias vi='nvim'
 alias vim='nvim'
-
-# ------------------------------------------------------------------------------
-# CONFIG
-# ------------------------------------------------------------------------------
-
-[[ -f $ZSH/__zshrc ]] && source $ZSH/__zshrc
 
 # vim: syntax=zsh
