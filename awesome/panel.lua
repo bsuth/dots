@@ -178,15 +178,6 @@ models.battery:connect_signal('update', function()
 end)
 
 -- -----------------------------------------------------------------------------
--- NOTIFICATIONS
--- -----------------------------------------------------------------------------
-
-local notifications = wibox.widget {
-    image = beautiful.icon('volume'),
-	widget = wibox.widget.imagebox,
-}
-
--- -----------------------------------------------------------------------------
 -- PANEL
 -- -----------------------------------------------------------------------------
 
@@ -201,7 +192,6 @@ return {
 			volume,
 			brightness,
 			battery,
-			notifications,
 			-- wibox.widget.systray(),
 			layout = wibox.layout.fixed.horizontal,
 		}
