@@ -8,8 +8,7 @@ local naughty = require 'naughty'
 --------------------------------------------------------------------------------
 
 local colors = {
-    -- black = '#282c34',
-    black = '#181818',
+    black = '#282c34',
     red = '#e06c75',
     green = '#98c379',
     yellow = '#e5c07b',
@@ -30,7 +29,7 @@ local colors = {
 -- THEME
 --------------------------------------------------------------------------------
 
-beautiful.init({
+beautiful.init {
     colors = colors,
 
     font = 'Titan One 16',
@@ -48,17 +47,32 @@ beautiful.init({
     notification_font = 'Quicksand Medium 16',
     notification_bg = '#181818',
     notification_fg = colors.purple,
-    notification_margin = 15,
-    notification_border_width = 5,
-    notification_border_color = '#0000',
-})
+    notification_border_color = colors.purple,
+    notification_shape = function(cr, width, height)
+        gears.shape.transform(gears.shape.infobubble)
+            :rotate_at(width / 2, height / 2, math.pi)
+                (cr, width, height, 20, 20, 30)
+    end,
+}
 
--- Some notification theme properties don't get overridden by default, so we
--- have to directly set them here. See defaults here:
+-- Some notification theme properties don't get overridden by the beautiful
+-- variables, so we have to directly set them here. See defaults here:
 -- https://awesomewm.org/doc/api/libraries/naughty.html#config.defaults
-naughty.config.defaults.margin = 15
-naughty.config.defaults.border_width = dpi(25)
-naughty.config.defaults.position = 'bottom_right'
+naughty.config.padding = 20
+naughty.config.default = {
+	timeout = 5,
+	ontop = true,
+	margin = dpi(5),
+	border_width = dpi(5),
+	position = 'bottom_right',
+}
+naughty.config.notify_callback = function(args)
+    args.text = ([[
+<span size='medium' weight='bold'>  Broadcast Received  </span>
+<span size='small'>  %s  </span>
+	]]):format(args.text)
+	return args
+end
 
 --------------------------------------------------------------------------------
 -- FUNCTIONS

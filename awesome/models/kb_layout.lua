@@ -1,5 +1,4 @@
 local awful = require 'awful' 
-
 local _model = require 'models/abstract'
 
 --------------------------------------------------------------------------------

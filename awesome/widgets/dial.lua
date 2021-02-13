@@ -6,7 +6,12 @@ local wibox = require 'wibox'
 -- DIAL
 --------------------------------------------------------------------------------
 
-local dial = {}
+local dial = {
+	percent = 0,
+	color = beautiful.colors.green,
+	background = beautiful.colors.black,
+	border_width = 10,
+}
 
 --------------------------------------------------------------------------------
 -- METHODS
@@ -19,15 +24,14 @@ end
 
 function dial:draw(_, cr, width, height)
     local m = math.min(width, height)
-    local thickness = m / 5
 
-    local bg = beautiful.hex2rgb(beautiful.colors.blacker)
+    local bg = beautiful.hex2rgb(self.background)
     cr:set_source_rgb(bg[1], bg[2], bg[3])
-    gears.shape.arc(cr, m, m, thickness, 0, 2*math.pi)
+    gears.shape.arc(cr, m, m, self.border_width, 0, 2*math.pi)
     cr:fill()
 
     if self.percent and self.percent > 0 then
-        local fg = beautiful.hex2rgb(self.color or beautiful.colors.green)
+        local fg = beautiful.hex2rgb(self.color)
         cr:set_source_rgb(fg[1], fg[2], fg[3])
 
         -- 98 is close enough so round (plus, battery percent never reaches
@@ -39,14 +43,14 @@ function dial:draw(_, cr, width, height)
             -- avoid this, we always draw a small circle centered at theta_end
             -- to mimic the rounded end, and just draw a rounded start for the
             -- actual arc.
-            cr:arc(m / 2, thickness / 2, thickness / 2, 0, 2*math.pi)
+            cr:arc(m / 2, self.border_width / 2, self.border_width / 2, 0, 2*math.pi)
             cr:fill()
 
             local theta_end = 3 * math.pi / 2
             local theta_start = theta_end - (self.percent / 100) * (2 * math.pi)
-            gears.shape.arc(cr, m, m, thickness, theta_start, theta_end, true, false)
+            gears.shape.arc(cr, m, m, self.border_width, theta_start, theta_end, true, false)
         else
-            gears.shape.arc(cr, m, m, thickness, 0, 2 * math.pi)
+            gears.shape.arc(cr, m, m, self.border_width, 0, 2 * math.pi)
         end
 
         cr:fill()
@@ -57,8 +61,9 @@ end
 
 function dial:layout(_, width, height)
     local m = math.min(width, height)
+
     local icon_padding = 10
-    local icon_offset = m / 5 + icon_padding
+    local icon_offset = self.border_width + icon_padding
     local icon_size = m - (2 * icon_offset)
 
     return {
@@ -70,16 +75,6 @@ function dial:layout(_, width, height)
             widget = wibox.container.place,
         }), icon_offset, icon_offset, icon_size, icon_size),
     }
-end
-
-function dial:onscroll(_, _, button, _, _)
-    if button == 4 and self.onscrollup~= nil then
-        self:onscrollup()
-        self:emit_signal('widget::redraw_needed')
-    elseif button == 5 and self.onscrolldown ~= nil then
-        self:onscrolldown()
-        self:emit_signal('widget::redraw_needed')
-    end
 end
 
 --------------------------------------------------------------------------------
@@ -96,7 +91,24 @@ return setmetatable(dial, {
         -- metatable set!
         gears.table.crush(newdial, dial, true)
 
-        newdial:connect_signal('button::press', dial.onscroll)
+		newdial:connect_signal('mouse::enter', function()
+			mouse.current_wibox.cursor = 'sb_v_double_arrow'
+		end)
+
+		newdial:connect_signal('mouse::leave', function()
+			mouse.current_wibox.cursor = 'arrow'
+		end)
+
+        newdial:connect_signal('button::press', function(self, _, _, button, _, _)
+			if button == 4 and self.onscrollup~= nil then
+				self:onscrollup()
+				self:emit_signal('widget::redraw_needed')
+			elseif button == 5 and self.onscrolldown ~= nil then
+				self:onscrolldown()
+				self:emit_signal('widget::redraw_needed')
+			end
+		end)
+
         return newdial
     end,
 })

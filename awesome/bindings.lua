@@ -50,7 +50,7 @@ local function alt_backtick(idx)
     end
 end
 
-awful.keygrabber({
+awful.keygrabber {
     keybindings = {
         {{ 'Mod1' }, 'Tab', function() alt_tab(1) end},
         {{ 'Mod1', 'Shift' }, 'Tab', function() alt_tab(-1) end},
@@ -65,7 +65,7 @@ awful.keygrabber({
     stop_callback = awful.client.focus.history.enable_tracking,
 
     export_keybindings = true,
-})
+}
 
 --------------------------------------------------------------------------------
 -- GLOBAL KEYS
@@ -88,6 +88,11 @@ bindings.globalkeys = gears.table.join(
     awful.key({ }, 'XF86MonBrightnessUp', function() brightness_model:shift(8) end),
 
     awful.key({ 'Mod4', 'Control' }, 'space', function() kb_switcher_view:start() end),
+
+    awful.key({ 'Mod4' }, "n", function()
+        local wibar = awful.screen.focused().wibar
+        wibar.visible = not wibar.visible
+    end),
 
     -- -------------------------------------------------------------------------
     -- Movement
@@ -195,7 +200,7 @@ bindings.clientkeys = gears.table.join(
             msg = ("%s\n%s: %s"):format(msg, attr, c[attr])
         end
 
-        naughty.notify({text = msg})
+        naughty.notify {text = msg}
     end),
 
     -- -------------------------------------------------------------------------

@@ -1,18 +1,17 @@
 local awful = require 'awful' 
 local beautiful = require 'beautiful'
-
 local _model = require 'models/abstract'
 
 --------------------------------------------------------------------------------
 -- MODEL
 --------------------------------------------------------------------------------
 
-local model = _model.new({
+local model = _model.new {
 	_modelname = 'volume',
 	percent = 0,
 	mute = false,
 	icon = beautiful.icon('volume'),
-})
+}
 
 awful.spawn.easy_async_with_shell(
     [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[([0-9]+)%\].*/\1/' ]],
