@@ -27,62 +27,70 @@ local config = {
 }
 
 -- -----------------------------------------------------------------------------
--- TAGLIST ITEM
+-- TAGLIST
 -- -----------------------------------------------------------------------------
 
-function taglist_item(s, index)
-	local planet = wibox.widget {
-		image = beautiful.icon('space/planets/' .. config.planets[index]),
-		widget = wibox.widget.imagebox,
+function taglist(s)
+	local template = {
+		layout = wibox.layout.fixed.horizontal,
 	}
 
-	local spaceship = wibox.widget {
-		image = beautiful.icon('space/spaceship-at-rest'),
-		widget = wibox.widget.imagebox,
-	}
+	for i = 1, 9 do
+		local planet = wibox.widget {
+			image = beautiful.icon('space/planets/' .. config.planets[i]),
+			widget = wibox.widget.imagebox,
+		}
 
-	local moon = wibox.widget {
-		image = beautiful.icon('space/moon'),
-		widget = wibox.widget.imagebox,
-	}
+		local spaceship = wibox.widget {
+			image = beautiful.icon('space/spaceship-at-rest'),
+			widget = wibox.widget.imagebox,
+		}
 
-	function update()
-		spaceship:set_visible(s.selected_tag.index == index)
-		moon:set_visible(#s.tags[index]:clients() > 0)
-		planet:emit_signal('widget::redraw_needed')
-	end
+		local moon = wibox.widget {
+			image = beautiful.icon('space/moon'),
+			widget = wibox.widget.imagebox,
+		}
 
-	s:connect_signal('tag::history::update', update)
-	s.tags[index]:connect_signal('tagged', update)
-	s.tags[index]:connect_signal('untagged', update)
-	update()
+		function update()
+			spaceship:set_visible(s.selected_tag.index == i)
+			moon:set_visible(#s.tags[i]:clients() > 0)
+			planet:emit_signal('widget::redraw_needed')
+		end
 
-	return wibox.widget {
-		{
-			planet,
+		s:connect_signal('tag::history::update', update)
+		s.tags[i]:connect_signal('tagged', update)
+		s.tags[i]:connect_signal('untagged', update)
+		update()
+
+		template[i] = wibox.widget {
 			{
+				planet,
 				{
-					spaceship,
-					top = 20,
-					bottom = 5,
+					{
+						spaceship,
+						top = 20,
+						bottom = 5,
+						widget = wibox.container.margin,
+					},
+					widget = wibox.container.place,
+				},
+				{
+					moon,
+					bottom = 40,
+					left = 40,
 					widget = wibox.container.margin,
 				},
-				widget = wibox.container.place,
+				forced_width = config.height - 10,
+				forced_height = config.height - 10,
+				layout = wibox.layout.stack,
 			},
-			{
-				moon,
-				bottom = 40,
-				left = 40,
-				widget = wibox.container.margin,
-			},
-			forced_width = config.height - 10,
-			forced_height = config.height - 10,
-			layout = wibox.layout.stack,
-		},
-		forced_width = config.height,
-		forced_height = config.height,
-		widget = wibox.container.place,
-	}
+			forced_width = config.height,
+			forced_height = config.height,
+			widget = wibox.container.place,
+		}
+	end
+
+	return wibox.widget(template)
 end
 
 -- -----------------------------------------------------------------------------
@@ -170,24 +178,22 @@ models.battery:connect_signal('update', function()
 end)
 
 -- -----------------------------------------------------------------------------
+-- NOTIFICATIONS
+-- -----------------------------------------------------------------------------
+
+local notifications = wibox.widget {
+    image = beautiful.icon('volume'),
+	widget = wibox.widget.imagebox,
+}
+
+-- -----------------------------------------------------------------------------
 -- PANEL
 -- -----------------------------------------------------------------------------
 
 return {
 	attach = function(s)
 		local content = wibox.widget {
-			{
-				taglist_item(s, 1),
-				taglist_item(s, 2),
-				taglist_item(s, 3),
-				taglist_item(s, 4),
-				taglist_item(s, 5),
-				taglist_item(s, 6),
-				taglist_item(s, 7),
-				taglist_item(s, 8),
-				taglist_item(s, 9),
-				layout = wibox.layout.fixed.horizontal,
-			},
+			taglist(s),
 			{
 				margins = config.height / 2,
 				widget = wibox.container.margin,
@@ -195,7 +201,8 @@ return {
 			volume,
 			brightness,
 			battery,
-			wibox.widget.systray(),
+			notifications,
+			-- wibox.widget.systray(),
 			layout = wibox.layout.fixed.horizontal,
 		}
 

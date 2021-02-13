@@ -1,6 +1,7 @@
 local awful = require 'awful' 
 local beautiful = require 'beautiful'
 local gears = require 'gears'
+local naughty = require 'naughty' 
 
 --------------------------------------------------------------------------------
 -- BATTERY
@@ -68,6 +69,22 @@ awful.spawn.easy_async_with_shell(
 )
 
 --------------------------------------------------------------------------------
+-- NOTIFICATIONS
+--------------------------------------------------------------------------------
+
+naughty.config.notify_callback = function(args)
+    args.text = ([[
+<span size='medium' weight='bold'>  Broadcast Received  </span>
+<span size='small'>  %s  </span>
+	]]):format(args.text)
+	return args
+end
+
+local notifications = gears.table.crush(gears.object(), {
+	stack = {},
+})
+
+--------------------------------------------------------------------------------
 -- VOLUME
 --------------------------------------------------------------------------------
 
@@ -112,5 +129,6 @@ awful.spawn.easy_async_with_shell(
 return {
 	battery = battery,
 	brightness = brightness,
+	notifications = notifications,
 	volume = volume,
 }

@@ -59,20 +59,9 @@ beautiful.init {
 -- variables, so we have to directly set them here. See defaults here:
 -- https://awesomewm.org/doc/api/libraries/naughty.html#config.defaults
 naughty.config.padding = 20
-naughty.config.default = {
-	timeout = 5,
-	ontop = true,
-	margin = dpi(5),
-	border_width = dpi(5),
-	position = 'bottom_right',
-}
-naughty.config.notify_callback = function(args)
-    args.text = ([[
-<span size='medium' weight='bold'>  Broadcast Received  </span>
-<span size='small'>  %s  </span>
-	]]):format(args.text)
-	return args
-end
+naughty.config.defaults.margin = dpi(5)
+naughty.config.defaults.border_width = dpi(5)
+naughty.config.defaults.position = 'bottom_right'
 
 --------------------------------------------------------------------------------
 -- FUNCTIONS
