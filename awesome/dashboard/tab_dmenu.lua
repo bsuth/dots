@@ -122,16 +122,6 @@ gears.table.crush(state, {
 	},
 })
 
-local dmenu_config_file = io.open(ROOT .. '/__config/dmenu.lua', 'r')
-
-if dmenu_config_file ~= nil then
-    io.close(dmenu_config_file)
-
-    for alias, command in pairs(require('__config/dmenu')) do
-        state.commands[alias] = command
-    end
-end
-
 for alias, command in pairs(state.commands) do
 	table.insert(list_items, {
 		alias = alias,

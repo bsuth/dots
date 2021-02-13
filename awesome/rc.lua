@@ -3,39 +3,27 @@ local beautiful = require 'beautiful'
 local gears = require 'gears'
 
 -- Autofocus another client when the current one is closed
-require('awful.autofocus')
+require('awful/autofocus')
 
---------------------------------------------------------------------------------
--- GLOBALS
---------------------------------------------------------------------------------
-
-modkey = 'Mod4'
-submodkey = 'Mod1'
-ROOT = gears.filesystem.get_dir('config')
-
---------------------------------------------------------------------------------
--- MY MODULES
---------------------------------------------------------------------------------
-
+-- Order matters here!
 require 'theme' 
-require 'views/meter_notify'
+local panel = require 'panel'
+-- require 'views/meter_notify'
 local bindings = require 'bindings' 
-local layouts = require 'layouts'
 
 --------------------------------------------------------------------------------
--- LAYOUTS
---------------------------------------------------------------------------------
-
-awful.layout.layouts = {
-    awful.layout.suit.max,
-}
-
---------------------------------------------------------------------------------
--- TAGS
+-- TAG / SCREEN SETUP
 --------------------------------------------------------------------------------
 
 awful.screen.connect_for_each_screen(function(s)
-    awful.tag({ '1', '2', '3', '4', '5', '6', '7', '8', '9' }, s, awful.layout.layouts[1])
+    awful.tag(
+		{ '1', '2', '3', '4', '5', '6', '7', '8', '9' },
+		s,
+		awful.layout.suit.tile.right
+	)
+
+	beautiful.set_wallpaper(s)
+	panel.attach(s)
 
     s:connect_signal('tag::history::update', function()
         -- restore focus to above client
@@ -49,12 +37,12 @@ awful.screen.connect_for_each_screen(function(s)
 end)
 
 awful.scratchpad = awful.tag.add('scratchpad', {
-	layout = layouts.grid,
+	layout = awful.layout.suit.fair.horizontal,
 	screen = awful.screen.focused(),
 })
 
 awful.clientbuffer = awful.tag.add('clientbuffer', {
-	layout = layouts.grid,
+	layout = awful.layout.suit.fair.horizontal,
 	screen = awful.screen.focused(),
 })
 
@@ -131,3 +119,10 @@ end)
 client.connect_signal('mouse::enter', function(c)
     c:emit_signal('request::activate', 'mouse_enter', { raise = false })
 end)
+
+-- Re-set wallpaper when screen geometry changes (e.g. resolution change)
+screen.connect_signal('property::geometry', beautiful.set_wallpaper)
+
+-- Focus changes border color
+client.connect_signal('focus', function(c) c.border_color = beautiful.border_focus end)
+client.connect_signal('unfocus', function(c) c.border_color = beautiful.border_normal end)

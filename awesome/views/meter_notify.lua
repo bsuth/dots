@@ -7,9 +7,6 @@ local volume_model = require 'models/volume'
 local brightness_model = require 'models/brightness'
 local battery_model = require 'models/battery'
 local ram_model = require 'models/ram'
-local cpu_model = require 'models/cpu'
-
-local dashboard = require 'dashboard'
 
 --------------------------------------------------------------------------------
 -- DECLARATIONS
@@ -44,23 +41,7 @@ local function show_ram_warning()
     bar_widget.color = beautiful.colors.purple
 end
 
-local function show_cpu_warning()
-    icon_widget.image = beautiful.icon('cpu')
-    bar_widget.value = cpu_model.percent
-    bar_widget.color = beautiful.colors.blue
-end
-
 local function notify(callback)
-    if dashboard.is_active() then
-		local urgent = gears.table.hasitem({
-			show_ram_warning,
-			show_cpu_warning,
-			show_battery_warning
-		}, callback) ~= nil
-
-		if not urgent then return end
-	end
-
     (callback)()
 
     popup.screen = awful.screen.focused()
@@ -75,14 +56,11 @@ end
 gears.table.crush(state, {
     battery_warning = false,
     ram_warning = false,
-    cpu_warning = false,
     timer = gears.timer({
         timeout = 1,
         callback = function()
             if state.ram_warning then
                 show_ram_warning()
-            elseif state.cpu_warning then
-                show_cpu_warning()
             elseif state.battery_warning then
                 show_battery_warning()
             else
@@ -192,16 +170,6 @@ end)
 
 ram_model:connect_signal('clear_warning', function()
     state.ram_warning = false
-    state.timer:again()
-end)
-
-cpu_model:connect_signal('warning', function()
-    -- state.cpu_warning = true
-	-- notify(show_cpu_warning)
-end)
-
-cpu_model:connect_signal('clear_warning', function()
-    state.cpu_warning = false
     state.timer:again()
 end)
 

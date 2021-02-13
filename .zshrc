@@ -46,11 +46,10 @@ zplugin light denysdovhan/spaceship-prompt
 
 export SHELL='/bin/zsh'
 export EDITOR=nvim
-export TMPDIR='/tmp'
 
 export HISTFILE=~/.zsh_history
-export HISTSIZE=10000
-export SAVEHIST=10000
+export HISTSIZE=1000
+export SAVEHIST=1000
 
 export FZF_DEFAULT_COMMAND='rg --files -L'
 export FZF_DEFAULT_OPTS='--exact'
@@ -62,8 +61,6 @@ export SPACESHIP_PROMPT_ORDER=(
   host          # Hostname section
   git           # Git section (git_branch + git_status)
   node          # Node.js section
-  pyenv         # Python
-  venv          # Python venv
   line_sep      # Line break
   battery       # Battery level and status
   vi_mode       # Vi-mode indicator
@@ -73,6 +70,7 @@ export SPACESHIP_PROMPT_ORDER=(
 )
 
 export PATH="$HOME/.local/bin:$PATH"
+source ~/emsdk/emsdk_env.sh 2>/dev/null
 
 # ------------------------------------------------------------------------------
 # ALIASES
@@ -81,5 +79,6 @@ export PATH="$HOME/.local/bin:$PATH"
 alias l='ls -1 --color=auto --group-directories-first'
 alias vi='nvim'
 alias vim='nvim'
+alias now='date +"%F %H:%M"'
 
 # vim: syntax=zsh

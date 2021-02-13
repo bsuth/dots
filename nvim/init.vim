@@ -99,8 +99,6 @@ endfunction
 function! OnTermClose()
 	if (!empty(matchstr(bufname(''), 'bundle/fzf/bin/fzf')))
 		return
-	else
-		echom bufname('')
 	endif
 
 	Dirvish
@@ -147,13 +145,14 @@ augroup END
 " ------------------------------------------------------------------------------
 
 command! -nargs=* CdDirvish call CdDirvish(<f-args>)
-command! -nargs=* FzfCD call fzf#run(fzf#wrap({
+command! -nargs=* FzfCDSelect call fzf#run(fzf#wrap({
 	\ 'source': "find -L -type d ! \\( \\(
 		\ -name .cache -o 
 		\ -name node_modules
 	\ \\) -prune \\) -name '*'",
-	\ 'sink': 'cd',
+	\ 'sink': 'FzfCDCommit',
 \}))
+command! -nargs=* FzfCDCommit exec 'cd ' . <f-args> . '|:Dirvish'
 
 " ------------------------------------------------------------------------------
 " MARKS (kind of)
@@ -188,12 +187,12 @@ nnoremap <leader><c-j> :rightbelow :sp\|:Dirvish<cr>
 nnoremap <leader><c-h> :aboveleft :vsp\|:Dirvish<cr>
 
 nnoremap <leader>fd :Files<cr>
-nnoremap <leader>cd :FzfCD<cr>
+nnoremap <leader>cd :FzfCDSelect<cr>
 nnoremap <leader>rg :Rg<cr>
 nnoremap <leader>ls :Buffers<cr>
 
 nnoremap <leader><leader>fd :cd ~\|:Files<cr>
-nnoremap <leader><leader>cd :cd ~\|:FzfCD<cr>
+nnoremap <leader><leader>cd :cd ~\|:FzfCDSelect<cr>
 nnoremap <leader><leader>rg :cd ~\|:Rg<cr>
 
 inoremap <silent><expr> <c-space> coc#refresh()

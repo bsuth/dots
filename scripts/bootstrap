@@ -73,6 +73,7 @@ function _install_packages_() {
 		
 		# cli tools
 		fd-find
+		curl
 		npm
 		htop
         pass
@@ -81,9 +82,6 @@ function _install_packages_() {
         flameshot
         anki
 		gnome-terminal
-		
-		# required for bluetooth
-		pulseaudio-module-bluetooth
 	)
 
 	if ! _yesno_ "Install packages?"; then status=2; return; fi
@@ -132,21 +130,6 @@ echo -e "${GREEN}=== System Configuration ===${NC}"
 _system_config_
 _report_status_
 
-## Copy files ##
-
-# function _copy_files_() {
-#     if ! _yesno_ "Copy files? WARNING: This will override existing files in /home/bsuth. If you are unsure, just copy files manually."; then
-#         status=2
-#         return
-#     fi
-    
-#     rsync -ahW --info=progress2 --no-compress $DIR/ /home/bsuth
-# }
-
-# echo -e "${GREEN}=== Setting up directory ===${NC}\n"
-# _copy_files_
-# _report_status_
-
 ## Setup Symlinks ##
 
 function _setup_symlinks_() {
@@ -156,6 +139,9 @@ function _setup_symlinks_() {
 		["Documents/password-store"]=".password-store"
 		["dots/.Xmodmap"]=".Xmodmap"
 		["dots/.zshrc"]=".zshrc"
+		["dots/.zprofile"]=".zprofile"
+		["dots/awesome"]=".config/awesome"
+		["dots/rofi"]=".config/rofi"
 	)
 
 	if ! _yesno_ "Setup symlinks?"; then status=2; return; fi

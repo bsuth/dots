@@ -9,7 +9,6 @@ local brightness = require 'models/brightness'
 local tab_home = require 'dashboard/tab_home'
 local tab_dmenu = require 'dashboard/tab_dmenu'
 local tab_notifications = require 'dashboard/tab_notifications'
-local tab_weather = require 'dashboard/tab_weather'
 
 local tab_tbd_1 = require 'dashboard/tab_tbd_1'
 local tab_tbd_2 = require 'dashboard/tab_tbd_2'
@@ -142,7 +141,6 @@ gears.table.crush(state, {
         {{ modkey }, 'f', function() focus(tab_home) end},
         {{ modkey }, 'd', function() focus(tab_dmenu) end},
         {{ modkey }, 's', function() focus(tab_notifications) end},
-        {{ modkey }, 'j', function() focus(tab_weather) end},
         {{ modkey }, 'k', function() focus(tab_tbd_1) end},
         {{ modkey }, 'l', function() focus(tab_tbd_2) end},
     },
@@ -165,7 +163,6 @@ tabs_left_widget = wibox.widget({
 --------------------------------------------------------------------------------
 
 tabs_right_widget = wibox.widget({
-    register(tab_weather),
     register(tab_tbd_1),
     register(tab_tbd_2),
     spacing = 50,

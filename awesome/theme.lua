@@ -1,4 +1,3 @@
-local awful = require 'awful' 
 local beautiful = require 'beautiful' 
 local dpi = require('beautiful/xresources').apply_dpi
 local gears = require 'gears'
@@ -9,7 +8,8 @@ local naughty = require 'naughty'
 --------------------------------------------------------------------------------
 
 local colors = {
-    black = '#282c34',
+    -- black = '#282c34',
+    black = '#181818',
     red = '#e06c75',
     green = '#98c379',
     yellow = '#e5c07b',
@@ -65,7 +65,7 @@ naughty.config.defaults.position = 'bottom_right'
 --------------------------------------------------------------------------------
 
 function beautiful.icon(icon)
-    return ('/home/bsuth/dots/awesome/icons/%s.svg'):format(icon)
+    return ('/home/bsuth/dots/icons/%s.svg'):format(icon)
 end
 
 function beautiful.hex2rgb(hex)
@@ -78,26 +78,11 @@ function beautiful.hex2rgb(hex)
 end
 
 function beautiful.set_wallpaper(screen)
-    gears.wallpaper.maximized(os.getenv('AWESOME') .. '/wallpaper.png', screen)
+    gears.wallpaper.maximized('/home/bsuth/dots/wallpaper.png', screen)
 end
-
---------------------------------------------------------------------------------
--- SIGNALS
---------------------------------------------------------------------------------
-
--- Re-set wallpaper when screen geometry changes (e.g. resolution change)
-screen.connect_signal('property::geometry', beautiful.set_wallpaper)
-
--- Focus changes border color
-client.connect_signal('focus', function(c) c.border_color = beautiful.border_focus end)
-client.connect_signal('unfocus', function(c) c.border_color = beautiful.border_normal end)
 
 --------------------------------------------------------------------------------
 -- RETURN
 --------------------------------------------------------------------------------
-
-awful.screen.connect_for_each_screen(function(s)
-    beautiful.set_wallpaper(s)
-end)
 
 return beautiful
