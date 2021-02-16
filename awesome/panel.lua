@@ -4,6 +4,7 @@ local dial = require 'widgets/dial'
 local gears = require 'gears'
 local models = require 'newmodels'
 local naughty = require 'naughty'
+local rotator = require 'widgets/rotator'
 local wibox = require 'wibox'
 
 -- -----------------------------------------------------------------------------
@@ -13,10 +14,12 @@ local wibox = require 'wibox'
 local config = {
 	height = 75,
 	padding = 15,
+	border_width = 2,
+	compass_size = 60,
 	planets = {
 		'volcano',
-		'volcano',
-		'volcano',
+		'desert',
+		'nature',
 		'volcano',
 		'volcano',
 		'frost',
@@ -105,7 +108,7 @@ local volume = wibox.widget {
     percent = models.volume.percent,
 
     color = beautiful.colors.green,
-	background = '#181818',
+	background = '#000000',
 	border_width = 5,
 
     onscrollup = function() models.volume:shift(5) end,
@@ -116,9 +119,6 @@ local volume = wibox.widget {
 
 models.volume:connect_signal('update', function()
     volume.percent = models.volume.percent
-
-	-- widget::layout_changed needed to update icon
-    volume:emit_signal('widget::layout_changed')
     volume:emit_signal('widget::redraw_needed')
 end)
 
@@ -134,7 +134,7 @@ local brightness = wibox.widget {
     percent = models.volume.percent,
 
     color = beautiful.colors.yellow,
-	background = '#181818',
+	background = '#000000',
 	border_width = 5,
 
     onscrollup = function() models.brightness:shift(5) end,
@@ -145,9 +145,6 @@ local brightness = wibox.widget {
 
 models.brightness:connect_signal('update', function()
     brightness.percent = models.brightness.percent
-
-	-- widget::layout_changed needed to update icon
-    brightness:emit_signal('widget::layout_changed')
     brightness:emit_signal('widget::redraw_needed')
 end)
 
@@ -155,26 +152,56 @@ end)
 -- BATTERY
 -- -----------------------------------------------------------------------------
 
+function calc_arrow_rot(p)
+	return (math.pi / 4) * (6 * p / 100 - 5)
+end
+
+local battery_meter = wibox.widget {
+    image = beautiful.icon('battery/meter'),
+	widget = wibox.widget.imagebox,
+}
+
+local battery_arrow = wibox.widget {
+    image = beautiful.icon('battery/arrow'),
+	widget = wibox.widget.imagebox,
+}
+
+local battery_arrow_rotation = wibox.widget {
+	origin_x = 32.8125,
+	origin_y = 37.5,
+	theta = calc_arrow_rot(models.battery.percent),
+	rotatee = battery_arrow,
+	widget = rotator,
+}
+
+local battery_notice = wibox.widget {
+	widget = wibox.widget.imagebox,
+}
+
 local battery = wibox.widget {
-    forced_width = config.height,
-    forced_height = config.height,
-
-    icon = beautiful.icon('battery-discharging'),
-    percent = models.volume.percent,
-
-    color = beautiful.colors.red,
-	background = '#181818',
-	border_width = 5,
-
-    widget = dial,
+	battery_meter,
+	battery_arrow_rotation,
+	battery_notice,
+	forced_width = config.height,
+	forced_height = config.height,
+	layout = wibox.layout.stack,
 }
 
 models.battery:connect_signal('update', function()
-    battery.percent = models.battery.percent
+	battery_arrow_rotation.theta = calc_arrow_rot(models.battery.percent)
+	battery_arrow_rotation:emit_signal('widget::layout_changed')
 
-	-- widget::layout_changed needed to update icon
-    battery:emit_signal('widget::layout_changed')
-    battery:emit_signal('widget::redraw_needed')
+	if models.battery.discharging then
+		if models.battery.percent < 25 then
+			battery_notice.image = beautiful.icon('battery/warning')
+		else
+			battery_notice.image = beautiful.icon('battery/discharging')
+		end
+	else
+		battery_notice.image = beautiful.icon('battery/charging')
+	end
+
+    battery_notice:emit_signal('widget::layout_changed')
 end)
 
 -- -----------------------------------------------------------------------------
@@ -199,9 +226,16 @@ return {
 		s.wibar = wibox {
 			screen = s,
 			x = s.geometry.x,
-			y = s.geometry.y + s.geometry.height - config.height - 2 * config.padding,
+			y = s.geometry.y + s.geometry.height
+				- config.height
+				- 2 * config.padding
+				- config.compass_size / 2
+				- config.border_width,
 			width = s.geometry.width,
-			height = config.height + 2 * config.padding,
+			height = config.height
+				+ 2 * config.padding
+				+ config.compass_size / 2
+				+ 2 * config.border_width,
 			visible = true,
 			ontop = true,
 			type = 'dock',
@@ -217,15 +251,33 @@ return {
 						widget = wibox.container.margin,
 					},
 					bg = beautiful.colors.black,
-					shape = gears.shape.rounded_bar,
-					shape_border_width = 5,
-					shape_border_color = '#e0e0e0',
+					shape = function(cr, width, height)
+						gears.shape.partially_rounded_rect(cr, width, height, true, true)
+					end,
+					shape_border_width = config.border_width,
+					shape_border_color = beautiful.colors.white,
 					widget = wibox.container.background,
 				},
-				widget = wibox.container.place,
+				{
+					{
+						{
+							forced_width = config.compass_size,
+							forced_height = config.compass_size,
+							image = beautiful.icon('compass'),
+							widget = wibox.widget.imagebox,
+						},
+						top = -1 -- the svg itself has a 1px padding
+							+ config.border_width
+							- config.compass_size / 2,
+						widget = wibox.container.margin,
+					},
+					valign = 'top',
+					widget = wibox.container.place,
+				},
+				layout = wibox.layout.stack,
 			},
-			bottom = 10,
-			widget = wibox.container.margin,
+			valign = 'bottom',
+			widget = wibox.container.place,
 		}
 	end,
 }

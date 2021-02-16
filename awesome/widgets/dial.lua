@@ -67,13 +67,13 @@ function dial:layout(_, width, height)
     local icon_size = m - (2 * icon_offset)
 
     return {
-        wibox.widget.base.place_widget_at(wibox.widget({
+        wibox.widget.base.place_widget_at(wibox.widget {
             {
                 image = self.icon,
                 widget = wibox.widget.imagebox,
             },
             widget = wibox.container.place,
-        }), icon_offset, icon_offset, icon_size, icon_size),
+        }, icon_offset, icon_offset, icon_size, icon_size),
     }
 end
 
@@ -91,8 +91,10 @@ return setmetatable(dial, {
         -- metatable set!
         gears.table.crush(newdial, dial, true)
 
-		newdial:connect_signal('mouse::enter', function()
-			mouse.current_wibox.cursor = 'sb_v_double_arrow'
+		newdial:connect_signal('mouse::enter', function(self)
+			if self.onscrollup ~= nil and self.onscrolldown ~= nil then
+				mouse.current_wibox.cursor = 'sb_v_double_arrow'
+			end
 		end)
 
 		newdial:connect_signal('mouse::leave', function()

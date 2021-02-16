@@ -10,9 +10,8 @@ local upower = require('lgi').require('UPowerGlib')
 local device = upower.Client():get_display_device()
 
 local battery = gears.table.crush(gears.object(), {
-	percent = device.percentage,
+	percent = 0,
 	discharging = true,
-	warning = false,
 
 	update = function(self)
 		self.percent = device.percentage
@@ -20,26 +19,23 @@ local battery = gears.table.crush(gears.object(), {
 			upower.DeviceState.PENDING_DISCHARGE,
 			upower.DeviceState.DISCHARGING,
 		}, device.state) ~= nil
-
-		if self.percent < 20 and self.discharging then
-			if not self.warning then
-				self.warning = true
-				self:emit_signal('warning')
-			end
-		else
-			if self.warning then
-				self.warning = false
-				self:emit_signal('clear_warning')
-			end
-		end
-
 		self:emit_signal('update')
 	end,
 })
 
-device.on_notify = function()
-	battery:update()
-end
+-- battery:update()
+-- device.on_notify = function()
+	-- battery:update()
+-- end
+
+gears.timer {
+	timeout   = 5,
+    call_now  = true,
+    autostart = true,
+    callback  = function()
+		battery:update()
+    end,
+}
 
 --------------------------------------------------------------------------------
 -- BRIGHTNESS
