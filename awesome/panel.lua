@@ -12,19 +12,20 @@ local wibox = require 'wibox'
 -- -----------------------------------------------------------------------------
 
 local config = {
-	height = 75,
-	padding = 15,
+	width = 1000,
+	height = 50,
+	padding = 10,
 	border_width = 2,
-	compass_size = 60,
+	compass_size = 40,
 	planets = {
 		'volcano',
 		'desert',
 		'nature',
 		'volcano',
 		'volcano',
-		'frost',
-		'frost',
-		'frost',
+		'volcano',
+		'volcano',
+		'volcano',
 		'frost',
 	},
 }
@@ -71,16 +72,16 @@ function taglist(s)
 				{
 					{
 						spaceship,
-						top = 20,
-						bottom = 5,
+						top = 8,
+						bottom = 2,
 						widget = wibox.container.margin,
 					},
 					widget = wibox.container.place,
 				},
 				{
 					moon,
-					bottom = 40,
-					left = 40,
+					bottom = 22,
+					left = 22,
 					widget = wibox.container.margin,
 				},
 				forced_width = config.height - 10,
@@ -104,7 +105,7 @@ local volume = wibox.widget {
     forced_width = config.height,
     forced_height = config.height,
 
-    icon = beautiful.icon('volume'),
+    icon = beautiful.icon('systray/volume-unmute'),
     percent = models.volume.percent,
 
     color = beautiful.colors.green,
@@ -130,7 +131,7 @@ local brightness = wibox.widget {
     forced_width = config.height,
     forced_height = config.height,
 
-    icon = beautiful.icon('brightness'),
+    icon = beautiful.icon('systray/brightness'),
     percent = models.volume.percent,
 
     color = beautiful.colors.yellow,
@@ -157,12 +158,12 @@ function calc_arrow_rot(p)
 end
 
 local battery_meter = wibox.widget {
-    image = beautiful.icon('battery/meter'),
+    image = beautiful.icon('systray/battery-meter'),
 	widget = wibox.widget.imagebox,
 }
 
 local battery_arrow = wibox.widget {
-    image = beautiful.icon('battery/arrow'),
+    image = beautiful.icon('systray/battery-arrow'),
 	widget = wibox.widget.imagebox,
 }
 
@@ -190,17 +191,17 @@ local battery = wibox.widget {
 models.battery:connect_signal('update', function()
 	battery_arrow_rotation.theta = calc_arrow_rot(models.battery.percent)
 	battery_arrow_rotation:emit_signal('widget::layout_changed')
+	local icon_src = 'systray/battery-charging'
 
 	if models.battery.discharging then
 		if models.battery.percent < 25 then
-			battery_notice.image = beautiful.icon('battery/warning')
+			icon_src = 'systray/battery-warning'
 		else
-			battery_notice.image = beautiful.icon('battery/discharging')
+			icon_src = 'systray/battery-discharging'
 		end
-	else
-		battery_notice.image = beautiful.icon('battery/charging')
 	end
 
+	battery_notice.image = beautiful.icon(icon_src)
     battery_notice:emit_signal('widget::layout_changed')
 end)
 
@@ -212,26 +213,29 @@ return {
 	attach = function(s)
 		local content = wibox.widget {
 			taglist(s),
-			{
-				margins = config.height / 2,
-				widget = wibox.container.margin,
-			},
-			volume,
-			brightness,
-			battery,
+			-- {
+			-- 	margins = config.height / 2,
+			-- 	widget = wibox.container.margin,
+			-- },
+			-- volume,
+			-- brightness,
+			-- battery,
 			-- wibox.widget.systray(),
 			layout = wibox.layout.fixed.horizontal,
 		}
 
 		s.wibar = wibox {
 			screen = s,
-			x = s.geometry.x,
-			y = s.geometry.y + s.geometry.height
+			x = s.geometry.x
+				+ s.geometry.width / 2
+				- config.width / 2,
+			y = s.geometry.y
+				+ s.geometry.height
 				- config.height
 				- 2 * config.padding
 				- config.compass_size / 2
 				- config.border_width,
-			width = s.geometry.width,
+			width = config.width,
 			height = config.height
 				+ 2 * config.padding
 				+ config.compass_size / 2

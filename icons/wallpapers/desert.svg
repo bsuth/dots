@@ -156,15 +156,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="7.9195959"
-     inkscape:cx="-3.8230085"
+     inkscape:cx="18.210944"
      inkscape:cy="36.717708"
      inkscape:document-units="px"
-     inkscape:current-layer="g3520"
+     inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
-     inkscape:window-width="779"
-     inkscape:window-height="874"
-     inkscape:window-x="805"
+     inkscape:window-width="785"
+     inkscape:window-height="880"
+     inkscape:window-x="10"
      inkscape:window-y="10"
      inkscape:window-maximized="0" />
   <metadata
@@ -197,6 +197,28 @@
          cx="8.4666672"
          id="path897"
          style="display:inline;opacity:0.45400002;fill:#ffdd1e;fill-opacity:0.96703336;stroke:#ffeb06;stroke-width:0.27183315;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:0.69230772" />
+      <g
+         transform="matrix(-1.05017,0,0,1.0471625,17.294185,-13.81607)"
+         clip-path="url(#clipPath2300)"
+         inkscape:label="sand"
+         id="g933"
+         sodipodi:insensitive="true">
+        <path
+           style="fill:#d39217;fill-opacity:1;stroke:none;stroke-width:0.26458335px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0"
+           d="m 16.044533,291.82704 c 0,0 -3.869359,-1.85687 -8.2334619,0.37565 -4.3641009,2.23252 -7.34818483,-1.73182 -7.34818483,-1.73182 0,0 0.56548403,5.44511 6.62914883,6.32983 6.0636739,0.88466 8.9524979,-4.97366 8.9524979,-4.97366 z"
+           id="path898"
+           inkscape:connector-curvature="0"
+           inkscape:label="sand"
+           clip-path="none" />
+        <path
+           style="fill:#ecc55c;fill-opacity:1;stroke:none;stroke-width:0.26458335px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           d="m 16.044533,292.16758 c 0,0 -3.869359,-1.85687 -8.2334619,0.37565 -4.3641009,2.23252 -7.34818483,-1.73182 -7.34818483,-1.73182 0,0 0.56548403,5.44511 6.62914883,6.32983 6.0636739,0.88466 8.9524979,-4.97366 8.9524979,-4.97366 z"
+           id="path898-7"
+           inkscape:connector-curvature="0"
+           inkscape:label="sand"
+           clip-path="url(#clipPath901-3)"
+           transform="rotate(-6.859466,16.629851,292.20266)" />
+      </g>
       <g
          sodipodi:insensitive="true"
          style="display:inline"

@@ -46,13 +46,9 @@ beautiful.init {
 
     notification_font = 'Quicksand Medium 16',
     notification_bg = '#181818',
-    notification_fg = colors.purple,
-    notification_border_color = colors.purple,
-    -- notification_shape = function(cr, width, height)
-    --     gears.shape.transform(gears.shape.infobubble)
-    --         :rotate_at(width / 2, height / 2, math.pi)
-    --             (cr, width, height, 20, 20, 30)
-    -- end,
+    notification_fg = colors.white,
+    notification_border_color = colors.white,
+    notification_icon_size = 40,
 }
 
 -- Some notification theme properties don't get overridden by the beautiful
@@ -60,8 +56,8 @@ beautiful.init {
 -- https://awesomewm.org/doc/api/libraries/naughty.html#config.defaults
 naughty.config.padding = 20
 naughty.config.defaults.margin = dpi(5)
-naughty.config.defaults.border_width = dpi(5)
-naughty.config.defaults.position = 'bottom_right'
+naughty.config.defaults.border_width = dpi(2)
+naughty.config.defaults.position = 'top_left'
 
 --------------------------------------------------------------------------------
 -- FUNCTIONS

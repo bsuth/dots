@@ -7,6 +7,7 @@ require('awful/autofocus')
 
 -- Order matters here!
 require 'theme' 
+require 'notifs' 
 local panel = require 'panel'
 -- require 'views/meter_notify'
 local bindings = require 'bindings' 
