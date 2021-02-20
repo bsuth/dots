@@ -1,10 +1,9 @@
 local awful = require 'awful' 
+local dashboard = require 'dashboard'
 local gears = require 'gears' 
+local models = require 'models'
 local naughty = require 'naughty' 
-
-local kb_switcher_view = require 'views/kb_switcher' 
-local volume_model = require 'models/volume'
-local brightness_model = require 'models/brightness'
+local taglist = require 'taglist'
 
 --------------------------------------------------------------------------------
 -- KEYBINDINGS
@@ -80,19 +79,14 @@ bindings.globalkeys = gears.table.join(
     awful.key({ 'Mod4', 'Shift' }, 'r', function() awesome.restart() end),
     awful.key({ 'Mod4', 'Shift' }, 'Escape', function() awesome.quit() end),
 
-    awful.key({ }, 'XF86AudioLowerVolume', function() volume_model:shift(-5) end),
-    awful.key({ }, 'XF86AudioRaiseVolume', function() volume_model:shift(5) end),
-    awful.key({ }, 'XF86AudioMute', function() volume_model:toggle() end),
+    awful.key({ }, 'XF86AudioLowerVolume', function() models.volume:shift(-5) end),
+    awful.key({ }, 'XF86AudioRaiseVolume', function() models.volume:shift(5) end),
+    awful.key({ }, 'XF86AudioMute', function() models.volume:toggle() end),
 
-    awful.key({ }, 'XF86MonBrightnessDown', function() brightness_model:shift(-8) end),
-    awful.key({ }, 'XF86MonBrightnessUp', function() brightness_model:shift(8) end),
+    awful.key({ }, 'XF86MonBrightnessDown', function() models.brightness:shift(-8) end),
+    awful.key({ }, 'XF86MonBrightnessUp', function() models.brightness:shift(8) end),
 
-    awful.key({ 'Mod4', 'Control' }, 'space', function() kb_switcher_view:start() end),
-
-    awful.key({ 'Mod4' }, "n", function()
-        local wibar = awful.screen.focused().wibar
-        wibar.visible = not wibar.visible
-    end),
+    -- awful.key({ 'Mod4', 'Control' }, 'space', function() kb_switcher_view:start() end),
 
     -- -------------------------------------------------------------------------
     -- Movement
@@ -156,7 +150,9 @@ bindings.globalkeys = gears.table.join(
     -- -------------------------------------------------------------------------
     
     awful.key({ 'Mod4' }, 'Return', function() awful.spawn('gnome-terminal') end),
-    awful.key({ 'Mod4' }, "'", function() awful.spawn('vivaldi') end)
+    awful.key({ 'Mod4' }, "'", function() awful.spawn('vivaldi') end),
+    awful.key({ 'Mod4' }, 'p', function() dashboard.toggle() end),
+    awful.key({ 'Mod4' }, 'n', function() taglist.toggle() end)
 )
 
 for i = 1, 9 do

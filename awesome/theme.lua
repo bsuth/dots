@@ -77,7 +77,7 @@ function beautiful.hex2rgb(hex)
 end
 
 function beautiful.set_wallpaper(screen)
-    gears.wallpaper.maximized('/home/bsuth/dots/wallpapers/desert.svg', screen)
+    gears.wallpaper.maximized('/home/bsuth/dots/wallpapers/empty.svg', screen)
 end
 
 --------------------------------------------------------------------------------

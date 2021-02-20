@@ -8,8 +8,7 @@ require('awful/autofocus')
 -- Order matters here!
 require 'theme' 
 require 'notifs' 
-local panel = require 'panel'
--- require 'views/meter_notify'
+local taglist = require 'taglist'
 local bindings = require 'bindings' 
 
 --------------------------------------------------------------------------------
@@ -24,7 +23,7 @@ awful.screen.connect_for_each_screen(function(s)
 	)
 
 	beautiful.set_wallpaper(s)
-	panel.attach(s)
+	taglist.attach(s)
 
     s:connect_signal('tag::history::update', function()
         -- restore focus to above client
