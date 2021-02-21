@@ -30,31 +30,12 @@ end)
 
 local function alt_tab(idx)
 	awful.tag.history.restore()
-    -- client.focus.above = false
-    -- awful.client.focus.byidx(idx)
-    -- client.focus.above = true
-end
-
-local function alt_backtick(idx)
-    local s = awful.screen.focused()
-    local n = tonumber(s.selected_tag.name)
-    if n == nil then return end
-
-    for i = idx, 7 * idx, idx do
-        local tag = s.tags[1 + (n - 1 + i) % 9]
-        if #tag:clients() > 0 then
-            tag:view_only()
-            return
-        end
-    end
 end
 
 awful.keygrabber {
     keybindings = {
         {{ 'Mod1' }, 'Tab', function() alt_tab(1) end},
         {{ 'Mod1', 'Shift' }, 'Tab', function() alt_tab(-1) end},
-        {{ 'Mod1' }, '`', function() alt_backtick(1) end},
-        {{ 'Mod1', 'Shift' }, '`', function() alt_backtick(-1) end},
     },
 
     stop_key = 'Mod1',
@@ -79,14 +60,14 @@ bindings.globalkeys = gears.table.join(
     awful.key({ 'Mod4', 'Shift' }, 'r', function() awesome.restart() end),
     awful.key({ 'Mod4', 'Shift' }, 'Escape', function() awesome.quit() end),
 
-    awful.key({ }, 'XF86AudioLowerVolume', function() models.volume:shift(-5) end),
-    awful.key({ }, 'XF86AudioRaiseVolume', function() models.volume:shift(5) end),
+    awful.key({ }, 'XF86AudioLowerVolume', function() models.volume:set(models.volume.percent - 5) end),
+    awful.key({ }, 'XF86AudioRaiseVolume', function() models.volume:set(models.volume.percent + 5) end),
     awful.key({ }, 'XF86AudioMute', function() models.volume:toggle() end),
 
-    awful.key({ }, 'XF86MonBrightnessDown', function() models.brightness:shift(-8) end),
-    awful.key({ }, 'XF86MonBrightnessUp', function() models.brightness:shift(8) end),
+    awful.key({ }, 'XF86MonBrightnessDown', function() models.brightness:set(models.brightness.percent - 8) end),
+    awful.key({ }, 'XF86MonBrightnessUp', function() models.brightness:set(models.brightness.percent + 8) end),
 
-    -- awful.key({ 'Mod4', 'Control' }, 'space', function() kb_switcher_view:start() end),
+    awful.key({ 'Mod4', 'Control' }, 'space', function() models.locale:cycle() end),
 
     -- -------------------------------------------------------------------------
     -- Movement

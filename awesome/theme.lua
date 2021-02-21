@@ -20,6 +20,7 @@ local colors = {
     dark_grey = '#545862',
     light_grey = '#c8ccd4',
     blacker = '#181818',
+    void = '#000000',
 
     dimmed = '#00000088',
     transparent = '#00000000',
@@ -63,8 +64,8 @@ naughty.config.defaults.position = 'top_left'
 -- FUNCTIONS
 --------------------------------------------------------------------------------
 
-function beautiful.icon(icon)
-    return ('/home/bsuth/dots/icons/%s.svg'):format(icon)
+function beautiful.svg(path)
+    return ('/home/bsuth/dots/svg/%s.svg'):format(path)
 end
 
 function beautiful.hex2rgb(hex)

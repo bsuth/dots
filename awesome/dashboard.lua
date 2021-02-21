@@ -1,23 +1,25 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
-local dial = require 'widgets/dial'
 local gears = require 'gears'
+local layout = require 'layout'
 local models = require 'models'
-local naughty = require 'naughty'
-local rotator = require 'widgets/rotator'
-local taglist = require 'taglist'
 local wibox = require 'wibox'
+local widgets = require 'widgets'
 
 -- -----------------------------------------------------------------------------
 -- CONFIG
 -- -----------------------------------------------------------------------------
 
 local config = {
-	width = 1000,
-	height = 50,
+	width = 1200,
+	height = 600,
 	margin = 100,
 	padding = 10,
 	border_width = 2,
+
+	slider_width = 35,
+	slider_height = 120,
+	meter_size = 64,
 }
 
 local state = {
@@ -25,112 +27,149 @@ local state = {
 }
 
 -- -----------------------------------------------------------------------------
--- VOLUME
+-- COMPONENTS
 -- -----------------------------------------------------------------------------
 
-local volume = wibox.widget {
-    forced_width = config.height,
-    forced_height = config.height,
+-- Slider
 
-    icon = beautiful.icon('systray/volume-unmute'),
-    percent = models.volume.percent,
+function slider(model, color)
+	local wslider = wibox.widget {
+		bar_shape = gears.shape.rounded_rect,
+		bar_height = 10,
+		bar_color = beautiful.colors.void,
 
-    color = beautiful.colors.green,
-	background = '#000000',
-	border_width = 5,
+		handle_width = 18,
+		handle_color = color,
+		handle_border_width = 2,
+		handle_border_color = beautiful.colors.void,
 
-    onscrollup = function() models.volume:shift(5) end,
-    onscrolldown = function() models.volume:shift(-5) end,
+		value = model.percent,
+		widget = wibox.widget.slider,
+	}
 
-    widget = dial,
-}
+	wslider:connect_signal('property::value', function(val)
+		model:set(wslider.value)
+	end)
 
-models.volume:connect_signal('update', function()
-    volume.percent = models.volume.percent
-    volume:emit_signal('widget::redraw_needed')
-end)
+	model:connect_signal('update', function()
+		wslider.value = model.percent
+	end)
 
--- -----------------------------------------------------------------------------
--- BRIGHTNESS
--- -----------------------------------------------------------------------------
-
-local brightness = wibox.widget {
-    forced_width = config.height,
-    forced_height = config.height,
-
-    icon = beautiful.icon('systray/brightness'),
-    percent = models.volume.percent,
-
-    color = beautiful.colors.yellow,
-	background = '#000000',
-	border_width = 5,
-
-    onscrollup = function() models.brightness:shift(5) end,
-    onscrolldown = function() models.brightness:shift(-5) end,
-
-    widget = dial,
-}
-
-models.brightness:connect_signal('update', function()
-    brightness.percent = models.brightness.percent
-    brightness:emit_signal('widget::redraw_needed')
-end)
-
--- -----------------------------------------------------------------------------
--- BATTERY
--- -----------------------------------------------------------------------------
-
-function calc_arrow_rot(p)
-	return (math.pi / 4) * (6 * p / 100 - 5)
+	return wibox.widget {
+		wslider,
+		direction = 'east',
+		forced_width = config.slider_width,
+		forced_height = config.slider_height,
+		widget = wibox.container.rotate,
+	}
 end
 
-local battery_meter = wibox.widget {
-    image = beautiful.icon('systray/battery-meter'),
-	widget = wibox.widget.imagebox,
+-- Meter
+
+function meter(id, model, update_hook)
+	local needle = wibox.widget {
+		rotatee = wibox.widget {
+			image = beautiful.svg('dashboard/meter/needle'),
+			widget = wibox.widget.imagebox,
+		},
+		widget = widgets.rotator,
+	}
+
+	local icon = wibox.widget {
+		image = beautiful.svg('dashboard/'..id..'/icon'),
+		widget = wibox.widget.imagebox,
+	}
+
+	function update()
+		needle.theta = (1 - model.percent / 100) * -math.pi,
+		needle:emit_signal('widget::layout_changed')
+		if update_hook then (update_hook)(icon) end
+	end
+
+	update()
+	model:connect_signal('update', update)
+
+	return wibox.widget {
+		{
+			image = beautiful.svg('dashboard/meter/body'),
+			widget = wibox.widget.imagebox,
+		},
+		needle,
+		icon,
+		{
+			image = beautiful.svg('dashboard/'..id..'/button'),
+			widget = wibox.widget.imagebox,
+		},
+		forced_width = config.meter_size,
+		forced_height = config.meter_size,
+		layout = wibox.layout.stack,
+	}
+end
+
+-- -----------------------------------------------------------------------------
+-- PARTIALS
+-- -----------------------------------------------------------------------------
+
+-- Locales
+
+local locales = wibox.widget(gears.table.crush(
+	gears.table.map(function(id)
+		return wibox.widget {
+			layout.center {
+				image = beautiful.svg('dashboard/locale/'..id),
+				forced_width = 60,
+				forced_height = 40,
+				widget = wibox.widget.imagebox,
+			},
+			layout = wibox.layout.fixed.vertical,
+		}
+	end, { 'usa', 'japan', 'germany' })
+, { layout = wibox.layout.flex.horizontal }))
+
+-- Sliders
+
+local sliders = wibox.widget {
+	layout.center(slider(models.volume, beautiful.colors.green)),
+	layout.center(slider(models.brightness, beautiful.colors.yellow)),
+	layout = wibox.layout.flex.horizontal,
 }
 
-local battery_arrow = wibox.widget {
-    image = beautiful.icon('systray/battery-arrow'),
-	widget = wibox.widget.imagebox,
-}
+-- Meters
 
-local battery_arrow_rotation = wibox.widget {
-	origin_x = 32.8125,
-	origin_y = 37.5,
-	theta = calc_arrow_rot(models.battery.percent),
-	rotatee = battery_arrow,
-	widget = rotator,
-}
-
-local battery_notice = wibox.widget {
-	widget = wibox.widget.imagebox,
-}
-
-local battery = wibox.widget {
-	battery_meter,
-	battery_arrow_rotation,
-	battery_notice,
-	forced_width = config.height,
-	forced_height = config.height,
+local meters = layout.center {
+	{
+		image = beautiful.svg('dashboard/meter/panel'),
+		widget = wibox.widget.imagebox,
+	},
+	layout.center {
+		meter('disk', models.disk),
+		layout.hpad(8),
+		meter('ram', models.ram),
+		layout.hpad(8),
+		meter('battery', models.battery, function(icon)
+			if models.battery.discharging then
+				icon.image = beautiful.svg('dashboard/battery/discharging')
+			else
+				icon.image = beautiful.svg('dashboard/battery/charging')
+			end
+			icon:emit_signal('widget::redraw_needed')
+		end),
+		layout = wibox.layout.fixed.horizontal,
+	},
+	-- panel svg dimensions
+	forced_width = 228,
+	forced_height = 84,
 	layout = wibox.layout.stack,
 }
 
-models.battery:connect_signal('update', function()
-	battery_arrow_rotation.theta = calc_arrow_rot(models.battery.percent)
-	battery_arrow_rotation:emit_signal('widget::layout_changed')
-	local icon_src = 'systray/battery-charging'
+-- -----------------------------------------------------------------------------
+-- NOTIF CENTER
+-- -----------------------------------------------------------------------------
 
-	if models.battery.discharging then
-		if models.battery.percent < 25 then
-			icon_src = 'systray/battery-warning'
-		else
-			icon_src = 'systray/battery-discharging'
-		end
-	end
-
-	battery_notice.image = beautiful.icon(icon_src)
-    battery_notice:emit_signal('widget::layout_changed')
-end)
+local notif_center = wibox.widget {
+	text = 'Placeholder',
+	widget = wibox.widget.textbox,
+}
 
 -- -----------------------------------------------------------------------------
 -- DASHBOARD
@@ -140,30 +179,49 @@ local dashboard = wibox {
 	visible = false,
 	ontop = true,
 	type = 'dock',
-	bg = '00000000',
+	bg = beautiful.colors.transparent,
 }
 
-local content = {
-	{
-		volume,
-		brightness,
-		battery,
-		wibox.widget.systray(),
-		layout = wibox.layout.fixed.horizontal,
-	},
-	forced_width = 1000,
-	forced_height = 600,
-	bg = beautiful.colors.black,
-	shape = gears.shape.rectangle,
-	shape_border_width = config.border_width,
-	shape_border_color = beautiful.colors.white,
-	widget = wibox.container.background,
+local column1 = wibox.widget {
+	notif_center,
+	layout = wibox.layout.fixed.vertical,
+}
+
+local column3 = wibox.widget {
+	text = 'Placeholder',
+	widget = wibox.widget.textbox,
 }
 
 dashboard:setup {
-	{
-		content,
-		widget = wibox.container.place,
+	layout.center {
+		{
+			layout.center {
+				notif_center,
+				layout = wibox.layout.fixed.vertical,
+			},
+			layout.center {
+				locales,
+				layout.vpad(16),
+				sliders,
+				layout.vpad(16),
+				meters,
+				layout = wibox.layout.fixed.vertical,
+			},
+			layout.center {
+				text = 'Placeholder',
+				widget = wibox.widget.textbox,
+			},
+			layout = wibox.layout.flex.horizontal,
+		},
+		forced_width = config.width,
+		forced_height = config.height,
+
+		bg = beautiful.colors.black,
+		shape = gears.shape.rectangle,
+		shape_border_width = config.border_width,
+		shape_border_color = beautiful.colors.white,
+
+		widget = wibox.container.background,
 	},
 	bg = beautiful.colors.dimmed,
 	widget = wibox.container.background,
