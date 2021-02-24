@@ -56,9 +56,28 @@ beautiful.init {
 -- variables, so we have to directly set them here. See defaults here:
 -- https://awesomewm.org/doc/api/libraries/naughty.html#config.defaults
 naughty.config.padding = 20
+naughty.config.defaults.timeout = 8
 naughty.config.defaults.margin = dpi(5)
 naughty.config.defaults.border_width = dpi(2)
 naughty.config.defaults.position = 'top_left'
+
+naughty.config.notify_callback = function(notif)
+	notif.icon = beautiful.svg('systray/radio-on')
+
+	if notif.title ~= nil then
+		notif.text = ([[
+<span size='small'>%s</span>
+<span size='small'>%s</span>
+		]]):format(notif.title, notif.text)
+	else
+		notif.text = ([[
+<span size='small'>%s</span>
+		]]):format(notif.text)
+	end
+
+	notif.title = 'Incoming Broadcast'
+	return notif
+end
 
 --------------------------------------------------------------------------------
 -- FUNCTIONS

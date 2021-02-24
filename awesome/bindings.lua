@@ -67,7 +67,7 @@ bindings.globalkeys = gears.table.join(
     awful.key({ }, 'XF86MonBrightnessDown', function() models.brightness:set(models.brightness.percent - 8) end),
     awful.key({ }, 'XF86MonBrightnessUp', function() models.brightness:set(models.brightness.percent + 8) end),
 
-    awful.key({ 'Mod4', 'Control' }, 'space', function() models.locale:cycle() end),
+    awful.key({ 'Mod4', 'Control' }, 'space', function() models.kb_layout:cycle() end),
 
     -- -------------------------------------------------------------------------
     -- Movement

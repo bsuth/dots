@@ -82,28 +82,21 @@ gears.timer {
 }
 
 --------------------------------------------------------------------------------
--- LOCALE
+-- KB LAYOUT
 --------------------------------------------------------------------------------
 
--- local kb_layouts = { 'fcitx-keyboard-us', 'mozc', 'fcitx-keyboard-de' }
--- local countries = { 'usa', 'japan', 'germany' }
-
--- Disable germany for now, not respecting Xmodmap
-local kb_layouts = { 'fcitx-keyboard-us', 'mozc' }
-local countries = { 'usa', 'japan' }
-
-local locale = gears.table.crush(gears.object(), {
-	id = 1,
-	kb_layout = kb_layouts[1],
-	country = countries[1],
+local kb_layout = gears.table.crush(gears.object(), {
+	index = 1,
+	list = {
+		'fcitx-keyboard-us',
+		'mozc',
+		-- 'fcitx-keyboard-de',
+	},
 
 	cycle = function(self)
-		self.id = (self.id == #countries) and 1 or (self.id + 1)
-		self.kb_layout = kb_layouts[self.id]
-		self.country = countries[self.id]
-
+		self.index = (self.index == #self.list) and 1 or (self.index + 1)
 		awful.spawn.easy_async_with_shell(
-			'fcitx-remote -s '..kb_layouts[self.id],
+			'fcitx-remote -s '..self.list[self.index],
 			function() self:emit_signal('update') end
 		)
 	end,
@@ -181,7 +174,7 @@ return {
 	battery = battery,
 	brightness = brightness,
 	disk = disk,
-	locale = locale,
+	kb_layout = kb_layout,
 	ram = ram,
 	volume = volume,
 }

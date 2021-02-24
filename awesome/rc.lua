@@ -7,7 +7,6 @@ require('awful/autofocus')
 
 -- Order matters here!
 require 'theme' 
-require 'notifs' 
 local taglist = require 'taglist'
 local bindings = require 'bindings' 
 

@@ -1,10 +1,10 @@
 local awful = require 'awful'
 local beautiful = require 'beautiful'
+local components = require 'components'
 local gears = require 'gears'
 local layout = require 'layout'
 local models = require 'models'
 local wibox = require 'wibox'
-local widgets = require 'widgets'
 
 -- -----------------------------------------------------------------------------
 -- CONFIG
@@ -16,10 +16,6 @@ local config = {
 	margin = 100,
 	padding = 10,
 	border_width = 2,
-
-	slider_width = 35,
-	slider_height = 120,
-	meter_size = 64,
 }
 
 local state = {
@@ -27,148 +23,115 @@ local state = {
 }
 
 -- -----------------------------------------------------------------------------
--- COMPONENTS
+-- SLIDERS
 -- -----------------------------------------------------------------------------
 
--- Slider
-
-function slider(model, color)
-	local wslider = wibox.widget {
-		bar_shape = gears.shape.rounded_rect,
-		bar_height = 10,
-		bar_color = beautiful.colors.void,
-
-		handle_width = 18,
-		handle_color = color,
-		handle_border_width = 2,
-		handle_border_color = beautiful.colors.void,
-
-		value = model.percent,
-		widget = wibox.widget.slider,
-	}
-
-	wslider:connect_signal('property::value', function(val)
-		model:set(wslider.value)
-	end)
-
-	model:connect_signal('update', function()
-		wslider.value = model.percent
-	end)
-
-	return wibox.widget {
-		wslider,
-		direction = 'east',
-		forced_width = config.slider_width,
-		forced_height = config.slider_height,
-		widget = wibox.container.rotate,
-	}
-end
-
--- Meter
-
-function meter(id, model, update_hook)
-	local needle = wibox.widget {
-		rotatee = wibox.widget {
-			image = beautiful.svg('dashboard/meter/needle'),
-			widget = wibox.widget.imagebox,
-		},
-		widget = widgets.rotator,
-	}
-
-	local icon = wibox.widget {
-		image = beautiful.svg('dashboard/'..id..'/icon'),
-		widget = wibox.widget.imagebox,
-	}
-
-	function update()
-		needle.theta = (1 - model.percent / 100) * -math.pi,
-		needle:emit_signal('widget::layout_changed')
-		if update_hook then (update_hook)(icon) end
-	end
-
-	update()
-	model:connect_signal('update', update)
-
-	return wibox.widget {
-		{
-			image = beautiful.svg('dashboard/meter/body'),
-			widget = wibox.widget.imagebox,
-		},
-		needle,
-		icon,
-		{
-			image = beautiful.svg('dashboard/'..id..'/button'),
-			widget = wibox.widget.imagebox,
-		},
-		forced_width = config.meter_size,
-		forced_height = config.meter_size,
-		layout = wibox.layout.stack,
-	}
-end
-
--- -----------------------------------------------------------------------------
--- PARTIALS
--- -----------------------------------------------------------------------------
-
--- Locales
-
-local locales = wibox.widget(gears.table.crush(
-	gears.table.map(function(id)
-		return wibox.widget {
-			layout.center {
-				image = beautiful.svg('dashboard/locale/'..id),
-				forced_width = 60,
-				forced_height = 40,
-				widget = wibox.widget.imagebox,
-			},
-			layout = wibox.layout.fixed.vertical,
-		}
-	end, { 'usa', 'japan', 'germany' })
-, { layout = wibox.layout.flex.horizontal }))
-
--- Sliders
+local sliders_defaults = {
+	width = 35,
+	height = 120,
+}
 
 local sliders = wibox.widget {
-	layout.center(slider(models.volume, beautiful.colors.green)),
-	layout.center(slider(models.brightness, beautiful.colors.yellow)),
+	layout.center(components.slider(gears.table.crush({
+		color = beautiful.colors.green,
+		model = models.volume,
+	}, sliders_defaults))),
+	layout.center(components.slider(gears.table.crush({
+		color = beautiful.colors.yellow,
+		model = models.brightness,
+	}, sliders_defaults))),
 	layout = wibox.layout.flex.horizontal,
 }
 
--- Meters
+-- -----------------------------------------------------------------------------
+-- METERS
+-- -----------------------------------------------------------------------------
+
+local meters_defaults = {
+	size = 64,
+}
 
 local meters = layout.center {
 	{
-		image = beautiful.svg('dashboard/meter/panel'),
+		image = beautiful.svg('dashboard/panel'),
 		widget = wibox.widget.imagebox,
 	},
 	layout.center {
-		meter('disk', models.disk),
+		components.meter(gears.table.crush({
+			icon = beautiful.svg('dashboard/meters/disk'),
+			color = 'purple',
+			model = models.disk,
+		}, meters_defaults)),
 		layout.hpad(8),
-		meter('ram', models.ram),
+		components.meter(gears.table.crush({
+			icon = beautiful.svg('dashboard/meters/ram'),
+			color = 'blue',
+			model = models.ram,
+		}, meters_defaults)),
 		layout.hpad(8),
-		meter('battery', models.battery, function(icon)
-			if models.battery.discharging then
-				icon.image = beautiful.svg('dashboard/battery/discharging')
-			else
-				icon.image = beautiful.svg('dashboard/battery/charging')
-			end
-			icon:emit_signal('widget::redraw_needed')
-		end),
+		components.meter(gears.table.crush({
+			icon = models.battery.discharging
+				and beautiful.svg('dashboard/meters/battery-discharging')
+				or beautiful.svg('dashboard/meters/battery-charging'),
+			color = 'red',
+			model = models.battery,
+			onupdate = function()
+				return {
+					icon = models.battery.discharging
+						and beautiful.svg('dashboard/meters/battery-discharging')
+						or beautiful.svg('dashboard/meters/battery-charging'),
+				}
+			end,
+		}, meters_defaults)),
 		layout = wibox.layout.fixed.horizontal,
 	},
-	-- panel svg dimensions
-	forced_width = 228,
-	forced_height = 84,
+	forced_width = 250,
 	layout = wibox.layout.stack,
 }
 
 -- -----------------------------------------------------------------------------
--- NOTIF CENTER
+-- BUTTON PANEL
 -- -----------------------------------------------------------------------------
 
-local notif_center = wibox.widget {
-	text = 'Placeholder',
-	widget = wibox.widget.textbox,
+local button_panel_kb_defaults = {
+	icon_size = 64,
+	size = 32,
+	model = models.kb_layout,
+}
+
+local button_panel = wibox.widget {
+	{
+		{
+			image = beautiful.svg('dashboard/panel'),
+			widget = wibox.widget.imagebox,
+		},
+		layout.center {
+			components.button(gears.table.crush({
+				icon = beautiful.svg('dashboard/locale/usa'),
+				is_pressed = function()
+					return models.kb_layout.index == 1
+				end,
+			}, button_panel_kb_defaults)),
+			layout.hpad(16),
+			components.button(gears.table.crush({
+				icon = beautiful.svg('dashboard/locale/japan'),
+				is_pressed = function()
+					return models.kb_layout.index == 2
+				end,
+			}, button_panel_kb_defaults)),
+			layout.hpad(16),
+			components.button(gears.table.crush({
+				icon = beautiful.svg('dashboard/locale/germany'),
+				is_pressed = function()
+					return models.kb_layout.index == 3
+				end,
+			}, button_panel_kb_defaults)),
+			layout = wibox.layout.fixed.horizontal,
+		},
+		forced_width = 300,
+		layout = wibox.layout.stack,
+	},
+	layout = wibox.layout.flex.vertical,
 }
 
 -- -----------------------------------------------------------------------------
@@ -183,8 +146,8 @@ local dashboard = wibox {
 }
 
 local column1 = wibox.widget {
-	notif_center,
-	layout = wibox.layout.fixed.vertical,
+	text = 'Placeholder',
+	widget = wibox.widget.textbox,
 }
 
 local column3 = wibox.widget {
@@ -196,11 +159,10 @@ dashboard:setup {
 	layout.center {
 		{
 			layout.center {
-				notif_center,
+				column1,
 				layout = wibox.layout.fixed.vertical,
 			},
 			layout.center {
-				locales,
 				layout.vpad(16),
 				sliders,
 				layout.vpad(16),
@@ -208,18 +170,14 @@ dashboard:setup {
 				layout = wibox.layout.fixed.vertical,
 			},
 			layout.center {
-				text = 'Placeholder',
-				widget = wibox.widget.textbox,
+				button_panel,
+				layout = wibox.layout.fixed.vertical,
 			},
 			layout = wibox.layout.flex.horizontal,
 		},
+
 		forced_width = config.width,
 		forced_height = config.height,
-
-		bg = beautiful.colors.black,
-		shape = gears.shape.rectangle,
-		shape_border_width = config.border_width,
-		shape_border_color = beautiful.colors.white,
 
 		widget = wibox.container.background,
 	},

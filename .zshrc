@@ -80,5 +80,6 @@ alias l='ls -1 --color=auto --group-directories-first'
 alias vi='nvim'
 alias vim='nvim'
 alias now='date +"%F %H:%M"'
+alias testwm='Xephyr -br -ac -noreset -screen 800x600 :1 &; DISPLAY=:1 awesome'
 
 # vim: syntax=zsh
