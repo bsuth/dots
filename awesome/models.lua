@@ -93,12 +93,16 @@ local kb_layout = gears.table.crush(gears.object(), {
 		-- 'fcitx-keyboard-de',
 	},
 
-	cycle = function(self)
-		self.index = (self.index == #self.list) and 1 or (self.index + 1)
+	set = function(self, newindex)
+		self.index = newindex
 		awful.spawn.easy_async_with_shell(
 			'fcitx-remote -s '..self.list[self.index],
 			function() self:emit_signal('update') end
 		)
+	end,
+
+	cycle = function(self)
+		self:set(self.index == #self.list and 1 or self.index + 1)
 	end,
 })
 

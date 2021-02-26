@@ -47,91 +47,68 @@ local sliders = wibox.widget {
 -- METERS
 -- -----------------------------------------------------------------------------
 
-local meters_defaults = {
-	size = 64,
-}
-
-local meters = layout.center {
-	{
-		image = beautiful.svg('dashboard/panel'),
-		widget = wibox.widget.imagebox,
+local meters = layout.center(components.panel {
+	components.meter {
+		icon = beautiful.svg('dashboard/meters/disk'),
+		color = 'purple',
+		model = models.disk,
 	},
-	layout.center {
-		components.meter(gears.table.crush({
-			icon = beautiful.svg('dashboard/meters/disk'),
-			color = 'purple',
-			model = models.disk,
-		}, meters_defaults)),
-		layout.hpad(8),
-		components.meter(gears.table.crush({
-			icon = beautiful.svg('dashboard/meters/ram'),
-			color = 'blue',
-			model = models.ram,
-		}, meters_defaults)),
-		layout.hpad(8),
-		components.meter(gears.table.crush({
-			icon = models.battery.discharging
-				and beautiful.svg('dashboard/meters/battery-discharging')
-				or beautiful.svg('dashboard/meters/battery-charging'),
-			color = 'red',
-			model = models.battery,
-			onupdate = function()
-				return {
-					icon = models.battery.discharging
-						and beautiful.svg('dashboard/meters/battery-discharging')
-						or beautiful.svg('dashboard/meters/battery-charging'),
-				}
-			end,
-		}, meters_defaults)),
-		layout = wibox.layout.fixed.horizontal,
+	layout.hpad(8),
+	components.meter {
+		icon = beautiful.svg('dashboard/meters/ram'),
+		color = 'blue',
+		model = models.ram,
 	},
-	forced_width = 250,
-	layout = wibox.layout.stack,
-}
+	layout.hpad(8),
+	components.meter {
+		icon = models.battery.discharging
+			and beautiful.svg('dashboard/meters/battery-discharging')
+			or beautiful.svg('dashboard/meters/battery-charging'),
+		color = 'red',
+		model = models.battery,
+		onupdate = function()
+			return {
+				icon = models.battery.discharging
+					and beautiful.svg('dashboard/meters/battery-discharging')
+					or beautiful.svg('dashboard/meters/battery-charging'),
+			}
+		end,
+	},
+	layout = wibox.layout.fixed.horizontal,
+})
 
 -- -----------------------------------------------------------------------------
 -- BUTTON PANEL
 -- -----------------------------------------------------------------------------
 
 local button_panel_kb_defaults = {
-	icon_size = 64,
-	size = 32,
+	icon_width = 64,
+	icon_height = 32,
 	model = models.kb_layout,
 }
 
-local button_panel = wibox.widget {
+local button_panel = components.panel {
 	{
-		{
-			image = beautiful.svg('dashboard/panel'),
-			widget = wibox.widget.imagebox,
-		},
-		layout.center {
-			components.button(gears.table.crush({
-				icon = beautiful.svg('dashboard/locale/usa'),
-				is_pressed = function()
-					return models.kb_layout.index == 1
-				end,
-			}, button_panel_kb_defaults)),
-			layout.hpad(16),
-			components.button(gears.table.crush({
-				icon = beautiful.svg('dashboard/locale/japan'),
-				is_pressed = function()
-					return models.kb_layout.index == 2
-				end,
-			}, button_panel_kb_defaults)),
-			layout.hpad(16),
-			components.button(gears.table.crush({
-				icon = beautiful.svg('dashboard/locale/germany'),
-				is_pressed = function()
-					return models.kb_layout.index == 3
-				end,
-			}, button_panel_kb_defaults)),
-			layout = wibox.layout.fixed.horizontal,
-		},
-		forced_width = 300,
-		layout = wibox.layout.stack,
+		components.button(gears.table.crush({
+			icon = beautiful.svg('dashboard/locale/usa'),
+			is_pressed = function() return models.kb_layout.index == 1 end,
+			onpress = function() models.kb_layout:set(1) end,
+		}, button_panel_kb_defaults)),
+		layout.hpad(16),
+		components.button(gears.table.crush({
+			icon = beautiful.svg('dashboard/locale/japan'),
+			is_pressed = function() return models.kb_layout.index == 2 end,
+			onpress = function() models.kb_layout:set(2) end,
+		}, button_panel_kb_defaults)),
+		layout.hpad(16),
+		components.button(gears.table.crush({
+			icon = beautiful.svg('dashboard/locale/germany'),
+			is_pressed = function() return models.kb_layout.index == 3 end,
+			onpress = function() models.kb_layout:set(3) end,
+		}, button_panel_kb_defaults)),
+		layout = wibox.layout.fixed.horizontal,
 	},
-	layout = wibox.layout.flex.vertical,
+	layout = wibox.layout.fixed.vertical,
 }
 
 -- -----------------------------------------------------------------------------
@@ -163,16 +140,16 @@ dashboard:setup {
 				layout = wibox.layout.fixed.vertical,
 			},
 			layout.center {
+				{
+					widget = wibox.widget.textclock,
+				},
 				layout.vpad(16),
 				sliders,
 				layout.vpad(16),
 				meters,
 				layout = wibox.layout.fixed.vertical,
 			},
-			layout.center {
-				button_panel,
-				layout = wibox.layout.fixed.vertical,
-			},
+			layout.center(button_panel),
 			layout = wibox.layout.flex.horizontal,
 		},
 
