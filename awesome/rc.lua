@@ -11,6 +11,16 @@ local taglist = require 'taglist'
 local bindings = require 'bindings' 
 
 --------------------------------------------------------------------------------
+-- LAYOUTS
+--------------------------------------------------------------------------------
+
+awful.layout.layouts = {
+    awful.layout.suit.spiral.dwindle,
+    awful.layout.suit.fair.horizontal,
+    awful.layout.suit.magnifier,
+}
+
+--------------------------------------------------------------------------------
 -- TAG / SCREEN SETUP
 --------------------------------------------------------------------------------
 
@@ -18,7 +28,7 @@ awful.screen.connect_for_each_screen(function(s)
     awful.tag(
 		{ '1', '2', '3', '4', '5', '6', '7', '8', '9' },
 		s,
-		awful.layout.suit.tile.right
+		awful.layout.layouts[1]
 	)
 
 	beautiful.set_wallpaper(s)
@@ -65,7 +75,7 @@ awful.rules.rules = {
 
             focus = awful.client.focus.filter,
             screen = awful.screen.preferred,
-            placement = awful.placement.no_overlap+awful.placement.no_offscreen,
+            placement = awful.placement.no_overlap + awful.placement.no_offscreen,
         },
     },
     

@@ -5,6 +5,89 @@ local wibox = require 'wibox'
 local widgets = require 'widgets'
 
 -- -----------------------------------------------------------------------------
+-- HELPERS
+-- -----------------------------------------------------------------------------
+
+function set_source_hex(cr, hex)
+	local rgb = beautiful.hex2rgb(hex)
+	cr:set_source_rgb(rgb[1], rgb[2], rgb[3])
+end
+
+-- -----------------------------------------------------------------------------
+-- BIG BUTTON
+-- -----------------------------------------------------------------------------
+
+function big_button(config)
+	local safety_check = false
+	local safety_check_timer = gears.timer {
+		timeout = 0.25,
+		single_shot = true,
+		callback = function()
+			safety_check = false
+		end,
+	}
+
+	local _button = wibox.widget {
+		{
+			layout.center {
+				forced_width = 32,
+				forced_height= 32,
+				image = config.icon,
+				widget = wibox.widget.imagebox,
+			},
+			top = 16,
+			bottom = 16 + 6,
+			left = 16,
+			right = 16,
+			widget = wibox.container.margin,
+		},
+
+		shape = function(cr, width, height)
+			local R = width / 2
+			local r = R - 4
+
+			set_source_hex(cr, beautiful.colors.black)
+			cr:arc(R, height - R, R, 0, 2 * math.pi)
+			cr:fill()
+
+			set_source_hex(cr, beautiful.colors.void)
+			cr:arc(R, height - R, r, 0, 2 * math.pi)
+			cr:rectangle(4, height - R - 6, 2 * r, 6)
+			cr:fill()
+
+			set_source_hex(cr, config.color)
+			cr:arc(R, height - R - 6, r, 0, 2 * math.pi)
+			cr:fill()
+		end,
+
+		widget = wibox.container.background,
+	}
+
+	if config.onpress ~= nil then
+		_button:connect_signal('button::press', function(_, _, _, button)
+			if button == 1 then
+				if not safety_check then
+					safety_check = true
+					safety_check_timer:again()
+				else
+					(config.onpress)()
+				end
+			end
+		end)
+
+		_button:connect_signal('mouse::enter', function()
+			mouse.current_wibox.cursor = 'hand1'
+		end)
+
+		_button:connect_signal('mouse::leave', function()
+			mouse.current_wibox.cursor = 'arrow'
+		end)
+	end
+
+	return _button
+end
+
+-- -----------------------------------------------------------------------------
 -- BUTTON
 -- -----------------------------------------------------------------------------
 
@@ -23,20 +106,17 @@ function button(config)
 			local top = config.is_pressed()
 				and bottom - 4
 				or bottom - 8
-			local color = beautiful.hex2rgb(beautiful.colors.black)
 
-			cr:set_source_rgb(color[1], color[2], color[3])
+			set_source_hex(cr, beautiful.colors.black)
 			cr:arc(R, bottom, R, 0, 2 * math.pi)
 			cr:fill()
 
-			color = beautiful.hex2rgb(beautiful.colors.void)
-			cr:set_source_rgb(color[1], color[2], color[3])
+			set_source_hex(cr, beautiful.colors.void)
 			cr:arc(R, bottom, r, 0, 2 * math.pi)
 			cr:rectangle(4, top, width - 8, bottom - top)
 			cr:fill()
 
-			color = beautiful.hex2rgb(beautiful.colors.dark_grey)
-			cr:set_source_rgb(color[1], color[2], color[3])
+			set_source_hex(cr, beautiful.colors.dark_grey)
 			cr:arc(R, top, r, 0, 2 * math.pi)
 			cr:fill()
 		end,
@@ -44,9 +124,9 @@ function button(config)
 		widget = wibox.container.background,
 	}
 
-	config.model:connect_signal('update', function()
-		_button:emit_signal('widget::redraw_needed')
-	end)
+	if config.hook ~= nil then
+		(config.hook)(_button)
+	end
 
 	if config.onpress ~= nil then
 		_button:connect_signal('button::press', function(_, _, _, button)
@@ -132,40 +212,72 @@ function meter(config)
 end
 
 -- -----------------------------------------------------------------------------
+-- MOUNT
+-- -----------------------------------------------------------------------------
+
+function mount(widget)
+	local tab_thickness = 8
+
+	return wibox.widget {
+		{
+			layout.center(widget),
+			margins = tab_thickness + 8,
+			widget = wibox.container.margin,
+		},
+
+		shape = function(cr, width, height)
+			set_source_hex(cr, '#282828')
+
+			cr:rectangle(tab_thickness, tab_thickness, width - 2 * tab_thickness, height - 2 * tab_thickness)
+			cr:fill()
+
+			cr:rectangle(width / 3, 0, width / 3, tab_thickness)
+			cr:fill()
+
+			cr:rectangle(width / 3, height - tab_thickness, width / 3, tab_thickness)
+			cr:fill()
+
+			cr:rectangle(0, height / 3, tab_thickness, height / 3)
+			cr:fill()
+
+			cr:rectangle(width - tab_thickness, height / 3, tab_thickness, height / 3)
+			cr:fill()
+		end,
+
+		widget = wibox.container.background,
+	}
+end
+
+-- -----------------------------------------------------------------------------
 -- PANEL
 -- -----------------------------------------------------------------------------
 
-function panel(widget)
-	local bg = beautiful.hex2rgb(beautiful.colors.blacker)
-
-	local border_color = beautiful.hex2rgb(beautiful.colors.black)
+function panel(widget, padding_x, padding_y)
 	local border_width = 8
-
-	local nail_color = beautiful.hex2rgb(beautiful.colors.white)
 	local nail_offset = border_width + 8
 	local nail_size = 4
 
 	return wibox.widget {
 		{
-			widget,
-			top = border_width + 16,
-			bottom = border_width + 16,
-			left = border_width + 32,
-			right = border_width + 32,
+			layout.center(widget),
+			top = border_width + (padding_y or 16),
+			bottom = border_width + (padding_y or 16),
+			left = border_width + (padding_x or 32),
+			right = border_width + (padding_x or 32),
 			widget = wibox.container.margin,
 		},
 
 		shape = function(cr, width, height)
-			cr:set_source_rgb(bg[1], bg[2], bg[3])
+			set_source_hex(cr, beautiful.colors.blacker)
 			cr:rectangle(0, 0, width, height)
 			cr:fill()
 
-			cr:set_source_rgb(border_color[1], border_color[2], border_color[3])
+			set_source_hex(cr, beautiful.colors.black)
 			cr:set_line_width(border_width)
 			cr:rectangle(0, 0, width, height)
 			cr:stroke()
 
-			cr:set_source_rgb(nail_color[1], nail_color[2], nail_color[3])
+			set_source_hex(cr, beautiful.colors.white)
 
 			cr:arc(nail_offset, nail_offset, nail_size, 0, 2 * math.pi)
 			cr:fill()
@@ -227,8 +339,10 @@ end
 -- -----------------------------------------------------------------------------
 
 return {
+	big_button = big_button,
 	button = button,
 	meter = meter,
+	mount = mount,
 	panel = panel,
 	slider = slider,
 }
