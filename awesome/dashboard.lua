@@ -24,6 +24,15 @@ local state = {
 }
 
 -- -----------------------------------------------------------------------------
+-- BLUETOOTH
+-- -----------------------------------------------------------------------------
+
+local bluetooth = components.panel {
+	text = 'Bluetooth Here',
+	widget = wibox.widget.textbox,
+}
+
+-- -----------------------------------------------------------------------------
 -- CLOCK
 -- -----------------------------------------------------------------------------
 
@@ -57,6 +66,84 @@ local clock = wibox.widget {
 }
 
 -- -----------------------------------------------------------------------------
+-- DANGER ZONE
+-- -----------------------------------------------------------------------------
+
+local danger_zone = wibox.widget {
+	components.panel(components.button {
+		icon = beautiful.svg('dashboard/danger/lock'),
+		color = beautiful.colors.green,
+		size = 64,
+		safety_check = true,
+		onpress = function()
+			require('naughty').notify { text = 'sleep' }
+		end,
+	}, 16, 16),
+	layout.hpad(8),
+	components.panel(components.button {
+		icon = beautiful.svg('dashboard/danger/restart'),
+		color = beautiful.colors.yellow,
+		size = 64,
+		safety_check = true,
+		onpress = function()
+			require('naughty').notify { text = 'reboot' }
+		end,
+	}, 16, 16),
+	layout.hpad(8),
+	components.panel(components.button {
+		icon = beautiful.svg('dashboard/danger/power'),
+		color = beautiful.colors.red,
+		size = 64,
+		safety_check = true,
+		onpress = function()
+			require('naughty').notify { text = 'shutdown' }
+		end,
+	}, 16, 16),
+	layout = wibox.layout.fixed.horizontal,
+}
+
+-- -----------------------------------------------------------------------------
+-- KB LAYOUT
+-- -----------------------------------------------------------------------------
+
+function create_kb_layout_item(index, icon)
+	return wibox.widget {
+		layout.center {
+			forced_width = 64,
+			forced_height = 32,
+			image = beautiful.svg(icon),
+			widget = wibox.widget.imagebox,
+		},
+		layout.vpad(16),
+		layout.center(components.button {
+			is_pressed = function()
+				return models.kb_layout.index == index
+			end,
+
+			onpress = function()
+				models.kb_layout:set(index)
+			end,
+
+			hook = function(button)
+				models.kb_layout:connect_signal('update', function()
+					button:emit_signal('widget::redraw_needed')
+				end)
+			end,
+		}),
+		layout = wibox.layout.fixed.vertical,
+	}
+end
+
+local kb_layout = components.panel {
+	create_kb_layout_item(1, 'dashboard/kb_layout/usa'),
+	layout.hpad(16),
+	create_kb_layout_item(2, 'dashboard/kb_layout/japan'),
+	layout.hpad(16),
+	create_kb_layout_item(3, 'dashboard/kb_layout/germany'),
+	layout = wibox.layout.fixed.horizontal,
+}
+
+-- -----------------------------------------------------------------------------
 -- METERS
 -- -----------------------------------------------------------------------------
 
@@ -75,15 +162,15 @@ local meters = components.panel {
 	layout.hpad(8),
 	components.meter {
 		icon = models.battery.discharging
-		and beautiful.svg('dashboard/meters/battery-discharging')
-		or beautiful.svg('dashboard/meters/battery-charging'),
+			and beautiful.svg('dashboard/meters/battery-discharging')
+			or beautiful.svg('dashboard/meters/battery-charging'),
 		color = 'red',
 		model = models.battery,
 		onupdate = function()
 			return {
 				icon = models.battery.discharging
-				and beautiful.svg('dashboard/meters/battery-discharging')
-				or beautiful.svg('dashboard/meters/battery-charging'),
+					and beautiful.svg('dashboard/meters/battery-discharging')
+					or beautiful.svg('dashboard/meters/battery-charging'),
 			}
 		end,
 	},
@@ -112,37 +199,52 @@ local sliders = wibox.widget {
 }
 
 -- -----------------------------------------------------------------------------
--- KB LAYOUT
+-- SWITCHES
 -- -----------------------------------------------------------------------------
 
-function create_kb_config(index, icon)
-	return {
-		icon_width = 64,
-		icon_height = 32,
-		icon = beautiful.svg(icon),
+function create_switch_item(config)
+	local icon = wibox.widget {
+		forced_width = 40,
+		forced_height = 40,
+		image = config.model.active
+			and config.active_icon
+			or config.inactive_icon,
+		widget = wibox.widget.imagebox,
+	}
 
-		is_pressed = function()
-			return models.kb_layout.index == index
-		end,
+	config.model:connect_signal('update', function()
+		icon.image = config.model.active
+			and config.active_icon
+			or config.inactive_icon
+		icon:emit_signal('widget::redraw_needed')
+	end)
 
-		onpress = function()
-			models.kb_layout:set(index)
-		end,
-
-		hook = function(button)
-			models.kb_layout:connect_signal('update', function()
-				button:emit_signal('widget::redraw_needed')
-			end)
-		end,
+	return wibox.widget {
+		layout.center(icon),
+		layout.vpad(16),
+		layout.center(components.switch { model = config.model }),
+		layout = wibox.layout.fixed.vertical,
 	}
 end
 
-local kb_layout = components.panel {
-	components.button(create_kb_config(1, 'dashboard/locale/usa')),
-	layout.hpad(16),
-	components.button(create_kb_config(2, 'dashboard/locale/japan')),
-	layout.hpad(16),
-	components.button(create_kb_config(3, 'dashboard/locale/germany')),
+local switches = wibox.widget {
+	create_switch_item {
+		active_icon = beautiful.svg('dashboard/switches/volume-on'),
+		inactive_icon = beautiful.svg('dashboard/switches/volume-off'),
+		model = models.volume,
+	},
+	layout.hpad(8),
+	create_switch_item {
+		active_icon = beautiful.svg('dashboard/switches/volume-on'),
+		inactive_icon = beautiful.svg('dashboard/switches/volume-off'),
+		model = models.bluetooth,
+	},
+	layout.hpad(8),
+	create_switch_item {
+		active_icon = beautiful.svg('dashboard/switches/volume-on'),
+		inactive_icon = beautiful.svg('dashboard/switches/volume-off'),
+		model = models.notifs,
+	},
 	layout = wibox.layout.fixed.horizontal,
 }
 
@@ -150,66 +252,50 @@ local kb_layout = components.panel {
 -- TILING LAYOUT
 -- -----------------------------------------------------------------------------
 
-function create_tiling_config(index, icon)
-	return {
-		icon_width = 40,
-		icon_height = 40,
-		icon = beautiful.svg(icon),
+function create_tiling_layout_item(index, icon)
+	return wibox.widget {
+		layout.center {
+			forced_width = 40,
+			forced_height = 40,
+			image = beautiful.svg(icon),
+			widget = wibox.widget.imagebox,
+		},
+		layout.vpad(16),
+		layout.center(components.button {
+			is_pressed = function()
+				return state.tag.layout == awful.layout.layouts[index]
+			end,
 
-		is_pressed = function()
-			return state.tag.layout == awful.layout.layouts[index]
-		end,
+			onpress = function()
+				awful.layout.set(awful.layout.layouts[index])
+			end,
 
-		onpress = function()
-			awful.layout.set(awful.layout.layouts[index])
-		end,
-
-		hook = function(button)
-			awful.tag.attached_connect_signal(nil, 'property::layout', function()
-				button:emit_signal('widget::redraw_needed')
-			end)
-		end,
+			hook = function(button)
+				awful.tag.attached_connect_signal(nil, 'property::layout', function()
+					button:emit_signal('widget::redraw_needed')
+				end)
+			end,
+		}),
+		layout = wibox.layout.fixed.vertical,
 	}
 end
 
 local tiling_layout = components.panel {
-	components.button(create_tiling_config(1, 'dashboard/tiling/dwindle')),
+	create_tiling_layout_item(1, 'dashboard/tiling/dwindle'),
 	layout.hpad(32),
-	components.button(create_tiling_config(2, 'dashboard/tiling/fair')),
+	create_tiling_layout_item(2, 'dashboard/tiling/fair'),
 	layout.hpad(32),
-	components.button(create_tiling_config(3, 'dashboard/tiling/magnifier')),
+	create_tiling_layout_item(3, 'dashboard/tiling/magnifier'),
 	layout = wibox.layout.fixed.horizontal,
 }
 
 -- -----------------------------------------------------------------------------
--- DANGER ZONE
+-- WIFI
 -- -----------------------------------------------------------------------------
 
-local danger_zone = wibox.widget {
-	components.panel(components.big_button {
-		icon = beautiful.svg('dashboard/lock'),
-		color = beautiful.colors.green,
-		onpress = function()
-			require('naughty').notify { text = 'sleep' }
-		end,
-	}, 16, 16),
-	layout.hpad(8),
-	components.panel(components.big_button {
-		icon = beautiful.svg('dashboard/restart'),
-		color = beautiful.colors.yellow,
-		onpress = function()
-			require('naughty').notify { text = 'reboot' }
-		end,
-	}, 16, 16),
-	layout.hpad(8),
-	components.panel(components.big_button {
-		icon = beautiful.svg('dashboard/power'),
-		color = beautiful.colors.red,
-		onpress = function()
-			require('naughty').notify { text = 'shutdown' }
-		end,
-	}, 16, 16),
-	layout = wibox.layout.fixed.horizontal,
+local wifi = components.panel {
+	text = 'Wifi Here',
+	widget = wibox.widget.textbox,
 }
 
 -- -----------------------------------------------------------------------------
@@ -223,24 +309,16 @@ local dashboard = wibox {
 	bg = beautiful.colors.transparent,
 }
 
-local column1 = wibox.widget {
-	text = 'Placeholder',
-	widget = wibox.widget.textbox,
-}
-
-local column3 = wibox.widget {
-	text = 'Placeholder',
-	widget = wibox.widget.textbox,
-}
-
 dashboard:setup {
 	layout.center {
 		{
 			layout.center {
-				column1,
+				wifi,
+				layout.vpad(32),
+				bluetooth,
 				layout = wibox.layout.fixed.vertical,
 			},
-			{
+			layout.center {
 				layout.center(components.mount(clock)),
 				layout.vpad(32),
 				layout.center(components.mount {
@@ -251,7 +329,9 @@ dashboard:setup {
 				}),
 				layout = wibox.layout.fixed.vertical,
 			},
-			{
+			layout.center {
+				layout.center(components.mount(switches)),
+				layout.vpad(32),
 				layout.center(components.mount {
 					kb_layout,
 					layout.vpad(16),
