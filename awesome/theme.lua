@@ -33,7 +33,7 @@ local colors = {
 beautiful.init {
     colors = colors,
 
-    font = 'Titan One 16',
+    font = 'Orbitron Regular 16',
 
     fg_normal = colors.white,
     bg_focus = colors.white,
@@ -45,7 +45,7 @@ beautiful.init {
     border_focus = colors.green,
     border_marked = colors.red,
 
-    notification_font = 'Quicksand Medium 16',
+    notification_font = 'Orbitron Regular 16',
     notification_bg = '#181818',
     notification_fg = colors.white,
     notification_border_color = colors.white,

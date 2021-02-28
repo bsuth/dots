@@ -24,6 +24,39 @@ local state = {
 }
 
 -- -----------------------------------------------------------------------------
+-- CLOCK
+-- -----------------------------------------------------------------------------
+
+local clock = wibox.widget {
+	{
+		{
+			layout.center {
+				format = ('<span color="%s" size="xx-large">%s</span>')
+					:format(beautiful.colors.cyan, '%H:%M'),
+				widget = wibox.widget.textclock,
+			},
+			layout.center {
+				format = ('<span color="%s" size="small">%s</span>')
+					:format(beautiful.colors.white, '%d-%m-%Y'),
+				widget = wibox.widget.textclock,
+			},
+			layout = wibox.layout.fixed.vertical,
+		},
+		top = 20,
+		bottom = 20,
+		left = 100,
+		right = 100,
+		widget = wibox.container.margin,
+	},
+
+	bg = beautiful.colors.void,
+	shape = gears.shape.rectangle,
+	shape_border_width = 2,
+	shape_border_color = beautiful.colors.dark_grey,
+	widget = wibox.container.background,
+}
+
+-- -----------------------------------------------------------------------------
 -- METERS
 -- -----------------------------------------------------------------------------
 
@@ -207,17 +240,15 @@ dashboard:setup {
 				column1,
 				layout = wibox.layout.fixed.vertical,
 			},
-			layout.center {
-				components.mount {
-					widget = wibox.widget.textclock,
-				},
+			{
+				layout.center(components.mount(clock)),
 				layout.vpad(32),
-				components.mount {
+				layout.center(components.mount {
 					meters,
 					layout.vpad(32),
 					sliders,
 					layout = wibox.layout.fixed.vertical,
-				},
+				}),
 				layout = wibox.layout.fixed.vertical,
 			},
 			{
