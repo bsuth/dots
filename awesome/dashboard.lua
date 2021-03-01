@@ -268,14 +268,14 @@ local switches = wibox.widget {
 	},
 	layout.hpad(8),
 	create_switch_item {
-		active_icon = beautiful.svg('dashboard/switches/volume-on'),
-		inactive_icon = beautiful.svg('dashboard/switches/volume-off'),
+		active_icon = beautiful.svg('dashboard/switches/bluetooth-on'),
+		inactive_icon = beautiful.svg('dashboard/switches/bluetooth-off'),
 		model = models.bluetooth,
 	},
 	layout.hpad(8),
 	create_switch_item {
-		active_icon = beautiful.svg('dashboard/switches/volume-on'),
-		inactive_icon = beautiful.svg('dashboard/switches/volume-off'),
+		active_icon = beautiful.svg('dashboard/switches/notifs-on'),
+		inactive_icon = beautiful.svg('dashboard/switches/notifs-off'),
 		model = models.notifs,
 	},
 	layout = wibox.layout.fixed.horizontal,
