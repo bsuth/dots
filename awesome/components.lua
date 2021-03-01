@@ -20,19 +20,8 @@ end
 function button(config)
 	local force_press = false
 
-	local icon = config.icon and wibox.widget {
-		{
-			image = config.icon,
-			widget = wibox.widget.imagebox,
-		},
-		point = { x = 0, y = 0 },
-		margins = 12,
-		widget = wibox.container.margin,
-	} or nil
-
 	local _button = wibox.widget {
 		{
-			icon,
 			forced_width = config.size or 32,
 			forced_height = (config.size or 32) + 8,
 			layout = wibox.layout.manual,
@@ -40,11 +29,6 @@ function button(config)
 
 		shape = function(cr, width, height)
 			local pressed = force_press or config.is_pressed and config.is_pressed()
-
-			if icon ~= nil then
-				icon.point.y = pressed and 4 or 0
-				icon:emit_signal('widget::layout_changed')
-			end
 
 			local R = width / 2
 			local r = R - 4

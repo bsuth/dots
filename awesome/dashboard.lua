@@ -69,37 +69,70 @@ local clock = wibox.widget {
 -- DANGER ZONE
 -- -----------------------------------------------------------------------------
 
+function create_danger_zone_icon(icon)
+	return wibox.widget {
+		{
+			forced_width = 32,
+			forced_height = 32,
+			image = beautiful.svg(icon),
+			widget = wibox.widget.imagebox,
+		},
+		top = 8,
+		bottom = 8,
+		-- Size to button + panel padding + panel border width
+		left = 8 + 16 + 8,
+		right = 8 + 16 + 8,
+		widget = wibox.container.margin,
+	}
+end
+
 local danger_zone = wibox.widget {
-	components.panel(components.button {
-		icon = beautiful.svg('dashboard/danger/lock'),
-		color = beautiful.colors.green,
-		size = 64,
-		safety_check = true,
-		onpress = function()
-			require('naughty').notify { text = 'sleep' }
-		end,
-	}, 16, 16),
-	layout.hpad(8),
-	components.panel(components.button {
-		icon = beautiful.svg('dashboard/danger/restart'),
-		color = beautiful.colors.yellow,
-		size = 64,
-		safety_check = true,
-		onpress = function()
-			require('naughty').notify { text = 'reboot' }
-		end,
-	}, 16, 16),
-	layout.hpad(8),
-	components.panel(components.button {
-		icon = beautiful.svg('dashboard/danger/power'),
-		color = beautiful.colors.red,
-		size = 64,
-		safety_check = true,
-		onpress = function()
-			require('naughty').notify { text = 'shutdown' }
-		end,
-	}, 16, 16),
-	layout = wibox.layout.fixed.horizontal,
+	{
+		{
+			create_danger_zone_icon('dashboard/danger/lock'),
+			layout.hpad(8),
+			create_danger_zone_icon('dashboard/danger/restart'),
+			layout.hpad(8),
+			create_danger_zone_icon('dashboard/danger/power'),
+			layout = wibox.layout.fixed.horizontal,
+		},
+		bg = beautiful.colors.blacker,
+		shape = gears.shape.rounded_rect,
+		shape_border_width = 2,
+		shape_border_color = beautiful.colors.void,
+		widget = wibox.container.background,
+	},
+	layout.vpad(8),
+	{
+		components.panel(components.button {
+			color = beautiful.colors.green,
+			size = 48,
+			safety_check = true,
+			onpress = function()
+				require('naughty').notify { text = 'sleep' }
+			end,
+		}, 16, 16),
+		layout.hpad(8),
+		components.panel(components.button {
+			color = beautiful.colors.yellow,
+			size = 48,
+			safety_check = true,
+			onpress = function()
+				require('naughty').notify { text = 'reboot' }
+			end,
+		}, 16, 16),
+		layout.hpad(8),
+		components.panel(components.button {
+			color = beautiful.colors.red,
+			size = 48,
+			safety_check = true,
+			onpress = function()
+				require('naughty').notify { text = 'shutdown' }
+			end,
+		}, 16, 16),
+		layout = wibox.layout.fixed.horizontal,
+	},
+	layout = wibox.layout.fixed.vertical,
 }
 
 -- -----------------------------------------------------------------------------
