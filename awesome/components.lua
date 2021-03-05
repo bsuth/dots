@@ -94,6 +94,38 @@ function button(config)
 end
 
 -- -----------------------------------------------------------------------------
+-- LAUNCHER
+-- -----------------------------------------------------------------------------
+
+function launcher(icon)
+	return wibox.widget {
+		{
+			{
+				layout.center {
+					forced_width = 48,
+					forced_height = 48,
+
+					image = beautiful.svg(icon),
+					widget = wibox.widget.imagebox,
+				},
+
+				forced_width = 64,
+				forced_height = 64,
+
+				bg = beautiful.colors.black,
+				shape = gears.shape.rounded_rect,
+				widget = wibox.container.background,
+			},
+			bottom = 4,
+			widget = wibox.container.margin,
+		},
+		bg = beautiful.colors.void,
+		shape = gears.shape.rounded_rect,
+		widget = wibox.container.background,
+	}
+end
+
+-- -----------------------------------------------------------------------------
 -- METER
 -- -----------------------------------------------------------------------------
 
@@ -154,7 +186,7 @@ end
 function mount(widget)
 	local tab_thickness = 8
 
-	return wibox.widget {
+	return panel({
 		{
 			layout.center(widget),
 			margins = tab_thickness + 8,
@@ -162,7 +194,7 @@ function mount(widget)
 		},
 
 		shape = function(cr, width, height)
-			set_source_hex(cr, '#282828')
+			set_source_hex(cr, '#282f3d')
 
 			cr:rectangle(tab_thickness, tab_thickness, width - 2 * tab_thickness, height - 2 * tab_thickness)
 			cr:fill()
@@ -181,7 +213,7 @@ function mount(widget)
 		end,
 
 		widget = wibox.container.background,
-	}
+	}, 12, 12)
 end
 
 -- -----------------------------------------------------------------------------
@@ -316,6 +348,7 @@ end
 
 return {
 	button = button,
+	launcher = launcher,
 	meter = meter,
 	mount = mount,
 	panel = panel,

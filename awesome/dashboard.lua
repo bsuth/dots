@@ -19,7 +19,6 @@ local config = {
 }
 
 local state = {
-	taglist_was_active = false,
 	tag = awful.screen.focused().selected_tag,
 }
 
@@ -71,37 +70,22 @@ local clock = wibox.widget {
 
 function create_danger_zone_icon(icon)
 	return wibox.widget {
-		{
-			forced_width = 32,
-			forced_height = 32,
-			image = beautiful.svg(icon),
-			widget = wibox.widget.imagebox,
-		},
-		top = 8,
-		bottom = 8,
-		-- Size to button + panel padding + panel border width
-		left = 8 + 16 + 8,
-		right = 8 + 16 + 8,
-		widget = wibox.container.margin,
+		forced_width = 32,
+		forced_height = 32,
+		image = beautiful.svg(icon),
+		widget = wibox.widget.imagebox,
 	}
 end
 
 local danger_zone = wibox.widget {
-	{
-		{
-			create_danger_zone_icon('dashboard/danger/lock'),
-			layout.hpad(8),
-			create_danger_zone_icon('dashboard/danger/restart'),
-			layout.hpad(8),
-			create_danger_zone_icon('dashboard/danger/power'),
-			layout = wibox.layout.fixed.horizontal,
-		},
-		bg = beautiful.colors.blacker,
-		shape = gears.shape.rounded_rect,
-		shape_border_width = 2,
-		shape_border_color = beautiful.colors.void,
-		widget = wibox.container.background,
-	},
+	components.panel({
+		create_danger_zone_icon('dashboard/danger/lock'),
+		layout.hpad(72),
+		create_danger_zone_icon('dashboard/danger/restart'),
+		layout.hpad(72),
+		create_danger_zone_icon('dashboard/danger/power'),
+		layout = wibox.layout.fixed.horizontal,
+	}, 0, 8),
 	layout.vpad(8),
 	{
 		components.panel(components.button {
@@ -173,6 +157,19 @@ local kb_layout = components.panel {
 	create_kb_layout_item(2, 'dashboard/kb_layout/japan'),
 	layout.hpad(16),
 	create_kb_layout_item(3, 'dashboard/kb_layout/germany'),
+	layout = wibox.layout.fixed.horizontal,
+}
+
+-- -----------------------------------------------------------------------------
+-- LAUNCHERS
+-- -----------------------------------------------------------------------------
+
+local launchers = components.panel {
+	components.launcher('dashboard/launchers/flameshot'),
+	layout.hpad(16),
+	components.launcher('dashboard/launchers/simplescreenrecorder'),
+	layout.hpad(16),
+	components.launcher('dashboard/launchers/gpick'),
 	layout = wibox.layout.fixed.horizontal,
 }
 
@@ -260,7 +257,7 @@ function create_switch_item(config)
 	}
 end
 
-local switches = wibox.widget {
+local switches = components.panel {
 	create_switch_item {
 		active_icon = beautiful.svg('dashboard/switches/volume-on'),
 		inactive_icon = beautiful.svg('dashboard/switches/volume-off'),
@@ -343,45 +340,40 @@ local dashboard = wibox {
 }
 
 dashboard:setup {
-	layout.center {
-		{
-			layout.center {
-				wifi,
-				layout.vpad(32),
-				bluetooth,
-				layout = wibox.layout.fixed.vertical,
-			},
-			layout.center {
-				layout.center(components.mount(clock)),
-				layout.vpad(32),
-				layout.center(components.mount {
-					meters,
-					layout.vpad(32),
-					sliders,
-					layout = wibox.layout.fixed.vertical,
-				}),
-				layout = wibox.layout.fixed.vertical,
-			},
-			layout.center {
-				layout.center(components.mount(switches)),
-				layout.vpad(32),
-				layout.center(components.mount {
-					kb_layout,
-					layout.vpad(16),
-					tiling_layout,
-					layout = wibox.layout.fixed.vertical,
-				}),
-				layout.vpad(32),
-				layout.center(components.mount(danger_zone)),
-				layout = wibox.layout.fixed.vertical,
-			},
-			layout = wibox.layout.flex.horizontal,
+	{
+		layout.center {
+			wifi,
+			layout.vpad(32),
+			bluetooth,
+			layout = wibox.layout.fixed.vertical,
 		},
-
-		forced_width = config.width,
-		forced_height = config.height,
-
-		widget = wibox.container.background,
+		layout.center {
+			layout.center(components.mount(clock)),
+			layout.vpad(32),
+			layout.center(components.mount {
+				launchers,
+				layout.vpad(32),
+				sliders,
+				layout.vpad(32),
+				switches,
+				layout = wibox.layout.fixed.vertical,
+			}),
+			layout = wibox.layout.fixed.vertical,
+		},
+		layout.center {
+			layout.center(components.mount(meters)),
+			layout.vpad(32),
+			layout.center(components.mount {
+				kb_layout,
+				layout.vpad(16),
+				tiling_layout,
+				layout = wibox.layout.fixed.vertical,
+			}),
+			layout.vpad(32),
+			layout.center(components.mount(danger_zone)),
+			layout = wibox.layout.fixed.vertical,
+		},
+		layout = wibox.layout.flex.horizontal,
 	},
 	bg = beautiful.colors.dimmed,
 	widget = wibox.container.background,
@@ -390,6 +382,7 @@ dashboard:setup {
 return {
 	toggle = function()
 		local s = awful.screen.focused()
+		state.tag = s.selected_tag
 
 		if not dashboard.visible then
 			gears.table.crush(dashboard, {
@@ -400,18 +393,7 @@ return {
 				width = s.geometry.width,
 				height = s.geometry.height,
 			})
-
-			state.taglist_was_active = s.taglist.visible
-			state.tag = s.selected_tag
-
-			-- Make sure the taglist appears on top of the dimmed background
-			s.taglist.visible = false 
-			s.taglist.visible = true 
 		else
-			if not state.taglist_was_active then
-				s.taglist.visible = false 
-			end
-
 			dashboard.visible = false
 		end
 	end,

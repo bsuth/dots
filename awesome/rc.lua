@@ -82,25 +82,20 @@ awful.rules.rules = {
     { 
         rule_any = {
             instance = {
-                "copyq",  -- Includes session name in class.
-                "pinentry",
+				'gcr-prompter', -- pass prompts
+				'simplescreenrecorder',
+				'gpick',
             },
-            class = {
-                "Arandr",
-            },
-
-            -- Note that the name property shown in xprop might be set slightly after creation of the client
-            -- and the name shown there might not match defined rules here.
             name = {
-                "Event Tester",  -- xev.
+                'Event Tester', -- xev
             },
             role = {
-                "pop-up",       -- Google Chrome's (detached) Developer Tools.
-            }
+                "pop-up", -- Google Chrome's (detached) Developer Tools.
+            },
         },
         properties = {
             floating = true,
-        }
+        },
     },
 }
 

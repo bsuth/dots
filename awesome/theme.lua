@@ -22,7 +22,7 @@ local colors = {
     blacker = '#181818',
     void = '#000000',
 
-    dimmed = '#00000088',
+    dimmed = '#000000C8',
     transparent = '#00000000',
 }
 
