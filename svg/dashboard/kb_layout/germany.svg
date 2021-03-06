@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -7,15 +9,36 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="1235"
-   height="650"
-   viewBox="0 0 6.175 3.25"
+   width="96"
+   height="64"
+   viewBox="0 0 25.399999 16.933334"
    version="1.1"
-   id="svg1017"
-   sodipodi:docname="germany.svg"
-   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="germany.svg">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.959798"
+     inkscape:cx="68.509624"
+     inkscape:cy="32.829366"
+     inkscape:document-units="px"
+     inkscape:current-layer="g826"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1574"
+     inkscape:window-height="874"
+     inkscape:window-x="10"
+     inkscape:window-y="10"
+     inkscape:window-maximized="0" />
   <metadata
-     id="metadata1023">
+     id="metadata5">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
@@ -26,49 +49,35 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <defs
-     id="defs1021" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1594"
-     inkscape:window-height="894"
-     id="namedview1019"
-     showgrid="false"
-     inkscape:zoom="0.38289832"
-     inkscape:cx="1141.8959"
-     inkscape:cy="187.62229"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg1017" />
-  <desc
-     id="desc1012">Flag of Germany</desc>
-  <rect
-     id="black_stripe"
-     width="6.1750002"
-     height="3.25"
-     y="-5e-09"
-     x="0"
-     style="fill:#000000;stroke-width:1" />
-  <rect
-     id="red_stripe"
-     width="6.1750002"
-     height="2.1666665"
-     y="1.0833333"
-     x="0"
-     style="fill:#dd0000;stroke-width:1" />
-  <rect
-     id="gold_stripe"
-     width="6.1750002"
-     height="1.0833333"
-     y="2.1666665"
-     x="0"
-     style="fill:#ffce00;stroke-width:1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-280.06665)">
+    <g
+       id="g826"
+       transform="translate(5.1544182e-8,-0.52784668)">
+      <rect
+         y="281.65152"
+         x="0.5291667"
+         height="4.9397707"
+         width="24.341667"
+         id="rect815"
+         style="opacity:1;fill:#282c34;fill-opacity:1;stroke:#000000;stroke-width:0.5291667;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <rect
+         style="opacity:1;fill:#e06c75;fill-opacity:1;stroke:#000000;stroke-width:0.5291667;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect817"
+         width="24.341667"
+         height="4.9397707"
+         x="0.5291667"
+         y="286.59128" />
+      <rect
+         y="291.53104"
+         x="0.5291667"
+         height="4.9397707"
+         width="24.341667"
+         id="rect819"
+         style="opacity:1;fill:#e5c07b;fill-opacity:1;stroke:#000000;stroke-width:0.5291667;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+    </g>
+  </g>
 </svg>

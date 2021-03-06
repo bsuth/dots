@@ -125,7 +125,7 @@ local danger_zone = wibox.widget {
 function create_kb_layout_item(index, icon)
 	return wibox.widget {
 		layout.center {
-			forced_width = 64,
+			forced_width = 48,
 			forced_height = 32,
 			image = beautiful.svg(icon),
 			widget = wibox.widget.imagebox,
