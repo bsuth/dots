@@ -9,8 +9,19 @@ local taglist = require 'taglist'
 -- KEYBINDINGS
 --------------------------------------------------------------------------------
 
-local bindings = {}
-local restore_tag = nil
+local bindings = {
+	restore_tag = nil,
+	grab_mouse_until_released = function()
+		local test = true
+		mousegrabber.run(function(mouse)
+			for _, v in pairs(mouse.buttons) do
+				if v then return true end
+			end
+
+			return false
+		end, 'mouse')
+	end,
+}
 
 awesome.connect_signal('startup', function()
     for s in screen do
@@ -83,33 +94,6 @@ bindings.globalkeys = gears.table.join(
     awful.key({ 'Mod4', 'Shift' }, 'k', function() awful.client.swap.global_bydirection('up') end),
     awful.key({ 'Mod4', 'Shift' }, 'l', function() awful.client.swap.global_bydirection('right') end),
 
-    awful.key({ 'Mod4' }, ";", function()
-		local current_screen = awful.screen.focused()
-
-		if current_screen.selected_tag.name ~= 'scratchpad' then
-			for s in screen do
-				local scratchpad = awful.tag.find_by_name(s, 'scratchpad')
-
-				if scratchpad ~= nil then
-					restore_tag = current_screen.selected_tag
-					scratchpad.screen = current_screen 
-					scratchpad:view_only()
-					break
-				end
-			end
-		elseif restore_tag ~= nil then
-			restore_tag:view_only()
-			restore_tag = nil
-		end
-	end),
-
-    -- -------------------------------------------------------------------------
-    -- Layout
-    -- -------------------------------------------------------------------------
-
-    awful.key({ 'Mod4', 'Shift', 'Control' }, 'h', function() awful.tag.incmwfact(-0.05) end),
-    awful.key({ 'Mod4', 'Shift', 'Control' }, 'l', function() awful.tag.incmwfact(0.05) end),
-    awful.key({ 'Mod4' }, ',', function () awful.layout.inc(1) end),
     awful.key({ 'Mod4', 'Shift' }, 'm', function()
         local clients = awful.clientbuffer:clients()
 		if #clients > 0 then
@@ -120,11 +104,33 @@ bindings.globalkeys = gears.table.join(
 		end
 	end),
 
+    awful.key({ 'Mod4' }, ";", function()
+		local current_screen = awful.screen.focused()
+
+		if current_screen.selected_tag.name ~= 'scratchpad' then
+			for s in screen do
+				local scratchpad = awful.tag.find_by_name(s, 'scratchpad')
+
+				if scratchpad ~= nil then
+					bindings.restore_tag = current_screen.selected_tag
+					scratchpad.screen = current_screen 
+					scratchpad:view_only()
+					break
+				end
+			end
+		elseif bindings.restore_tag ~= nil then
+			bindings.restore_tag:view_only()
+			bindings.restore_tag = nil
+		end
+	end),
+
     -- -------------------------------------------------------------------------
-    -- Apps
+    -- Layout
     -- -------------------------------------------------------------------------
 
-    awful.key({ 'Mod4' }, 'space', function() awful.spawn('rofi -show run') end),
+    awful.key({ 'Mod4', 'Shift', 'Control' }, 'h', function() awful.tag.incmwfact(-0.05) end),
+    awful.key({ 'Mod4', 'Shift', 'Control' }, 'l', function() awful.tag.incmwfact(0.05) end),
+    awful.key({ 'Mod4' }, ',', function() awful.layout.inc(1) end),
 
     -- -------------------------------------------------------------------------
     -- Spawners
@@ -132,13 +138,14 @@ bindings.globalkeys = gears.table.join(
     
     awful.key({ 'Mod4' }, 'Return', function() awful.spawn('gnome-terminal') end),
     awful.key({ 'Mod4' }, "'", function() awful.spawn('vivaldi') end),
-    awful.key({ 'Mod4' }, 'p', function() dashboard.toggle() end),
+    awful.key({ 'Mod4' }, 'space', function() awful.spawn('rofi -show run') end),
+    awful.key({ 'Mod4' }, 'p', function() dashboard:toggle() end),
     awful.key({ 'Mod4' }, 'n', function() taglist.toggle() end)
 )
 
 for i = 1, 9 do
     bindings.globalkeys = gears.table.join(bindings.globalkeys,
-        awful.key({ 'Mod4' }, "#" .. i + 9, function ()
+        awful.key({ 'Mod4' }, "#" .. i + 9, function()
             local screen = awful.screen.focused()
             local tag = screen.tags[i]
 
@@ -161,7 +168,7 @@ bindings.clientkeys = gears.table.join(
 
     awful.key({ 'Mod4', 'Shift' }, 'q', function(c) c:kill() end),
 
-    awful.key({ 'Mod4', 'Mod1', 'Shift' }, 'i', function(c)
+    awful.key({ 'Mod4', 'Shift' }, 'i', function(c)
         local msg = 'name: ' .. c.name
 
         local attrs= { 
@@ -196,36 +203,61 @@ bindings.clientkeys = gears.table.join(
 )
 
 --------------------------------------------------------------------------------
--- GLOBAL BUTTONS
---------------------------------------------------------------------------------
-
-bindings.globalbuttons = gears.table.join(
-)
-
---------------------------------------------------------------------------------
 -- CLIENT BUTTONS
 --------------------------------------------------------------------------------
 
 bindings.clientbuttons = gears.table.join(
-
-    -- -------------------------------------------------------------------------
-    -- Move/Resize
-    -- -------------------------------------------------------------------------
-
-    awful.button({ }, 1, function (c)
-        c:emit_signal('request::activate', 'mouse_click', {raise = true})
+    awful.button({ }, 1, function(c)
+        c:emit_signal('request::activate', 'mouse_click', { raise = true })
     end),
 
-    awful.button({ 'Mod1', 'Control' }, 1, function (c)
-        c:emit_signal('request::activate', 'mouse_click', {raise = true})
+    awful.button({ 'Control' }, 3, function(c)
+        c:emit_signal('request::activate', 'mouse_click', { raise = true })
+        awful.mouse.client.resize(c)
+    end),
+
+    awful.button({ 'Control' }, 2, function(c)
+        c:emit_signal('request::activate', 'mouse_click', { raise = true })
         awful.mouse.client.move(c)
     end),
 
-    awful.button({ 'Control', 'Shift' }, 1, function (c)
-        c:emit_signal('request::activate', 'mouse_click', {raise = true})
-        awful.mouse.client.resize(c)
+    awful.button({ 'Control', 'Shift' }, 1, function(c)
+		dashboard:toggle()
+		bindings.grab_mouse_until_released()
+    end),
+
+    awful.button({ 'Control', 'Shift' }, 3, function(c)
+		taglist.toggle()
+		bindings.grab_mouse_until_released()
+    end),
+
+    awful.button({ 'Control', 'Shift' }, 2, function(c)
+        c:emit_signal('request::activate', 'mouse_click', { raise = true })
+		c.floating = not c.floating
+    end),
+
+    awful.button({ 'Control', 'Shift' }, 4, function()
+		local c = awful.client.next(1)
+        c:emit_signal('request::activate', 'mouse_click', { raise = true })
+		awful.placement.centered(mouse, { parent = c })
+    end),
+
+    awful.button({ 'Control', 'Shift' }, 5, function()
+		local c = awful.client.next(-1)
+        c:emit_signal('request::activate', 'mouse_click', { raise = true })
+		awful.placement.centered(mouse, { parent = c })
     end)
 )
+
+dashboard:connect_signal('button::press', function(_, _, _, button, mods)
+	if #mods == 2 and gears.table.hasitem(mods, 'Control') and gears.table.hasitem(mods, 'Shift') then
+		if button == 1 then
+			dashboard:toggle()
+		elseif button == 3 then
+			taglist.toggle()
+		end
+	end
+end)
 
 --------------------------------------------------------------------------------
 -- RETURN

@@ -7,19 +7,35 @@ local models = require 'models'
 local wibox = require 'wibox'
 
 -- -----------------------------------------------------------------------------
--- STATE / DASHBOARD
+-- DASHBOARD
 -- -----------------------------------------------------------------------------
 
-local state = {
-	tag = awful.screen.focused().selected_tag,
-}
-
-local dashboard = wibox {
+local dashboard = gears.table.crush(wibox {
 	visible = false,
 	ontop = true,
 	type = 'dock',
 	bg = beautiful.colors.transparent,
-}
+}, {
+	tag = awful.screen.focused().selected_tag,
+
+	toggle = function(self)
+		local s = awful.screen.focused()
+		self.tag = s.selected_tag
+
+		if not self.visible then
+			gears.table.crush(self, {
+				screen = s,
+				visible = true,
+				x = s.geometry.x,
+				y = s.geometry.y,
+				width = s.geometry.width,
+				height = s.geometry.height,
+			})
+		else
+			self.visible = false
+		end
+	end,
+})
 
 -- -----------------------------------------------------------------------------
 -- BLUETOOTH
@@ -152,9 +168,9 @@ end
 
 local kb_layout = components.panel {
 	create_kb_layout_item(1, 'dashboard/kb_layout/usa'),
-	layout.hpad(16),
+	layout.hpad(24),
 	create_kb_layout_item(2, 'dashboard/kb_layout/japan'),
-	layout.hpad(16),
+	layout.hpad(24),
 	create_kb_layout_item(3, 'dashboard/kb_layout/germany'),
 	layout = wibox.layout.fixed.horizontal,
 }
@@ -310,7 +326,7 @@ function create_tiling_layout_item(index, icon)
 		layout.vpad(16),
 		layout.center(components.button {
 			is_pressed = function()
-				return state.tag.layout == awful.layout.layouts[index]
+				return dashboard.tag.layout == awful.layout.layouts[index]
 			end,
 
 			onpress = function()
@@ -346,7 +362,7 @@ local wifi = components.panel {
 }
 
 -- -----------------------------------------------------------------------------
--- DASHBOARD
+-- RETURN
 -- -----------------------------------------------------------------------------
 
 dashboard:setup {
@@ -365,15 +381,15 @@ dashboard:setup {
 				layout.vpad(32),
 				sliders,
 				layout.vpad(32),
-				switches,
+				meters,
 				layout = wibox.layout.fixed.vertical,
 			}),
 			layout = wibox.layout.fixed.vertical,
 		},
 		layout.center {
-			layout.center(components.mount(meters)),
-			layout.vpad(32),
 			layout.center(components.mount {
+				switches,
+				layout.vpad(16),
 				kb_layout,
 				layout.vpad(16),
 				tiling_layout,
@@ -389,22 +405,4 @@ dashboard:setup {
 	widget = wibox.container.background,
 }
 
-return {
-	toggle = function()
-		local s = awful.screen.focused()
-		state.tag = s.selected_tag
-
-		if not dashboard.visible then
-			gears.table.crush(dashboard, {
-				screen = s,
-				visible = true,
-				x = s.geometry.x,
-				y = s.geometry.y,
-				width = s.geometry.width,
-				height = s.geometry.height,
-			})
-		else
-			dashboard.visible = false
-		end
-	end,
-}
+return dashboard
