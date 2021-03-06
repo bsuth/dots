@@ -7,19 +7,18 @@ local models = require 'models'
 local wibox = require 'wibox'
 
 -- -----------------------------------------------------------------------------
--- CONFIG
+-- STATE / DASHBOARD
 -- -----------------------------------------------------------------------------
-
-local config = {
-	width = 1400,
-	height = 800,
-	margin = 100,
-	padding = 10,
-	border_width = 2,
-}
 
 local state = {
 	tag = awful.screen.focused().selected_tag,
+}
+
+local dashboard = wibox {
+	visible = false,
+	ontop = true,
+	type = 'dock',
+	bg = beautiful.colors.transparent,
 }
 
 -- -----------------------------------------------------------------------------
@@ -165,11 +164,29 @@ local kb_layout = components.panel {
 -- -----------------------------------------------------------------------------
 
 local launchers = components.panel {
-	components.launcher('dashboard/launchers/flameshot'),
+	components.launcher {
+		icon = beautiful.svg('dashboard/launchers/flameshot'),
+		onpress = function()
+			dashboard.visible = false
+			awful.spawn('flameshot gui')
+		end,
+	},
 	layout.hpad(16),
-	components.launcher('dashboard/launchers/simplescreenrecorder'),
+	components.launcher {
+		icon = beautiful.svg('dashboard/launchers/simplescreenrecorder'),
+		onpress = function()
+			dashboard.visible = false
+			awful.spawn('simplescreenrecorder')
+		end,
+	},
 	layout.hpad(16),
-	components.launcher('dashboard/launchers/gpick'),
+	components.launcher {
+		icon = beautiful.svg('dashboard/launchers/gpick'),
+		onpress = function()
+			dashboard.visible = false
+			awful.spawn.easy_async_with_shell('gpick -s -o | tr -d "\n" | xclip -sel c')
+		end,
+	},
 	layout = wibox.layout.fixed.horizontal,
 }
 
@@ -331,13 +348,6 @@ local wifi = components.panel {
 -- -----------------------------------------------------------------------------
 -- DASHBOARD
 -- -----------------------------------------------------------------------------
-
-local dashboard = wibox {
-	visible = false,
-	ontop = true,
-	type = 'dock',
-	bg = beautiful.colors.transparent,
-}
 
 dashboard:setup {
 	{

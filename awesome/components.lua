@@ -74,7 +74,7 @@ function button(config)
 				config.safety_check = false 
 				safety_check_timer:again()
 			elseif config.onpress then
-				(config.onpress)()
+				config.onpress()
 			end
 
 			force_press = true
@@ -97,32 +97,67 @@ end
 -- LAUNCHER
 -- -----------------------------------------------------------------------------
 
-function launcher(icon)
-	return wibox.widget {
-		{
-			{
-				layout.center {
-					forced_width = 48,
-					forced_height = 48,
+function launcher(config)
+	local _button = wibox.widget {
+		layout.center {
+			forced_width = 48,
+			forced_height = 48,
 
-					image = beautiful.svg(icon),
-					widget = wibox.widget.imagebox,
-				},
-
-				forced_width = 64,
-				forced_height = 64,
-
-				bg = beautiful.colors.black,
-				shape = gears.shape.rounded_rect,
-				widget = wibox.container.background,
-			},
-			bottom = 4,
-			widget = wibox.container.margin,
+			image = config.icon,
+			widget = wibox.widget.imagebox,
 		},
-		bg = beautiful.colors.void,
+
+		forced_width = 64,
+		forced_height = 64,
+		point = { x = 0, y = 0 },
+
+		bg = beautiful.colors.black,
 		shape = gears.shape.rounded_rect,
 		widget = wibox.container.background,
 	}
+
+	local _launcher = wibox.widget {
+		{
+			{
+				margins = 32,
+				widget = wibox.container.margin,
+			},
+
+			point = { x = 0, y = 4 },
+
+			bg = beautiful.colors.void,
+			shape = gears.shape.rounded_rect,
+			widget = wibox.container.background,
+		},
+		_button,
+		forced_width = 64,
+		forced_height = 64 + 4,
+		layout = wibox.layout.manual,
+	}
+
+	_launcher:connect_signal('mouse::enter', function()
+		mouse.current_wibox.cursor = 'hand1'
+	end)
+
+	_launcher:connect_signal('mouse::leave', function()
+		mouse.current_wibox.cursor = 'arrow'
+		_launcher:move_widget(_button, { x = 0, y = 0 })
+	end)
+
+	_launcher:connect_signal('button::press', function(_, _, _, button)
+		if button == 1 then
+			_launcher:move_widget(_button, { x = 0, y = 4 })
+		end
+	end)
+
+	_launcher:connect_signal('button::release', function(_, _, _, button)
+		if button == 1 then
+			_launcher:move_widget(_button, { x = 0, y = 0 })
+			config.onpress()
+		end
+	end)
+
+	return _launcher
 end
 
 -- -----------------------------------------------------------------------------
