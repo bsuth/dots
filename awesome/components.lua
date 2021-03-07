@@ -215,47 +215,11 @@ function meter(config)
 end
 
 -- -----------------------------------------------------------------------------
--- MOUNT
--- -----------------------------------------------------------------------------
-
-function mount(widget)
-	local tab_thickness = 8
-
-	return panel({
-		{
-			layout.center(widget),
-			margins = tab_thickness + 8,
-			widget = wibox.container.margin,
-		},
-
-		shape = function(cr, width, height)
-			set_source_hex(cr, '#282f3d')
-
-			cr:rectangle(tab_thickness, tab_thickness, width - 2 * tab_thickness, height - 2 * tab_thickness)
-			cr:fill()
-
-			cr:rectangle(width / 3, 0, width / 3, tab_thickness)
-			cr:fill()
-
-			cr:rectangle(width / 3, height - tab_thickness, width / 3, tab_thickness)
-			cr:fill()
-
-			cr:rectangle(0, height / 3, tab_thickness, height / 3)
-			cr:fill()
-
-			cr:rectangle(width - tab_thickness, height / 3, tab_thickness, height / 3)
-			cr:fill()
-		end,
-
-		widget = wibox.container.background,
-	}, 12, 12)
-end
-
--- -----------------------------------------------------------------------------
 -- PANEL
 -- -----------------------------------------------------------------------------
 
-function panel(widget, padding_x, padding_y)
+function panel(widget, config)
+	config = config or {}
 	local border_width = 8
 	local nail_offset = border_width + 8
 	local nail_size = 4
@@ -263,24 +227,24 @@ function panel(widget, padding_x, padding_y)
 	return wibox.widget {
 		{
 			layout.center(widget),
-			top = border_width + (padding_y or 16),
-			bottom = border_width + (padding_y or 16),
-			left = border_width + (padding_x or 32),
-			right = border_width + (padding_x or 32),
+			top = border_width + (config.ypad or 16),
+			bottom = border_width + (config.ypad or 16),
+			left = border_width + (config.xpad or 32),
+			right = border_width + (config.xpad or 32),
 			widget = wibox.container.margin,
 		},
 
 		shape = function(cr, width, height)
-			set_source_hex(cr, beautiful.colors.blacker)
+			set_source_hex(cr, config.bg or beautiful.colors.blacker)
 			cr:rectangle(0, 0, width, height)
 			cr:fill()
 
-			set_source_hex(cr, beautiful.colors.black)
+			set_source_hex(cr, config.border_color or beautiful.colors.void)
 			cr:set_line_width(border_width)
 			cr:rectangle(0, 0, width, height)
 			cr:stroke()
 
-			set_source_hex(cr, beautiful.colors.white)
+			set_source_hex(cr, config.nail_color or beautiful.colors.white)
 
 			cr:arc(nail_offset, nail_offset, nail_size, 0, 2 * math.pi)
 			cr:fill()
@@ -351,7 +315,7 @@ function switch(config)
 		forced_width = 64,
 		forced_height = 64,
 
-		direction = config.model.active and 'north' or 'south',
+		direction = config.model.active and 'south' or 'north',
 		widget = wibox.container.rotate,
 	}
 
@@ -370,7 +334,7 @@ function switch(config)
 	end)
 
 	config.model:connect_signal('update', function()
-		_switch.direction = config.model.active and 'north' or 'south'
+		_switch.direction = config.model.active and 'south' or 'north'
 		_switch:emit_signal('widget::redraw_needed')
 	end)
 

@@ -11,29 +11,22 @@ local taglist = require 'taglist'
 
 local bindings = {
 	restore_tag = nil,
+
+	scratchpad = {
+		client = nil,
+		width = 900,
+		height = 600,
+	},
+
 	grab_mouse_until_released = function()
-		local test = true
 		mousegrabber.run(function(mouse)
 			for _, v in pairs(mouse.buttons) do
 				if v then return true end
 			end
-
 			return false
 		end, 'mouse')
 	end,
 }
-
-awesome.connect_signal('startup', function()
-    for s in screen do
-        for _, tag in ipairs(s.tags) do
-			for _, c in ipairs(tag:clients()) do
-				if c.minimized then
-			        c:move_to_tag(awful.clientbuffer)
-				end
-			end
-		end
-    end
-end)
 
 --------------------------------------------------------------------------------
 -- ALT TAB
@@ -105,22 +98,33 @@ bindings.globalkeys = gears.table.join(
 	end),
 
     awful.key({ 'Mod4' }, ";", function()
-		local current_screen = awful.screen.focused()
+		local s = awful.screen.focused()
 
-		if current_screen.selected_tag.name ~= 'scratchpad' then
-			for s in screen do
-				local scratchpad = awful.tag.find_by_name(s, 'scratchpad')
+		if bindings.scratchpad.client == nil or not bindings.scratchpad.client.valid then
+			awful.spawn('gnome-terminal', {
+				name = 'scratchpad',
+				floating = true,
+				screen = s,
+				width = bindings.scratchpad.width,
+				height = bindings.scratchpad.height,
+				x = s.geometry.x + (s.geometry.width - bindings.scratchpad.width) / 2,
+				y = s.geometry.y + (s.geometry.height - bindings.scratchpad.height) / 2,
 
-				if scratchpad ~= nil then
-					bindings.restore_tag = current_screen.selected_tag
-					scratchpad.screen = current_screen 
-					scratchpad:view_only()
-					break
-				end
-			end
-		elseif bindings.restore_tag ~= nil then
-			bindings.restore_tag:view_only()
-			bindings.restore_tag = nil
+				callback = function(c)
+					bindings.scratchpad.client = c
+					c:emit_signal('request::activate', 'client.jumpto', { raise = true })
+				end,
+			})
+		elseif bindings.scratchpad.client.hidden then
+			gears.table.crush(bindings.scratchpad.client, {
+				screen = s,
+				hidden = false,
+				x = s.geometry.x + (s.geometry.width - bindings.scratchpad.width) / 2,
+				y = s.geometry.y + (s.geometry.height - bindings.scratchpad.height) / 2,
+			})
+			bindings.scratchpad.client:emit_signal('request::activate', 'client.jumpto', { raise = true })
+		else
+			bindings.scratchpad.client.hidden = true
 		end
 	end),
 

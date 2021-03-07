@@ -21,41 +21,6 @@ awful.layout.layouts = {
 }
 
 --------------------------------------------------------------------------------
--- TAG / SCREEN SETUP
---------------------------------------------------------------------------------
-
-awful.screen.connect_for_each_screen(function(s)
-    awful.tag(
-		{ '1', '2', '3', '4', '5', '6', '7', '8', '9' },
-		s,
-		awful.layout.layouts[1]
-	)
-
-	beautiful.set_wallpaper(s)
-	taglist.attach(s)
-
-    s:connect_signal('tag::history::update', function()
-        -- restore focus to above client
-        for _, c in ipairs(s.selected_tag:clients()) do
-            if c.above then
-                c:emit_signal('request::activate')
-                return
-            end
-        end
-    end)
-end)
-
-awful.scratchpad = awful.tag.add('scratchpad', {
-	layout = awful.layout.suit.fair.horizontal,
-	screen = awful.screen.focused(),
-})
-
-awful.clientbuffer = awful.tag.add('clientbuffer', {
-	layout = awful.layout.suit.fair.horizontal,
-	screen = awful.screen.focused(),
-})
-
---------------------------------------------------------------------------------
 -- RULES
 --------------------------------------------------------------------------------
 
@@ -130,3 +95,45 @@ screen.connect_signal('property::geometry', beautiful.set_wallpaper)
 -- Focus changes border color
 client.connect_signal('focus', function(c) c.border_color = beautiful.border_focus end)
 client.connect_signal('unfocus', function(c) c.border_color = beautiful.border_normal end)
+
+--------------------------------------------------------------------------------
+-- STARTUP
+--------------------------------------------------------------------------------
+
+awful.screen.connect_for_each_screen(function(s)
+    awful.tag(
+		{ '1', '2', '3', '4', '5', '6', '7', '8', '9' },
+		s,
+		awful.layout.layouts[1]
+	)
+
+	beautiful.set_wallpaper(s)
+	taglist.attach(s)
+
+    s:connect_signal('tag::history::update', function()
+        -- restore focus to above client
+        for _, c in ipairs(s.selected_tag:clients()) do
+            if c.above then
+                c:emit_signal('request::activate')
+                return
+            end
+        end
+    end)
+end)
+
+awful.clientbuffer = awful.tag.add('clientbuffer', {
+	layout = awful.layout.suit.fair.horizontal,
+	screen = awful.screen.focused(),
+})
+
+awesome.connect_signal('startup', function()
+    for s in screen do
+        for _, tag in ipairs(s.tags) do
+			for _, c in ipairs(tag:clients()) do
+				if c.minimized then
+			        c:move_to_tag(awful.clientbuffer)
+				end
+			end
+		end
+    end
+end)

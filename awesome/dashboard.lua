@@ -100,7 +100,7 @@ local danger_zone = wibox.widget {
 		layout.hpad(72),
 		create_danger_zone_icon('dashboard/danger/power'),
 		layout = wibox.layout.fixed.horizontal,
-	}, 0, 8),
+	}, { xpad = 0, ypad = 8 }),
 	layout.vpad(8),
 	{
 		components.panel(components.button {
@@ -110,7 +110,7 @@ local danger_zone = wibox.widget {
 			onpress = function()
 				require('naughty').notify { text = 'sleep' }
 			end,
-		}, 16, 16),
+		}, { xpad = 16, ypad = 16 }),
 		layout.hpad(8),
 		components.panel(components.button {
 			color = beautiful.colors.yellow,
@@ -119,7 +119,7 @@ local danger_zone = wibox.widget {
 			onpress = function()
 				require('naughty').notify { text = 'reboot' }
 			end,
-		}, 16, 16),
+		}, { xpad = 16, ypad = 16 }),
 		layout.hpad(8),
 		components.panel(components.button {
 			color = beautiful.colors.red,
@@ -128,7 +128,7 @@ local danger_zone = wibox.widget {
 			onpress = function()
 				require('naughty').notify { text = 'shutdown' }
 			end,
-		}, 16, 16),
+		}, { xpad = 16, ypad = 16 }),
 		layout = wibox.layout.fixed.horizontal,
 	},
 	layout = wibox.layout.fixed.vertical,
@@ -365,6 +365,16 @@ local wifi = components.panel {
 -- RETURN
 -- -----------------------------------------------------------------------------
 
+function outer_panel(widget)
+	return components.panel(widget, {
+		xpad = 16,
+		ypad = 16,
+		bg = beautiful.colors.black,
+		border_color = beautiful.colors.void,
+		nail_color = beautiful.colors.blacker,
+	})
+end
+
 dashboard:setup {
 	{
 		layout.center {
@@ -374,29 +384,29 @@ dashboard:setup {
 			layout = wibox.layout.fixed.vertical,
 		},
 		layout.center {
-			layout.center(components.mount(clock)),
+			outer_panel(clock),
 			layout.vpad(32),
-			layout.center(components.mount {
+			outer_panel {
 				launchers,
 				layout.vpad(32),
 				sliders,
 				layout.vpad(32),
 				meters,
 				layout = wibox.layout.fixed.vertical,
-			}),
+			},
 			layout = wibox.layout.fixed.vertical,
 		},
 		layout.center {
-			layout.center(components.mount {
+			outer_panel {
 				switches,
 				layout.vpad(16),
 				kb_layout,
 				layout.vpad(16),
 				tiling_layout,
 				layout = wibox.layout.fixed.vertical,
-			}),
+			},
 			layout.vpad(32),
-			layout.center(components.mount(danger_zone)),
+			outer_panel(danger_zone),
 			layout = wibox.layout.fixed.vertical,
 		},
 		layout = wibox.layout.flex.horizontal,
