@@ -16,7 +16,6 @@ Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'sheerun/vim-polyglot'
 Plug 'lambdalisue/suda.vim'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'justinmk/vim-dirvish'
 call plug#end()
 
@@ -44,7 +43,6 @@ let g:mapleader = ' '
 let g:fzf_layout =  { 'down': '50%' }
 let g:fzf_preview_window = 'right:60%'
 let g:suda_smart_edit = 1
-let g:coc_disable_startup_warning = 1
 
 colorscheme onedark
 highlight ColorColumn guibg=#585858
@@ -60,8 +58,6 @@ endfunction
 function! Docs()
   if (index(['vim','help'], &filetype) >= 0)
     execute 'h '.expand('<cword>')
-  elseif (coc#rpc#ready())
-    call CocActionAsync('doHover')
   else
     execute '!' . &keywordprg . ' ' . expand('<cword>')
   endif
@@ -137,7 +133,6 @@ augroup bsuth-general
 	au TermClose term://*zsh* Dirvish
 	au FileType html,scss,css,less,javascript,typescript,typescriptreact,json setlocal shiftwidth=2 tabstop=2 softtabstop=2
 	au FileType dirvish nnoremap <buffer><silent> <cr> :call DirvishXdgOpen()<cr>
-	au CursorHold * silent call CocActionAsync('highlight')
 augroup END
 
 " ------------------------------------------------------------------------------
@@ -195,9 +190,4 @@ nnoremap <leader><leader>fd :cd ~\|:Files<cr>
 nnoremap <leader><leader>cd :cd ~\|:FzfCDSelect<cr>
 nnoremap <leader><leader>rg :cd ~\|:Rg<cr>
 
-inoremap <silent><expr> <c-space> coc#refresh()
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
 nnoremap <silent> K :call Docs()<CR>

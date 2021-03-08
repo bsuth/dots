@@ -4,7 +4,8 @@
 configuration {
 	lines: 5;
 	cycle: false;
-	display-run: "::";
+	display-run: ": :";
+	font: "Quicksand Regular 16";
 }
 
 /* vim:ft=css

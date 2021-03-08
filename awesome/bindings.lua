@@ -101,7 +101,7 @@ bindings.globalkeys = gears.table.join(
 		local s = awful.screen.focused()
 
 		if bindings.scratchpad.client == nil or not bindings.scratchpad.client.valid then
-			awful.spawn('gnome-terminal', {
+			awful.spawn('kitty', {
 				name = 'scratchpad',
 				floating = true,
 				screen = s,
@@ -140,7 +140,7 @@ bindings.globalkeys = gears.table.join(
     -- Spawners
     -- -------------------------------------------------------------------------
     
-    awful.key({ 'Mod4' }, 'Return', function() awful.spawn('gnome-terminal') end),
+    awful.key({ 'Mod4' }, 'Return', function() awful.spawn('kitty') end),
     awful.key({ 'Mod4' }, "'", function() awful.spawn('vivaldi') end),
     awful.key({ 'Mod4' }, 'space', function() awful.spawn('rofi -show run') end),
     awful.key({ 'Mod4' }, 'p', function() dashboard:toggle() end),

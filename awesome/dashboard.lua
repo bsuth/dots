@@ -108,7 +108,7 @@ local danger_zone = wibox.widget {
 			size = 48,
 			safety_check = true,
 			onpress = function()
-				require('naughty').notify { text = 'sleep' }
+				awful.spawn('physlock -m -p "Clearance Required"')
 			end,
 		}, { xpad = 16, ypad = 16 }),
 		layout.hpad(8),
@@ -117,7 +117,7 @@ local danger_zone = wibox.widget {
 			size = 48,
 			safety_check = true,
 			onpress = function()
-				require('naughty').notify { text = 'reboot' }
+				awful.spawn('/sbin/reboot')
 			end,
 		}, { xpad = 16, ypad = 16 }),
 		layout.hpad(8),
@@ -126,7 +126,7 @@ local danger_zone = wibox.widget {
 			size = 48,
 			safety_check = true,
 			onpress = function()
-				require('naughty').notify { text = 'shutdown' }
+				awful.spawn('/sbin/poweroff')
 			end,
 		}, { xpad = 16, ypad = 16 }),
 		layout = wibox.layout.fixed.horizontal,
