@@ -3,9 +3,9 @@
 " ------------------------------------------------------------------------------
 
 if empty(glob('~/.config/nvim/autoload/plug.vim'))
-  silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
-    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+	silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
 endif
 
 call plug#begin('~/.config/nvim/bundle')
@@ -29,15 +29,16 @@ set termguicolors
 set splitright
 set splitbelow
 set clipboard=unnamedplus
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
 set number
 set nowrap
 set colorcolumn=80
 set signcolumn=yes
 set scrollback=100000
 set updatetime=300
+set expandtab
 
 let g:mapleader = ' '
 let g:fzf_layout =  { 'down': '50%' }
@@ -56,11 +57,11 @@ function! CdDirvish(dir)
 endfunction
 
 function! Docs()
-  if (index(['vim','help'], &filetype) >= 0)
-    execute 'h '.expand('<cword>')
-  else
-    execute '!' . &keywordprg . ' ' . expand('<cword>')
-  endif
+	if (index(['vim','help'], &filetype) >= 0)
+		execute 'h '.expand('<cword>')
+	else
+		execute '!' . &keywordprg . ' ' . expand('<cword>')
+	endif
 endfunction
 
 function! DirvishXdgOpen()
@@ -101,20 +102,20 @@ function! OnTermClose()
 endfunction
 
 function! GetVisualSelection()
-    let [line_start, column_start] = getpos("'<")[1:2]
-    let [line_end, column_end] = getpos("'>")[1:2]
+	let [line_start, column_start] = getpos("'<")[1:2]
+	let [line_end, column_end] = getpos("'>")[1:2]
 
-    let lines = getline(line_start, line_end)
+	let lines = getline(line_start, line_end)
 	call setpos('.', [0, line_start, column_start, 0])
 
-    if len(lines) == 0
-        return ''
-    endif
+	if len(lines) == 0
+		return ''
+	endif
 
-    let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
-    let lines[0] = lines[0][column_start - 1:]
+	let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
+	let lines[0] = lines[0][column_start - 1:]
 
-    return join(lines, "\n")
+	return join(lines, "\n")
 endfunction
 
 function! SearchVisualSelection()
@@ -131,7 +132,7 @@ augroup bsuth-general
 	au TermOpen term://*zsh* setlocal nonumber wrap
 	au TermOpen term://*zsh* startinsert
 	au TermClose term://*zsh* Dirvish
-	au FileType html,scss,css,less,javascript,typescript,typescriptreact,json setlocal shiftwidth=2 tabstop=2 softtabstop=2
+	" au FileType c setlocal shiftwidth=4 tabstop=4 softtabstop=4
 	au FileType dirvish nnoremap <buffer><silent> <cr> :call DirvishXdgOpen()<cr>
 augroup END
 
@@ -141,12 +142,12 @@ augroup END
 
 command! -nargs=* CdDirvish call CdDirvish(<f-args>)
 command! -nargs=* FzfCDSelect call fzf#run(fzf#wrap({
-	\ 'source': "find -L -type d ! \\( \\(
-		\ -name .cache -o 
-		\ -name node_modules
-	\ \\) -prune \\) -name '*'",
-	\ 'sink': 'FzfCDCommit',
-\}))
+			\ 'source': "find -L -type d ! \\( \\(
+			\ -name .cache -o 
+			\ -name node_modules
+			\ \\) -prune \\) -name '*'",
+			\ 'sink': 'FzfCDCommit',
+			\}))
 command! -nargs=* FzfCDCommit exec 'cd ' . <f-args> . '|:Dirvish'
 
 " ------------------------------------------------------------------------------
