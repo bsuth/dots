@@ -53,19 +53,18 @@ local bluetooth = components.panel {
 
 local clock = lui.render {
   {
-    layout.center {
-      format = ('<span color="%s" size="xx-large">%s</span>')
-        :format(beautiful.colors.cyan, '%H:%M'),
-      widget = wibox.widget.textclock,
-    },
-    layout.center {
-      format = ('<span color="%s" size="small">%s</span>')
-        :format(beautiful.colors.white, '%d-%m-%Y'),
-      widget = wibox.widget.textclock,
-    },
-    layout = wibox.layout.fixed.vertical,
+    format = ('<span color="%s" size="xx-large">%s</span>')
+      :format(beautiful.colors.cyan, '%H:%M'),
+    widget = wibox.widget.textclock,
+  },
+  {
+    format = ('<span color="%s" size="small">%s</span>')
+      :format(beautiful.colors.white, '%d-%m-%Y'),
+    widget = wibox.widget.textclock,
   },
 
+  flow = 'vertical',
+  layout = 'fixed',
   padding = { 20, 100 },
 	bg = beautiful.colors.void,
   border = { 2, beautiful.colors.dark_grey },

@@ -54,16 +54,40 @@ function render_background_border(node)
   }
 end
 
+local function render_layout(node)
+  local layout = wibox.layout.flex.horizontal
+
+  if node.layout == 'fixed' then
+    layout = wibox.layout.fixed[node.flow or 'horizontal']
+  end
+
+  return {
+    layout = layout,
+  }
+end
+
 function render(node)
-  if node.widget ~= nil or node.layout ~= nil then
+  if type(node) == 'string' then
+    return wibox.widget {
+      text = node,
+      widget = wibox.widget.textbox,
+    }
+  elseif node.widget ~= nil then
     return wibox.widget(node)
   else
     local margins = render_margins(node.margin)
     local border_background = render_background_border(node)
-    local padding = _.merge {
-      render_margins(node.padding),
+    local padding = render_margins(node.padding)
+
+    local layout = _.merge {
+      render_layout(node),
       _.map(node, function(child)
-        return render(child)
+        return {
+          render(child),
+          halign = child.halign or 'center',
+          valign = child.valign or 'center',
+          widget = wibox.container.place,
+        }
       end, ipairs),
     }
 
@@ -73,7 +97,12 @@ function render(node)
         _.merge {
           border_background,
           {
-            padding,
+            _.merge {
+              padding,
+              {
+                layout,
+              },
+            },
           },
         },
       },
