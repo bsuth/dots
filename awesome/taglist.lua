@@ -112,7 +112,7 @@ return {
 			height = svg.height
 				+ config.compass_size / 2
 				+ 2 * config.border_width,
-			visible = true,
+			visible = false,
 			ontop = true,
 			type = 'dock',
 			bg = beautiful.colors.transparent,
