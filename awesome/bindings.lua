@@ -87,6 +87,11 @@ bindings.globalkeys = gears.table.join(
     awful.key({ 'Mod4', 'Shift' }, 'k', function() awful.client.swap.global_bydirection('up') end),
     awful.key({ 'Mod4', 'Shift' }, 'l', function() awful.client.swap.global_bydirection('right') end),
 
+    awful.key({ 'Mod4', 'Control' }, 'h', function() awful.screen.focus_bydirection('left') end),
+    awful.key({ 'Mod4', 'Control' }, 'j', function() awful.screen.focus_bydirection('down') end),
+    awful.key({ 'Mod4', 'Control' }, 'k', function() awful.screen.focus_bydirection('up') end),
+    awful.key({ 'Mod4', 'Control' }, 'l', function() awful.screen.focus_bydirection('right') end),
+
     awful.key({ 'Mod4', 'Shift' }, 'm', function()
         local clients = awful.clientbuffer:clients()
 		if #clients > 0 then
