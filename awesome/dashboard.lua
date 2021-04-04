@@ -3,7 +3,6 @@ local beautiful = require 'beautiful'
 local components = require 'components'
 local gears = require 'gears'
 local layout = require 'layout'
-local lui = require 'lui'
 local models = require 'models'
 local wibox = require 'wibox'
 
@@ -51,23 +50,33 @@ local bluetooth = components.panel {
 -- CLOCK
 -- -----------------------------------------------------------------------------
 
-local clock = lui.render {
-  {
-    format = ('<span color="%s" size="xx-large">%s</span>')
-      :format(beautiful.colors.cyan, '%H:%M'),
-    widget = wibox.widget.textclock,
-  },
-  {
-    format = ('<span color="%s" size="small">%s</span>')
-      :format(beautiful.colors.white, '%d-%m-%Y'),
-    widget = wibox.widget.textclock,
-  },
+local clock = wibox.widget {
+	{
+		{
+			layout.center {
+				format = ('<span color="%s" size="xx-large">%s</span>')
+					:format(beautiful.colors.cyan, '%H:%M'),
+				widget = wibox.widget.textclock,
+			},
+			layout.center {
+				format = ('<span color="%s" size="small">%s</span>')
+					:format(beautiful.colors.white, '%d-%m-%Y'),
+				widget = wibox.widget.textclock,
+			},
+			layout = wibox.layout.fixed.vertical,
+		},
+		top = 20,
+		bottom = 20,
+		left = 100,
+		right = 100,
+		widget = wibox.container.margin,
+	},
 
-  flow = 'vertical',
-  layout = 'fixed',
-  padding = { 20, 100 },
 	bg = beautiful.colors.void,
-  border = { 2, beautiful.colors.dark_grey },
+	shape = gears.shape.rectangle,
+	shape_border_width = 2,
+	shape_border_color = beautiful.colors.dark_grey,
+	widget = wibox.container.background,
 }
 
 -- -----------------------------------------------------------------------------
