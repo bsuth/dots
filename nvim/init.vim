@@ -39,6 +39,7 @@ set signcolumn=yes
 set scrollback=100000
 set updatetime=300
 set expandtab
+set suffixes=.bak,~,.o,.info,.swp,.obj
 
 let g:mapleader = ' '
 let g:fzf_layout =  { 'down': '50%' }
