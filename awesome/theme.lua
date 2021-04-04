@@ -79,7 +79,7 @@ function beautiful.hex2rgb(hex)
 end
 
 function beautiful.set_wallpaper(screen)
-    gears.wallpaper.maximized('/home/bsuth/dots/svg/wallpapers/empty.svg', screen)
+    gears.wallpaper.maximized('/home/bsuth/dots/wallpaper.jpg', screen)
 end
 
 --------------------------------------------------------------------------------
