@@ -1,78 +1,73 @@
-local function default(t, tdefaults)
-  local defaulted = {}
+local _ = {}
 
-  for k, v in pairs(tdefaults) do
-    defaulted[k] = v
+function _.default(t, defaults)
+  local _t = {}
+
+  for k, v in pairs(defaults) do
+    _t[k] = v
   end
 
   if type(t) == 'table' then
     for k, v in pairs(t) do
-      defaulted[k] = v
+      _t[k] = v
     end
   end
 
-  return defaulted
+  return _t
 end
 
-local function merge(ts)
-  local merged = {}
+function _.filter(t, f)
+  local _t = {}
 
-  for _, t in ipairs(ts) do
-    for k, v in pairs(t) do
-      merged[k] = v
+  for k, v in pairs(t) do
+    if f(v, k) then
+      _t[k] = v
     end
   end
 
-  return merged
+  return _t 
 end
 
-local function map(t, mapper, iter)
-  local mapped = {}
+function _.map(t, f, iter)
+  local _t = {}
 
   for k, v in (iter or pairs)(t) do
-    local _v, _k = mapper(v, k)
+    local _v, _k = f(v, k)
     _k = _k ~= nil and _k or k
-    mapped[_k] = _v
+    _t[_k] = _v
   end
 
-  return mapped
+  return _t
 end
 
-local function filter(t, filterer)
-  local filtered = {}
+function _.merge(T)
+  local _t = {}
 
-  for k, v in pairs(t) do
-    if filterer(v, k) then
-      filtered[k] = v
+  for _, t in ipairs(T) do
+    for k, v in pairs(t) do
+      _t[k] = v
     end
   end
 
-  return filtered
+  return _t
 end
 
-local function reduce(t, reducer, reduction)
-  for k, v in pairs(t) do
-    reduction = reducer(reduction, v, k)
-  end
-
-  return reduction
-end
-
-local function range(n)
-  local sequence = {}
+function _.range(n)
+  local _t = {}
 
   for i = 1, n do
-    table.insert(sequence, i)
+    table.insert(_t, i)
   end
 
-  return sequence
+  return _t
 end
 
-return {
-  default = default,
-  merge = merge,
-  map = map,
-  filter = filter,
-  reduce = reduce,
-  range = range,
-}
+function _.reduce(t, f, r)
+  for k, v in pairs(t) do
+    r = reducer(r, v, k)
+  end
+
+  return r 
+end
+
+return _
