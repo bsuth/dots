@@ -33,7 +33,7 @@ function create_spaceship(s)
 
 	spaceship:add_at(wibox.widget {
 		forced_width = config.spaceship_width,
-		image = beautiful.svg('space/spaceship-at-rest'),
+		image = beautiful.svg('taglist/spaceship-at-rest'),
 		widget = wibox.widget.imagebox,
 	}, { x = 0, y = 0 })
 
@@ -66,7 +66,7 @@ function create_moons(s)
 		local moon = wibox.widget {
 			forced_width = config.moon_size,
 			forced_height = config.moon_size,
-			image = beautiful.svg('space/moon'),
+			image = beautiful.svg('taglist/moon'),
 			widget = wibox.widget.imagebox,
 		}
 
@@ -128,7 +128,7 @@ return {
 			{
 				{
 					{
-						image = beautiful.svg('space/solarsystem'),
+						image = beautiful.svg('taglist/solarsystem'),
 						widget = wibox.widget.imagebox,
 					},
 					shape = gears.shape.rectangle,
@@ -143,7 +143,7 @@ return {
 						{
 							forced_width = config.compass_size,
 							forced_height = config.compass_size,
-							image = beautiful.svg('compass'),
+							image = beautiful.svg('taglist/compass'),
 							widget = wibox.widget.imagebox,
 						},
 						top = -1 -- the svg itself has a 1px padding
