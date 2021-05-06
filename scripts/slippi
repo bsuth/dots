@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd ~/Documents/dolphin
+sudo mount slippi.AppImage slippimount -o offset=189632
+slippimount/AppRun
+sudo umount slippimount
+cd -

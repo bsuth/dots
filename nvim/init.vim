@@ -10,6 +10,7 @@ endif
 
 call plug#begin('~/.config/nvim/bundle')
 Plug 'joshdick/onedark.vim'
+Plug 'drewtempelmeyer/palenight.vim'
 Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'junegunn/fzf'
@@ -17,6 +18,7 @@ Plug 'junegunn/fzf.vim'
 Plug 'sheerun/vim-polyglot'
 Plug 'lambdalisue/suda.vim'
 Plug 'justinmk/vim-dirvish'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 call plug#end()
 
 " ------------------------------------------------------------------------------
@@ -45,17 +47,16 @@ let g:mapleader = ' '
 let g:fzf_layout =  { 'down': '50%' }
 let g:fzf_preview_window = 'right:60%'
 let g:suda_smart_edit = 1
+let g:coc_disable_startup_warning = 1
+let g:loaded_clipboard_provider = 1
 
-colorscheme onedark
+" colorscheme onedark
+colorscheme palenight
 highlight ColorColumn guibg=#585858
 
 " ------------------------------------------------------------------------------
 " FUNCTIONS
 " ------------------------------------------------------------------------------
-
-function! CdDirvish(dir)
-	:exec 'lcd ' . a:dir | :Dirvish
-endfunction
 
 function! Docs()
 	if (index(['vim','help'], &filetype) >= 0)
@@ -141,7 +142,6 @@ augroup END
 " COMMANDS
 " ------------------------------------------------------------------------------
 
-command! -nargs=* CdDirvish call CdDirvish(<f-args>)
 command! -nargs=* FzfCDSelect call fzf#run(fzf#wrap({
 			\ 'source': "find -L -type d ! \\( \\(
 			\ -name .cache -o 
@@ -150,6 +150,12 @@ command! -nargs=* FzfCDSelect call fzf#run(fzf#wrap({
 			\ 'sink': 'FzfCDCommit',
 			\}))
 command! -nargs=* FzfCDCommit exec 'cd ' . <f-args> . '|:Dirvish'
+
+command! -nargs=* FavoriteCDSelect call fzf#run(fzf#wrap({
+			\ 'source': "ls ~/edtechy",
+			\ 'sink': 'FavoriteCDCommit',
+			\}))
+command! -nargs=* FavoriteCDCommit exec 'cd ~/edtechy/' . <f-args> . '|:Dirvish'
 
 " ------------------------------------------------------------------------------
 " MARKS (kind of)
@@ -188,8 +194,21 @@ nnoremap <leader>cd :FzfCDSelect<cr>
 nnoremap <leader>rg :Rg<cr>
 nnoremap <leader>ls :Buffers<cr>
 
-nnoremap <leader><leader>fd :cd ~\|:Files<cr>
-nnoremap <leader><leader>cd :cd ~\|:FzfCDSelect<cr>
-nnoremap <leader><leader>rg :cd ~\|:Rg<cr>
+nnoremap <leader><leader> :FavoriteCDSelect<cr>
+nnoremap <silent> K :call Docs()<cr>
+nnoremap <leader>coc :silent CocRestart<cr>
 
-nnoremap <silent> K :call Docs()<CR>
+" Emacs Bindings for insert mode
+
+inoremap <M-b> <C-o>b
+inoremap <M-f> <C-o>w
+inoremap <c-b> <C-o>h
+inoremap <c-f> <C-o>l
+
+inoremap <c-a> <C-o>^
+inoremap <c-e> <C-o>$
+inoremap <c-u> <C-o>d^
+inoremap <c-k> <C-o>d$
+
+inoremap <M-backspace> <C-o>db
+inoremap <M-d> <C-o>dw
