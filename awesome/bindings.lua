@@ -146,7 +146,7 @@ bindings.globalkeys = gears.table.join(
     -- -------------------------------------------------------------------------
     
     awful.key({ 'Mod4' }, 'Return', function() awful.spawn('kitty') end),
-    awful.key({ 'Mod4' }, "'", function() awful.spawn('vivaldi') end),
+    awful.key({ 'Mod4' }, "'", function() awful.spawn('vivaldi-stable') end),
     awful.key({ 'Mod4' }, 'space', function() awful.spawn('rofi -show run') end),
     awful.key({ 'Mod4' }, 'p', function() dashboard:toggle() end),
     awful.key({ 'Mod4' }, 'n', function() taglist.toggle() end)
@@ -195,6 +195,12 @@ bindings.clientkeys = gears.table.join(
 
         naughty.notify {text = msg}
     end),
+
+    awful.key({ 'Mod4', 'Control', 'Shift' }, 'r', function(c)
+			c.floating = false
+			c.maximized = false
+			c.fullscreen = false
+		end),
 
     -- -------------------------------------------------------------------------
     -- Layout

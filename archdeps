@@ -1,0 +1,30 @@
+# system
+xorg-server
+xorg-xinit
+iwd
+bluez
+bluez-utils
+pulseaudio
+pulseaudio-alsa
+pulseaudio-bluetooth
+upower
+ttf-hack
+
+# tools
+git
+zsh
+nodejs
+flameshot
+ripgrep
+fd
+physlock
+
+# apps
+arandr
+nvim
+kitty
+vivaldi
+
+# AUR
+yay
+awesome-luajit
