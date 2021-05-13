@@ -1,29 +1,39 @@
-# system
+# System
 xorg-server
 xorg-xinit
 iwd
 bluez
 bluez-utils
+alsa-utils
 pulseaudio
 pulseaudio-alsa
 pulseaudio-bluetooth
 upower
-ttf-hack
 
-# tools
+# Essentials
 git
+openssh
 zsh
 nodejs
+npm
+
+# Input / Fonts
+fcitx
+fcitx-mozc
+ttf-hack
+adobe-source-han-sans-jp-fonts
+
+# Tools
 flameshot
 ripgrep
 fd
 physlock
 
-# apps
-arandr
+# Apps
 nvim
-kitty
 vivaldi
+kitty
+arandr
 
 # AUR
 yay

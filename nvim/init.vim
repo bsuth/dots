@@ -1,58 +1,4 @@
-" ------------------------------------------------------------------------------
-" VIM-PLUG
-" ------------------------------------------------------------------------------
-
-if empty(glob('~/.config/nvim/autoload/plug.vim'))
-	silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
-				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-endif
-
-call plug#begin('~/.config/nvim/bundle')
-Plug 'joshdick/onedark.vim'
-Plug 'drewtempelmeyer/palenight.vim'
-Plug 'tpope/vim-surround'
-Plug 'tpope/vim-commentary'
-Plug 'junegunn/fzf'
-Plug 'junegunn/fzf.vim'
-Plug 'sheerun/vim-polyglot'
-Plug 'lambdalisue/suda.vim'
-Plug 'justinmk/vim-dirvish'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-call plug#end()
-
-" ------------------------------------------------------------------------------
-" OPTIONS / VARIABLES
-" ------------------------------------------------------------------------------
-
-set ignorecase
-set smartcase
-set termguicolors
-set splitright
-set splitbelow
-set clipboard=unnamedplus
-set tabstop=2
-set softtabstop=2
-set shiftwidth=2
-set number
-set nowrap
-set colorcolumn=80
-set signcolumn=yes
-set scrollback=100000
-set updatetime=300
-set expandtab
-set suffixes=.bak,~,.o,.info,.swp,.obj
-
-let g:mapleader = ' '
-let g:fzf_layout =  { 'down': '50%' }
-let g:fzf_preview_window = 'right:60%'
-let g:suda_smart_edit = 1
-let g:coc_disable_startup_warning = 1
-let g:loaded_clipboard_provider = 1
-
-" colorscheme onedark
-colorscheme palenight
-highlight ColorColumn guibg=#585858
+lua require('init')
 
 " ------------------------------------------------------------------------------
 " FUNCTIONS
@@ -93,14 +39,6 @@ function! BufEnterAutoCd()
 	if (getbufvar('', '&filetype') == 'dirvish')
 		Dirvish
 	endif
-endfunction
-
-function! OnTermClose()
-	if (!empty(matchstr(bufname(''), 'bundle/fzf/bin/fzf')))
-		return
-	endif
-
-	Dirvish
 endfunction
 
 function! GetVisualSelection()
