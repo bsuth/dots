@@ -25,15 +25,15 @@ local buffer_options = {
 }
 
 for k, v in pairs(global_options) do
-  vim.api.nvim_set_option(k, v)
+  nvim_set_option(k, v)
 end
 
 for k, v in pairs(window_options) do
-  vim.api.nvim_win_set_option(0, k, v)
+  nvim_win_set_option(0, k, v)
 end
 
 for k, v in pairs(buffer_options) do
-  vim.api.nvim_buf_set_option(0, k, v)
+  nvim_buf_set_option(0, k, v)
 end
 
-vim.api.nvim_command('highlight ColorColumn guibg=#585858')
+nvim_command('highlight ColorColumn guibg=#585858')

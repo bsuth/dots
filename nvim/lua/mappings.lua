@@ -1,4 +1,4 @@
-vim.api.nvim_set_var('mapleader', ' ')
+nvim_set_var('mapleader', ' ')
 
 local bindings = {
   n = { -- normal mode
@@ -60,6 +60,6 @@ local bindings = {
 
 for mode, modebindings in pairs(bindings) do
   for k, v in pairs(modebindings) do
-    vim.api.nvim_set_keymap(mode, k, v, { noremap = true })
+    nvim_set_keymap(mode, k, v, { noremap = true })
   end
 end
