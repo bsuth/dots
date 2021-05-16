@@ -5,7 +5,8 @@ for k, v in pairs(vim.api) do
   end
 end
 
-require('stlua').expose()
+require('luascript').expose()
 require 'plugins'
 require 'options'
+require 'autocommands'
 require 'mappings'

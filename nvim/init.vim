@@ -64,19 +64,6 @@ function! SearchVisualSelection()
 endfunction
 
 " ------------------------------------------------------------------------------
-" AUGROUPS
-" ------------------------------------------------------------------------------
-
-augroup bsuth-general
-	au BufEnter * call BufEnterAutoCd()
-	au TermOpen term://*zsh* setlocal nonumber wrap
-	au TermOpen term://*zsh* startinsert
-	au TermClose term://*zsh* Dirvish
-	" au FileType c setlocal shiftwidth=4 tabstop=4 softtabstop=4
-	au FileType dirvish nnoremap <buffer><silent> <cr> :call DirvishXdgOpen()<cr>
-augroup END
-
-" ------------------------------------------------------------------------------
 " COMMANDS
 " ------------------------------------------------------------------------------
 

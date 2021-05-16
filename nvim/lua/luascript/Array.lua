@@ -31,7 +31,13 @@ return setmetatable(Array, {
     return setmetatable({}, {
       __index = function(self, k)
         if type(k) == 'number' then
-          -- TODO: 0 index + negative indices
+          if k > #self - 1 or k < -(#self - 1) then
+            error('out of bounds access: '..tostring(k))
+          elseif k < 0 then
+            k = k + #self - 1
+          end
+
+          return self[k]
         else
           return Array[k]
         end
