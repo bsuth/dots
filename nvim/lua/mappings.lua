@@ -34,7 +34,11 @@ local bindings = {
     ['<leader>coc'] = ':silent CocRestart<cr>',
 
     -- tabby
-    ['<leader>t'] = ':echo "hi"<cr>',
+    ['<leader>t'] = ':unlet g:loaded_tabby|:source $MYVIMRC<cr>',
+    ['<c-t>'] = ':tabnew|:Dirvish ~<cr>',
+    ['<c-w>'] = ':tabclose<cr>',
+    ['<Tab>'] = ':tabnext<cr>',
+    ['<s-Tab>'] = ':tabprev<cr>',
   },
 
   i = { -- insert mode

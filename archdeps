@@ -1,6 +1,7 @@
 # System
 xorg-server
 xorg-xinit
+xorg-xev
 iwd
 bluez
 bluez-utils

@@ -106,7 +106,7 @@ bindings.globalkeys = gears.table.join(
 		local s = awful.screen.focused()
 
 		if bindings.scratchpad.client == nil or not bindings.scratchpad.client.valid then
-			awful.spawn('kitty', {
+			awful.spawn('st -e nvim -c ":term"', {
 				name = 'scratchpad',
 				floating = true,
 				screen = s,
@@ -145,7 +145,7 @@ bindings.globalkeys = gears.table.join(
     -- Spawners
     -- -------------------------------------------------------------------------
     
-    awful.key({ 'Mod4' }, 'Return', function() awful.spawn('kitty') end),
+    awful.key({ 'Mod4' }, 'Return', function() awful.spawn('st -e nvim -c ":Dirvish"') end),
     awful.key({ 'Mod4' }, "'", function() awful.spawn('vivaldi-stable') end),
     awful.key({ 'Mod4' }, 'space', function() awful.spawn('rofi -show run') end),
     awful.key({ 'Mod4' }, 'p', function() dashboard:toggle() end),
