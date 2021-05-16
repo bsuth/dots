@@ -5,7 +5,7 @@ for k, v in pairs(vim.api) do
   end
 end
 
-require 'stl'
+require('stlua').expose()
 require 'plugins'
 require 'options'
 require 'mappings'
