@@ -1,3 +1,4 @@
+lua package.loaded.init = nil
 lua require('init')
 
 " ------------------------------------------------------------------------------
@@ -77,7 +78,7 @@ command! -nargs=* FzfCDSelect call fzf#run(fzf#wrap({
 command! -nargs=* FzfCDCommit exec 'cd ' . <f-args> . '|:Dirvish'
 
 command! -nargs=* FavoriteCDSelect call fzf#run(fzf#wrap({
-			\ 'source': "ls ~/edtechy",
+			\ 'source': "ls ~/edtechy ~/projects",
 			\ 'sink': 'FavoriteCDCommit',
 			\}))
 command! -nargs=* FavoriteCDCommit exec 'cd ~/edtechy/' . <f-args> . '|:Dirvish'

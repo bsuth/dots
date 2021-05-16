@@ -16,6 +16,7 @@ openssh
 zsh
 nodejs
 npm
+unzip
 
 # Input / Fonts
 fcitx

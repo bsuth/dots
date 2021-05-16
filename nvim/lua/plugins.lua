@@ -20,6 +20,7 @@ local plugins = {
 	'lambdalisue/suda.vim',
 	'justinmk/vim-dirvish',
 	{[[ 'neoclide/coc.nvim', {'branch': 'release'}  ]]},
+	'~/projects/tabby',
 }
 
 nvim_call_function('plug#begin', { '~/.config/nvim/bundle' })

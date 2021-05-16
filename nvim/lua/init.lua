@@ -5,6 +5,11 @@ for k, v in pairs(vim.api) do
   end
 end
 
+package.loaded.plugins = nil
+package.loaded.options = nil
+package.loaded.autocommands = nil
+package.loaded.mappings= nil
+
 require('luascript').expose()
 require 'plugins'
 require 'options'

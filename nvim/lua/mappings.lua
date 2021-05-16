@@ -32,6 +32,9 @@ local bindings = {
     -- coc
     ['<silent>'] = 'K :call Docs()<cr>',
     ['<leader>coc'] = ':silent CocRestart<cr>',
+
+    -- tabby
+    ['<leader>t'] = ':echo "hi"<cr>',
   },
 
   i = { -- insert mode
