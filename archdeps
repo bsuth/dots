@@ -30,11 +30,11 @@ flameshot
 ripgrep
 fd
 physlock
+brightnessctl
 
 # Apps
 nvim
 vivaldi
-kitty
 arandr
 
 # AUR
