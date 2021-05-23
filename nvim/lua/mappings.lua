@@ -30,7 +30,7 @@ local bindings = {
     ['<leader>ls'] = ':Buffers<cr>',
 
     -- coc
-    ['<silent>'] = 'K :call Docs()<cr>',
+    ['<silent>'] = 'K :lua docs()<cr>',
     ['<leader>coc'] = ':silent CocRestart<cr>',
 
     -- tabby
@@ -57,7 +57,7 @@ local bindings = {
 
   v = { -- visual mode
     ['<c-_>'] = ':Commentary<cr>',
-    ['<c-n>'] = ':call SearchVisualSelection()<cr>',
+    ['<c-n>'] = ':lua search_visual_selection()<cr>',
   },
 
   t = { -- terminal mode

@@ -63,7 +63,7 @@ nvim_call_function('setenv', { 'FZF_DEFAULT_COMMAND', 'rg --files -L' })
 nvim_call_function('setenv', { 'FZF_DEFAULT_OPTS', '--exact --reverse --border' })
 
 nvim_set_var('fzf_layout', { window = 'lua fzfwin()' })
-nvim_set_var('fzf_preview_window', 'right:60%')
+nvim_set_var('fzf_preview_window', 'right:0%')
 
 nvim_set_var('fzf_action', {
 	['ctrl-t'] = 'tab split',
