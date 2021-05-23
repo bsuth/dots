@@ -3,7 +3,7 @@ local Array = require 'luascript/Array'
 function docs()
 	local filetype = nvim_buf_get_option(0, 'filetype')
 
-	if Array({ 'vim', 'help' }):find(function(v) return v ==  filetype end) then
+	if Array({ 'vim', 'help' }):find(filetype) then
 		nvim_command('h '..nvim_cWORD())
 	else
 		nvim_command('Man '..nvim_cWORD())
