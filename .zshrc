@@ -46,13 +46,12 @@ zplugin light denysdovhan/spaceship-prompt
 
 export SHELL='/bin/zsh'
 export EDITOR=nvim
+export WORDCHARS=${WORDCHARS//[\/\.]}
+export PATH="$HOME/.local/bin:$PATH"
 
 export HISTFILE=~/.zsh_history
 export HISTSIZE=1000
 export SAVEHIST=1000
-
-export FZF_DEFAULT_COMMAND='rg --files -L'
-export FZF_DEFAULT_OPTS='--exact'
 
 export SPACESHIP_PROMPT_ORDER=(
   time          # Time stamps section
@@ -68,11 +67,6 @@ export SPACESHIP_PROMPT_ORDER=(
   exit_code     # Exit code section
   char          # Prompt character
 )
-
-export PATH="$HOME/.local/bin:$PATH"
-source ~/emsdk/emsdk_env.sh 2>/dev/null
-
-export WORDCHARS=${WORDCHARS//[\/\.]}
 
 # ------------------------------------------------------------------------------
 # EDTECHYUI COMPLETION
@@ -95,10 +89,8 @@ compdef _edtechyui_yargs_completions edtechyui
 # ALIASES
 # ------------------------------------------------------------------------------
 
-alias l='ls -1 --color=auto --group-directories-first'
 alias vi='nvim'
 alias vim='nvim'
-alias now='date +"%F %H:%M"'
 alias testwm='Xephyr -br -ac -noreset -screen 800x600 :1 &; DISPLAY=:1 awesome'
 
 # vim: syntax=zsh
