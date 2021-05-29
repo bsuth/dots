@@ -1,3 +1,5 @@
+local Array = require 'luascript/Array'
+
 --
 -- vim-plug
 --
@@ -19,12 +21,12 @@ local plugins = {
 	'tpope/vim-surround',
 	'tpope/vim-commentary',
 	'junegunn/fzf',
-	'junegunn/fzf.vim',
 	'sheerun/vim-polyglot',
 	'lambdalisue/suda.vim',
 	'justinmk/vim-dirvish',
 	{[[ 'neoclide/coc.nvim', {'branch': 'release'}  ]]},
-	'~/projects/tabby',
+	'~/projects/nvim-tabby',
+	'~/projects/nvim-imacs',
 }
 
 nvim_call_function('plug#begin', { '~/.config/nvim/bundle' })
@@ -59,10 +61,18 @@ nvim_set_var('coc_global_extensions', {
 -- fzf
 --
 
+local fzfPruneDirs = Array {
+	'.cache',
+	'.git',
+	'node_modules',
+	'build',
+	'dist',
+}
+
 nvim_call_function('setenv', { 'FZF_DEFAULT_COMMAND', 'rg --files -L' })
 nvim_call_function('setenv', { 'FZF_DEFAULT_OPTS', '--exact --reverse --border' })
 
-nvim_set_var('fzf_layout', { window = 'lua fzfwin()' })
+nvim_set_var('fzf_layout', { window = 'lua fzf_win()' })
 nvim_set_var('fzf_preview_window', 'right:0%')
 
 nvim_set_var('fzf_action', {
@@ -86,7 +96,7 @@ nvim_set_var('fzf_colors', {
 	spinner = { 'fg', 'Keyword' },
 })
 
-function fzfwin()
+function fzf_win()
 	local width = 80
 	local height = 20
 
@@ -101,4 +111,80 @@ function fzfwin()
 		relative = 'editor',
 		style = 'minimal',
 	})
+end
+
+function fzf_cd()
+	nvim_call_function('fzf#run', {
+		nvim_call_function('fzf#wrap', {{
+			source = ([[ fd --follow --type d %s ]]):format(
+				fzfPruneDirs:map(function(v) return '--exclude '..v end):join(' ')
+			),
+			sink = 'FzfCdSink',
+		}})
+	})
+end
+
+nvim_command([[
+	command! -nargs=* FzfCdSink exec 'cd ' . <f-args> . '|:Dirvish'
+]])
+
+function fzf_favorites_cd()
+	local favorites = Array {
+		'edtechy',
+		'projects',
+	}
+
+	nvim_call_function('fzf#run', {
+		nvim_call_function('fzf#wrap', {{
+			source = ([[ fd --type d --base-directory ~ --exact-depth 1 %s %s ]]):format(
+				fzfPruneDirs:map(function(v) return '--exclude '..v end):join(' '),
+				favorites:map(function(v) return '--search-path '..v end):join(' ')
+			),
+			sink = 'FzfBookmarkCdSink',
+		}})
+	})
+end
+
+nvim_command([[
+	command! -nargs=* FzfBookmarkCdSink exec 'cd ~/' . <f-args> . '|:Dirvish'
+]])
+
+function fzf_rg()
+	local fzfOptions = Array {
+		'--ansi',
+		'--multi',
+		'--delimiter :',
+		'--nth 2..',
+	}
+
+	local rgFlags = Array {
+		'--color=always',
+		'--smart-case',
+		'--line-number',
+		'--no-column',
+		'--no-heading',
+	}
+
+	nvim_call_function('fzf#run', {
+		nvim_call_function('fzf#wrap', {{
+			source = ([[ rg . %s ]]):format(rgFlags:join(' ')),
+			options = fzfOptions:join(' '),
+			sink = 'FzfRgSink',
+		}})
+	})
+end
+
+nvim_command([[
+	command! -nargs=* FzfRgSink lua fzf_rg_sink(<f-args>)
+]])
+
+function fzf_rg_sink(...)
+	-- TODO: luascript split
+	Array({ ... }):each(function(v)
+		local columns = {}
+		for match in v:gmatch('[^:]+') do
+			table.insert(columns, match)
+		end
+		nvim_command(('edit +%d %s'):format(columns[2], columns[1]))
+	end)
 end

@@ -17,47 +17,50 @@ local bindings = {
     ['<c-j>'] = '<c-w>j',
     ['<c-k>'] = '<c-w>k',
     ['<c-l>'] = '<c-w>l',
-    ['<leader><c-l>'] = ':rightbelow :vsp|:Dirvish<cr>',
-    ['<leader><c-k>'] = ':aboveleft :sp|:Dirvish<cr>',
-    ['<leader><c-j>'] = ':rightbelow :sp|:Dirvish<cr>',
-    ['<leader><c-h>'] = ':aboveleft :vsp|:Dirvish<cr>',
+    ['<leader><c-l>'] = ':rightbelow :vsp | :Dirvish<cr>',
+    ['<leader><c-k>'] = ':aboveleft :sp | :Dirvish<cr>',
+    ['<leader><c-j>'] = ':rightbelow :sp | :Dirvish<cr>',
+    ['<leader><c-h>'] = ':aboveleft :vsp | :Dirvish<cr>',
 
     -- fzf
-    ['<leader><leader>'] = ':FavoriteCDSelect<cr>',
+    ['<leader><leader>'] = ':lua fzf_favorites_cd()<cr>',
     ['<leader>fd'] = ':Files<cr>',
-    ['<leader>cd'] = ':FzfCDSelect<cr>',
-    ['<leader>rg'] = ':Rg<cr>',
+    ['<leader>cd'] = ':lua fzf_cd()<cr>',
+    ['<leader>rg'] = ':lua fzf_rg()<cr>',
     ['<leader>ls'] = ':Buffers<cr>',
 
     -- coc
-    ['<silent>'] = 'K :lua docs()<cr>',
     ['<leader>coc'] = ':silent CocRestart<cr>',
 
     -- tabby
-    ['<leader>t'] = ':unlet g:loaded_tabby|:source $MYVIMRC<cr>',
-    ['<c-t>'] = ':tabnew|:Dirvish ~<cr>',
-    ['<c-w>'] = ':tabclose<cr>',
-    ['<Tab>'] = ':tabnext<cr>',
-    ['<s-Tab>'] = ':tabprev<cr>',
+    ['<c-t>'] = ':TabbyOpen|:Dirvish ~<cr>',
+    ['<c-w>'] = ':TabbyClose<cr>',
+    ['<tab>'] = ':tabnext<cr>',
+    ['<s-tab>'] = ':tabprev<cr>',
+    ['<lt>'] = ':TabbyMove -1<cr>',
+    ['>'] = ':TabbyMove +1<cr>',
+    ['<leader><tab>'] = ':TabbyRename ',
   },
 
   i = { -- insert mode
     -- emacs bindings
-    ['<M-b>'] = '<C-o>b',
-    ['<M-f>'] = '<C-o>w',
-    ['<c-b>'] = '<C-o>h',
-    ['<c-f>'] = '<C-o>l',
-    ['<c-a>'] = '<C-o>^',
-    ['<c-e>'] = '<C-o>$',
-    ['<c-u>'] = '<C-o>d^',
-    ['<c-k>'] = '<C-o>d$',
-    ['<M-backspace>'] = '<C-o>db',
-    ['<M-d>'] = '<C-o>dw',
+    ['<m-b>'] = '<c-o>b',
+    ['<m-f>'] = '<c-o>w',
+    ['<c-b>'] = '<c-o>h',
+    ['<c-f>'] = '<c-o>l',
+    ['<c-a>'] = '<c-o>^',
+    ['<c-e>'] = '<c-o>$',
+    ['<c-u>'] = '<c-o>d^',
+    ['<c-k>'] = '<c-o>d$',
+    ['<m-backspace>'] = '<c-o>db',
+    ['<m-d>'] = '<c-o>dw',
   },
 
   v = { -- visual mode
     ['<c-_>'] = ':Commentary<cr>',
     ['<c-n>'] = ':lua search_visual_selection()<cr>',
+    -- TODO: visual selection docs
+    -- ['K'] = ':lua docs()<cr>',
   },
 
   t = { -- terminal mode

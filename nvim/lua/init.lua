@@ -10,14 +10,6 @@ for k, v in pairs(vim.api) do
   end
 end
 
-function nvim_cword()
-  return nvim_call_function('expand', { '<cword>' })
-end
-
-function nvim_cWORD()
-  return nvim_call_function('expand', { '<cWORD>' })
-end
-
 --
 -- packages
 --

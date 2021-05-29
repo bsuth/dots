@@ -2,11 +2,12 @@ local Array = require 'luascript/Array'
 
 function docs()
 	local filetype = nvim_buf_get_option(0, 'filetype')
+	local cWORD = nvim_call_function('expand', { '<cWORD>' })
 
 	if Array({ 'vim', 'help' }):find(filetype) then
-		nvim_command('h '..nvim_cWORD())
+		nvim_command('h '..cWORD)
 	else
-		nvim_command('Man '..nvim_cWORD())
+		nvim_command('Man '..cWORD)
 	end
 end
 
@@ -40,7 +41,7 @@ function on_bufenter()
 		filetype = nvim_buf_get_option(0, 'filetype')
 	}
 
-	if buffer.filetype:match('^term://') then
+	if buffer.name:match('^term://') then
 		return
 	end
 
@@ -52,7 +53,7 @@ end
 
 function dirvish_open()
 	-- TODO: use luascript path functions
-	local file = nvim_cWORD()
+	local file = nvim_call_function('expand', { '<cWORD>' })
 	local dir = nvim_call_function('fnamemodify', { file, ':p:h' })
 	local ext = nvim_call_function('fnamemodify', { file, ':e' })
 
