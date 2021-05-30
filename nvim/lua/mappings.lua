@@ -3,7 +3,7 @@ nvim_set_var('mapleader', ' ')
 local bindings = {
   n = { -- normal mode
     -- common use
-    ['<leader>ev'] = ':e $MYVIMRC<cr>',
+    ['<leader>ev'] = ':Dirvish ~/dots/nvim/lua<cr>',
     ['<leader>sv'] = ':source $MYVIMRC<cr>',
     ['<c-space>'] = ':term<cr>',
     ['<leader>/'] = ':nohlsearch<cr><c-l>',
@@ -22,6 +22,10 @@ local bindings = {
     ['<leader><c-j>'] = ':rightbelow :sp | :Dirvish<cr>',
     ['<leader><c-h>'] = ':aboveleft :vsp | :Dirvish<cr>',
 
+    -- fake marks
+    ["'r"] = ':cd / | :Dirvish<cr>',
+    ["'h"] = ':cd ~ | :Dirvish<cr>',
+
     -- fzf
     ['<leader><leader>'] = ':lua fzf_favorites_cd()<cr>',
     ['<leader>fd'] = ':Files<cr>',
@@ -33,7 +37,7 @@ local bindings = {
     ['<leader>coc'] = ':silent CocRestart<cr>',
 
     -- tabby
-    ['<c-t>'] = ':TabbyOpen|:Dirvish ~<cr>',
+    ['<c-t>'] = ':TabbyOpen | :Dirvish ~<cr>',
     ['<c-w>'] = ':TabbyClose<cr>',
     ['<tab>'] = ':tabnext<cr>',
     ['<s-tab>'] = ':tabprev<cr>',
