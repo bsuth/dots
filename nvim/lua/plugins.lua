@@ -1,5 +1,3 @@
-local Array = require 'luascript/Array'
-
 --
 -- vim-plug
 --
@@ -25,6 +23,7 @@ local plugins = {
 	'lambdalisue/suda.vim',
 	'justinmk/vim-dirvish',
 	{[[ 'neoclide/coc.nvim', {'branch': 'release'}  ]]},
+	'matze/vim-move',
 	'~/projects/nvim-tabby',
 	'~/projects/nvim-imacs',
 }

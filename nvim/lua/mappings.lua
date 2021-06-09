@@ -32,6 +32,7 @@ local bindings = {
     ['<leader>cd'] = ':lua fzf_cd()<cr>',
     ['<leader>rg'] = ':lua fzf_rg()<cr>',
     ['<leader>ls'] = ':Buffers<cr>',
+    ['<leader>tb'] = ':lua fzf_tabby()<cr>',
 
     -- coc
     ['<leader>coc'] = ':silent CocRestart<cr>',
@@ -47,6 +48,12 @@ local bindings = {
   },
 
   i = { -- insert mode
+    -- coc
+    ['<c-space>'] = {
+      rhs = 'coc#refresh()',
+      opts = { expr = true, silent = true },
+    },
+
     -- emacs bindings
     ['<m-b>'] = '<c-o>b',
     ['<m-f>'] = '<c-o>w',
@@ -74,6 +81,11 @@ local bindings = {
 
 for mode, modebindings in pairs(bindings) do
   for k, v in pairs(modebindings) do
-    nvim_set_keymap(mode, k, v, { noremap = true })
+    if type(v) == 'string' then
+      nvim_set_keymap(mode, k, v, { noremap = true })
+    elseif type(v) == 'table' then
+      v.opts.noremap = true
+      nvim_set_keymap(mode, k, v.rhs, v.opts)
+    end
   end
 end

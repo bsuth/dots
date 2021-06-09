@@ -1,7 +1,7 @@
 --
 -- lua env
 -- 1) expose vim.api to global scope
--- 2) expose global helper functions
+-- 2) expose utils
 --
 
 for k, v in pairs(vim.api) do
@@ -10,14 +10,30 @@ for k, v in pairs(vim.api) do
   end
 end
 
+ANSI = {
+    RESET = string.char(27)..'[0m',
+    BLACK = string.char(27)..'[30m',
+    RED = string.char(27)..'[31m',
+    GREEN = string.char(27)..'[32m',
+    YELLOW = string.char(27)..'[33m',
+    BLUE = string.char(27)..'[34m',
+    MAGENTA = string.char(27)..'[35m',
+    CYAN = string.char(27)..'[36m',
+    WHITE = string.char(27)..'[37m',    
+}
+
+function colorize(s, color)
+    return color..s..ANSI.RESET
+end
+
 --
 -- packages
 --
 
 local packages = {
   'plugins',
-  'fzf',
   'helpers',
+  'fzf',
   'mappings',
 }
 

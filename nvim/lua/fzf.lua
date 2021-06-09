@@ -1,4 +1,5 @@
 local Array = require 'luascript/Array'
+local helpers = require './helpers';
 
 --
 -- constants
@@ -113,13 +114,6 @@ nvim_command([[
 --
 
 function fzf_rg()
-	local fzfOptions = Array {
-		'--ansi',
-		'--multi',
-		'--delimiter :',
-		'--nth 2..',
-	}
-
 	local rgFlags = Array {
 		'--color=always',
 		'--smart-case',
@@ -131,7 +125,12 @@ function fzf_rg()
 	nvim_call_function('fzf#run', {
 		nvim_call_function('fzf#wrap', {{
 			source = ([[ rg . %s ]]):format(rgFlags:join(' ')),
-			options = fzfOptions:join(' '),
+			options = Array({
+				'--ansi',
+				'--multi',
+				'--delimiter :',
+				'--nth 2..',
+			}):join(' '),
 			sink = 'FzfRgSink',
 		}})
 	})
@@ -150,4 +149,32 @@ function fzf_rg_sink(...)
 		end
 		nvim_command(('edit +%d %s'):format(columns[2], columns[1]))
 	end)
+end
+
+--
+-- fzf_tabby
+--
+
+function fzf_tabby()
+	nvim_call_function('fzf#run', {
+		nvim_call_function('fzf#wrap', {{
+			source = require('tabby').list(true):map(function(tabname, i)
+        return colorize(tostring(i + 1), ANSI.GREEN)..':'..colorize(tabname, ANSI.RED)
+      end):raw(),
+      options = Array({
+        '--ansi',
+        '--delimiter :',
+        '--nth 2..',
+      }):join(' '),
+			sink = 'FzfTabbySink',
+		}})
+	})
+end
+
+nvim_command([[
+	command! -nargs=* FzfTabbySink lua fzf_tabby_sink(<f-args>)
+]])
+
+function fzf_tabby_sink(selection)
+  require('tabby').open(selection:match("([^:]+)"))
 end
