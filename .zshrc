@@ -47,7 +47,7 @@ zplugin light denysdovhan/spaceship-prompt
 export SHELL='/bin/zsh'
 export EDITOR=nvim
 export WORDCHARS=${WORDCHARS//[\/\.]}
-export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
 
 export HISTFILE=~/.zsh_history
 export HISTSIZE=1000

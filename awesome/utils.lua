@@ -25,7 +25,7 @@ function _.filter(t, f)
     end
   end
 
-  return _t 
+  return _t
 end
 
 function _.map(t, f, iter)
@@ -67,7 +67,7 @@ function _.reduce(t, f, r)
     r = reducer(r, v, k)
   end
 
-  return r 
+  return r
 end
 
 return _
