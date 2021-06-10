@@ -6,9 +6,9 @@ local layout = require('layout')
 local models = require('models')
 local wibox = require('wibox')
 
--- -----------------------------------------------------------------------------
--- DASHBOARD
--- -----------------------------------------------------------------------------
+--
+-- Dashboard
+--
 
 local dashboard = gears.table.crush(
   wibox({
@@ -40,18 +40,18 @@ local dashboard = gears.table.crush(
   }
 )
 
--- -----------------------------------------------------------------------------
--- BLUETOOTH
--- -----------------------------------------------------------------------------
+--
+-- Bluetooth
+--
 
 local bluetooth = components.panel({
   text = 'Bluetooth Here',
   widget = wibox.widget.textbox,
 })
 
--- -----------------------------------------------------------------------------
--- CLOCK
--- -----------------------------------------------------------------------------
+--
+-- Clock
+--
 
 local clock = wibox.widget({
   {
@@ -86,9 +86,9 @@ local clock = wibox.widget({
   widget = wibox.container.background,
 })
 
--- -----------------------------------------------------------------------------
--- DANGER ZONE
--- -----------------------------------------------------------------------------
+--
+-- Danger Zone
+--
 
 function create_danger_zone_icon(icon)
   return wibox.widget({
@@ -153,9 +153,9 @@ local danger_zone = wibox.widget({
   layout = wibox.layout.fixed.vertical,
 })
 
--- -----------------------------------------------------------------------------
--- KB LAYOUT
--- -----------------------------------------------------------------------------
+--
+-- Kb Layout
+--
 
 function create_kb_layout_item(index, icon)
   return wibox.widget({
@@ -194,9 +194,9 @@ local kb_layout = components.panel({
   layout = wibox.layout.fixed.horizontal,
 })
 
--- -----------------------------------------------------------------------------
--- LAUNCHERS
--- -----------------------------------------------------------------------------
+--
+-- Launchers
+--
 
 local launchers = components.panel({
   components.launcher({
@@ -225,9 +225,9 @@ local launchers = components.panel({
   layout = wibox.layout.fixed.horizontal,
 })
 
--- -----------------------------------------------------------------------------
--- METERS
--- -----------------------------------------------------------------------------
+--
+-- Meters
+--
 
 local meters = components.panel({
   components.meter({
@@ -255,9 +255,9 @@ local meters = components.panel({
   layout = wibox.layout.fixed.horizontal,
 })
 
--- -----------------------------------------------------------------------------
--- SLIDERS
--- -----------------------------------------------------------------------------
+--
+-- Sliders
+--
 
 local sliders_defaults = {
   width = 35,
@@ -276,9 +276,9 @@ local sliders = wibox.widget({
   layout = wibox.layout.flex.horizontal,
 })
 
--- -----------------------------------------------------------------------------
--- SWITCHES
--- -----------------------------------------------------------------------------
+--
+-- Switches
+--
 
 function create_switch_item(config)
   local icon = wibox.widget({
@@ -323,9 +323,9 @@ local switches = components.panel({
   layout = wibox.layout.fixed.horizontal,
 })
 
--- -----------------------------------------------------------------------------
--- TILING LAYOUT
--- -----------------------------------------------------------------------------
+--
+-- Tiling Layout
+--
 
 function create_tiling_layout_item(index, icon)
   return wibox.widget({
@@ -364,18 +364,18 @@ local tiling_layout = components.panel({
   layout = wibox.layout.fixed.horizontal,
 })
 
--- -----------------------------------------------------------------------------
--- WIFI
--- -----------------------------------------------------------------------------
+--
+-- Wifi
+--
 
 local wifi = components.panel({
   text = 'Wifi Here',
   widget = wibox.widget.textbox,
 })
 
--- -----------------------------------------------------------------------------
--- RETURN
--- -----------------------------------------------------------------------------
+--
+-- Return
+--
 
 function outer_panel(widget)
   return components.panel(widget, {

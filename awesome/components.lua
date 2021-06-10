@@ -4,18 +4,18 @@ local layout = require('layout')
 local wibox = require('wibox')
 local widgets = require('widgets')
 
--- -----------------------------------------------------------------------------
--- HELPERS
--- -----------------------------------------------------------------------------
+--
+-- Helpers
+--
 
 function set_source_hex(cr, hex)
   local rgb = beautiful.hex2rgb(hex)
   cr:set_source_rgb(rgb[1], rgb[2], rgb[3])
 end
 
--- -----------------------------------------------------------------------------
--- BUTTON
--- -----------------------------------------------------------------------------
+--
+-- Button
+--
 
 function button(config)
   local force_press = false
@@ -95,9 +95,9 @@ function button(config)
   return _button
 end
 
--- -----------------------------------------------------------------------------
--- LAUNCHER
--- -----------------------------------------------------------------------------
+--
+-- Launcher
+--
 
 function launcher(config)
   local _button = wibox.widget({
@@ -162,9 +162,9 @@ function launcher(config)
   return _launcher
 end
 
--- -----------------------------------------------------------------------------
--- METER
--- -----------------------------------------------------------------------------
+--
+-- Meter
+--
 
 function meter(config)
   local needle = wibox.widget({
@@ -218,9 +218,9 @@ function meter(config)
   })
 end
 
--- -----------------------------------------------------------------------------
--- PANEL
--- -----------------------------------------------------------------------------
+--
+-- Panel
+--
 
 function panel(widget, config)
   config = config or {}
@@ -273,9 +273,9 @@ function panel(widget, config)
   })
 end
 
--- -----------------------------------------------------------------------------
--- SLIDER
--- -----------------------------------------------------------------------------
+--
+-- Slider
+--
 
 function slider(config)
   local _slider = wibox.widget({
@@ -311,9 +311,9 @@ function slider(config)
   })
 end
 
--- -----------------------------------------------------------------------------
--- SWITCH
--- -----------------------------------------------------------------------------
+--
+-- Switch
+--
 
 function switch(config)
   local _switch = wibox.widget({
@@ -351,9 +351,9 @@ function switch(config)
   return _switch
 end
 
--- -----------------------------------------------------------------------------
--- EXPORT
--- -----------------------------------------------------------------------------
+--
+-- Export
+--
 
 return {
   button = button,

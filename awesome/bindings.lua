@@ -6,9 +6,9 @@ local naughty = require('naughty')
 -- local taglist = require('taglist')
 local tagtabs = require('tagtabs')
 
---------------------------------------------------------------------------------
--- KEYBINDINGS
---------------------------------------------------------------------------------
+--
+-- Keybindings
+--
 
 local bindings = {
   restore_tag = nil,
@@ -31,42 +31,15 @@ local bindings = {
   end,
 }
 
---------------------------------------------------------------------------------
--- ALT TAB
---------------------------------------------------------------------------------
-
-local function alt_tab(idx)
-  awful.tag.history.restore()
-end
-
-awful.keygrabber({
-  keybindings = {
-    { { 'Mod1' }, 'Tab', function()
-      alt_tab(1)
-    end },
-    { { 'Mod1', 'Shift' }, 'Tab', function()
-      alt_tab(-1)
-    end },
-  },
-
-  stop_key = 'Mod1',
-  stop_event = 'release',
-
-  start_callback = awful.client.focus.history.disable_tracking,
-  stop_callback = awful.client.focus.history.enable_tracking,
-
-  export_keybindings = true,
-})
-
---------------------------------------------------------------------------------
--- GLOBAL KEYS
---------------------------------------------------------------------------------
+--
+-- Global Keys
+--
 
 bindings.globalkeys = gears.table.join(
 
-  -- -------------------------------------------------------------------------
+  --
   -- System
-  -- -------------------------------------------------------------------------
+  --
 
   awful.key({ 'Mod4', 'Shift' }, 'r', function()
       awesome.restart()
@@ -96,9 +69,9 @@ bindings.globalkeys = gears.table.join(
     models.kb_layout:cycle()
   end),
 
-  -- -------------------------------------------------------------------------
+  --
   -- Movement
-  -- -------------------------------------------------------------------------
+  --
 
   awful.key({ 'Mod4' }, 'h', function()
     awful.client.focus.global_bydirection('left')
@@ -187,9 +160,9 @@ bindings.globalkeys = gears.table.join(
     end
   end),
 
-  -- -------------------------------------------------------------------------
+  --
   -- Layout
-  -- -------------------------------------------------------------------------
+  --
 
   awful.key({ 'Mod4', 'Shift', 'Control' }, 'h', function()
     awful.tag.incmwfact(-0.05)
@@ -201,9 +174,9 @@ bindings.globalkeys = gears.table.join(
     awful.layout.inc(1)
   end),
 
-  -- -------------------------------------------------------------------------
+  --
   -- Spawners
-  -- -------------------------------------------------------------------------
+  --
 
   awful.key({ 'Mod4' }, 'Return', function()
     awful.spawn('st -e nvim -c ":Dirvish"')
@@ -238,15 +211,15 @@ for i = 1, 9 do
   )
 end
 
---------------------------------------------------------------------------------
--- CLIENT KEYS
---------------------------------------------------------------------------------
+--
+-- Client Keys
+--
 
 bindings.clientkeys = gears.table.join(
 
-  -- -------------------------------------------------------------------------
+  --
   -- System
-  -- -------------------------------------------------------------------------
+  --
 
   awful.key({ 'Mod4', 'Shift' }, 'q', function(c)
       c:kill()
@@ -277,9 +250,9 @@ bindings.clientkeys = gears.table.join(
     c.fullscreen = false
   end),
 
-  -- -------------------------------------------------------------------------
+  --
   -- Layout
-  -- -------------------------------------------------------------------------
+  --
 
   awful.key({ 'Mod4' }, 'f', function(c)
     c.fullscreen = not c.fullscreen
@@ -292,9 +265,9 @@ bindings.clientkeys = gears.table.join(
   end)
 )
 
---------------------------------------------------------------------------------
--- CLIENT BUTTONS
---------------------------------------------------------------------------------
+--
+-- Client Buttons
+--
 
 bindings.clientbuttons = gears.table.join(
   awful.button({}, 1, function(c)
@@ -346,9 +319,9 @@ dashboard:connect_signal('button::press', function(_, _, _, button, mods)
   end
 end)
 
---------------------------------------------------------------------------------
--- RETURN
---------------------------------------------------------------------------------
+--
+-- Return
+--
 
 root.keys(bindings.globalkeys)
 return bindings

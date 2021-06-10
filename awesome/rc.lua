@@ -8,11 +8,12 @@ require('awful/autofocus')
 -- Order matters here!
 require('theme')
 local taglist = require('taglist')
+local tagtabs = require('tagtabs')
 local bindings = require('bindings')
 
---------------------------------------------------------------------------------
--- LAYOUTS
---------------------------------------------------------------------------------
+--
+-- Layouts
+--
 
 awful.layout.layouts = {
   awful.layout.suit.spiral.dwindle,
@@ -20,9 +21,9 @@ awful.layout.layouts = {
   awful.layout.suit.magnifier,
 }
 
---------------------------------------------------------------------------------
--- RULES
---------------------------------------------------------------------------------
+--
+-- Rules
+--
 
 awful.rules.rules = {
   {
@@ -64,9 +65,9 @@ awful.rules.rules = {
   },
 }
 
---------------------------------------------------------------------------------
--- SIGNALS
---------------------------------------------------------------------------------
+--
+-- Signals
+--
 
 -- Signal function to execute when a new client appears.
 client.connect_signal('manage', function(c)
@@ -100,9 +101,9 @@ client.connect_signal('unfocus', function(c)
   c.border_color = beautiful.border_normal
 end)
 
---------------------------------------------------------------------------------
--- STARTUP
---------------------------------------------------------------------------------
+--
+-- Startup
+--
 
 awful.screen.connect_for_each_screen(function(s)
   awful.tag(
@@ -112,7 +113,7 @@ awful.screen.connect_for_each_screen(function(s)
   )
 
   beautiful.set_wallpaper(s)
-  taglist.attach(s)
+  tagtabs.attach(s)
 
   s:connect_signal('tag::history::update', function()
     -- restore focus to above client

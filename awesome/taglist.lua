@@ -3,9 +3,9 @@ local beautiful = require 'beautiful'
 local gears = require 'gears'
 local wibox = require 'wibox'
 
--- -----------------------------------------------------------------------------
--- CONSTANTS / CONFIG
--- -----------------------------------------------------------------------------
+--
+-- Constants / Config
+--
 
 -- Properties of the solarsystem svg
 local svg = {
@@ -22,9 +22,9 @@ local config = {
 	border_width = 2,
 }
 
--- -----------------------------------------------------------------------------
--- SPACESHIP
--- -----------------------------------------------------------------------------
+--
+-- Spaceship
+--
 
 function create_spaceship(s)
 	local spaceship = wibox.widget {
@@ -53,9 +53,9 @@ function create_spaceship(s)
 	return spaceship
 end
 
--- -----------------------------------------------------------------------------
--- MOONS
--- -----------------------------------------------------------------------------
+--
+-- Moons
+--
 
 function create_moons(s)
 	local moons = wibox.widget {
@@ -92,9 +92,9 @@ function create_moons(s)
 	return moons
 end
 
--- -----------------------------------------------------------------------------
--- TAGLIST
--- -----------------------------------------------------------------------------
+--
+-- Taglist
+--
 
 return {
 	attach = function(s)

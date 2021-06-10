@@ -3,9 +3,9 @@ local dpi = require('beautiful/xresources').apply_dpi
 local gears = require('gears')
 local naughty = require('naughty')
 
---------------------------------------------------------------------------------
--- COLORSCHEME: ONEDARK
---------------------------------------------------------------------------------
+--
+-- Colorscheme: OneDark
+--
 
 local colors = {
   black = '#282c34',
@@ -26,9 +26,9 @@ local colors = {
   transparent = '#00000000',
 }
 
---------------------------------------------------------------------------------
--- THEME
---------------------------------------------------------------------------------
+--
+-- Theme
+--
 
 beautiful.init({
   colors = colors,
@@ -61,9 +61,9 @@ naughty.config.defaults.margin = dpi(5)
 naughty.config.defaults.border_width = dpi(2)
 naughty.config.defaults.position = 'top_left'
 
---------------------------------------------------------------------------------
--- FUNCTIONS
---------------------------------------------------------------------------------
+--
+-- Functions
+--
 
 function beautiful.svg(path)
   return ('/home/bsuth/dots/svg/%s.svg'):format(path)
@@ -82,8 +82,8 @@ function beautiful.set_wallpaper(screen)
   gears.wallpaper.maximized('/home/bsuth/dots/wallpaper.png', screen)
 end
 
---------------------------------------------------------------------------------
--- RETURN
---------------------------------------------------------------------------------
+--
+-- Return
+--
 
 return beautiful
