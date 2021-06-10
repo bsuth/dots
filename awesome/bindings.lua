@@ -3,8 +3,8 @@ local dashboard = require('dashboard')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
-local taglist = require('taglist')
--- local tagtabs = require 'tagtabs'
+-- local taglist = require('taglist')
+local tagtabs = require('tagtabs')
 
 --------------------------------------------------------------------------------
 -- KEYBINDINGS

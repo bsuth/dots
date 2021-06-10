@@ -69,6 +69,29 @@ function fzf_win()
 end
 
 --
+-- fzf_fd
+--
+
+function fzf_fd()
+  nvim_call_function('fzf#run', {
+    nvim_call_function('fzf#wrap', {
+      {
+        source = ([[ fd --follow --type f %s ]]):format(FZF_PRUNE_DIRS
+            :map(function(v)
+            return '--exclude ' .. v
+          end)
+            :join(' ')),
+        sink = 'FzfFdSink',
+      },
+    }),
+  })
+end
+
+nvim_command([[
+	command! -nargs=* FzfFdSink exec 'edit ' . <f-args>
+]])
+
+--
 -- fzf_cd
 --
 

@@ -72,7 +72,11 @@ function apply_stylua()
   local stylua = '~/.cargo/bin/stylua --config-path ~/dots/stylua.toml'
   local target = nvim_call_function('expand', { '%:p' })
 
-  if os.execute(stylua .. ' --check ' .. target) then
+  local handle = io.popen(stylua .. ' --check ' .. target..' 2>&1 >/dev/null')
+  local checkOutput = handle:read("*a")
+  handle:close()
+
+  if not checkOutput:match('^error') then
     local cursor_pos = nvim_call_function('getpos', { '.' })
     nvim_command('silent exec "%! ' .. stylua .. ' -"')
     nvim_call_function('setpos', { '.', cursor_pos })
