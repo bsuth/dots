@@ -7,8 +7,7 @@ require('awful/autofocus')
 
 -- Order matters here!
 require('theme')
-local taglist = require('taglist')
-local TagTabber = require('TagTabber')
+local TagTabs = require('TagTabs')
 local bindings = require('bindings')
 
 --
@@ -106,14 +105,10 @@ end)
 --
 
 awful.screen.connect_for_each_screen(function(s)
-  awful.tag(
-    { '1', '2', '3', '4', '5', '6', '7', '8', '9' },
-    s,
-    awful.layout.layouts[1]
-  )
+  awful.tag({ '1' }, s, awful.layout.layouts[1])
 
   beautiful.set_wallpaper(s)
-  s.tagTabber = TagTabber(s)
+  s.tagTabs = TagTabs(s)
 
   s:connect_signal('tag::history::update', function()
     -- restore focus to above client
@@ -126,7 +121,7 @@ awful.screen.connect_for_each_screen(function(s)
   end)
 end)
 
-awful.clientbuffer = awful.tag.add('clientbuffer', {
+awful.clientbuffer = awful.tag.add('_clientbuffer', {
   layout = awful.layout.suit.fair.horizontal,
   screen = awful.screen.focused(),
 })

@@ -5,7 +5,7 @@ local layout = require('layout')
 local wibox = require('wibox')
 
 --
--- TagTabber
+-- TagTabs
 --
 
 local config = {
@@ -13,21 +13,22 @@ local config = {
   margins = { x = 60, y = 20 },
 }
 
-local TagTabber = {
+local TagTabs = {
   screen = nil,
   tabsWidget = nil,
   wibox = nil,
 }
 
 --
--- TagTab
+-- TabWidget
 --
 
-local function TagTab(active)
-  local theme = beautiful.colors.purple
+local function TabWidget(name, active)
+  local theme = beautiful.colors.green
+  name = name or 'Tab'
   local markup = active
-      and ('<span foreground="%s">Test</span>'):format(theme)
-    or 'test'
+      and ('<span foreground="%s">%s</span>'):format(theme, name)
+    or name
 
   return wibox.widget({
     {
@@ -81,17 +82,60 @@ end
 -- Methods
 --
 
-function TagTabber:refresh()
+function TagTabs:new()
+  awful.tag.add(tostring(#self.screen.tags), {
+    layout = awful.layout.layouts[1],
+    screen = self.screen,
+  }):view_only()
+end
+
+function TagTabs:close()
+  self.screen.selected_tag:delete()
+end
+
+function TagTabs:focus(relidx)
+  local newTagIndex = self.screen.selected_tag.index
+  local numTags = #self.screen.tags
+
+  for i = 1, numTags do -- limit iterations
+    if relidx > 0 then
+      newTagIndex = newTagIndex < numTags and newTagIndex + 1 or 1
+    else
+      newTagIndex = newTagIndex > 1 and newTagIndex - 1 or numTags
+    end
+
+    local newTag = self.screen.tags[newTagIndex]
+    if not newTag.name:match('^_.*') then
+      newTag:view_only()
+      break
+    end
+  end
+end
+
+function TagTabs:next()
+  self:focus(1)
+end
+
+function TagTabs:prev()
+  self:focus(-1)
+end
+
+function TagTabs:refresh()
   local tabChildren = {}
 
   for _, tag in ipairs(self.screen.tags) do
-    table.insert(tabChildren, TagTab(tag == self.screen.selected_tag))
+    if not tag.name:match('^_') then
+      table.insert(
+        tabChildren,
+        TabWidget(tag.name, tag == self.screen.selected_tag)
+      )
+    end
   end
 
   self.tabsWidget.children = tabChildren
 end
 
-function TagTabber:toggle()
+function TagTabs:toggle()
   self:refresh()
   self.wibox.visible = not self.wibox.visible
 end
@@ -102,14 +146,10 @@ end
 
 return setmetatable({}, {
   __call = function(self, screen)
-    local newTagTabber = {
+    local newTagTabs = {
       screen = screen,
 
       tabsWidget = wibox.widget({
-        TagTab(true),
-        TagTab(),
-        TagTab(),
-        TagTab(),
         layout = wibox.layout.fixed.horizontal,
       }),
 
@@ -128,9 +168,9 @@ return setmetatable({}, {
       }),
     }
 
-    newTagTabber.wibox:setup({
+    newTagTabs.wibox:setup({
       {
-        layout.center(newTagTabber.tabsWidget),
+        layout.center(newTagTabs.tabsWidget),
         margins = 10,
         widget = wibox.container.margin,
       },
@@ -146,9 +186,9 @@ return setmetatable({}, {
     })
 
     screen:connect_signal('tag::history::update', function()
-      newTagTabber:refresh()
+      newTagTabs:refresh()
     end)
 
-    return setmetatable(newTagTabber, { __index = TagTabber })
+    return setmetatable(newTagTabs, { __index = TagTabs })
   end,
 })
