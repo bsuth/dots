@@ -4,7 +4,6 @@ local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
 -- local taglist = require('taglist')
-local tagtabs = require('tagtabs')
 
 --
 -- Keybindings
@@ -41,11 +40,12 @@ bindings.globalkeys = gears.table.join(
   -- System
   --
 
-  awful.key({ 'Mod4', 'Shift' }, 'r', function()
-      awesome.restart()
-    end),
   awful.key({ 'Mod4', 'Shift' }, 'Escape', function()
-    awesome.quit()
+      awesome.quit()
+    end),
+
+  awful.key({ 'Mod4', 'Shift' }, 'r', function()
+    awesome.restart()
   end),
 
   awful.key({}, 'XF86AudioLowerVolume', function()
@@ -122,6 +122,21 @@ bindings.globalkeys = gears.table.join(
     end
   end),
 
+  --
+  -- TagTabs
+  --
+
+  awful.key({ 'Mod4' }, 'Tab', function()
+    awful.tag.viewnext(awful.screen.focused())
+  end),
+  awful.key({ 'Mod4', 'Shift' }, 'Tab', function()
+    awful.tag.viewprev(awful.screen.focused())
+  end),
+
+  --
+  -- Scratchpad
+  --
+
   awful.key({ 'Mod4' }, ';', function()
     local s = awful.screen.focused()
 
@@ -190,10 +205,8 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4' }, 'p', function()
     dashboard:toggle()
   end),
-
   awful.key({ 'Mod4' }, 'n', function()
-    local tagtabs = awful.screen.focused().tagtabs
-    tagtabs.visible = not tagtabs.visible
+    awful.screen.focused().tagTabber:toggle()
   end)
 )
 

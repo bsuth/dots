@@ -8,7 +8,7 @@ require('awful/autofocus')
 -- Order matters here!
 require('theme')
 local taglist = require('taglist')
-local tagtabs = require('tagtabs')
+local TagTabber = require('TagTabber')
 local bindings = require('bindings')
 
 --
@@ -113,7 +113,7 @@ awful.screen.connect_for_each_screen(function(s)
   )
 
   beautiful.set_wallpaper(s)
-  tagtabs.attach(s)
+  s.tagTabber = TagTabber(s)
 
   s:connect_signal('tag::history::update', function()
     -- restore focus to above client
