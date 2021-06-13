@@ -34,6 +34,7 @@ local packages = {
   'plugins',
   'helpers',
   'fzf',
+  'lightline',
   'mappings',
 }
 
