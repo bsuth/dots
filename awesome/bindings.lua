@@ -3,6 +3,7 @@ local dashboard = require('dashboard')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
+local prompt = require('prompt')
 
 --
 -- Keybindings
@@ -20,7 +21,7 @@ local scratchpad = {
 -- Helpers
 --
 
-function grab_mouse_until_released()
+local function grab_mouse_until_released()
   mousegrabber.run(function(mouse)
     for _, v in pairs(mouse.buttons) do
       if v then
@@ -31,13 +32,13 @@ function grab_mouse_until_released()
   end, 'mouse')
 end
 
-function global_swap_tags(dir)
+local function global_swap_tags(dir)
   local screen1 = awful.screen.focused()
   local screen2 = screen1:get_next_in_direction(dir)
   screen1.selected_tag:swap(screen2.selected_tag)
 end
 
-function global_move_client(dir)
+local function global_move_client(dir)
   local oldId = awful.client.idx(client.focus)
   awful.client.swap.bydirection(dir)
   local newId = awful.client.idx(client.focus)
@@ -237,8 +238,11 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4' }, "'", function()
     awful.spawn('vivaldi-stable')
   end),
+  -- awful.key({ 'Mod4' }, 'space', function()
+  --   awful.spawn('rofi -show run')
+  -- end),
   awful.key({ 'Mod4' }, 'space', function()
-    awful.spawn('rofi -show run')
+    prompt:toggle()
   end),
   awful.key({ 'Mod4' }, 'p', function()
     dashboard:toggle()
