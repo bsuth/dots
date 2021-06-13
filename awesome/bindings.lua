@@ -104,17 +104,17 @@ bindings.globalkeys = gears.table.join(
     awful.client.focus.global_bydirection('right')
   end),
 
-  awful.key({ 'Mod4', 'Shift' }, 'h', function(c)
-    global_move_client(c, 'left')
+  awful.key({ 'Mod4', 'Shift' }, 'h', function()
+    global_move_client('left')
   end),
-  awful.key({ 'Mod4', 'Shift' }, 'j', function(c)
-    global_move_client(c, 'down')
+  awful.key({ 'Mod4', 'Shift' }, 'j', function()
+    global_move_client('down')
   end),
-  awful.key({ 'Mod4', 'Shift' }, 'k', function(c)
-    global_move_client(c, 'up')
+  awful.key({ 'Mod4', 'Shift' }, 'k', function()
+    global_move_client('up')
   end),
-  awful.key({ 'Mod4', 'Shift' }, 'l', function(c)
-    global_move_client(c, 'right')
+  awful.key({ 'Mod4', 'Shift' }, 'l', function()
+    global_move_client('right')
   end),
 
   awful.key({ 'Mod4', 'Control' }, 'h', function()
@@ -188,15 +188,11 @@ bindings.globalkeys = gears.table.join(
 
   awful.key({ 'Mod4' }, ';', function()
     local screen = awful.screen.focused()
-    local x = screen.geometry.x
-      + (screen.geometry.width - scratchpad.width) / 2
+    local x = screen.geometry.x + (screen.geometry.width - scratchpad.width) / 2
     local y = screen.geometry.y
       + (screen.geometry.height - scratchpad.height) / 2
 
-    if
-      scratchpad.client == nil
-      or not scratchpad.client.valid
-    then
+    if scratchpad.client == nil or not scratchpad.client.valid then
       awful.spawn('st -e nvim -c ":term"', {
         name = 'scratchpad',
         floating = true,
