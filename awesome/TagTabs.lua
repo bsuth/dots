@@ -90,7 +90,9 @@ function TagTabs:new()
 end
 
 function TagTabs:close()
-  self.screen.selected_tag:delete()
+  if #self.screen.tags > 1 then
+    self.screen.selected_tag:delete()
+  end
 end
 
 function TagTabs:focus(relidx)
