@@ -61,6 +61,7 @@ local global_options = {
   scrollback = 100000,
   updatetime = 300,
   suffixes = '.bak,~,.o,.info,.swp,.obj',
+  showmode = false, -- replaced by lightline
 }
 
 local window_options = {

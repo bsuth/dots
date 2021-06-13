@@ -25,6 +25,7 @@ local plugins = {
   'justinmk/vim-dirvish',
   { [[ 'neoclide/coc.nvim', {'branch': 'release'}  ]] },
   'matze/vim-move',
+  'itchyny/lightline.vim',
   '~/projects/nvim-tabby',
   '~/projects/nvim-imacs',
 }
@@ -55,4 +56,71 @@ nvim_set_var('coc_global_extensions', {
   'coc-css',
   'coc-json',
   'coc-prettier',
+})
+
+--
+-- lightline
+--
+
+local lightlineOneDark = (function()
+  local palette = {}
+
+  for k, v in pairs(nvim_call_function('onedark#GetColors', {})) do
+    palette[k] = { v.gui, tonumber(v.cterm) }
+  end
+
+  return palette
+end)()
+
+function lightlineMode(color, normal)
+  local mode = {
+    left = {
+      { lightlineOneDark.black, color, 'bold' },
+      { color, lightlineOneDark.special_grey },
+    },
+    middle = {
+      { lightlineOneDark.white, lightlineOneDark.black },
+    },
+    right = {
+      { lightlineOneDark.black, color, 'bold' },
+      { lightlineOneDark.white, lightlineOneDark.special_grey },
+    },
+  }
+
+  if normal then
+    mode.error = { lightlineOneDark.red, lightlineOneDark.black }
+    mode.warning = { lightlineOneDark.yellow, lightlineOneDark.black }
+  end
+
+  return mode
+end
+
+nvim_set_var(
+  'lightline#colorscheme#onedark#palette',
+  nvim_call_function('lightline#colorscheme#flatten', {
+      {
+        inactive = lightlineMode(lightlineOneDark.white),
+        normal = lightlineMode(lightlineOneDark.green, true),
+        insert = lightlineMode(lightlineOneDark.blue),
+        command = lightlineMode(lightlineOneDark.yellow),
+        terminal = lightlineMode(lightlineOneDark.red),
+        visual = lightlineMode(lightlineOneDark.purple),
+        tabline = lightlineMode(lightlineOneDark.cyan),
+      },
+    })
+)
+
+nvim_set_var('lightline', {
+  colorscheme = 'onedark',
+  active = {
+    left = {
+      { 'mode', 'paste' },
+      { 'readonly', 'filename', 'modified' },
+    },
+    right = {
+      { 'lineinfo' },
+      { 'percent' },
+      { 'filetype' },
+    },
+  },
 })
