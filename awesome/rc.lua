@@ -11,13 +11,20 @@ local TagTabs = require('TagTabs')
 local bindings = require('bindings')
 
 --
--- Layouts
+-- Layout
 --
 
 awful.layout.layouts = {
-  awful.layout.suit.spiral.dwindle,
-  awful.layout.suit.fair.horizontal,
-  awful.layout.suit.magnifier,
+  {
+    name = 'mylayout',
+    arrange = function(p)
+      if #p.clients < 4 then
+        awful.layout.suit.spiral.dwindle.arrange(p)
+      else
+        awful.layout.suit.fair.horizontal.arrange(p)
+      end
+    end,
+  },
 }
 
 --
@@ -33,10 +40,6 @@ awful.rules.rules = {
 
       keys = bindings.clientkeys,
       buttons = bindings.clientbuttons,
-
-      raise = true,
-      floating = false,
-      maximized = false,
 
       focus = awful.client.focus.filter,
       screen = awful.screen.preferred,

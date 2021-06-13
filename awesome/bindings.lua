@@ -8,38 +8,43 @@ local naughty = require('naughty')
 -- Keybindings
 --
 
-local bindings = {
-  restore_tag = nil,
+local bindings = {}
 
-  scratchpad = {
-    client = nil,
-    width = 900,
-    height = 600,
-  },
-
-  grab_mouse_until_released = function()
-    mousegrabber.run(function(mouse)
-      for _, v in pairs(mouse.buttons) do
-        if v then
-          return true
-        end
-      end
-      return false
-    end, 'mouse')
-  end,
+local scratchpad = {
+  client = nil,
+  width = 900,
+  height = 600,
 }
 
 --
 -- Helpers
 --
 
-function global_move_client(c, dir)
-  local oldId = awful.client.idx(c)
+function grab_mouse_until_released()
+  mousegrabber.run(function(mouse)
+    for _, v in pairs(mouse.buttons) do
+      if v then
+        return true
+      end
+    end
+    return false
+  end, 'mouse')
+end
+
+function global_swap_tags(dir)
+  local screen1 = awful.screen.focused()
+  local screen2 = screen1:get_next_in_direction(dir)
+  screen1.selected_tag:swap(screen2.selected_tag)
+end
+
+function global_move_client(dir)
+  local oldId = awful.client.idx(client.focus)
   awful.client.swap.bydirection(dir)
-  local newId = awful.client.idx(c)
+  local newId = awful.client.idx(client.focus)
 
   if oldId.col == newId.col and oldId.idx == newId.idx then
-    c:move_to_screen(awful.screen.focused():get_next_in_direction(dir))
+    local newScreen = awful.screen.focused():get_next_in_direction(dir)
+    client.focus:move_to_screen(newScreen)
   end
 end
 
@@ -99,6 +104,19 @@ bindings.globalkeys = gears.table.join(
     awful.client.focus.global_bydirection('right')
   end),
 
+  awful.key({ 'Mod4', 'Shift' }, 'h', function(c)
+    global_move_client(c, 'left')
+  end),
+  awful.key({ 'Mod4', 'Shift' }, 'j', function(c)
+    global_move_client(c, 'down')
+  end),
+  awful.key({ 'Mod4', 'Shift' }, 'k', function(c)
+    global_move_client(c, 'up')
+  end),
+  awful.key({ 'Mod4', 'Shift' }, 'l', function(c)
+    global_move_client(c, 'right')
+  end),
+
   awful.key({ 'Mod4', 'Control' }, 'h', function()
     awful.screen.focus_bydirection('left')
   end),
@@ -110,6 +128,19 @@ bindings.globalkeys = gears.table.join(
   end),
   awful.key({ 'Mod4', 'Control' }, 'l', function()
     awful.screen.focus_bydirection('right')
+  end),
+
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'h', function()
+    global_swap_tags('left')
+  end),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'j', function()
+    global_swap_tags('down')
+  end),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'k', function()
+    global_swap_tags('up')
+  end),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'l', function()
+    global_swap_tags('right')
   end),
 
   --
@@ -136,6 +167,11 @@ bindings.globalkeys = gears.table.join(
   -- Client Buffer
   --
 
+  awful.key({ 'Mod4' }, 'm', function()
+    client.focus:move_to_tag(awful.clientbuffer)
+    client.focus.minimized = true
+  end),
+
   awful.key({ 'Mod4', 'Shift' }, 'm', function()
     local clients = awful.clientbuffer:clients()
     if #clients > 0 then
@@ -153,45 +189,45 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4' }, ';', function()
     local screen = awful.screen.focused()
     local x = screen.geometry.x
-      + (screen.geometry.width - bindings.scratchpad.width) / 2
+      + (screen.geometry.width - scratchpad.width) / 2
     local y = screen.geometry.y
-      + (screen.geometry.height - bindings.scratchpad.height) / 2
+      + (screen.geometry.height - scratchpad.height) / 2
 
     if
-      bindings.scratchpad.client == nil
-      or not bindings.scratchpad.client.valid
+      scratchpad.client == nil
+      or not scratchpad.client.valid
     then
       awful.spawn('st -e nvim -c ":term"', {
         name = 'scratchpad',
         floating = true,
         screen = screen,
-        width = bindings.scratchpad.width,
-        height = bindings.scratchpad.height,
+        width = scratchpad.width,
+        height = scratchpad.height,
         x = x,
         y = y,
 
         callback = function(c)
           naughty.notify({ text = 'hi' })
-          bindings.scratchpad.client = c
+          scratchpad.client = c
           c.floating = true,
         c:emit_signal('request::activate', 'client.jumpto', { raise = true })
         end,
       })
-    elseif bindings.scratchpad.client.hidden then
-      gears.table.crush(bindings.scratchpad.client, {
+    elseif scratchpad.client.hidden then
+      gears.table.crush(scratchpad.client, {
         screen = screen,
         hidden = false,
         x = x,
         y = y,
       })
 
-      bindings.scratchpad.client:emit_signal(
+      scratchpad.client:emit_signal(
         'request::activate',
         'client.jumpto',
         { raise = true }
       )
     else
-      bindings.scratchpad.client.hidden = true
+      scratchpad.client.hidden = true
     end
   end),
 
@@ -218,11 +254,6 @@ bindings.globalkeys = gears.table.join(
 --
 
 bindings.clientkeys = gears.table.join(
-
-  --
-  -- System
-  --
-
   awful.key({ 'Mod4', 'Shift' }, 'q', function(c)
       c:kill()
     end),
@@ -255,45 +286,6 @@ bindings.clientkeys = gears.table.join(
     c.floating = false
     c.maximized = false
     c.fullscreen = false
-  end),
-
-  --
-  -- Movement
-  --
-
-  awful.key({ 'Mod4', 'Shift' }, 'h', function(c)
-    global_move_client(c, 'left')
-  end),
-  awful.key({ 'Mod4', 'Shift' }, 'j', function(c)
-    global_move_client(c, 'down')
-  end),
-  awful.key({ 'Mod4', 'Shift' }, 'k', function(c)
-    global_move_client(c, 'up')
-  end),
-  awful.key({ 'Mod4', 'Shift' }, 'l', function(c)
-    global_move_client(c, 'right')
-  end),
-
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'h', function(c)
-    c:move_to_screen(awful.screen.focused():get_next_in_direction('left'))
-  end),
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'j', function(c)
-    c:move_to_screen(awful.screen.focused():get_next_in_direction('down'))
-  end),
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'k', function(c)
-    c:move_to_screen(awful.screen.focused():get_next_in_direction('up'))
-  end),
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'l', function(c)
-    c:move_to_screen(awful.screen.focused():get_next_in_direction('right'))
-  end),
-
-  --
-  -- Client Buffer
-  --
-
-  awful.key({ 'Mod4' }, 'm', function(c)
-    c:move_to_tag(awful.clientbuffer)
-    c.minimized = true
   end)
 )
 
@@ -318,7 +310,7 @@ bindings.clientbuttons = gears.table.join(
 
   awful.button({ 'Control', 'Shift' }, 1, function(c)
     dashboard:toggle()
-    bindings.grab_mouse_until_released()
+    grab_mouse_until_released()
   end),
 
   awful.button({ 'Control', 'Shift' }, 2, function(c)
