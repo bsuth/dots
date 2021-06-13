@@ -3,7 +3,6 @@ local dashboard = require('dashboard')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
-local prompt = require('prompt')
 
 --
 -- Keybindings
@@ -163,6 +162,9 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4', 'Shift' }, 'Tab', function()
     awful.screen.focused().tagTabs:prev()
   end),
+  awful.key({ 'Mod4' }, 'r', function()
+    awful.screen.focused().tagTabs:rename()
+  end),
 
   --
   -- Client Buffer
@@ -242,7 +244,7 @@ bindings.globalkeys = gears.table.join(
   --   awful.spawn('rofi -show run')
   -- end),
   awful.key({ 'Mod4' }, 'space', function()
-    prompt:toggle()
+    -- TODO: awesome-rofi
   end),
   awful.key({ 'Mod4' }, 'p', function()
     dashboard:toggle()

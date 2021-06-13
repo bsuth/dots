@@ -25,94 +25,103 @@ local prompt = {
   }),
 }
 
---
--- Setup
---
-
 local rawPrompt = awful.widget.prompt({
   prompt = '',
-  exe_callback = function(input)
-    require('naughty').notify({ text = input })
+
+  keypressed_callback = function()
   end,
+
   done_callback = function()
     prompt.wibox.visible = false
   end,
 })
 
-prompt.wibox:setup({
-  {
+--
+-- Helpers
+--
+
+function noop()
+end
+
+--
+-- Methods
+--
+
+function prompt.attach(widget)
+  prompt.wibox:setup({
     {
-      {
-        layout.center({
-          {
-            -- placeholder widget so container actually renders
-            text = '',
-            widget = wibox.widget.textbox,
-          },
-
-          forced_width = 30 + 4, -- + shape_border_width
-          forced_height = 15 + 4, -- + shape_border_width
-
-          shape_border_width = 4,
-          shape_border_color = beautiful.colors.white,
-          shape = function(cr, width, height)
-            gears.shape.powerline(cr, 30, 15)
-          end,
-
-          widget = wibox.container.background,
-        }),
-
-        right = 10,
-        widget = wibox.container.margin,
-      },
-      layout.center(rawPrompt.widget),
-      layout = wibox.layout.fixed.horizontal,
+      widget,
+      margins = 20,
+      widget = wibox.container.margin,
     },
-    margins = 20,
+
+    shape_border_width = 2,
+    shape_border_color = beautiful.colors.white,
+    bg = beautiful.colors.blacker,
+    shape = function(cr, width, height)
+      gears.shape.rounded_rect(cr, width, height, 5)
+    end,
+
+    widget = wibox.container.background,
+  })
+end
+
+--
+-- Normal Mode
+--
+
+local normalModeWidget = {
+  {
+    layout.center({
+      {
+        -- placeholder widget so container actually renders
+        text = '',
+        widget = wibox.widget.textbox,
+      },
+
+      forced_width = 30 + 4, -- + shape_border_width
+      forced_height = 15 + 4, -- + shape_border_width
+
+      shape_border_width = 4,
+      shape_border_color = beautiful.colors.white,
+      shape = function(cr, width, height)
+        gears.shape.powerline(cr, 30, 15)
+      end,
+
+      widget = wibox.container.background,
+    }),
+
+    right = 10,
     widget = wibox.container.margin,
   },
+  layout.center(rawPrompt.widget),
+  layout = wibox.layout.fixed.horizontal,
+}
 
-  shape_border_width = 2,
-  shape_border_color = beautiful.colors.white,
-  bg = beautiful.colors.blacker,
-  shape = function(cr, width, height)
-    gears.shape.rounded_rect(cr, width, height, 5)
-  end,
-
-  widget = wibox.container.background,
-})
-
---
--- Modes
---
-
-function prompt:normal_mode()
+function prompt.normal_mode(callback)
   local screen = awful.screen.focused()
 
-  gears.table.crush(self.wibox, {
+  gears.table.crush(prompt.wibox, {
     screen = screen,
     x = screen.geometry.x + (screen.geometry.width - config.normal.width) / 2,
     y = screen.geometry.y + (screen.geometry.height - config.normal.height) / 2,
     width = config.normal.width,
     height = config.normal.height,
   })
+
+  gears.table.crush(rawPrompt, {
+    exe_callback = callback or noop,
+  })
+
+  prompt.attach(normalModeWidget)
+  rawPrompt:run()
+  prompt.wibox.visible = not prompt.wibox.visible
 end
 
--- TODO: normal (ask for input), dmenu
-
 --
--- Methods
+-- Dmenu Mode
+-- TODO
 --
-
-function prompt:toggle()
-  self:normal_mode()
-
-  self.wibox.visible = not self.wibox.visible
-
-  if self.wibox.visible then
-    rawPrompt:run()
-  end
-end
 
 --
 -- Return

@@ -2,6 +2,7 @@ local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
 local layout = require('layout')
+local prompt = require('prompt')
 local wibox = require('wibox')
 
 --
@@ -135,6 +136,13 @@ function TagTabs:refresh()
   end
 
   self.tabsWidget.children = tabChildren
+end
+
+function TagTabs:rename()
+  prompt.normal_mode(function(newName)
+    self.screen.selected_tag.name = newName
+    self:refresh()
+  end)
 end
 
 function TagTabs:toggle()
