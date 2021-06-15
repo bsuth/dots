@@ -3,6 +3,7 @@ local dashboard = require('dashboard')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
+local prompt = require('prompt')
 
 --
 -- Keybindings
@@ -29,12 +30,6 @@ local function grab_mouse_until_released()
     end
     return false
   end, 'mouse')
-end
-
-local function global_swap_tags(dir)
-  local screen1 = awful.screen.focused()
-  local screen2 = screen1:get_next_in_direction(dir)
-  screen1.selected_tag:swap(screen2.selected_tag)
 end
 
 local function global_move_client(dir)
@@ -131,25 +126,22 @@ bindings.globalkeys = gears.table.join(
   end),
 
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'h', function()
-    global_swap_tags('left')
+    awful.client.swap.global_bydirection('left')
   end),
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'j', function()
-    global_swap_tags('down')
+    awful.client.swap.global_bydirection('down')
   end),
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'k', function()
-    global_swap_tags('up')
+    awful.client.swap.global_bydirection('up')
   end),
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'l', function()
-    global_swap_tags('right')
+    awful.client.swap.global_bydirection('right')
   end),
 
   --
   -- TagTabs
   --
 
-  awful.key({ 'Mod4' }, 'n', function()
-    awful.screen.focused().tagTabs:toggle()
-  end),
   awful.key({ 'Mod4' }, 't', function()
     awful.screen.focused().tagTabs:new()
   end),
@@ -240,11 +232,13 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4' }, "'", function()
     awful.spawn('vivaldi-stable')
   end),
-  -- awful.key({ 'Mod4' }, 'space', function()
-  --   awful.spawn('rofi -show run')
-  -- end),
   awful.key({ 'Mod4' }, 'space', function()
-    -- TODO: awesome-rofi
+    prompt.dmenu_mode({
+      { label = 'Discord', cmd = 'discord' },
+      { label = 'Vivaldi', cmd = 'vivaldi-stable' },
+    }, function(choice)
+      naughty.notify({ text = choice })
+    end)
   end),
   awful.key({ 'Mod4' }, 'p', function()
     dashboard:toggle()

@@ -1,5 +1,4 @@
 local beautiful = require('beautiful')
-local dpi = require('beautiful/xresources').apply_dpi
 local gears = require('gears')
 local naughty = require('naughty')
 
@@ -39,8 +38,8 @@ beautiful.init({
   bg_focus = colors.white,
   fg_focus = colors.black,
 
-  useless_gap = dpi(5),
-  border_width = dpi(3),
+  useless_gap = 5,
+  border_width = 2,
   border_normal = colors.dark_grey,
   border_focus = colors.white,
   border_marked = colors.red,
@@ -57,8 +56,8 @@ beautiful.init({
 -- https://awesomewm.org/doc/api/libraries/naughty.html#config.defaults
 naughty.config.padding = 20
 naughty.config.defaults.timeout = 8
-naughty.config.defaults.margin = dpi(5)
-naughty.config.defaults.border_width = dpi(2)
+naughty.config.defaults.margin = 5
+naughty.config.defaults.border_width = 2
 naughty.config.defaults.position = 'top_left'
 
 --

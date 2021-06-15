@@ -9,15 +9,12 @@ local wibox = require('wibox')
 -- TagTabs
 --
 
-local config = {
-  height = 40,
-  margins = { x = 60, y = 20 },
-}
-
 local TagTabs = {
+  height = 40,
   screen = nil,
+  backupFileName = '',
   tabsWidget = nil,
-  wibox = nil,
+  wibar = nil,
 }
 
 --
@@ -25,11 +22,14 @@ local TagTabs = {
 --
 
 local function TabWidget(name, active)
-  local theme = beautiful.colors.green
+  local activeColor = beautiful.colors.white
+  local inactiveColor = beautiful.colors.dark_grey
+
   name = name or 'Tab'
-  local markup = active
-      and ('<span foreground="%s">%s</span>'):format(theme, name)
-    or name
+  local markup = ('<span foreground="%s">%s</span>'):format(
+    active and activeColor or inactiveColor,
+    name
+  )
 
   return wibox.widget({
     {
@@ -37,7 +37,7 @@ local function TabWidget(name, active)
         markup = markup,
         halign = 'center',
         valign = 'center',
-        forced_height = config.height,
+        forced_height = TagTabs.height,
         widget = wibox.widget.textbox,
       },
       left = 20,
@@ -51,7 +51,7 @@ local function TabWidget(name, active)
       end
 
       local size = 6
-      local rgb = beautiful.hex2rgb(theme)
+      local rgb = beautiful.hex2rgb(activeColor)
       cr:set_source_rgb(rgb[1], rgb[2], rgb[3])
 
       cr:move_to(0, 0)
@@ -145,11 +145,6 @@ function TagTabs:rename()
   end)
 end
 
-function TagTabs:toggle()
-  self:refresh()
-  self.wibox.visible = not self.wibox.visible
-end
-
 --
 -- Constructor
 --
@@ -158,40 +153,36 @@ return setmetatable({}, {
   __call = function(self, screen)
     local newTagTabs = {
       screen = screen,
+      backupFileName = '/tmp/tagtabs' .. tostring(screen.index),
 
       tabsWidget = wibox.widget({
         layout = wibox.layout.fixed.horizontal,
       }),
 
-      wibox = wibox({
+      wibar = awful.wibar({
         screen = screen,
-        ontop = true,
-        visible = false,
+        position = 'top',
 
-        x = screen.geometry.x + config.margins.x,
-        y = screen.geometry.y + config.margins.y,
-        width = screen.geometry.width - 2 * config.margins.x,
-        height = config.height,
+        width = screen.geometry.width - 4 * beautiful.useless_gap,
+        height = TagTabs.height,
 
         bg = beautiful.colors.transparent,
         type = 'dock', -- remove box shadows
       }),
     }
 
-    newTagTabs.wibox:setup({
+    newTagTabs.wibar:setup({
       {
         layout.center(newTagTabs.tabsWidget),
         margins = 10,
         widget = wibox.container.margin,
       },
 
+      shape = gears.shape.rectangle,
       shape_border_width = 2,
-      shape_border_color = beautiful.colors.white,
-      bg = beautiful.colors.blacker,
-      shape = function(cr, width, height)
-        gears.shape.rounded_rect(cr, width, height, 50)
-      end,
+      shape_border_color = beautiful.colors.dark_grey,
 
+      bg = beautiful.colors.black,
       widget = wibox.container.background,
     })
 
