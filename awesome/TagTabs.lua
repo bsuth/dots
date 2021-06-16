@@ -10,7 +10,7 @@ local wibox = require('wibox')
 --
 
 local TagTabs = {
-  height = 40,
+  height = 50,
   screen = nil,
   wibar = nil,
   tabContainerWidget = nil,
@@ -187,17 +187,21 @@ return setmetatable({}, {
 
     newTagTabs.wibar:setup({
       {
-        layout.center(newTagTabs.tabContainerWidget),
-        margins = 10,
-        widget = wibox.container.margin,
+        {
+          layout.center(newTagTabs.tabContainerWidget),
+          margins = 10,
+          widget = wibox.container.margin,
+        },
+
+        shape = gears.shape.rectangle,
+        shape_border_width = 2,
+        shape_border_color = beautiful.colors.dark_grey,
+
+        bg = beautiful.colors.black,
+        widget = wibox.container.background,
       },
-
-      shape = gears.shape.rectangle,
-      shape_border_width = 2,
-      shape_border_color = beautiful.colors.dark_grey,
-
-      bg = beautiful.colors.black,
-      widget = wibox.container.background,
+      top = 10,
+      widget = wibox.container.margin,
     })
 
     screen:connect_signal('tag::history::update', function()
