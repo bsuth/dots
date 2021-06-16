@@ -12,16 +12,17 @@ local wibox = require('wibox')
 local TagTabs = {
   height = 40,
   screen = nil,
-  backupFileName = '',
-  tabsWidget = nil,
   wibar = nil,
+  tabContainerWidget = nil,
+  prompt = nil,
+  renameTag = nil,
 }
 
 --
 -- TabWidget
 --
 
-local function TabWidget(name, active)
+local function TabWidget(name, active, prompt)
   local activeColor = beautiful.colors.white
   local inactiveColor = beautiful.colors.dark_grey
 
@@ -33,7 +34,7 @@ local function TabWidget(name, active)
 
   return wibox.widget({
     {
-      {
+      prompt or {
         markup = markup,
         halign = 'center',
         valign = 'center',
@@ -130,19 +131,22 @@ function TagTabs:refresh()
     if not tag.name:match('^_') then
       table.insert(
         tabChildren,
-        TabWidget(tag.name, tag == self.screen.selected_tag)
+        TabWidget(
+          tag.name,
+          tag == self.screen.selected_tag,
+          tag == self.renameTag and self.prompt.widget
+        )
       )
     end
   end
 
-  self.tabsWidget.children = tabChildren
+  self.tabContainerWidget.children = tabChildren
 end
 
 function TagTabs:rename()
-  prompt.normal_mode(function(newName)
-    self.screen.selected_tag.name = newName
-    self:refresh()
-  end)
+  self.renameTag = self.screen.selected_tag
+  self.prompt:run()
+  self:refresh()
 end
 
 --
@@ -153,9 +157,8 @@ return setmetatable({}, {
   __call = function(self, screen)
     local newTagTabs = {
       screen = screen,
-      backupFileName = '/tmp/tagtabs' .. tostring(screen.index),
 
-      tabsWidget = wibox.widget({
+      tabContainerWidget = wibox.widget({
         layout = wibox.layout.fixed.horizontal,
       }),
 
@@ -171,9 +174,20 @@ return setmetatable({}, {
       }),
     }
 
+    newTagTabs.prompt = awful.widget.prompt({
+      prompt = '',
+      exe_callback = function(newTagName)
+        screen.selected_tag.name = newTagName
+      end,
+      done_callback = function()
+        newTagTabs.renameTag = nil
+        newTagTabs:refresh()
+      end,
+    })
+
     newTagTabs.wibar:setup({
       {
-        layout.center(newTagTabs.tabsWidget),
+        layout.center(newTagTabs.tabContainerWidget),
         margins = 10,
         widget = wibox.container.margin,
       },
