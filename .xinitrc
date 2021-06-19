@@ -11,6 +11,8 @@ picom -b \
   --inactive-opacity=1 \
   --frame-opacity=1
 
-awesome
+# dbus-launch required for flameshot
+# https://wiki.archlinux.org/title/Flameshot
+exec dbus-launch awesome
 
 # vim: syntax=sh

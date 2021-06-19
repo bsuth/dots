@@ -1,9 +1,9 @@
 local awful = require('awful')
 local dashboard = require('dashboard')
+local newdashboard = require('newdashboard')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
-local prompt = require('prompt')
 
 --
 -- Keybindings
@@ -233,15 +233,9 @@ bindings.globalkeys = gears.table.join(
     awful.spawn('vivaldi-stable')
   end),
   awful.key({ 'Mod4' }, 'space', function()
-    prompt.dmenu_mode({
-      { label = 'Discord', cmd = 'discord' },
-      { label = 'Vivaldi', cmd = 'vivaldi-stable' },
-    }, function(choice)
-      naughty.notify({ text = choice })
-    end)
   end),
   awful.key({ 'Mod4' }, 'p', function()
-    dashboard:toggle()
+    newdashboard:toggle()
   end)
 )
 

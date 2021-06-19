@@ -18,7 +18,7 @@ local colors = {
 
   dark_grey = '#545862',
   light_grey = '#c8ccd4',
-  blacker = '#181818',
+  blacker = '#212328',
   void = '#000000',
 
   dimmed = '#000000C8',
@@ -68,6 +68,10 @@ function beautiful.svg(path)
   return ('/home/bsuth/dots/svg/%s.svg'):format(path)
 end
 
+function beautiful.assets(path)
+  return '/home/bsuth/dots/awesome/assets/' .. path
+end
+
 function beautiful.hex2rgb(hex)
   hex = hex:gsub('#', '')
   return {
@@ -78,7 +82,7 @@ function beautiful.hex2rgb(hex)
 end
 
 function beautiful.set_wallpaper(screen)
-  gears.wallpaper.maximized('/home/bsuth/dots/wallpaper.png', screen)
+  gears.wallpaper.maximized(beautiful.assets('wallpaper.svg'), screen)
 end
 
 --

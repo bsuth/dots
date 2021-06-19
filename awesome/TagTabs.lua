@@ -1,8 +1,6 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
-local layout = require('layout')
-local prompt = require('prompt')
 local wibox = require('wibox')
 
 --
@@ -188,7 +186,12 @@ return setmetatable({}, {
     newTagTabs.wibar:setup({
       {
         {
-          layout.center(newTagTabs.tabContainerWidget),
+          {
+            newTagTabs.tabContainerWidget,
+            halign = 'center',
+            valign = 'center',
+            widget = wibox.container.place,
+          },
           margins = 10,
           widget = wibox.container.margin,
         },
