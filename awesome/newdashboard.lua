@@ -9,7 +9,10 @@ local wibox = require('wibox')
 --
 
 local dashboard = {
+  gridWidthRatio = (800 / 1920),
+  gridHeightRatio = (450 / 1080),
   gridWidget = nil,
+
   wibox = wibox({
     visible = false,
     ontop = true,
@@ -37,8 +40,8 @@ function dashboard:toggle()
     })
 
     -- Scale gridWidget to match wallpaper
-    self.gridWidget.forced_width = (800 / 1920) * s.geometry.width
-    self.gridWidget.forced_height = (450 / 1080) * s.geometry.height
+    self.gridWidget.forced_width = self.gridWidthRatio * s.geometry.width
+    self.gridWidget.forced_height = self.gridHeightRatio * s.geometry.height
   else
     self.wibox.visible = false
   end
@@ -492,8 +495,6 @@ end
 
 local function DashboardGridWidget()
   local dashboardGridWidget = wibox.widget({
-    forced_width = 800,
-    forced_height = 450,
     spacing = 10,
     expand = true,
     homogeneous = true,
