@@ -41,6 +41,9 @@ awful.rules.rules = {
       keys = bindings.clientkeys,
       buttons = bindings.clientbuttons,
 
+      floating = false,
+      maximized = false,
+
       focus = awful.client.focus.filter,
       screen = awful.screen.preferred,
       placement = awful.placement.no_overlap + awful.placement.no_offscreen,
@@ -49,10 +52,8 @@ awful.rules.rules = {
 
   {
     rule_any = {
-      instance = {
-        'gcr-prompter', -- pass prompts
-        'simplescreenrecorder',
-        'gpick',
+      type = {
+        'dialog',
       },
       name = {
         'Event Tester', -- xev

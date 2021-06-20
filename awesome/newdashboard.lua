@@ -163,21 +163,25 @@ end
 -- SystemWidget
 --
 
-local function SystemStatBarWidget(model, theme)
+local function SystemStatBarWidget(args)
   local systemStatBarWidget = wibox.widget({
     forced_width = 160,
     forced_height = 16,
     max_value = 100,
-    value = model.percent,
-    color = theme,
+    value = args.model.percent,
+    color = args.color,
     background_color = beautiful.colors.blacker,
     bar_shape = gears.shape.rounded_bar,
     shape = gears.shape.rounded_bar,
     widget = wibox.widget.progressbar,
   })
 
-  model:connect_signal('update', function()
-    systemStatBarWidget.value = model.percent
+  args.model:connect_signal('update', function()
+    systemStatBarWidget.value = args.model.percent
+
+    if args.on_bar_update ~= nil then
+      args.on_bar_update(systemStatBarWidget)
+    end
   end)
 
   return {
@@ -186,36 +190,45 @@ local function SystemStatBarWidget(model, theme)
   }
 end
 
-local function SystemStatWidget(model, theme)
+local function SystemStatWidget(args, isBattery)
+  local iconWidget = wibox.widget({
+    image = isBattery and (args.model.discharging and args.dischargingIcon or args.chargingIcon) or args.icon,
+    widget = wibox.widget.imagebox,
+  })
+
   local systemStatWidget = wibox.widget({
     {
-      SystemStatBarWidget(model, theme),
+      SystemStatBarWidget(args),
       direction = 'south',
       widget = wibox.container.rotate,
     },
     {
-      {
-        image = beautiful.assets('notifs-on.svg'),
-        widget = wibox.widget.imagebox,
-      },
-
+      iconWidget,
       left = 40,
       right = 40,
       widget = wibox.container.margin,
     },
-    SystemStatBarWidget(model, theme),
+    SystemStatBarWidget(args),
 
     expand = 'outside',
     layout = wibox.layout.align.horizontal,
   })
 
+  if isBattery then
+    args.model:connect_signal('update', function()
+        iconWidget.image = args.model.discharging
+            and args.dischargingIcon
+          or args.chargingIcon
+    end)
+  end
+
   systemStatWidget:connect_signal(
     'button::press',
     function(self, lx, ly, button, mods)
       if button == 4 then
-        model:set(model.percent + 5)
+        args.model:set(args.model.percent + 5)
       elseif button == 5 then
-        model:set(model.percent - 5)
+        args.model:set(args.model.percent - 5)
       end
     end
   )
@@ -228,9 +241,22 @@ local function SystemWidget()
     {
       {
         {
-          SystemStatWidget(models.volume, beautiful.colors.green),
-          SystemStatWidget(models.brightness, beautiful.colors.yellow),
-          SystemStatWidget(models.battery, beautiful.colors.red),
+          SystemStatWidget({
+            model = models.volume,
+            color = beautiful.colors.green,
+            icon = beautiful.assets('volume.svg'),
+          }),
+          SystemStatWidget({
+            model = models.brightness,
+            color = beautiful.colors.yellow,
+            icon = beautiful.assets('brightness.svg'),
+          }),
+          SystemStatWidget({
+            model = models.battery,
+            color = beautiful.colors.red,
+            chargingIcon = beautiful.assets('battery-charging.svg'),
+            dischargingIcon = beautiful.assets('battery-discharging.svg'),
+          }, true),
 
           spacing = 16,
           layout = wibox.layout.flex.vertical,
@@ -266,6 +292,10 @@ local apps = {
     icon = beautiful.assets('apps/gpick.svg'),
     cmd = 'gpick -s -o | tr -d "\n" | xclip -sel c',
     shell = true,
+  },
+  {
+    icon = beautiful.assets('apps/inkscape.png'),
+    cmd = 'inkscape',
   },
 }
 
