@@ -115,7 +115,7 @@ local function ClockGridWidget()
   clockGridWidget:add_widget_at(
     wibox.widget({
       format = ('<span color="%s" size="small">%s</span>'):format(
-        beautiful.colors.green,
+        beautiful.colors.cyan,
         '%d-%m-%Y'
       ),
       widget = wibox.widget.textclock,
@@ -146,11 +146,72 @@ end
 -- PowerWidget
 --
 
+local function PowerItemWidget(args)
+  local safety_check = true
+
+  local powerItemWidget = wibox.widget({
+    forced_width = 64,
+    forced_height = 64,
+    image = args.icon,
+    widget = wibox.widget.imagebox,
+  })
+
+  local safety_check_timer = gears.timer({
+    timeout = 0.25,
+    single_shot = true,
+    callback = function()
+      safety_check = true
+    end,
+  })
+
+  powerItemWidget:connect_signal('mouse::enter', function()
+    mouse.current_wibox.cursor = 'hand1'
+  end)
+
+  powerItemWidget:connect_signal('mouse::leave', function()
+    mouse.current_wibox.cursor = 'arrow'
+  end)
+
+  powerItemWidget:connect_signal(
+    'button::release',
+    function(self, lx, ly, button, mods)
+      if button == 1 then
+        if safety_check then
+          safety_check = false
+          safety_check_timer:again()
+        else
+          awful.spawn.easy_async_with_shell(args.cmd)
+          dashboard:toggle()
+        end
+      end
+    end
+  )
+
+  return powerItemWidget
+end
+
 local function PowerWidget()
   return wibox.widget({
     {
-      text = 'power',
-      widget = wibox.widget.textbox,
+      {
+        PowerItemWidget({
+          icon = beautiful.assets('lock.svg'),
+          cmd = 'physlock',
+        }),
+        PowerItemWidget({
+          icon = beautiful.assets('restart.svg'),
+          cmd = '/sbin/reboot',
+        }),
+        PowerItemWidget({
+          icon = beautiful.assets('power.svg'),
+          cmd = '/sbin/poweroff',
+        }),
+
+        spacing = 24,
+        layout = wibox.layout.flex.horizontal,
+      },
+
+      widget = wibox.container.place,
     },
 
     bg = beautiful.colors.black,
