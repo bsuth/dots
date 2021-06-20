@@ -9,6 +9,7 @@ local wibox = require('wibox')
 --
 
 local dashboard = {
+  gridWidget = nil,
   wibox = wibox({
     visible = false,
     ontop = true,
@@ -34,6 +35,10 @@ function dashboard:toggle()
       width = s.geometry.width,
       height = s.geometry.height,
     })
+
+    -- Scale gridWidget to match wallpaper
+    self.gridWidget.forced_width = (800 / 1920) * s.geometry.width
+    self.gridWidget.forced_height = (450 / 1080) * s.geometry.height
   else
     self.wibox.visible = false
   end
@@ -509,16 +514,21 @@ end
 -- Setup
 --
 
+dashboard.gridWidget = DashboardGridWidget()
+
 dashboard.wibox:setup({
   {
-    DashboardGridWidget(),
+    image = beautiful.assets('dashboard.svg'),
+    widget = wibox.widget.imagebox,
+  },
+  {
+    dashboard.gridWidget,
     halign = 'center',
     valign = 'center',
     widget = wibox.container.place,
   },
 
-  bgimage = beautiful.assets('dashboard.svg'),
-  widget = wibox.container.background,
+  layout = wibox.layout.stack,
 })
 
 --
