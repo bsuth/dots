@@ -216,9 +216,9 @@ local function SystemStatWidget(args, isBattery)
 
   if isBattery then
     args.model:connect_signal('update', function()
-        iconWidget.image = args.model.discharging
-            and args.dischargingIcon
-          or args.chargingIcon
+      iconWidget.image = args.model.discharging
+          and args.dischargingIcon
+        or args.chargingIcon
     end)
   end
 
@@ -371,16 +371,46 @@ end
 -- NotificationWidget
 --
 
+local function get_notification_icon()
+  if models.notifs.active then
+    return beautiful.assets('notifications-active.svg')
+  else
+    return beautiful.assets('notifications-inactive.svg')
+  end
+end
+
 local function NotificationWidget()
+  local iconWidget = wibox.widget({
+    forced_width = 50,
+    forced_height = 50,
+    image = get_notification_icon(),
+    widget = wibox.widget.imagebox,
+  })
+
+  models.notifs:connect_signal('update', function()
+    iconWidget.image = get_notification_icon()
+  end)
+
+  iconWidget:connect_signal('mouse::enter', function()
+    mouse.current_wibox.cursor = 'hand1'
+  end)
+
+  iconWidget:connect_signal('mouse::leave', function()
+    mouse.current_wibox.cursor = 'arrow'
+  end)
+
+  iconWidget:connect_signal(
+    'button::release',
+    function(self, lx, ly, button, mods)
+      if button == 1 then
+        models.notifs:toggle()
+      end
+    end
+  )
+
   return wibox.widget({
     {
-      {
-        forced_width = 40,
-        forced_height = 40,
-        image = beautiful.assets('notifs-on.svg'),
-        widget = wibox.widget.imagebox,
-      },
-
+      iconWidget,
       widget = wibox.container.place,
     },
 

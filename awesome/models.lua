@@ -162,7 +162,7 @@ local kb_layout = gears.table.crush(gears.object(), {
 --
 
 local notifs = gears.table.crush(gears.object(), {
-  active = true,
+  active = false,
 
   toggle = function(self)
     self.active = not self.active
