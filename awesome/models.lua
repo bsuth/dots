@@ -131,10 +131,10 @@ gears.timer({
 })
 
 --
--- Kb Layout
+-- Locale
 --
 
-local kb_layout = gears.table.crush(gears.object(), {
+local locale = gears.table.crush(gears.object(), {
   index = 1,
   list = {
     'fcitx-keyboard-us',
@@ -273,7 +273,7 @@ return {
   bluetooth = bluetooth,
   brightness = brightness,
   disk = disk,
-  kb_layout = kb_layout,
+  locale = locale,
   notifs = notifs,
   ram = ram,
   volume = volume,

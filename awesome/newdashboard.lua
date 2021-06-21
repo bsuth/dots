@@ -441,7 +441,7 @@ end
 --
 
 local function get_locale_icon()
-  local locale = models.kb_layout.list[models.kb_layout.index]
+  local locale = models.locale.list[models.locale.index]
 
   if locale == 'mozc' then
     return beautiful.assets('ja_JP.svg')
@@ -456,7 +456,7 @@ local function LocaleWidget()
     widget = wibox.widget.imagebox,
   })
 
-  models.kb_layout:connect_signal('update', function()
+  models.locale:connect_signal('update', function()
     iconWidget.image = get_locale_icon()
   end)
 
@@ -472,7 +472,7 @@ local function LocaleWidget()
     'button::release',
     function(self, lx, ly, button, mods)
       if button == 1 then
-        models.kb_layout:cycle()
+        models.locale:cycle()
       end
     end
   )

@@ -168,15 +168,15 @@ function create_kb_layout_item(index, icon)
     layout.vpad(16),
     layout.center(components.button({
       is_pressed = function()
-        return models.kb_layout.index == index
+        return models.locale.index == index
       end,
 
       onpress = function()
-        models.kb_layout:set(index)
+        models.locale:set(index)
       end,
 
       hook = function(button)
-        models.kb_layout:connect_signal('update', function()
+        models.locale:connect_signal('update', function()
           button:emit_signal('widget::redraw_needed')
         end)
       end,

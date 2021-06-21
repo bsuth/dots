@@ -79,7 +79,7 @@ bindings.globalkeys = gears.table.join(
   end),
 
   awful.key({ 'Mod4', 'Control' }, 'space', function()
-    models.kb_layout:cycle()
+    models.locale:cycle()
   end),
 
   --
