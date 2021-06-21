@@ -1,6 +1,5 @@
 local awful = require('awful')
 local dashboard = require('dashboard')
-local newdashboard = require('newdashboard')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
@@ -182,9 +181,10 @@ bindings.globalkeys = gears.table.join(
     awful.spawn('vivaldi-stable')
   end),
   awful.key({ 'Mod4' }, 'space', function()
+    -- open!
   end),
   awful.key({ 'Mod4' }, 'p', function()
-    newdashboard:toggle()
+    dashboard:toggle()
   end)
 )
 
@@ -238,49 +238,23 @@ bindings.clientbuttons = gears.table.join(
   end),
 
   awful.button({ 'Control' }, 3, function(c)
-    c:emit_signal('request::activate', 'mouse_click', { raise = true })
-    awful.mouse.client.resize(c)
-  end),
-
-  awful.button({ 'Control' }, 2, function(c)
-    c:emit_signal('request::activate', 'mouse_click', { raise = true })
-    awful.mouse.client.move(c)
-  end),
-
-  awful.button({ 'Control', 'Shift' }, 1, function(c)
     dashboard:toggle()
     grab_mouse_until_released()
-  end),
-
-  awful.button({ 'Control', 'Shift' }, 2, function(c)
-    c:emit_signal('request::activate', 'mouse_click', { raise = true })
-    c.floating = not c.floating
-  end),
-
-  awful.button({ 'Control', 'Shift' }, 4, function()
-    local c = awful.client.next(1)
-    c:emit_signal('request::activate', 'mouse_click', { raise = true })
-    awful.placement.centered(mouse, { parent = c })
-  end),
-
-  awful.button({ 'Control', 'Shift' }, 5, function()
-    local c = awful.client.next(-1)
-    c:emit_signal('request::activate', 'mouse_click', { raise = true })
-    awful.placement.centered(mouse, { parent = c })
   end)
 )
 
-dashboard:connect_signal('button::press', function(_, _, _, button, mods)
-  if
-    #mods == 2
-    and gears.table.hasitem(mods, 'Control')
-    and gears.table.hasitem(mods, 'Shift')
-  then
-    if button == 1 then
+dashboard.wibox:connect_signal(
+  'button::press',
+  function(self, lx, ly, button, mods)
+    if
+      #mods == 1
+      and gears.table.hasitem(mods, 'Control')
+      and button == 3
+    then
       dashboard:toggle()
     end
   end
-end)
+)
 
 --
 -- Return

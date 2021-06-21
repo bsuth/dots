@@ -64,10 +64,6 @@ naughty.config.defaults.position = 'top_left'
 -- Functions
 --
 
-function beautiful.svg(path)
-  return ('/home/bsuth/dots/svg/%s.svg'):format(path)
-end
-
 function beautiful.assets(path)
   return '/home/bsuth/dots/awesome/assets/' .. path
 end

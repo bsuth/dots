@@ -162,7 +162,7 @@ local locale = gears.table.crush(gears.object(), {
 --
 
 local notifs = gears.table.crush(gears.object(), {
-  active = false,
+  active = true,
 
   toggle = function(self)
     self.active = not self.active
@@ -171,7 +171,7 @@ local notifs = gears.table.crush(gears.object(), {
 })
 
 naughty.config.notify_callback = function(notif)
-  notif.icon = beautiful.svg('notifs')
+  notif.icon = beautiful.assets('notifications-active.svg')
 
   if not notifs.active then
     return nil
