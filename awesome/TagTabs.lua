@@ -36,6 +36,7 @@ local function TabWidget(name, active, prompt)
         markup = markup,
         halign = 'center',
         valign = 'center',
+        font = 'Fredoka One 14',
         forced_height = TagTabs.height,
         widget = wibox.widget.textbox,
       },
@@ -174,6 +175,7 @@ return setmetatable({}, {
 
     newTagTabs.prompt = awful.widget.prompt({
       prompt = '',
+      font = 'Fredoka One 14',
       exe_callback = function(newTagName)
         screen.selected_tag.name = newTagName
       end,

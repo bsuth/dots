@@ -123,7 +123,7 @@ local function ClockGridWidget()
       {
         format = ('<span color="%s" font_family="%s" size="xx-large">%s</span>'):format(
           beautiful.colors.blue,
-          'Leckerli One',
+          'Fredoka One',
           '%H'
         ),
         widget = wibox.widget.textclock,
@@ -142,7 +142,7 @@ local function ClockGridWidget()
       {
         format = ('<span color="%s" font_family="%s" size="xx-large">%s</span>'):format(
           beautiful.colors.purple,
-          'Leckerli One',
+          'Fredoka One',
           '%M'
         ),
         widget = wibox.widget.textclock,
