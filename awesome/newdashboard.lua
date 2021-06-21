@@ -57,15 +57,34 @@ local function ProfileWidget()
       {
         {
           {
-            image = beautiful.assets('profile.png'),
-            widget = wibox.widget.imagebox,
+            {
+              forced_width = 128,
+              forced_height = 128,
+              image = beautiful.assets('profile.png'),
+              widget = wibox.widget.imagebox,
+            },
+
+            widget = wibox.container.place,
           },
 
-          margins = 24,
+          bottom = 24,
           widget = wibox.container.margin,
         },
         {
-          text = 'bsuth',
+          {
+            text = 'bsuth',
+            font = 'Leckerli One 24',
+            align = 'center',
+            valign = 'center',
+            widget = wibox.widget.textbox,
+          },
+
+          bottom = 8,
+          widget = wibox.container.margin,
+        },
+        {
+          text = '“ Code is like humor. When you have to explain it, it’s bad.”',
+          font = 'Fredoka One 12',
           align = 'center',
           valign = 'center',
           widget = wibox.widget.textbox,
@@ -95,8 +114,9 @@ local function ClockGridWidget()
   clockGridWidget:add_widget_at(
     wibox.widget({
       {
-        format = ('<span color="%s" size="xx-large">%s</span>'):format(
+        format = ('<span color="%s" font_family="%s" size="xx-large">%s</span>'):format(
           beautiful.colors.blue,
+          'Leckerli One',
           '%H'
         ),
         widget = wibox.widget.textclock,
@@ -113,8 +133,9 @@ local function ClockGridWidget()
   clockGridWidget:add_widget_at(
     wibox.widget({
       {
-        format = ('<span color="%s" size="xx-large">%s</span>'):format(
+        format = ('<span color="%s" font_family="%s" size="xx-large">%s</span>'):format(
           beautiful.colors.purple,
+          'Leckerli One',
           '%M'
         ),
         widget = wibox.widget.textclock,
@@ -131,8 +152,9 @@ local function ClockGridWidget()
   clockGridWidget:add_widget_at(
     wibox.widget({
       {
-        format = ('<span color="%s" size="small">%s</span>'):format(
+        format = ('<span color="%s" font_family="%s" size="small">%s</span>'):format(
           beautiful.colors.cyan,
+          'Fredoka One',
           '%d-%m-%Y'
         ),
         widget = wibox.widget.textclock,

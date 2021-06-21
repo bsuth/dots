@@ -25,8 +25,13 @@ rust
 fcitx
 fcitx-mozc
 fcitx-configtool
-ttf-hack
 adobe-source-han-sans-jp-fonts
+
+Hack
+Quicksand
+Fredoka One
+Leckerli One
+
 
 # Tools
 flameshot
