@@ -11,12 +11,6 @@ local naughty = require('naughty')
 
 local bindings = {}
 
-local scratchpad = {
-  client = nil,
-  width = 900,
-  height = 600,
-}
-
 --
 -- Helpers
 --
@@ -174,51 +168,6 @@ bindings.globalkeys = gears.table.join(
       c:move_to_tag(awful.screen.focused().selected_tag)
       c.minimized = false
       client.focus = c
-    end
-  end),
-
-  --
-  -- Scratchpad
-  --
-
-  awful.key({ 'Mod4' }, ';', function()
-    local screen = awful.screen.focused()
-    local x = screen.geometry.x + (screen.geometry.width - scratchpad.width) / 2
-    local y = screen.geometry.y
-      + (screen.geometry.height - scratchpad.height) / 2
-
-    if scratchpad.client == nil or not scratchpad.client.valid then
-      awful.spawn('st -e nvim -c ":term"', {
-        name = 'scratchpad',
-        floating = true,
-        screen = screen,
-        width = scratchpad.width,
-        height = scratchpad.height,
-        x = x,
-        y = y,
-
-        callback = function(c)
-          naughty.notify({ text = 'hi' })
-          scratchpad.client = c
-          c.floating = true,
-        c:emit_signal('request::activate', 'client.jumpto', { raise = true })
-        end,
-      })
-    elseif scratchpad.client.hidden then
-      gears.table.crush(scratchpad.client, {
-        screen = screen,
-        hidden = false,
-        x = x,
-        y = y,
-      })
-
-      scratchpad.client:emit_signal(
-        'request::activate',
-        'client.jumpto',
-        { raise = true }
-      )
-    else
-      scratchpad.client.hidden = true
     end
   end),
 
