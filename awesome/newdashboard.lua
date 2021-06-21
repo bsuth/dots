@@ -89,6 +89,13 @@ local function ProfileWidget()
           valign = 'center',
           widget = wibox.widget.textbox,
         },
+        {
+          text = '-Cory House',
+          font = 'Fredoka One 12',
+          align = 'center',
+          valign = 'center',
+          widget = wibox.widget.textbox,
+        },
 
         layout = wibox.layout.fixed.vertical,
       },
