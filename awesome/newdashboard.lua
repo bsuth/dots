@@ -452,8 +452,6 @@ end
 
 local function LocaleWidget()
   local iconWidget = wibox.widget({
-    forced_width = 65,
-    forced_height = 45,
     image = get_locale_icon(),
     widget = wibox.widget.imagebox,
   })
@@ -481,7 +479,12 @@ local function LocaleWidget()
 
   return wibox.widget({
     {
-      iconWidget,
+      {
+        iconWidget,
+        margins = 16,
+        widget = wibox.container.margin,
+      },
+
       widget = wibox.container.place,
     },
 
