@@ -94,11 +94,15 @@ local function ClockGridWidget()
 
   clockGridWidget:add_widget_at(
     wibox.widget({
-      format = ('<span color="%s" size="xx-large">%s</span>'):format(
-        beautiful.colors.blue,
-        '%H'
-      ),
-      widget = wibox.widget.textclock,
+      {
+        format = ('<span color="%s" size="xx-large">%s</span>'):format(
+          beautiful.colors.blue,
+          '%H'
+        ),
+        widget = wibox.widget.textclock,
+      },
+
+      widget = wibox.container.place,
     }),
     1,
     1,
@@ -108,11 +112,15 @@ local function ClockGridWidget()
 
   clockGridWidget:add_widget_at(
     wibox.widget({
-      format = ('<span color="%s" size="xx-large">%s</span>'):format(
-        beautiful.colors.purple,
-        '%M'
-      ),
-      widget = wibox.widget.textclock,
+      {
+        format = ('<span color="%s" size="xx-large">%s</span>'):format(
+          beautiful.colors.purple,
+          '%M'
+        ),
+        widget = wibox.widget.textclock,
+      },
+
+      widget = wibox.container.place,
     }),
     1,
     2,
@@ -122,11 +130,15 @@ local function ClockGridWidget()
 
   clockGridWidget:add_widget_at(
     wibox.widget({
-      format = ('<span color="%s" size="small">%s</span>'):format(
-        beautiful.colors.cyan,
-        '%d-%m-%Y'
-      ),
-      widget = wibox.widget.textclock,
+      {
+        format = ('<span color="%s" size="small">%s</span>'):format(
+          beautiful.colors.cyan,
+          '%d-%m-%Y'
+        ),
+        widget = wibox.widget.textclock,
+      },
+
+      widget = wibox.container.place,
     }),
     3,
     1,
