@@ -56,19 +56,19 @@ local function ProfileWidget()
     {
       {
         {
-          image = '/home/bsuth/dots/wallpaper.png',
-          widget = wibox.widget.imagebox,
-        },
-        {
           {
-            text = 'bsuth',
-            align = 'center',
-            valign = 'center',
-            widget = wibox.widget.textbox,
+            image = beautiful.assets('profile.png'),
+            widget = wibox.widget.imagebox,
           },
 
-          top = 8,
+          margins = 24,
           widget = wibox.container.margin,
+        },
+        {
+          text = 'bsuth',
+          align = 'center',
+          valign = 'center',
+          widget = wibox.widget.textbox,
         },
 
         layout = wibox.layout.fixed.vertical,
@@ -215,7 +215,7 @@ local function PowerWidget()
           cmd = '/sbin/poweroff',
         }),
 
-        spacing = 24,
+        spacing = 16,
         layout = wibox.layout.flex.horizontal,
       },
 
@@ -437,6 +437,61 @@ local function AppsWidget()
 end
 
 --
+-- LocaleWidget
+--
+
+local function get_locale_icon()
+  local locale = models.kb_layout.list[models.kb_layout.index]
+
+  if locale == 'mozc' then
+    return beautiful.assets('ja_JP.svg')
+  else
+    return beautiful.assets('en_US.svg')
+  end
+end
+
+local function LocaleWidget()
+  local iconWidget = wibox.widget({
+    forced_width = 65,
+    forced_height = 45,
+    image = get_locale_icon(),
+    widget = wibox.widget.imagebox,
+  })
+
+  models.kb_layout:connect_signal('update', function()
+    iconWidget.image = get_locale_icon()
+  end)
+
+  iconWidget:connect_signal('mouse::enter', function()
+    mouse.current_wibox.cursor = 'hand1'
+  end)
+
+  iconWidget:connect_signal('mouse::leave', function()
+    mouse.current_wibox.cursor = 'arrow'
+  end)
+
+  iconWidget:connect_signal(
+    'button::release',
+    function(self, lx, ly, button, mods)
+      if button == 1 then
+        models.kb_layout:cycle()
+      end
+    end
+  )
+
+  return wibox.widget({
+    {
+      iconWidget,
+      widget = wibox.container.place,
+    },
+
+    bg = beautiful.colors.black,
+    shape = gears.shape.rounded_rect,
+    widget = wibox.container.background,
+  })
+end
+
+--
 -- NotificationWidget
 --
 
@@ -501,12 +556,13 @@ local function DashboardGridWidget()
     layout = wibox.layout.grid,
   })
 
-  dashboardGridWidget:add_widget_at(ProfileWidget(), 1, 1, 4, 2)
-  dashboardGridWidget:add_widget_at(TimeWidget(), 1, 3, 2, 2)
-  dashboardGridWidget:add_widget_at(PowerWidget(), 1, 5, 2, 3)
-  dashboardGridWidget:add_widget_at(SystemWidget(), 3, 3, 2, 5)
+  dashboardGridWidget:add_widget_at(ProfileWidget(), 1, 1, 4, 3)
+  dashboardGridWidget:add_widget_at(TimeWidget(), 1, 4, 2, 2)
+  dashboardGridWidget:add_widget_at(PowerWidget(), 1, 6, 2, 3)
+  dashboardGridWidget:add_widget_at(SystemWidget(), 3, 4, 2, 5)
   dashboardGridWidget:add_widget_at(AppsWidget(), 5, 1, 1, 6)
-  dashboardGridWidget:add_widget_at(NotificationWidget(), 5, 7, 1, 1)
+  dashboardGridWidget:add_widget_at(LocaleWidget(), 5, 7, 1, 1)
+  dashboardGridWidget:add_widget_at(NotificationWidget(), 5, 8, 1, 1)
 
   return dashboardGridWidget
 end

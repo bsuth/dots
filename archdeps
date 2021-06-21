@@ -39,6 +39,9 @@ brightnessctl
 nvim
 vivaldi
 arandr
+inkscape
+gimp
+st (fork)
 
 # AUR
 yay
