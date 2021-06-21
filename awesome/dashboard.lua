@@ -540,7 +540,7 @@ end
 --
 
 local function get_notification_icon()
-  if models.notifs.active then
+  if models.notifications.active then
     return beautiful.assets('notifications-active.svg')
   else
     return beautiful.assets('notifications-inactive.svg')
@@ -555,7 +555,7 @@ local function NotificationWidget()
     widget = wibox.widget.imagebox,
   })
 
-  models.notifs:connect_signal('update', function()
+  models.notifications:connect_signal('update', function()
     iconWidget.image = get_notification_icon()
   end)
 
@@ -571,7 +571,7 @@ local function NotificationWidget()
     'button::release',
     function(self, lx, ly, button, mods)
       if button == 1 then
-        models.notifs:toggle()
+        models.notifications:toggle()
       end
     end
   )

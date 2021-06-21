@@ -158,10 +158,10 @@ local locale = gears.table.crush(gears.object(), {
 })
 
 --
--- Notifs
+-- Notifications
 --
 
-local notifs = gears.table.crush(gears.object(), {
+local notifications = gears.table.crush(gears.object(), {
   active = true,
 
   toggle = function(self)
@@ -170,29 +170,29 @@ local notifs = gears.table.crush(gears.object(), {
   end,
 })
 
-naughty.config.notify_callback = function(notif)
-  notif.icon = beautiful.assets('notifications-active.svg')
+naughty.config.notify_callback = function(notification)
+  notification.icon = beautiful.assets('notifications-active.svg')
 
-  if not notifs.active then
+  if not notifications.active then
     return nil
   end
 
-  if notif.title ~= nil then
-    notif.text = ([[
+  if notification.title ~= nil then
+    notification.text = ([[
 <span size='small'>%s</span>
 <span size='small'>%s</span>
 		]]):format(
-      notif.title,
-      notif.text
+      notification.title,
+      notification.text
     )
   else
-    notif.text = ([[
+    notification.text = ([[
 <span size='small'>%s</span>
-		]]):format(notif.text)
+		]]):format(notification.text)
   end
 
-  notif.title = 'Incoming Broadcast'
-  return notif
+  notification.title = 'Incoming Broadcast'
+  return notification
 end
 
 --
@@ -274,7 +274,7 @@ return {
   brightness = brightness,
   disk = disk,
   locale = locale,
-  notifs = notifs,
+  notifications = notifications,
   ram = ram,
   volume = volume,
 }
