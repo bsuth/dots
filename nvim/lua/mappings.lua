@@ -11,7 +11,7 @@ local bindings = {
     ['<leader>v?'] = ':vert :help ',
     ['<c-_>'] = ':Commentary<cr>', -- secretly <c-/>
 
-    -- window management
+    -- windows
     ['<leader>w'] = '<c-w>',
     ['<c-h>'] = '<c-w>h',
     ['<c-j>'] = '<c-w>j',
@@ -21,6 +21,14 @@ local bindings = {
     ['<leader><c-k>'] = ':aboveleft :sp | :Dirvish<cr>',
     ['<leader><c-j>'] = ':rightbelow :sp | :Dirvish<cr>',
     ['<leader><c-h>'] = ':aboveleft :vsp | :Dirvish<cr>',
+
+    -- tabs
+    ['<c-t>'] = ':tabnew | :Dirvish<cr>',
+    ['<c-w>'] = ':tabclose<cr>',
+    ['<tab>'] = ':tabnext<cr>',
+    ['<s-tab>'] = ':tabprev<cr>',
+    ['<lt>'] = ':tabmove -1<cr>',
+    ['>'] = ':tabmove +1<cr>',
 
     -- fake marks
     ["'r"] = ':cd / | :Dirvish<cr>',
@@ -36,15 +44,6 @@ local bindings = {
 
     -- coc
     ['<leader>coc'] = ':silent CocRestart<cr>',
-
-    -- tabby
-    ['<c-t>'] = ':TabbyOpen | :Dirvish ~<cr>',
-    ['<c-w>'] = ':TabbyClose<cr>',
-    ['<tab>'] = ':tabnext<cr>',
-    ['<s-tab>'] = ':tabprev<cr>',
-    ['<lt>'] = ':TabbyMove -1<cr>',
-    ['>'] = ':TabbyMove +1<cr>',
-    ['<leader><tab>'] = ':TabbyRename ',
   },
 
   i = { -- insert mode

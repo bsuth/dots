@@ -27,7 +27,6 @@ local plugins = {
   { [[ 'neoclide/coc.nvim', {'branch': 'release'}  ]] },
   'matze/vim-move',
   'itchyny/lightline.vim',
-  '~/projects/nvim-tabby',
   '~/projects/nvim-imacs',
 }
 

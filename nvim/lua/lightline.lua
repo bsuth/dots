@@ -12,7 +12,7 @@ local palette = (function()
   return palette
 end)()
 
-local function lightline_theme(color, normal)
+local function lightline_theme(color, flag)
   local mode = {
     left = {
       { palette.black, color, 'bold' },
@@ -25,12 +25,9 @@ local function lightline_theme(color, normal)
       { palette.black, color, 'bold' },
       { palette.white, palette.special_grey },
     },
+    error = { palette.red, palette.black },
+    warning = { palette.yellow, palette.black },
   }
-
-  if normal then
-    mode.error = { palette.red, palette.black }
-    mode.warning = { palette.yellow, palette.black }
-  end
 
   return mode
 end
@@ -40,12 +37,22 @@ nvim_set_var(
   nvim_call_function('lightline#colorscheme#flatten', {
       {
         inactive = lightline_theme(palette.white),
-        normal = lightline_theme(palette.green, true),
+        normal = lightline_theme(palette.green),
         insert = lightline_theme(palette.blue),
         command = lightline_theme(palette.yellow),
         terminal = lightline_theme(palette.red),
         visual = lightline_theme(palette.purple),
-        tabline = lightline_theme(palette.cyan),
+        tabline = {
+          left = {
+            { palette.white, palette.black, 'bold' },
+          },
+          right = {
+            { palette.black, palette.white, 'bold' },
+          },
+          tabsel = {
+            { palette.black, palette.cyan, 'bold' },
+          },
+        },
       },
     })
 )
@@ -54,19 +61,19 @@ nvim_set_var(
 -- Components
 --
 
-function lightline_filename()
+function lightline_file_name()
   local filetype = nvim_buf_get_option(0, 'filetype')
   local filename = nvim_call_function('expand', { '%:t' })
   return filetype == 'dirvish' and 'Dirvish' or filename or '[No Name]'
 end
 
+nvim_command([[ function! LightlineFileName()
+  return luaeval('lightline_file_name()')
+endfunction ]])
+
 --
 -- Setup
 --
-
-nvim_command([[ function! LightlineFilename()
-  return luaeval('lightline_filename()')
-endfunction ]])
 
 nvim_set_var('lightline', {
   colorscheme = 'onedark',
@@ -84,7 +91,19 @@ nvim_set_var('lightline', {
   },
 
   component_function = {
-    filename = 'LightlineFilename',
+    filename = 'LightlineFileName',
     gitbranch = 'FugitiveHead',
+  },
+
+  tabline_separator = { left = '', right = '' },
+  tabline_subseparator = { left = '', right = '' },
+
+  tab = {
+    active = { 'filename', 'modified' },
+    inactive = { 'filename', 'modified' },
+  },
+
+  tab_component_function = {
+    tabname = 'LightlineTabName',
   },
 })
