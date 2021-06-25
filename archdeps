@@ -39,6 +39,7 @@ ripgrep
 fd
 physlock
 brightnessctl
+clang
 
 # Apps
 nvim
@@ -51,3 +52,4 @@ st (fork)
 # AUR
 yay
 awesome-luajit
+bear

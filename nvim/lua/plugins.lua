@@ -56,4 +56,5 @@ nvim_set_var('coc_global_extensions', {
   'coc-css',
   'coc-json',
   'coc-prettier',
+  'coc-clangd',
 })

@@ -40,7 +40,10 @@ function on_bufenter()
   -- TODO: use luascript path functions
   local buffer = {
     name = nvim_buf_get_name(0),
-    dir = nvim_call_function('fnamemodify', { nvim_buf_get_name(0), ':p:h' }),
+    dir = nvim_call_function('fnamemodify', { nvim_buf_get_name(0), ':p:h' }):gsub(
+      '^suda://',
+      ''
+    ),
     filetype = nvim_buf_get_option(0, 'filetype'),
   }
 
@@ -49,6 +52,7 @@ function on_bufenter()
   end
 
   nvim_command('cd ' .. buffer.dir)
+
   if buffer.filetype == 'dirvish' then
     nvim_command('Dirvish')
   end
@@ -72,8 +76,8 @@ function apply_stylua()
   local stylua = '~/.cargo/bin/stylua --config-path ~/dots/stylua.toml'
   local target = nvim_call_function('expand', { '%:p' })
 
-  local handle = io.popen(stylua .. ' --check ' .. target..' 2>&1 >/dev/null')
-  local checkOutput = handle:read("*a")
+  local handle = io.popen(stylua .. ' --check ' .. target .. ' 2>&1 >/dev/null')
+  local checkOutput = handle:read('*a')
   handle:close()
 
   if not checkOutput:match('^error') then
