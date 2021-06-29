@@ -68,22 +68,9 @@ export SPACESHIP_PROMPT_ORDER=(
   char          # Prompt character
 )
 
-# ------------------------------------------------------------------------------
-# EDTECHYUI COMPLETION
-# ------------------------------------------------------------------------------
-
-_edtechyui_yargs_completions()
-{
-  local reply
-  local si=$IFS
-  IFS=$'\n' reply=($(COMP_CWORD="$((CURRENT-1))"
-  COMP_LINE="$BUFFER"
-  COMP_POINT="$CURSOR"
-  edtechyui --get-yargs-completions "${words[@]}"))
-  IFS=$si
-  _describe 'values' reply
-}
-compdef _edtechyui_yargs_completions edtechyui
+export LUI_ROOT="/home/bsuth/projects/lui";
+export LUA_PATH="$LUI_ROOT/test/?.lua;$LUA_PATH"
+export LUA_CPATH="$LUI_ROOT/build/?.so;$LUA_CPATH"
 
 # ------------------------------------------------------------------------------
 # ALIASES
