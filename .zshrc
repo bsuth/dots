@@ -68,10 +68,6 @@ export SPACESHIP_PROMPT_ORDER=(
   char          # Prompt character
 )
 
-export LUI_ROOT="/home/bsuth/projects/lui";
-export LUA_PATH="$LUI_ROOT/test/?.lua;$LUA_PATH"
-export LUA_CPATH="$LUI_ROOT/build/?.so;$LUA_CPATH"
-
 # ------------------------------------------------------------------------------
 # ALIASES
 # ------------------------------------------------------------------------------

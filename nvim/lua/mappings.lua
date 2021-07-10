@@ -1,6 +1,6 @@
 nvim_set_var('mapleader', ' ')
 
-local bindings = {
+local mappings = {
   n = { -- normal mode
     -- common use
     ['<leader>ev'] = ':Dirvish ~/dots/nvim/lua<cr>',
@@ -35,7 +35,7 @@ local bindings = {
     ["'h"] = ':cd ~ | :Dirvish<cr>',
 
     -- fzf
-    ['<leader><leader>'] = ':lua fzf_favorites_cd()<cr>',
+    ['<leader><leader>'] = ':lua fzf_favorites()<cr>',
     ['<leader>fd'] = ':lua fzf_fd()<cr>',
     ['<leader>cd'] = ':lua fzf_cd()<cr>',
     ['<leader>rg'] = ':lua fzf_rg()<cr>',
@@ -52,7 +52,7 @@ local bindings = {
       opts = { expr = true, silent = true },
     },
 
-    -- emacs bindings
+    -- emacs mappings
     ['<m-b>'] = '<c-o>b',
     ['<m-f>'] = '<c-o>w',
     ['<c-b>'] = '<c-o>h',
@@ -77,8 +77,8 @@ local bindings = {
   },
 }
 
-for mode, modebindings in pairs(bindings) do
-  for k, v in pairs(modebindings) do
+for mode, modemappings in pairs(mappings) do
+  for k, v in pairs(modemappings) do
     if type(v) == 'string' then
       nvim_set_keymap(mode, k, v, { noremap = true })
     elseif type(v) == 'table' then

@@ -116,10 +116,10 @@ nvim_command([[
 ]])
 
 --
--- fzf_favorite_cd
+-- fzf_favorites
 --
 
-function fzf_favorites_cd()
+function fzf_favorites()
   local favorites = {
     'edtechy',
     'projects',
@@ -142,14 +142,14 @@ function fzf_favorites_cd()
             ' '
           )
         ),
-        sink = 'FzfFavoritesCdSink',
+        sink = 'FzfFavoritesSink',
       },
     }),
   })
 end
 
 nvim_command([[
-	command! -nargs=* FzfFavoritesCdSink exec 'cd ~/' . <f-args> . '|:Dirvish'
+	command! -nargs=* FzfFavoritesSink exec 'cd ~/' . <f-args> . '|:Dirvish'
 ]])
 
 --
