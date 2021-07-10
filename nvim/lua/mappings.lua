@@ -40,7 +40,6 @@ local bindings = {
     ['<leader>cd'] = ':lua fzf_cd()<cr>',
     ['<leader>rg'] = ':lua fzf_rg()<cr>',
     ['<leader>ls'] = ':Buffers<cr>',
-    ['<leader>tb'] = ':lua fzf_tabby()<cr>',
 
     -- coc
     ['<leader>coc'] = ':silent CocRestart<cr>',

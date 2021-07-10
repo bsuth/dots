@@ -1,20 +1,19 @@
-local Array = require('luascript/Array')
-local helpers = require('./helpers')
+local _ = require('lutil')
 
 --
--- constants
+-- Constants
 --
 
-local FZF_PRUNE_DIRS = Array({
+local FZF_PRUNE_DIRS = {
   '.cache',
   '.git',
   'node_modules',
   'build',
   'dist',
-})
+}
 
 --
--- settings
+-- Settings
 --
 
 nvim_call_function('setenv', { 'FZF_DEFAULT_COMMAND', 'rg --files -L' })
@@ -30,7 +29,7 @@ nvim_set_var('fzf_action', {
 })
 
 --
--- theme
+-- Theme
 --
 
 nvim_set_var('fzf_layout', { window = 'lua fzf_win()' })
@@ -76,11 +75,12 @@ function fzf_fd()
   nvim_call_function('fzf#run', {
     nvim_call_function('fzf#wrap', {
       {
-        source = ([[ fd --follow --type f %s ]]):format(FZF_PRUNE_DIRS
-            :map(function(v)
-            return '--exclude ' .. v
-          end)
-            :join(' ')),
+        source = ([[ fd --follow --type f %s ]]):format(_.join(
+          _.map(FZF_PRUNE_DIRS, function(v)
+              return '--exclude ' .. v
+            end),
+          ' '
+        )),
         sink = 'FzfFdSink',
       },
     }),
@@ -99,11 +99,12 @@ function fzf_cd()
   nvim_call_function('fzf#run', {
     nvim_call_function('fzf#wrap', {
       {
-        source = ([[ fd --follow --type d %s ]]):format(FZF_PRUNE_DIRS
-            :map(function(v)
-            return '--exclude ' .. v
-          end)
-            :join(' ')),
+        source = ([[ fd --follow --type d %s ]]):format(_.join(
+          _.map(FZF_PRUNE_DIRS, function(v)
+              return '--exclude ' .. v
+            end),
+          ' '
+        )),
         sink = 'FzfCdSink',
       },
     }),
@@ -119,25 +120,27 @@ nvim_command([[
 --
 
 function fzf_favorites_cd()
-  local favorites = Array({
+  local favorites = {
     'edtechy',
     'projects',
-  })
+  }
 
   nvim_call_function('fzf#run', {
     nvim_call_function('fzf#wrap', {
       {
         source = ([[ fd --type d --base-directory ~ --exact-depth 1 %s %s ]]):format(
-          FZF_PRUNE_DIRS
-              :map(function(v)
-              return '--exclude ' .. v
-            end)
-              :join(' '),
-          favorites
-              :map(function(v)
+          _.join(
+            _.map(FZF_PRUNE_DIRS, function(v)
+                return '--exclude ' .. v
+              end),
+            ' '
+          ),
+          _.join(
+            _.map(favorites, function(v)
               return '--search-path ' .. v
-            end)
-              :join(' ')
+            end),
+            ' '
+          )
         ),
         sink = 'FzfFavoritesCdSink',
       },
@@ -154,24 +157,24 @@ nvim_command([[
 --
 
 function fzf_rg()
-  local rgFlags = Array({
+  local rgFlags = {
     '--color=always',
     '--smart-case',
     '--line-number',
     '--no-column',
     '--no-heading',
-  })
+  }
 
   nvim_call_function('fzf#run', {
     nvim_call_function('fzf#wrap', {
       {
-        source = ([[ rg . %s ]]):format(rgFlags:join(' ')),
-        options = Array({
+        source = ([[ rg . %s ]]):format(_.join(rgFlags, ' ')),
+        options = _.join({
           '--ansi',
           '--multi',
           '--delimiter :',
           '--nth 2..',
-        }):join(' '),
+        }, ' '),
         sink = 'FzfRgSink',
       },
     }),
@@ -183,47 +186,27 @@ nvim_command([[
 ]])
 
 function fzf_rg_sink(...)
-  -- TODO: luascript split
-  Array({ ... }):each(function(v)
-    local columns = {}
-    for match in v:gmatch('[^:]+') do
-      table.insert(columns, match)
-    end
+  _.each({ ... }, function(v)
+    local columns = _.split(v, ':')
     nvim_command(('edit +%d %s'):format(columns[2], columns[1]))
   end)
 end
 
 --
--- fzf_tabby
+-- fzf_ls
 --
 
-function fzf_tabby()
+function fzf_ls()
   nvim_call_function('fzf#run', {
     nvim_call_function('fzf#wrap', {
       {
-        source = require('tabby').list(true)
-            :map(function(tabname, i)
-            return colorize(tostring(i + 1), ANSI.GREEN) .. ':' .. colorize(
-              tabname,
-              ANSI.RED
-            )
-          end)
-            :raw(),
-        options = Array({
-          '--ansi',
-          '--delimiter :',
-          '--nth 2..',
-        }):join(' '),
-        sink = 'FzfTabbySink',
+        source = {},
+        sink = 'FzfLsSink',
       },
     }),
   })
 end
 
 nvim_command([[
-	command! -nargs=* FzfTabbySink lua fzf_tabby_sink(<f-args>)
+	command! -nargs=* FzfLsSink exec 'edit ' . <f-args>
 ]])
-
-function fzf_tabby_sink(selection)
-  require('tabby').open(selection:match('([^:]+)'))
-end

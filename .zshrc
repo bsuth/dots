@@ -78,6 +78,7 @@ export LUA_CPATH="$LUI_ROOT/build/?.so;$LUA_CPATH"
 
 alias vi='nvim'
 alias vim='nvim'
+alias love='love-git'
 alias testwm='Xephyr -br -ac -noreset -screen 800x600 :1 &; DISPLAY=:1 awesome'
 
 # vim: syntax=zsh

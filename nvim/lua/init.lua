@@ -1,5 +1,5 @@
 --
--- lua env
+-- Lua Environment
 -- 1) expose vim.api to global scope
 -- 2) expose utils
 --
@@ -27,10 +27,10 @@ function colorize(s, color)
 end
 
 --
--- packages
+-- Modules
 --
 
-local packages = {
+local modules = {
   'plugins',
   'helpers',
   'fzf',
@@ -38,13 +38,13 @@ local packages = {
   'mappings',
 }
 
-for _, v in ipairs(packages) do
+for _, v in ipairs(modules) do
   package.loaded[v] = nil
   require(v)
 end
 
 --
--- options
+-- Options
 --
 
 local global_options = {
@@ -88,7 +88,7 @@ end
 nvim_command('highlight ColorColumn guibg=#585858')
 
 --
--- augroups
+-- Autogroups
 --
 
 nvim_command('augroup bsuth')
