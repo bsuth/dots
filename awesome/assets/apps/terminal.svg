@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 16.933333 16.933333"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1 (c4e8f9ed74, 2021-05-24)"
+   sodipodi:docname="terminal.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="false"
+     units="px"
+     width="64px"
+     inkscape:zoom="11.313708"
+     inkscape:cx="27.00264"
+     inkscape:cy="29.477514"
+     inkscape:window-width="1896"
+     inkscape:window-height="1006"
+     inkscape:window-x="10"
+     inkscape:window-y="60"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs2">
+    <marker
+       style="overflow:visible;"
+       id="Arrow1Lend"
+       refX="0.0"
+       refY="0.0"
+       orient="auto"
+       inkscape:stockid="Arrow1Lend"
+       inkscape:isstock="true">
+      <path
+         transform="scale(0.8) rotate(180) translate(12.5,0)"
+         style="fill-rule:evenodd;fill:context-stroke;stroke:context-stroke;stroke-width:1.0pt;"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         id="path4358" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <ellipse
+       style="fill:#282c34;stroke:#abb2bf;stroke-width:1.1338;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="circle925"
+       cx="8.4783611"
+       cy="8.4666662"
+       rx="7.6351814"
+       ry="7.635181" />
+    <g
+       id="g5245"
+       transform="translate(2.0782546,-0.35188488)">
+      <g
+         id="g4859"
+         transform="matrix(0.79760075,0,0,1.0196897,-0.14745457,-0.13154007)">
+        <path
+           style="fill:none;stroke:#56b6c2;stroke-width:0.88015;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="m 2.9212008,6.7707943 c 0,0 0.7050884,-1.975965 2.2604619,-0.3049688 1.5553732,1.6709962 2.1782729,-0.2938804 2.1782729,-0.2938804"
+           id="path3951" />
+        <g
+           id="g4833"
+           style="stroke:#98c379;stroke-width:0.88015;stroke-miterlimit:4;stroke-dasharray:none"
+           transform="translate(1.442862,0.1846295)">
+          <path
+             style="fill:none;stroke:#98c379;stroke-width:0.88015;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+             d="M 1.5137525,9.9358769 H 5.622898"
+             id="path4207" />
+          <g
+             id="g4827"
+             style="stroke:#98c379;stroke-width:0.88015;stroke-miterlimit:4;stroke-dasharray:none">
+            <path
+               style="fill:none;stroke:#98c379;stroke-width:0.88015;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+               d="M 4.9341201,8.9883369 5.8816599,9.9358768"
+               id="path4723"
+               inkscape:transform-center-x="0.62235604"
+               inkscape:transform-center-y="-0.62235605" />
+            <path
+               style="fill:none;stroke:#98c379;stroke-width:0.88015;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+               d="M 4.93412,10.883417 5.8816599,9.9358768"
+               id="path4805"
+               inkscape:transform-center-x="0.62235609"
+               inkscape:transform-center-y="0.6223564" />
+          </g>
+        </g>
+      </g>
+      <rect
+         style="fill:#abb2bf;stroke:none;stroke-width:1.15103;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         id="rect4883"
+         width="3.1112354"
+         height="4.1603584"
+         x="7.3579082"
+         y="8.1468487"
+         ry="0.28478238" />
+    </g>
+  </g>
+</svg>

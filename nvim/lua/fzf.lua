@@ -121,7 +121,7 @@ nvim_command([[
 
 function fzf_favorites()
   local favorites = {
-    'edtechy',
+    'dots',
     'projects',
   }
 

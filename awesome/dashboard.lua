@@ -404,8 +404,16 @@ local apps = {
     shell = true,
   },
   {
-    icon = beautiful.assets('apps/inkscape.png'),
+    icon = beautiful.assets('apps/inkscape.svg'),
     cmd = 'inkscape',
+  },
+  {
+    icon = beautiful.assets('apps/vivaldi.svg'),
+    cmd = 'vivaldi-stable',
+  },
+  {
+    icon = beautiful.assets('apps/terminal.svg'),
+    cmd = 'st -e nvim -c ":Dirvish"',
   },
 }
 
