@@ -178,7 +178,7 @@ bindings.globalkeys = gears.table.join(
     awful.spawn('st -e nvim -c ":Dirvish"')
   end),
   awful.key({ 'Mod4' }, "'", function()
-    awful.spawn('luakit')
+    awful.spawn('firefox-developer-edition')
   end),
   awful.key({ 'Mod4' }, 'space', function()
     -- open!
