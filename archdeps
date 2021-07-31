@@ -49,6 +49,11 @@ inkscape
 gimp
 st (fork)
 
+# Luakit
+luakit
+gst-plugins-good # required for video
+gst-libav # required for video
+
 # AUR
 yay
 awesome-luajit

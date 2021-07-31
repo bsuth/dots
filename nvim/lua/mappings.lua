@@ -10,6 +10,7 @@ local mappings = {
     ['<leader>?'] = ':help ',
     ['<leader>v?'] = ':vert :help ',
     ['<c-_>'] = ':Commentary<cr>', -- secretly <c-/>
+    ['<c-f>'] = 'l%',
 
     -- windows
     ['<leader>w'] = '<c-w>',
@@ -68,6 +69,7 @@ local mappings = {
   v = { -- visual mode
     ['<c-_>'] = ':Commentary<cr>',
     ['<c-n>'] = ':lua search_visual_selection()<cr>',
+    ['<c-f>'] = 'l%',
     -- TODO: visual selection docs
     -- ['K'] = ':lua docs()<cr>',
   },
