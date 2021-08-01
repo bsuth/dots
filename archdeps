@@ -52,4 +52,11 @@ st (fork)
 # AUR
 yay
 awesome-luajit
-bear
+openresty
+
+# luarocks
+lapis
+lpeg
+luafilesystem
+lua-cjson
+busted
