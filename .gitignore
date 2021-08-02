@@ -10,3 +10,6 @@ bundle/
 # vifm
 vifminfo*
 vifm-help.txt
+
+# firefox custom plugins
+node_modules

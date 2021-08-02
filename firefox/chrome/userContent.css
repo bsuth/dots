@@ -17,19 +17,27 @@
     --newtab-text-primary-color: var(--onedark-white) !important;
     --newtab-text-secondary-color: var(--onedark-dark-grey) !important;
     --newtab-textbox-background-color: var(--onedark-blacker) !important;
+
     --newtab-background-color: var(--onedark-black) !important;
-
     --newtab-card-background-color: var(--onedark-blacker) !important;
-    --newtab-search-icon: url() !important;
   }
 
-  .logo {
-    background: url() !important;
-  }
-
-  .search-inner-wrapper,
+  .icon-settings,
+  .search-wrapper,
   .card-context,
   .section-top-bar {
     display: none !important;
+  }
+
+  .section-body,
+  .collapsible-section {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .card-outer {
+    margin: 0 !important;
+    max-width: 200px !important;
+    background: var(--newtab-card-background-color) !important;
   }
 }
