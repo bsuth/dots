@@ -2,9 +2,11 @@
   "name": "newtab",
   "private": true,
   "scripts": {
-    "build": "node build.js"
+    "build": "node dev.js",
+    "watch": "node dev.js --watch"
   },
   "devDependencies": {
+    "chokidar": "^3.5.2",
     "esbuild": "^0.12.17",
     "fs-extra": "^10.0.0",
     "prettier": "^2.3.2",
