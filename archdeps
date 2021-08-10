@@ -11,15 +11,13 @@ pulseaudio-alsa
 pulseaudio-bluetooth
 upower
 
-# Essentials
-git
-openssh
-zsh
+# Languages
 nodejs
 npm
-zip
-unzip
 rust
+go
+python3
+python-pip
 
 # Input / Fonts
 fcitx
@@ -34,6 +32,11 @@ Leckerli One
 
 
 # Tools
+git
+openssh
+zsh
+zip
+unzip
 flameshot
 ripgrep
 fd
@@ -52,11 +55,12 @@ st (fork)
 # AUR
 yay
 awesome-luajit
-openresty
 
 # luarocks
-lapis
 lpeg
 luafilesystem
 lua-cjson
 busted
+
+# python
+pynvim

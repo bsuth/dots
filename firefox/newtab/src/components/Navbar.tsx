@@ -11,7 +11,9 @@ const NavItems = [
 export const Navbar = () => (
   <div className={styles.navbar}>
     {NavItems.map(navItem => (
-      <Link to={navItem.href}>{navItem.title}</Link>
+      <Link to={navItem.href} className={styles.link}>
+        {navItem.title}
+      </Link>
     ))}
   </div>
 );

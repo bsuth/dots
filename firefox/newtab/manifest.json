@@ -5,5 +5,7 @@
 
   "chrome_url_overrides": {
     "newtab": "build/index.html"
-  }
+  },
+
+  "permissions": ["bookmarks"]
 }

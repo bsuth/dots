@@ -47,7 +47,6 @@ zplugin light denysdovhan/spaceship-prompt
 export SHELL='/bin/zsh'
 export EDITOR=nvim
 export WORDCHARS=${WORDCHARS//[\/\.]}
-export PATH="$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
 
 export HISTFILE=~/.zsh_history
 export HISTSIZE=1000
@@ -68,6 +67,10 @@ export SPACESHIP_PROMPT_ORDER=(
   char          # Prompt character
 )
 
+export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
+
 # ------------------------------------------------------------------------------
 # ALIASES
 # ------------------------------------------------------------------------------
@@ -76,5 +79,15 @@ alias vi='nvim'
 alias vim='nvim'
 alias love='love-git'
 alias testwm='Xephyr -br -ac -noreset -screen 800x600 :1 &; DISPLAY=:1 awesome'
+
+# ------------------------------------------------------------------------------
+# HOOKS
+# ------------------------------------------------------------------------------
+
+function bsuth_propogate_cd() {
+  echo "hi"
+}
+
+chpwd_functions=(${chpwd_functions[@]} "bsuth_propogate_cd")
 
 # vim: syntax=zsh
