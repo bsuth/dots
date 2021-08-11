@@ -1,15 +1,8 @@
 local _ = require('lutil')
 
-function docs()
-  local filetype = nvim_buf_get_option(0, 'filetype')
-  local cWORD = nvim_call_function('expand', { '<cWORD>' })
-
-  if _.has({ 'vim', 'help' }, filetype) then
-    nvim_command('h ' .. cWORD)
-  else
-    nvim_command('Man ' .. cWORD)
-  end
-end
+-- -----------------------------------------------------------------------------
+-- Visual Selection
+-- -----------------------------------------------------------------------------
 
 function get_visual_selection()
   local buffer, line_start, column_start = unpack(nvim_call_function('getpos', {
@@ -39,28 +32,52 @@ function search_visual_selection()
   nvim_command('normal n')
 end
 
-function on_bufenter()
-  local buffer = {
-    name = nvim_buf_get_name(0),
-    dir = nvim_call_function('fnamemodify', { nvim_buf_get_name(0), ':p:h' }):gsub(
-      '^suda://',
-      ''
-    ),
-    filetype = nvim_buf_get_option(0, 'filetype'),
-  }
+-- -----------------------------------------------------------------------------
+-- CWD Tracking
+-- -----------------------------------------------------------------------------
 
-  if buffer.name:match('^term://') then
-    return
-  end
+local cwd_cache = {}
 
-  nvim_command('cd ' .. buffer.dir)
+function save_cwd()
+  local bufname = nvim_buf_get_name(0)
+  print(bufname)
+  cwd_cache[bufname] = nvim_call_function('getcwd', {})
+end
 
-  if buffer.filetype == 'dirvish' then
-    nvim_command('Dirvish')
+function restore_cwd()
+  local bufname = nvim_buf_get_name(0)
+  if cwd_cache[bufname] ~= nil then
+    nvim_command(('cd %s'):format(cwd_cache[bufname]))
+    cwd_cache[bufname] = nil
   end
 end
 
-function dirvish_open()
+function track_cwd()
+  local bufname = nvim_buf_get_name(0)
+
+  if bufname:match('^term://') then
+    if cwd_cache[bufname] ~= nil then
+      nvim_command(('cd %s'):format(cwd_cache[bufname]))
+    end
+  else
+    -- Change to current buffer's parent directory
+    nvim_command(('cd %s'):format(nvim_call_function('fnamemodify', {
+      bufname,
+      ':p:h',
+    }):gsub('^suda://', '')))
+
+    -- refresh dirvish after cd
+    if nvim_buf_get_option(0, 'filetype') == 'dirvish' then
+      nvim_command('Dirvish')
+    end
+  end
+end
+
+-- -----------------------------------------------------------------------------
+-- Dirvish
+-- -----------------------------------------------------------------------------
+
+function dirvish_xdg_open()
   local file = nvim_call_function('expand', { '<cWORD>' })
   local dir = nvim_call_function('fnamemodify', { file, ':p:h' })
   local ext = nvim_call_function('fnamemodify', { file, ':e' })
@@ -70,6 +87,21 @@ function dirvish_open()
   else
     nvim_call_function('dirvish#open', { 'edit', 0 })
     nvim_command('cd ' .. dir)
+  end
+end
+
+-- -----------------------------------------------------------------------------
+-- Misc
+-- -----------------------------------------------------------------------------
+
+function docs()
+  local filetype = nvim_buf_get_option(0, 'filetype')
+  local cWORD = nvim_call_function('expand', { '<cWORD>' })
+
+  if _.has({ 'vim', 'help' }, filetype) then
+    nvim_command('h ' .. cWORD)
+  else
+    nvim_command('Man ' .. cWORD)
   end
 end
 

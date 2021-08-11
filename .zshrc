@@ -84,10 +84,8 @@ alias testwm='Xephyr -br -ac -noreset -screen 800x600 :1 &; DISPLAY=:1 awesome'
 # HOOKS
 # ------------------------------------------------------------------------------
 
-function bsuth_propogate_cd() {
-  echo "hi"
+function on_cd() {
+  (python3 $HOME/dots/nvim/onshellcd.py &)
 }
 
-chpwd_functions=(${chpwd_functions[@]} "bsuth_propogate_cd")
-
-# vim: syntax=zsh
+chpwd_functions=(${chpwd_functions[@]} "on_cd")

@@ -92,10 +92,21 @@ nvim_command('highlight ColorColumn guibg=#585858')
 --
 
 nvim_command('augroup bsuth')
-nvim_command('au BufEnter * lua on_bufenter()')
+
+-- CWD Tracking
+nvim_command('au TermOpen term://*zsh* lua save_cwd()')
+nvim_command('au TermClose term://*zsh* lua restore_cwd()')
+nvim_command('au BufEnter * lua track_cwd()')
+
+-- Dirvish
+nvim_command('au TermClose term://*zsh* Dirvish')
+nvim_command('au FileType dirvish nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>')
+
+-- Term
 nvim_command('au TermOpen term://*zsh* setlocal nonumber wrap')
 nvim_command('au TermOpen term://*zsh* startinsert')
-nvim_command('au TermClose term://*zsh* Dirvish')
-nvim_command('au FileType dirvish nnoremap <buffer><silent> <cr> :lua dirvish_open()<cr>')
+
+-- Misc
 nvim_command('au BufWritePost *.lua lua apply_stylua()')
+
 nvim_command('augroup END')
