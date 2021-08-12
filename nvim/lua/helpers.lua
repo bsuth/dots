@@ -40,7 +40,6 @@ local cwd_cache = {}
 
 function save_cwd()
   local bufname = nvim_buf_get_name(0)
-  print(bufname)
   cwd_cache[bufname] = nvim_call_function('getcwd', {})
 end
 

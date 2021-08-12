@@ -37,7 +37,8 @@ local mappings = {
 
     -- fzf
     ['<leader><leader>'] = ':lua fzf_favorites()<cr>',
-    ['<leader>fd'] = ':lua fzf_fd()<cr>',
+    -- ['<leader>fd'] = ':lua fzf_fd()<cr>',
+    ['<leader>fd'] = ':Telescope find_files<cr>',
     ['<leader>cd'] = ':lua fzf_cd()<cr>',
     ['<leader>rg'] = ':lua fzf_rg()<cr>',
     ['<leader>ls'] = ':Buffers<cr>',
