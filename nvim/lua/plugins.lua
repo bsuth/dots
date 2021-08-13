@@ -15,32 +15,30 @@ else
   io.close(paqfile)
 end
 
--- prevent netrw from taking over:
--- https://github.com/justinmk/vim-dirvish/issues/137
-nvim_set_var('loaded_netrwPlugin', true)
-
 require('paq')({
-  -- paq
+  -- core
   'savq/paq-nvim',
+  'nvim-lua/plenary.nvim',
 
-  -- stable
+  -- syntax
+  'nvim-treesitter/nvim-treesitter',
   'navarasu/onedark.nvim',
+
+  -- apps
   'justinmk/vim-dirvish',
+  'hoob3rt/lualine.nvim',
+  'nvim-telescope/telescope.nvim',
+  { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' },
+
+  -- util
   'tpope/vim-surround',
+  'tpope/vim-commentary',
   'matze/vim-move',
   'lambdalisue/suda.vim',
-
-  -- unstable
-  'nvim-lua/plenary.nvim',
-  'nvim-telescope/telescope.nvim',
-  'tpope/vim-commentary',
-  -- 'itchyny/lightline.vim',
-  'nvim-treesitter/nvim-treesitter',
-  'hoob3rt/lualine.nvim',
 })
 
 -- -----------------------------------------------------------------------------
--- Vim-Plug
+-- DEPRECATED: Vim-Plug + Coc
 -- -----------------------------------------------------------------------------
 
 local plug =
@@ -57,7 +55,6 @@ else
 end
 
 local plugins = {
-  'junegunn/fzf',
   { [[ 'neoclide/coc.nvim', {'branch': 'release'}  ]] },
 }
 
@@ -71,9 +68,21 @@ for _, plugin in ipairs(plugins) do
 end
 nvim_call_function('plug#end', {})
 
+nvim_set_var('coc_global_extensions', {
+  'coc-tsserver',
+  'coc-css',
+  'coc-json',
+  'coc-prettier',
+  'coc-clangd',
+})
+
 -- -----------------------------------------------------------------------------
 -- Misc
 -- -----------------------------------------------------------------------------
+
+-- prevent netrw from taking over:
+-- https://github.com/justinmk/vim-dirvish/issues/137
+nvim_set_var('loaded_netrwPlugin', true)
 
 nvim_set_var('suda_smart_edit', true)
 nvim_command('colorscheme onedark')
@@ -96,18 +105,6 @@ require('lualine').setup({
   sections = {
     lualine_x = {},
   },
-})
-
--- -----------------------------------------------------------------------------
--- Coc
--- -----------------------------------------------------------------------------
-
-nvim_set_var('coc_global_extensions', {
-  'coc-tsserver',
-  'coc-css',
-  'coc-json',
-  'coc-prettier',
-  'coc-clangd',
 })
 
 -- -----------------------------------------------------------------------------
@@ -135,15 +132,93 @@ require('nvim-treesitter.configs').setup({
 -- Telescope
 -- -----------------------------------------------------------------------------
 
-function mypick()
-  require('telescope.pickers').new({}, {
+local telescope = require('telescope')
+local pickers = require('telescope.pickers')
+local finders = require('telescope.finders')
+local config = require('telescope.config').values
+local actions = require('telescope.actions')
+local action_set = require('telescope.actions.set')
+local action_state = require('telescope.actions.state')
+
+--
+-- Setup
+--
+
+telescope.setup({
+  extensions = {
+    fzf = {
+      fuzzy = false,
+    },
+  },
+})
+
+telescope.load_extension('fzf')
+
+--
+-- Helpers
+--
+
+local fd = { 'fd', '--follow', '--type', 'd' }
+
+local function telescope_edit_action(prompt_bufnr)
+  local current_picker = action_state.get_current_picker(prompt_bufnr)
+  actions.close(prompt_bufnr)
+  nvim_command(('edit %s'):format(table.concat({
+    current_picker.cwd or '.',
+    action_state.get_selected_entry().value,
+  }, '/')))
+end
+
+--
+-- Picker: Favorites
+--
+
+function telescope_favorites()
+  local opts = {}
+
+  local favorites = { 'dots', 'projects' }
+  local job = tbl_flatten({
+    fd,
+    tbl_flatten(tbl_map(function(v)
+      return { '--search-path', v }
+    end, favorites)),
+  })
+
+  pickers.new(opts, {
+    prompt_title = 'Favorites',
+    finder = finders.new_oneshot_job(job, { cwd = os.getenv('HOME') }),
+    sorter = config.generic_sorter(opts),
+    attach_mappings = function(_, map)
+      action_set.select:replace(telescope_edit_action)
+      return true
+    end,
+  }):find()
+end
+
+--
+-- Picker: Change Directory
+--
+
+function telescope_change_dir()
+  local opts = {}
+
+  local function cwd_tree_finder(cwd)
+    return finders.new_oneshot_job(fd, { cwd = cwd })
+  end
+
+  pickers.new(opts, {
     prompt_title = 'Change Directory',
-    finder = require('telescope.finders').new_oneshot_job({
-      'fd',
-      '--follow',
-      '--type',
-      'd',
-    }),
-    sorter = require('telescope.sorters').fuzzy_with_index_bias(),
+    finder = cwd_tree_finder(),
+    sorter = config.generic_sorter(opts),
+    attach_mappings = function(prompt_bufnr, map)
+      local current_picker = action_state.get_current_picker(prompt_bufnr)
+      action_set.select:replace(telescope_edit_action)
+      map('i', '<c-b>', function()
+        local cwd = table.concat({ '..', current_picker.cwd }, '/')
+        current_picker.cwd = cwd
+        current_picker:refresh(cwd_tree_finder(cwd), { reset_prompt = true })
+      end)
+      return true
+    end,
   }):find()
 end

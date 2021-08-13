@@ -90,19 +90,8 @@ function dirvish_xdg_open()
 end
 
 -- -----------------------------------------------------------------------------
--- Misc
+-- Stylua
 -- -----------------------------------------------------------------------------
-
-function docs()
-  local filetype = nvim_buf_get_option(0, 'filetype')
-  local cWORD = nvim_call_function('expand', { '<cWORD>' })
-
-  if _.has({ 'vim', 'help' }, filetype) then
-    nvim_command('h ' .. cWORD)
-  else
-    nvim_command('Man ' .. cWORD)
-  end
-end
 
 function apply_stylua()
   local stylua = '~/.cargo/bin/stylua --config-path ~/dots/stylua.toml'
