@@ -1,3 +1,4 @@
+-- TODO: Deprecate this module
 local _ = require('lutil')
 
 --

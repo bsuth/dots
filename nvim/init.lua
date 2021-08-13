@@ -23,160 +23,149 @@ end
 -- Options
 -- -----------------------------------------------------------------------------
 
-local global_options = {
-  wrap = false,
-  ignorecase = true,
-  smartcase = true,
-  splitright = true,
-  splitbelow = true,
-  termguicolors = true,
-  tabstop = 2,
-  softtabstop = 2,
-  shiftwidth = 2,
-  expandtab = true,
-  clipboard = 'unnamedplus',
-  scrollback = 100000,
-  updatetime = 300,
-  suffixes = '.bak,~,.o,.info,.swp,.obj',
-  showmode = false, -- replaced by lightline
-}
+-- casing
+opt.ignorecase = true
+opt.smartcase = true
 
-local window_options = {
-  number = true,
-  colorcolumn = '80',
-  signcolumn = 'yes',
-}
+-- splitting
+opt.splitright = true
+opt.splitbelow = true
 
-local buffer_options = {}
+-- tabs
+opt.tabstop = 2
+opt.softtabstop = 2
+opt.shiftwidth = 2
+opt.expandtab = true
 
-for k, v in pairs(global_options) do
-  nvim_set_option(k, v)
-end
+-- interface
+opt.termguicolors = true
+opt.number = true
+opt.signcolumn = 'yes'
+opt.showmode = false
+opt.colorcolumn = '80'
+cmd('highlight ColorColumn guibg=#585858')
 
-for k, v in pairs(window_options) do
-  nvim_win_set_option(0, k, v)
-end
-
-for k, v in pairs(buffer_options) do
-  nvim_buf_set_option(0, k, v)
-end
-
-nvim_command('highlight ColorColumn guibg=#585858')
+-- misc
+opt.wrap = false
+opt.clipboard = 'unnamedplus'
+opt.updatetime = 300
+opt.scrollback = 100000
 
 -- -----------------------------------------------------------------------------
 -- Autocommands
 -- -----------------------------------------------------------------------------
 
-nvim_command('augroup bsuth')
+cmd('augroup bsuth')
 
 -- CWD Tracking
-nvim_command('au TermOpen term://*zsh* lua save_cwd()')
-nvim_command('au TermClose term://*zsh* lua restore_cwd()')
-nvim_command('au BufEnter * lua track_cwd()')
+cmd('au TermOpen term://*zsh* lua save_cwd()')
+cmd('au TermClose term://*zsh* lua restore_cwd()')
+cmd('au BufEnter * lua track_cwd()')
 
 -- Dirvish
-nvim_command('au TermClose term://*zsh* Dirvish')
-nvim_command('au FileType dirvish nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>')
+cmd('au TermClose term://*zsh* Dirvish')
+cmd('au FileType dirvish nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>')
 
 -- Term
-nvim_command('au TermOpen term://*zsh* setlocal nonumber wrap')
-nvim_command('au TermOpen term://*zsh* startinsert')
+cmd('au TermOpen term://*zsh* setlocal nonumber wrap')
+cmd('au TermOpen term://*zsh* startinsert')
 
 -- Misc
-nvim_command('au BufWritePost *.lua lua apply_stylua()')
+cmd('au BufWritePost *.lua lua apply_stylua()')
 
-nvim_command('augroup END')
+cmd('augroup END')
 
 -- -----------------------------------------------------------------------------
 -- Mappings
 -- -----------------------------------------------------------------------------
 
-nvim_set_var('mapleader', ' ')
+--
+-- Setup
+--
 
-local mappings = {
-  n = { -- normal mode
-    -- common use
-    ['<leader>ev'] = ':Dirvish ~/dots/nvim/lua<cr>',
-    ['<leader>sv'] = ':source $MYVIMRC<cr>',
-    ['<c-space>'] = ':term<cr>',
-    ['<leader>/'] = ':nohlsearch<cr><c-l>',
-    ['<leader>?'] = ':help ',
-    ['<leader>v?'] = ':vert :help ',
-    ['<c-_>'] = ':Commentary<cr>', -- secretly <c-/>
-    ['<c-f>'] = 'l%',
+g.mapleader = ' '
 
-    -- windows
-    ['<leader>w'] = '<c-w>',
-    ['<c-h>'] = '<c-w>h',
-    ['<c-j>'] = '<c-w>j',
-    ['<c-k>'] = '<c-w>k',
-    ['<c-l>'] = '<c-w>l',
-    ['<leader><c-l>'] = ':rightbelow :vsp | :Dirvish<cr>',
-    ['<leader><c-k>'] = ':aboveleft :sp | :Dirvish<cr>',
-    ['<leader><c-j>'] = ':rightbelow :sp | :Dirvish<cr>',
-    ['<leader><c-h>'] = ':aboveleft :vsp | :Dirvish<cr>',
-
-    -- tabs
-    ['<c-t>'] = ':tabnew | :Dirvish<cr>',
-    ['<c-w>'] = ':tabclose<cr>',
-    ['<tab>'] = ':tabnext<cr>',
-    ['<s-tab>'] = ':tabprev<cr>',
-    ['<lt>'] = ':tabmove -1<cr>',
-    ['>'] = ':tabmove +1<cr>',
-
-    -- fake marks
-    ["'r"] = ':cd / | :Dirvish<cr>',
-    ["'h"] = ':cd ~ | :Dirvish<cr>',
-
-    -- telescope
-    ['<leader><leader>'] = ':lua telescope_favorites()<cr>',
-    ['<leader>cd'] = ':lua telescope_change_dir()<cr>',
-    ['<leader>fd'] = ':Telescope find_files<cr>',
-    ['<leader>rg'] = ':Telescope live_grep<cr>',
-    ['<leader>ls'] = ':Telescope buffers<cr>',
-
-    -- coc
-    ['<leader>coc'] = ':silent CocRestart<cr>',
-  },
-
-  i = { -- insert mode
-    -- coc
-    ['<c-space>'] = {
-      rhs = 'coc#refresh()',
-      opts = { expr = true, silent = true },
-    },
-
-    -- emacs mappings
-    ['<m-b>'] = '<c-o>b',
-    ['<m-f>'] = '<c-o>w',
-    ['<c-b>'] = '<c-o>h',
-    ['<c-f>'] = '<c-o>l',
-    ['<c-a>'] = '<c-o>^',
-    ['<c-e>'] = '<c-o>$',
-    ['<c-u>'] = '<c-o>d^',
-    ['<c-k>'] = '<c-o>d$',
-    ['<m-backspace>'] = '<c-o>db',
-    ['<m-d>'] = '<c-o>dw',
-  },
-
-  v = { -- visual mode
-    ['<c-_>'] = ':Commentary<cr>',
-    ['<c-n>'] = ':lua search_visual_selection()<cr>',
-    ['<c-f>'] = 'l%',
-  },
-
-  t = { -- terminal mode
-    ['<c-[>'] = '<c-\\><c-n>',
-  },
-}
-
-for mode, modemappings in pairs(mappings) do
-  for k, v in pairs(modemappings) do
-    if type(v) == 'string' then
-      nvim_set_keymap(mode, k, v, { noremap = true })
-    elseif type(v) == 'table' then
-      v.opts.noremap = true
-      nvim_set_keymap(mode, k, v.rhs, v.opts)
-    end
-  end
+local function map(mode, lhs, rhs, opts)
+  opts = tbl_extend('force', { noremap = true }, opts or {})
+  nvim_set_keymap(mode, lhs, rhs, opts)
 end
+
+--
+-- Core
+--
+
+map('n', '<leader>ev', ':Dirvish ~/dots/nvim/lua<cr>')
+map('n', '<leader>sv', ':source $MYVIMRC<cr>')
+
+map('n', '<c-space>', ':term<cr>')
+map('n', '<leader>/', ':nohlsearch<cr><c-l>')
+map('t', '<c-[>', '<c-\\><c-n>')
+
+map('n', '<leader>?', ':help ')
+map('n', '<leader>v?', ':vert :help ')
+
+--
+-- Splits
+--
+
+map('n', '<leader>w', '<c-w>')
+
+map('n', '<c-h>', '<c-w>h')
+map('n', '<c-j>', '<c-w>j')
+map('n', '<c-k>', '<c-w>k')
+map('n', '<c-l>', '<c-w>l')
+
+map('n', '<leader><c-l>', ':rightbelow :vsp | :Dirvish<cr>')
+map('n', '<leader><c-k>', ':aboveleft :sp | :Dirvish<cr>')
+map('n', '<leader><c-j>', ':rightbelow :sp | :Dirvish<cr>')
+map('n', '<leader><c-h>', ':aboveleft :vsp | :Dirvish<cr>')
+
+--
+-- Movement
+--
+
+map('n', '<c-f>', 'l%')
+map('v', '<c-f>', 'l%')
+map('v', '<c-n>', ':lua search_visual_selection()<cr>')
+
+--
+-- Quickmarks
+--
+
+map('n', "'r", ':cd / | :Dirvish<cr>')
+map('n', "'h", ':cd ~ | :Dirvish<cr>')
+
+--
+-- Emacs Bindings
+--
+
+map('i', '<m-b>', '<c-o>b')
+map('i', '<m-f>', '<c-o>w')
+map('i', '<c-b>', '<c-o>h')
+map('i', '<c-f>', '<c-o>l')
+map('i', '<c-a>', '<c-o>^')
+map('i', '<c-e>', '<c-o>$')
+map('i', '<c-u>', '<c-o>d^')
+map('i', '<c-k>', '<c-o>d$')
+map('i', '<m-backspace>', '<c-o>db')
+map('i', '<m-d>', '<c-o>dw')
+
+--
+-- Telescope
+--
+
+map('n', '<leader><leader>', ':lua telescope_favorites()<cr>')
+map('n', '<leader>cd', ':lua telescope_change_dir()<cr>')
+map('n', '<leader>fd', ':Telescope find_files<cr>')
+map('n', '<leader>rg', ':Telescope live_grep<cr>')
+map('n', '<leader>ls', ':Telescope buffers<cr>')
+
+--
+-- DEPRECATED
+-- TODO: cleanup
+--
+
+map('n', '<leader>coc', ':silent CocRestart<cr>')
+map('i', '<c-space>', 'coc#refresh()', { expr = true, silent = true })
+map('n', '<c-_>', ':Commentary<cr>') -- secretly <c-/>
+map('v', '<c-_>', ':Commentary<cr>')

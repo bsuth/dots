@@ -10,7 +10,7 @@ if paqfile == nil then
   os.execute(([[
     git clone --depth=1 https://github.com/savq/paq-nvim.git %s
 	]]):format(paqpath))
-  nvim_command('autocmd VimEnter * source $MYVIMRC | PaqSync | source $MYVIMRC')
+  cmd('autocmd VimEnter * source $MYVIMRC | PaqSync | source $MYVIMRC')
 else
   io.close(paqfile)
 end
@@ -38,54 +38,15 @@ require('paq')({
 })
 
 -- -----------------------------------------------------------------------------
--- DEPRECATED: Vim-Plug + Coc
--- -----------------------------------------------------------------------------
-
-local plug =
-  io.open(os.getenv('HOME') .. '/.config/nvim/autoload/plug.vim', 'r')
-
-if plug == nil then
-  os.execute([[
-		curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
-		https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-	]])
-  nvim_command('autocmd VimEnter * PlugInstall --sync | source $MYVIMRC')
-else
-  io.close(plug)
-end
-
-local plugins = {
-  { [[ 'neoclide/coc.nvim', {'branch': 'release'}  ]] },
-}
-
-nvim_call_function('plug#begin', { '~/.config/nvim/bundle' })
-for _, plugin in ipairs(plugins) do
-  if type(plugin) == 'string' then
-    nvim_command(([[ Plug '%s' ]]):format(plugin))
-  elseif type(plugin) == 'table' then
-    nvim_command('Plug ' .. plugin[1])
-  end
-end
-nvim_call_function('plug#end', {})
-
-nvim_set_var('coc_global_extensions', {
-  'coc-tsserver',
-  'coc-css',
-  'coc-json',
-  'coc-prettier',
-  'coc-clangd',
-})
-
--- -----------------------------------------------------------------------------
 -- Misc
 -- -----------------------------------------------------------------------------
 
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
-nvim_set_var('loaded_netrwPlugin', true)
+g.loaded_netrwPlugin = true
 
-nvim_set_var('suda_smart_edit', true)
-nvim_command('colorscheme onedark')
+g.suda_smart_edit = true
+cmd('colorscheme onedark')
 
 -- -----------------------------------------------------------------------------
 -- Lualine
@@ -163,7 +124,7 @@ local fd = { 'fd', '--follow', '--type', 'd' }
 local function telescope_edit_action(prompt_bufnr)
   local current_picker = action_state.get_current_picker(prompt_bufnr)
   actions.close(prompt_bufnr)
-  nvim_command(('edit %s'):format(table.concat({
+  cmd(('edit %s'):format(table.concat({
     current_picker.cwd or '.',
     action_state.get_selected_entry().value,
   }, '/')))
@@ -222,3 +183,42 @@ function telescope_change_dir()
     end,
   }):find()
 end
+
+-- -----------------------------------------------------------------------------
+-- DEPRECATED: Vim-Plug + Coc
+-- -----------------------------------------------------------------------------
+
+local plug =
+  io.open(os.getenv('HOME') .. '/.config/nvim/autoload/plug.vim', 'r')
+
+if plug == nil then
+  os.execute([[
+		curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+		https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	]])
+  cmd('autocmd VimEnter * PlugInstall --sync | source $MYVIMRC')
+else
+  io.close(plug)
+end
+
+local plugins = {
+  { [[ 'neoclide/coc.nvim', {'branch': 'release'}  ]] },
+}
+
+nvim_call_function('plug#begin', { '~/.config/nvim/bundle' })
+for _, plugin in ipairs(plugins) do
+  if type(plugin) == 'string' then
+    cmd(([[ Plug '%s' ]]):format(plugin))
+  elseif type(plugin) == 'table' then
+    cmd('Plug ' .. plugin[1])
+  end
+end
+nvim_call_function('plug#end', {})
+
+nvim_set_var('coc_global_extensions', {
+  'coc-tsserver',
+  'coc-css',
+  'coc-json',
+  'coc-prettier',
+  'coc-clangd',
+})
