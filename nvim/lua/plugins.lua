@@ -147,6 +147,7 @@ function telescope_favorites()
 
   pickers.new(opts, {
     prompt_title = 'Favorites',
+    cwd = os.getenv('HOME'),
     finder = finders.new_oneshot_job(job, { cwd = os.getenv('HOME') }),
     sorter = config.generic_sorter(opts),
     attach_mappings = function(_, map)

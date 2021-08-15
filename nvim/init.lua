@@ -71,7 +71,8 @@ cmd('au TermOpen term://*zsh* setlocal nonumber wrap')
 cmd('au TermOpen term://*zsh* startinsert')
 
 -- Misc
-cmd('au BufWritePost *.lua lua apply_stylua()')
+-- TODO: deprecate
+-- cmd('au BufWritePost *.lua lua apply_stylua()')
 
 cmd('augroup END')
 

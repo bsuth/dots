@@ -1,5 +1,3 @@
-local _ = require('lutil')
-
 -- -----------------------------------------------------------------------------
 -- Visual Selection
 -- -----------------------------------------------------------------------------
@@ -18,7 +16,7 @@ function get_visual_selection()
     lines[#lines] = lines[#lines]:sub(1, column_end)
   end
 
-  return _.join(lines, '\n')
+  return table.concat(lines, '\n')
 end
 
 function search_visual_selection()
@@ -82,6 +80,7 @@ end
 
 -- -----------------------------------------------------------------------------
 -- Stylua
+-- TODO: deprecate this
 -- -----------------------------------------------------------------------------
 
 function apply_stylua()
