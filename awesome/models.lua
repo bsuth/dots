@@ -137,15 +137,14 @@ gears.timer({
 local locale = gears.table.crush(gears.object(), {
   index = 1,
   list = {
-    'fcitx-keyboard-us',
+    'keyboard-us',
     'mozc',
-    -- 'fcitx-keyboard-de',
   },
 
   set = function(self, newindex)
     self.index = newindex
     awful.spawn.easy_async_with_shell(
-      'fcitx-remote -s ' .. self.list[self.index],
+      'fcitx5-remote -s ' .. self.list[self.index],
       function()
         self:emit_signal('update')
       end

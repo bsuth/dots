@@ -20,9 +20,11 @@ python3
 python-pip
 
 # Input / Fonts
-fcitx
-fcitx-mozc
-fcitx-configtool
+fcitx5
+fcitx5-mozc
+fcitx5-configtool
+fcitx5-gtk
+fcitx5-qt
 adobe-source-han-sans-jp-fonts
 
 Hack
