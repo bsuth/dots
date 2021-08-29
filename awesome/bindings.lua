@@ -3,6 +3,7 @@ local dashboard = require('dashboard')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
+local scratchpad = require('scratchpad')
 
 --
 -- Keybindings
@@ -182,6 +183,9 @@ bindings.globalkeys = gears.table.join(
   end),
   awful.key({ 'Mod4' }, "'", function()
     awful.spawn('vivaldi-stable')
+  end),
+  awful.key({ 'Mod4' }, ";", function()
+    scratchpad.toggle()
   end),
   awful.key({ 'Mod4' }, 'p', function()
     dashboard:toggle()
