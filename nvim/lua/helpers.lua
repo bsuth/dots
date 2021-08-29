@@ -79,6 +79,23 @@ function dirvish_xdg_open()
 end
 
 -- -----------------------------------------------------------------------------
+-- Headers
+--
+-- Note that the header formatting relies on comments automatically inserted
+-- by vim (see :h 'formatoptions').
+-- -----------------------------------------------------------------------------
+
+function setupheaders()
+  local comment = opt.commentstring._value:gsub('%%s', '')
+  local colorcolumn = tonumber(opt.colorcolumn._value)
+  cmd(('iabbrev _h1 %s<cr><cr>%s<Up>'):format(
+    comment .. ' ' .. ('-'):rep(colorcolumn - #comment - 1),
+    ('-'):rep(colorcolumn - #comment - 1)
+  ))
+  cmd(('iabbrev _h2 %s<cr><cr><Up>'):format(comment))
+end
+
+-- -----------------------------------------------------------------------------
 -- Stylua
 -- TODO: deprecate this
 -- -----------------------------------------------------------------------------

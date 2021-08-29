@@ -50,6 +50,7 @@ opt.wrap = false
 opt.clipboard = 'unnamedplus'
 opt.updatetime = 300
 opt.scrollback = 100000
+opt.commentstring = '//%s'
 
 -- -----------------------------------------------------------------------------
 -- Autocommands
@@ -69,6 +70,9 @@ cmd('au FileType dirvish nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<
 -- Term
 cmd('au TermOpen term://*zsh* setlocal nonumber wrap')
 cmd('au TermOpen term://*zsh* startinsert')
+
+-- Headers
+cmd('au FileType * lua setupheaders()')
 
 -- Misc
 -- TODO: deprecate
