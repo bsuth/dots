@@ -109,6 +109,9 @@ map('t', '<c-[>', '<c-\\><c-n>')
 map('n', '<leader>?', ':help ')
 map('n', '<leader>v?', ':vert :help ')
 
+map('c', '<c-space>', '<c-f>')
+map('n', ':', ':<c-f><c-c>')
+
 --
 -- Splits
 --
@@ -144,16 +147,33 @@ map('n', "'h", ':cd ~ | :Dirvish<cr>')
 -- Emacs Bindings
 --
 
+map('i', '<c-b>', '<Left>')
+map('i', '<c-f>', '<Right>')
 map('i', '<m-b>', '<c-o>b')
 map('i', '<m-f>', '<c-o>w')
-map('i', '<c-b>', '<c-o>h')
-map('i', '<c-f>', '<c-o>l')
-map('i', '<c-a>', '<c-o>^')
-map('i', '<c-e>', '<c-o>$')
+map('i', '<c-a>', '<Home>')
+map('i', '<c-e>', '<End>')
+
+map('i', '<c-d>', '<Delete>')
+map('i', '<c-h>', '<BS>')
+map('i', '<m-d>', '<c-o>dw')
+map('i', '<m-backspace>', '<c-o>db')
 map('i', '<c-u>', '<c-o>d^')
 map('i', '<c-k>', '<c-o>d$')
-map('i', '<m-backspace>', '<c-o>db')
-map('i', '<m-d>', '<c-o>dw')
+
+map('c', '<c-b>', '<Left>')
+map('c', '<c-f>', '<Right>')
+map('c', '<m-b>', '<c-f>bi<c-c>')
+map('c', '<m-f>', '<c-f>wi<c-c>')
+map('c', '<c-a>', '<Home>')
+map('c', '<c-e>', '<End>')
+
+map('c', '<c-d>', '<Delete>')
+map('c', '<c-h>', '<BS>')
+map('c', '<m-d>', '<C-f>dw<C-c>')
+map('c', '<m-backspace>', '<C-f>db<C-c>')
+map('c', '<c-u>', '<C-f>d^<C-c>')
+map('c', '<c-k>', '<C-f>d$A<C-c>')
 
 --
 -- Telescope
