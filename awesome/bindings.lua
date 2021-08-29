@@ -132,23 +132,26 @@ bindings.globalkeys = gears.table.join(
   end),
 
   --
-  -- TagTabs
+  -- Navbar
   --
 
+  awful.key({ 'Mod4' }, 'space', function()
+    awful.screen.focused().navbar:refresh({ mode = 'dmenu' })
+  end),
   awful.key({ 'Mod4' }, 't', function()
-    awful.screen.focused().tagTabs:new()
+    awful.screen.focused().navbar:newTag()
   end),
   awful.key({ 'Mod4' }, 'w', function()
-    awful.screen.focused().tagTabs:close()
+    awful.screen.focused().navbar:closeTag()
   end),
   awful.key({ 'Mod4' }, 'Tab', function()
-    awful.screen.focused().tagTabs:next()
+    awful.screen.focused().navbar:nextTag()
   end),
   awful.key({ 'Mod4', 'Shift' }, 'Tab', function()
-    awful.screen.focused().tagTabs:prev()
+    awful.screen.focused().navbar:prevTag()
   end),
   awful.key({ 'Mod4' }, 'r', function()
-    awful.screen.focused().tagTabs:rename()
+    awful.screen.focused().navbar:renameTag()
   end),
 
   --
@@ -179,9 +182,6 @@ bindings.globalkeys = gears.table.join(
   end),
   awful.key({ 'Mod4' }, "'", function()
     awful.spawn('vivaldi-stable')
-  end),
-  awful.key({ 'Mod4' }, 'space', function()
-    -- open!
   end),
   awful.key({ 'Mod4' }, 'p', function()
     dashboard:toggle()

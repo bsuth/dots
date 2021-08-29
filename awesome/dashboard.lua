@@ -32,7 +32,6 @@ function dashboard:toggle()
     gears.table.crush(self.wibox, {
       screen = s,
       visible = true,
-
       x = s.geometry.x,
       y = s.geometry.y,
       width = s.geometry.width,
