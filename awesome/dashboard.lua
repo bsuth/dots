@@ -244,7 +244,7 @@ local function PowerWidget()
       {
         PowerItemWidget({
           icon = beautiful.assets('lock.svg'),
-          cmd = 'physlock',
+          cmd = 'systemctl suspend',
         }),
         PowerItemWidget({
           icon = beautiful.assets('restart.svg'),
