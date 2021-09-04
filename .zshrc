@@ -47,6 +47,7 @@ zplugin light denysdovhan/spaceship-prompt
 export SHELL='/bin/zsh'
 export EDITOR=nvim
 export WORDCHARS=${WORDCHARS//[\/\.]}
+export BROWSER='none'
 
 export HISTFILE=~/.zsh_history
 export HISTSIZE=1000

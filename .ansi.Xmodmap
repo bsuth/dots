@@ -11,7 +11,7 @@
 ! ------------------------------------------------------------------------------
 
 ! ------------------------------------------------------------------------------
-! Regular Keyboard Settings 
+! ANSI Keyboard Settings 
 !
 ! 1) Swap Control_L <-> Caps_Lock
 ! 2) Swap Alt_R <-> Super_R
@@ -31,22 +31,3 @@ add Lock = Caps_Lock
 add Control = Control_L Control_R
 add Mod1 = Alt_R Alt_L
 add Mod4 = Super_R Super_L
-
-! ------------------------------------------------------------------------------
-! HHKB Settings
-!
-! 1) Remap Alt_R -> Control_R
-! 2) Swap Alt_L <-> Super_L
-! ------------------------------------------------------------------------------
-
-! clear Control
-! clear Mod1
-! clear Mod4
-
-! keycode 108 = Control_R
-! keycode 133 = Alt_L
-! keycode 64 = Super_L
-
-! add Control = Control_L Control_R
-! add Mod1 = Alt_L Alt_R
-! add Mod4 = Super_L Super_R
