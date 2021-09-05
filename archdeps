@@ -1,4 +1,7 @@
 # System
+amd-ucode (or intel-ucode)
+efibootmgr
+lvm2
 xorg-server
 xorg-xinit
 xorg-xev
@@ -12,6 +15,7 @@ pulseaudio-bluetooth
 upower
 
 # Languages
+luajit
 nodejs
 npm
 rust
@@ -32,8 +36,8 @@ Quicksand
 Fredoka One
 Leckerli One
 
-
 # Tools
+base-devel
 git
 openssh
 zsh
@@ -47,15 +51,15 @@ brightnessctl
 clang
 
 # Apps
-nvim
-vivaldi
+neovim
+firefox-developer-edition
 arandr
 inkscape
 gimp
 st (fork)
 
 # AUR
-yay
+luarocks
 awesome-luajit
 
 # luarocks
