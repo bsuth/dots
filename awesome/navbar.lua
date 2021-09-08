@@ -95,6 +95,20 @@ function navbar:closeTag()
   end
 end
 
+function navbar:shiftTag(shift)
+  local currentTag = self.screen.selected_tag
+
+  local limit = shift > 0 and #self.screen.tags or 0
+  for i = currentTag.index + shift, limit, shift do
+    local swapTag = self.screen.tags[i]
+    if swapTag and not swapTag.name:match('^_.*') then
+      currentTag:swap(swapTag)
+      self:refresh()
+      break
+    end
+  end
+end
+
 function navbar:focusTag(relidx)
   local newTagIndex = self.screen.selected_tag.index
   local numTags = #self.screen.tags
