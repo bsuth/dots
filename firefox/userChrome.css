@@ -54,9 +54,11 @@ toolbarspring {
 
 #tabbrowser-tabs tab {
   padding-inline: 0 !important;
+  color: var(--onedark-dark-grey) !important;
 }
 
 #tabbrowser-tabs tab[selected] {
+  color: var(--onedark-white) !important;
   background-color: #abb2bf28 !important;
 }
 
@@ -117,5 +119,5 @@ toolbarspring {
 }
 
 #urlbar[focused] #urlbar-input {
-  min-height: var(--tab-min-height) !important;
+  min-height: 40px !important;
 }
