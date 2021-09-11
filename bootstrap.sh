@@ -154,7 +154,7 @@ function _install_luarocks_packages_() {
   for LUA_VERSION in ${LUA_VERSIONS[@]}; do
     ./configure --lua-version="$LUA_VERSION"
     make
-    make install
+    sudo make install
     sudo luarocks install "${LUAROCKS_PACKAGES[@]}"
   done
   cd -
