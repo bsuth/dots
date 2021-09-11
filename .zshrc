@@ -80,10 +80,10 @@ alias vi='nvim'
 alias vim='nvim'
 alias testwm='Xephyr -br -ac -noreset -screen 800x600 :1 &; DISPLAY=:1 awesome'
 
-alias luarocks5.1='luarocks --lua-version=5.1 --local'
-alias luarocks5.2='luarocks --lua-version=5.2 --local'
-alias luarocks5.3='luarocks --lua-version=5.3 --local'
-alias luarocks5.4='luarocks --lua-version=5.4 --local'
+alias lrocks5.1='luarocks --lua-version=5.1 --local'
+alias lrocks5.2='luarocks --lua-version=5.2 --local'
+alias lrocks5.3='luarocks --lua-version=5.3 --local'
+alias lrocks5.4='luarocks --lua-version=5.4 --local'
 
 # ------------------------------------------------------------------------------
 # HOOKS
