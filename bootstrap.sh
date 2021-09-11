@@ -151,7 +151,7 @@ function _install_luarocks_packages_() {
 
   cd "$HOME/repos/luarocks"
   git pull
-  for LUA_VERSION in ${!LUA_VERSIONS[@]}; do
+  for LUA_VERSION in ${LUA_VERSIONS[@]}; do
     ./configure --lua-version="$LUA_VERSION"
     make
     make install
@@ -202,12 +202,12 @@ function _setup_services_() {
     "physlock.service"
   )
 
-  for SERVICE in ${!SERVICES[@]}; do
-    printf "$DOTS/${SERVICE} -> /etc/systemd/system/${SERVICES[$SERVICE]}"
-    if [[ -d "$HOME/${SERVICES[$SERVICE]}" ]]; then
-      rm -rf "$HOME/${SERVICES[$SERVICE]}"
+  for SERVICE in ${SERVICES[@]}; do
+    printf "$DOTS/${SERVICE} -> /etc/systemd/system/${SERVICE}"
+    if [[ -d "$HOME/${SERVICE}" ]]; then
+      rm -rf "$HOME/${SERVICE}"
     fi
-    sudo ln -sfn "$DOTS/${SERVICE}" "/etc/systemd/system/${SERVICES[$SERVICE]}" 2>/dev/null
+    sudo ln -sfn "$DOTS/${SERVICE}" "/etc/systemd/system/${SERVICE}" 2>/dev/null
     systemctl enable "$SERVICE"
   done
 
