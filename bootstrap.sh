@@ -63,6 +63,7 @@ function _install_pacman_packages_() {
     xorg-server
     xorg-xinit
     xorg-xev
+    xclip
     picom
 
     # Wifi / Bluetooth
