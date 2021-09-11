@@ -63,6 +63,7 @@ function _install_pacman_packages_() {
     xorg-server
     xorg-xinit
     xorg-xev
+    picom
 
     # Wifi / Bluetooth
     iwd
@@ -175,8 +176,6 @@ _install_luarocks_packages_
 # ------------------------------------------------------------------------------
 
 function _setup_symlinks_() {
-  mkdir -p $HOME/.config
-
   declare -A SYMLINKS=(
     ["$HOME/Documents/ssh"]=".ssh"
     ["$HOME/Documents/gnupg"]=".gnupg"
@@ -193,6 +192,7 @@ function _setup_symlinks_() {
     if [[ -d "$HOME/${SYMLINKS[$SYMLINK]}" ]]; then
       rm -rf "$HOME/${SYMLINKS[$SYMLINK]}"
     fi
+    mkdir -p $(dirname "$HOME/${SYMLINKS[$SYMLINK]}")
     ln -sfn "$SYMLINK" "$HOME/${SYMLINKS[$SYMLINK]}"
   done
 
@@ -203,8 +203,9 @@ function _setup_symlinks_() {
   for SYMLINK_DIR in ${!DEEP_SYMLINKS[@]}; do
     for FILE in $SYMLINK_DIR/*; do
       if [[ -x $FILE ]]; then
-        echo "$SYMLINK_DIR/$FILE -> ~/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
-        ln -sf "$SYMLINK_DIR/$FILE" "$HOME/${SYMLINKS[$SYMLINK]}"
+        echo "$FILE -> ~/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
+	mkdir -p "$HOME/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
+        ln -sf "$FILE" "$HOME/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
       fi
     done
   done
