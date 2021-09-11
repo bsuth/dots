@@ -59,8 +59,14 @@ function _install_pacman_packages_() {
     pulseaudio-alsa
     pulseaudio-bluetooth
 
-    # Languages
+    # Lua
+    lua51
+    lua52
+    lua53
+    lua
     luajit
+
+    # Languages
     nodejs
     npm
     rust
@@ -116,7 +122,7 @@ function _install_luarocks_packages_() {
   )
 
   mkdir -p "$HOME/repos"
-  if ! [[ -d $HOME/packages/luarocks ]]; then
+  if ! [[ -d $HOME/repos/luarocks ]]; then
     git clone git://github.com/luarocks/luarocks.git "$HOME/repos/luarocks"
   fi
 
@@ -132,7 +138,6 @@ function _install_luarocks_packages_() {
 echo -e "${GREEN}=== Packages ===${NC}\n"
 _install_pacman_packages_
 _install_pip_packages_
-_install_aur_packages_
 _install_luarocks_packages_
 
 # ------------------------------------------------------------------------------
