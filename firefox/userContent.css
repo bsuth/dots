@@ -8,8 +8,4 @@
     background-position: center;
     background-repeat: no-repeat;
   }
-
-  body > * {
-    display: none;
-  }
 }
