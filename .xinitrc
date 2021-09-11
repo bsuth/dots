@@ -1,7 +1,7 @@
 xmodmap ~/.Xmodmap
 eval $(ssh-agent -s)
 
-fcitx5
+fcitx5 -d
 
 picom -b \
   --no-fading-openclose \

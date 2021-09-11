@@ -28,7 +28,6 @@ require('paq')({
   'justinmk/vim-dirvish',
   'hoob3rt/lualine.nvim',
   'nvim-telescope/telescope.nvim',
-  { 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' },
 
   -- util
   'tpope/vim-surround',
@@ -100,20 +99,6 @@ local config = require('telescope.config').values
 local actions = require('telescope.actions')
 local action_set = require('telescope.actions.set')
 local action_state = require('telescope.actions.state')
-
---
--- Setup
---
-
-telescope.setup({
-  extensions = {
-    fzf = {
-      fuzzy = false,
-    },
-  },
-})
-
-telescope.load_extension('fzf')
 
 --
 -- Helpers
@@ -189,37 +174,37 @@ end
 -- DEPRECATED: Vim-Plug + Coc
 -- -----------------------------------------------------------------------------
 
-local plug =
-  io.open(os.getenv('HOME') .. '/.config/nvim/autoload/plug.vim', 'r')
-
-if plug == nil then
-  os.execute([[
-		curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
-		https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-	]])
-  cmd('autocmd VimEnter * PlugInstall --sync | source $MYVIMRC')
-else
-  io.close(plug)
-end
-
-local plugins = {
-  { [[ 'neoclide/coc.nvim', {'branch': 'release'}  ]] },
-}
-
-nvim_call_function('plug#begin', { '~/.config/nvim/bundle' })
-for _, plugin in ipairs(plugins) do
-  if type(plugin) == 'string' then
-    cmd(([[ Plug '%s' ]]):format(plugin))
-  elseif type(plugin) == 'table' then
-    cmd('Plug ' .. plugin[1])
-  end
-end
-nvim_call_function('plug#end', {})
-
-nvim_set_var('coc_global_extensions', {
-  'coc-tsserver',
-  'coc-css',
-  'coc-json',
-  'coc-prettier',
-  'coc-clangd',
-})
+-- local plug =
+  -- io.open(os.getenv('HOME') .. '/.config/nvim/autoload/plug.vim', 'r')
+-- 
+-- if plug == nil then
+  -- os.execute([[
+		-- curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
+		-- https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+	-- ]])
+  -- cmd('autocmd VimEnter * PlugInstall --sync | source $MYVIMRC')
+-- else
+  -- io.close(plug)
+-- end
+-- 
+-- local plugins = {
+  -- { [[ 'neoclide/coc.nvim', {'branch': 'release'}  ]] },
+-- }
+-- 
+-- nvim_call_function('plug#begin', { '~/.config/nvim/bundle' })
+-- for _, plugin in ipairs(plugins) do
+  -- if type(plugin) == 'string' then
+    -- cmd(([[ Plug '%s' ]]):format(plugin))
+  -- elseif type(plugin) == 'table' then
+    -- cmd('Plug ' .. plugin[1])
+  -- end
+-- end
+-- nvim_call_function('plug#end', {})
+-- 
+-- nvim_set_var('coc_global_extensions', {
+  -- 'coc-tsserver',
+  -- 'coc-css',
+  -- 'coc-json',
+  -- 'coc-prettier',
+  -- 'coc-clangd',
+-- })
