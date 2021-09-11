@@ -156,8 +156,8 @@ function _install_luarocks_packages_() {
     make
     sudo make install
     for PACKAGE in ${LUAROCKS_PACKAGES[@]}; do
-      if ! luarocks --lua-version="$LUA_VERSION" show "$PACKAGE" 2&> /dev/null; then
-        sudo luarocks --lua-version="$LUA_VERSION" install "$PACKAGE"
+      if ! luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE" 2&> /dev/null; then
+        luarocks --local --lua-version="$LUA_VERSION" install "$PACKAGE"
       fi
     done
   done
@@ -174,6 +174,8 @@ _install_luarocks_packages_
 # ------------------------------------------------------------------------------
 
 function _setup_symlinks_() {
+  mkdir -p $HOME/.config
+
   declare -A SYMLINKS=(
     ["$HOME/Documents/ssh"]=".ssh"
     ["$HOME/Documents/gnupg"]=".gnupg"
