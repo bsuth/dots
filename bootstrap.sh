@@ -180,10 +180,11 @@ function _setup_symlinks_() {
     ["$HOME/Documents/ssh"]=".ssh"
     ["$HOME/Documents/gnupg"]=".gnupg"
     ["$HOME/Documents/password-store"]=".password-store"
-    ["$DOTS/.zshrc"]=".zshrc"
-    ["$DOTS/.zprofile"]=".zprofile"
     ["$DOTS/awesome"]=".config/awesome"
     ["$DOTS/nvim"]=".config/nvim"
+    ["$DOTS/.xinitrc"]=".xinitrc"
+    ["$DOTS/.zprofile"]=".zprofile"
+    ["$DOTS/.zshrc"]=".zshrc"
   )
 
   for SYMLINK in ${!SYMLINKS[@]}; do
@@ -241,4 +242,4 @@ _setup_services_
 
 echo -e "${GREEN}=== Complete ===${NC}\n"
 echo "The following need to be setup manually:"
-echo "1) Firefox profile / userChrome"
+echo "1) Firefox: profile / userChrome / surfingkeys"
