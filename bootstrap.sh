@@ -156,7 +156,8 @@ function _install_luarocks_packages_() {
     make
     sudo make install
     for PACKAGE in ${LUAROCKS_PACKAGES[@]}; do
-      if ! luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE" 2&> /dev/null; then
+      if ! luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE"; then
+	echo "luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE""
         luarocks --local --lua-version="$LUA_VERSION" install "$PACKAGE"
       fi
     done
