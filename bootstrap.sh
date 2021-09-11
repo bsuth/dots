@@ -33,6 +33,8 @@
 # ------------------------------------------------------------------------------
 
 set -e
+shopt -s nullglob
+
 DOTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 RED="$(tput setaf 1)"
@@ -154,7 +156,7 @@ function _install_luarocks_packages_() {
     make
     sudo make install
     for PACKAGE in ${LUAROCKS_PACKAGES[@]}; do
-      sudo luarocks install "${PACKAGE}"
+      sudo luarocks install "$PACKAGE"
     done
   done
   cd $DOTS
@@ -174,7 +176,6 @@ function _setup_symlinks_() {
     ["$HOME/Documents/ssh"]=".ssh"
     ["$HOME/Documents/gnupg"]=".gnupg"
     ["$HOME/Documents/password-store"]=".password-store"
-    ["$DOTS/bin"]=".local/bin"
     ["$DOTS/.zshrc"]=".zshrc"
     ["$DOTS/.zprofile"]=".zprofile"
     ["$DOTS/awesome"]=".config/awesome"
@@ -182,11 +183,24 @@ function _setup_symlinks_() {
   )
 
   for SYMLINK in ${!SYMLINKS[@]}; do
-    echo "${SYMLINK} -> ~/${SYMLINKS[$SYMLINK]}"
+    echo "$SYMLINK -> ~/${SYMLINKS[$SYMLINK]}"
     if [[ -d "$HOME/${SYMLINKS[$SYMLINK]}" ]]; then
       rm -rf "$HOME/${SYMLINKS[$SYMLINK]}"
     fi
-    ln -sfn "$SYMLINK" "$HOME/${SYMLINKS[$SYMLINK]}" 2>/dev/null
+    ln -sfn "$SYMLINK" "$HOME/${SYMLINKS[$SYMLINK]}"
+  done
+
+  declare -A DEEP_SYMLINKS=(
+    ["$DOTS/bin"]=".local/bin"
+  )
+
+  for SYMLINK_DIR in ${!DEEP_SYMLINKS[@]}; do
+    for FILE in $SYMLINK_DIR/*; do
+      if [[ -x $FILE ]]; then
+        echo "$SYMLINK_DIR/$FILE -> ~/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
+        ln -sf "$SYMLINK_DIR/$FILE" "$HOME/${SYMLINKS[$SYMLINK]}"
+      fi
+    done
   done
 }
 
@@ -207,7 +221,7 @@ function _setup_services_() {
     if [[ -d "$HOME/${SERVICE}" ]]; then
       rm -rf "$HOME/${SERVICE}"
     fi
-    sudo ln -sfn "$DOTS/${SERVICE}" "/etc/systemd/system/${SERVICE}" 2>/dev/null
+    sudo ln -sfn "$DOTS/${SERVICE}" "/etc/systemd/system/${SERVICE}"
     systemctl enable "$SERVICE"
   done
 
