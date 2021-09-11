@@ -7,9 +7,6 @@ autoload/
 bundle/
 .netrwhist
 
-# vifm
-vifminfo*
-vifm-help.txt
-
-# firefox custom plugins
-node_modules
+# st terminal
+st/st
+*.o
