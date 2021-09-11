@@ -177,9 +177,6 @@ _install_luarocks_packages_
 
 function _setup_symlinks_() {
   declare -A SYMLINKS=(
-    ["$HOME/Documents/ssh"]=".ssh"
-    ["$HOME/Documents/gnupg"]=".gnupg"
-    ["$HOME/Documents/password-store"]=".password-store"
     ["$DOTS/awesome"]=".config/awesome"
     ["$DOTS/nvim"]=".config/nvim"
     ["$DOTS/.xinitrc"]=".xinitrc"
