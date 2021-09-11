@@ -11,7 +11,9 @@
 #   groupadd sudo
 # 3) Add user to sudoers by uncommenting following line in /etc/sudoers
 #   %sudo ALL=(ALL) ALL
-# 4) Create systemd-networkd config file at /etc/systemd/network/1-wireless.network
+# 4) Change default shell
+#   chsh -s /bin/zsh bsuth
+# 5) Create systemd-networkd config file at /etc/systemd/network/1-wireless.network
 #    https://wiki.archlinux.org/title/systemd-networkd#Wireless_adapter
 #
 #   Ex)
@@ -59,11 +61,13 @@ function _install_pacman_packages_() {
     upower
 
     # X11
-    awesome
+    xf86-video-amdgpu # AMD
+    xf86-video-intel # Intel
     xorg-server
     xorg-xinit
     xorg-xev
     xclip
+    awesome
     picom
 
     # Wifi / Bluetooth
