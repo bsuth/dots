@@ -44,8 +44,6 @@ if [[ $UID == 0 ]]; then
   exit 1
 fi
 
-echo
-
 # ------------------------------------------------------------------------------
 # Packages
 # ------------------------------------------------------------------------------
@@ -159,10 +157,10 @@ function _install_luarocks_packages_() {
       sudo luarocks install "${PACKAGE}"
     done
   done
-  cd -
+  cd $DOTS
 }
 
-echo -e "${GREEN}=== Packages ===${NC}\n"
+echo -e "${GREEN}=== Packages ===${NC}"
 _install_pacman_packages_
 _install_pip_packages_
 _install_luarocks_packages_
@@ -184,7 +182,7 @@ function _setup_symlinks_() {
   )
 
   for SYMLINK in ${!SYMLINKS[@]}; do
-    printf "${SYMLINK} -> ~/${SYMLINKS[$SYMLINK]}"
+    echo "${SYMLINK} -> ~/${SYMLINKS[$SYMLINK]}"
     if [[ -d "$HOME/${SYMLINKS[$SYMLINK]}" ]]; then
       rm -rf "$HOME/${SYMLINKS[$SYMLINK]}"
     fi
@@ -192,7 +190,7 @@ function _setup_symlinks_() {
   done
 }
 
-echo -e "${GREEN}=== Symlinks ===${NC}\n"
+echo -e "${GREEN}=== Symlinks ===${NC}"
 _setup_symlinks_
 
 # ------------------------------------------------------------------------------
@@ -205,7 +203,7 @@ function _setup_services_() {
   )
 
   for SERVICE in ${SERVICES[@]}; do
-    printf "$DOTS/${SERVICE} -> /etc/systemd/system/${SERVICE}"
+    echo "$DOTS/${SERVICE} -> /etc/systemd/system/${SERVICE}"
     if [[ -d "$HOME/${SERVICE}" ]]; then
       rm -rf "$HOME/${SERVICE}"
     fi
@@ -216,7 +214,7 @@ function _setup_services_() {
   systemctl daemon-reload
 }
 
-echo -e "${GREEN}=== Services ===${NC}\n"
+echo -e "${GREEN}=== Services ===${NC}"
 _setup_services_
 
 # ------------------------------------------------------------------------------
@@ -226,4 +224,3 @@ _setup_services_
 echo -e "${GREEN}=== Complete ===${NC}\n"
 echo "The following need to be setup manually:"
 echo "1) Firefox profile / userChrome"
-echo
