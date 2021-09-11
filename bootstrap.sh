@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
 # ------------------------------------------------------------------------------
-# Notes
+# Prereqs
 #
+# As root:
 # 1) Creating a new user
 #   useradd -m -d /home/bsuth -s /bin/zsh -G sudo bsuth 
 #   passwd bsuth
@@ -10,6 +11,21 @@
 #   groupadd sudo
 # 3) Add user to sudoers by uncommenting following line in /etc/sudoers
 #   %sudo ALL=(ALL) ALL
+# 4) Create systemd-networkd config file at /etc/systemd/network/1-wireless.network
+#    https://wiki.archlinux.org/title/systemd-networkd#Wireless_adapter
+#
+#   Ex)
+#    [Match]
+#    Name=wlan0
+#    
+#    [Network]
+#    DHCP=yes
+# 
+# As user:
+# 1) Enable wifi services (systemd-networkd, systemd-resolved)
+# 2) Restore Documents/ + symlinks
+# 3) Install pass
+# 4) Clone dots
 # ------------------------------------------------------------------------------
 
 # ------------------------------------------------------------------------------
@@ -114,6 +130,13 @@ function _install_pip_packages_() {
 }
 
 function _install_luarocks_packages_() {
+  declare -a LUA_VERSIONS=(
+    "5.1"
+    "5.2"
+    "5.3"
+    "5.4"
+  )
+
   declare -a LUAROCKS_PACKAGES=(
     lpeg
     luafilesystem
@@ -128,10 +151,12 @@ function _install_luarocks_packages_() {
 
   cd "$HOME/repos/luarocks"
   git pull
-  ./configure --with-lua-include=/usr/local/include
-  make
-  make install
-  sudo luarocks install "${LUAROCKS_PACKAGES[@]}"
+  for LUA_VERSION in ${!LUA_VERSIONS[@]}; do
+    ./configure --lua-version="$LUA_VERSION"
+    make
+    make install
+    sudo luarocks install "${LUAROCKS_PACKAGES[@]}"
+  done
   cd -
 }
 
@@ -158,11 +183,9 @@ function _setup_symlinks_() {
 
   for SYMLINK in ${!SYMLINKS[@]}; do
     printf "${SYMLINK} -> ~/${SYMLINKS[$SYMLINK]}"
-
     if [[ -d "$HOME/${SYMLINKS[$SYMLINK]}" ]]; then
       rm -rf "$HOME/${SYMLINKS[$SYMLINK]}"
     fi
-
     ln -sfn "$SYMLINK" "$HOME/${SYMLINKS[$SYMLINK]}" 2>/dev/null
   done
 }
@@ -175,19 +198,17 @@ _setup_symlinks_
 # ------------------------------------------------------------------------------
 
 function _setup_services_() {
-  declare -A services=(
+  declare -A SERVICES=(
     "physlock.service"
   )
 
-  for service in ${!services[@]}; do
-    printf "$DOTS/${service} -> /etc/systemd/system/${services[$service]}"
-
-    if [[ -d "$HOME/${services[$service]}" ]]; then
-      rm -rf "$HOME/${services[$service]}"
+  for SERVICE in ${!SERVICES[@]}; do
+    printf "$DOTS/${SERVICE} -> /etc/systemd/system/${SERVICES[$SERVICE]}"
+    if [[ -d "$HOME/${SERVICES[$SERVICE]}" ]]; then
+      rm -rf "$HOME/${SERVICES[$SERVICE]}"
     fi
-
-    sudo ln -sfn "$DOTS/${service}" "/etc/systemd/system/${services[$service]}" 2>/dev/null
-    systemctl enable "$service"
+    sudo ln -sfn "$DOTS/${SERVICE}" "/etc/systemd/system/${SERVICES[$SERVICE]}" 2>/dev/null
+    systemctl enable "$SERVICE"
   done
 
   systemctl daemon-reload
