@@ -24,7 +24,11 @@
 #    DHCP=yes
 # 
 # As user:
-# 1) Enable wifi services (systemd-networkd, systemd-resolved)
+# 1) Enable services
+#   - systemd-networkd
+#   - systemd-resolved
+#   - iwd
+#   - bluetooth
 # 2) Restore Documents/ + symlinks
 # 3) Install pass
 # 4) Clone dots
@@ -62,7 +66,7 @@ function _install_pacman_packages_() {
 
     # X11
     xf86-video-amdgpu # AMD
-    xf86-video-intel # Intel
+    # xf86-video-intel # Intel
     xorg-server
     xorg-xinit
     xorg-xev
@@ -108,6 +112,7 @@ function _install_pacman_packages_() {
     # Tools
     reflector
     base-devel
+    man-db
     git
     openssh
     zsh
@@ -115,16 +120,19 @@ function _install_pacman_packages_() {
     unzip
     ripgrep
     fd
+    fzf
     brightnessctl
     clang
 
     # Apps
     flameshot
+    gpick
     physlock
     neovim
     firefox-developer-edition
     arandr
     inkscape
+    anki
   )
   sudo pacman -Syu --needed "${PACMAN_PACKAGES[@]}"
 }
@@ -149,6 +157,7 @@ function _install_luarocks_packages_() {
     luafilesystem
     lua-cjson
     busted
+    inspect
   )
 
   mkdir -p "$HOME/repos"
@@ -164,7 +173,7 @@ function _install_luarocks_packages_() {
     sudo make install
     for PACKAGE in ${LUAROCKS_PACKAGES[@]}; do
       if ! luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE"; then
-	echo "luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE""
+	      echo "luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE""
         luarocks --local --lua-version="$LUA_VERSION" install "$PACKAGE"
       fi
     done
@@ -207,7 +216,7 @@ function _setup_symlinks_() {
     for FILE in $SYMLINK_DIR/*; do
       if [[ -x $FILE ]]; then
         echo "$FILE -> ~/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
-	mkdir -p "$HOME/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
+	      mkdir -p "$HOME/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
         ln -sf "$FILE" "$HOME/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
       fi
     done
@@ -218,38 +227,16 @@ echo -e "${GREEN}=== Symlinks ===${NC}"
 _setup_symlinks_
 
 # ------------------------------------------------------------------------------
-# Services
-# ------------------------------------------------------------------------------
-
-function _setup_services_() {
-  declare -A SERVICES=(
-    "physlock.service"
-  )
-
-  for SERVICE in ${SERVICES[@]}; do
-    echo "$DOTS/${SERVICE} -> /etc/systemd/system/${SERVICE}"
-    if [[ -d "$HOME/${SERVICE}" ]]; then
-      rm -rf "$HOME/${SERVICE}"
-    fi
-    sudo ln -sfn "$DOTS/${SERVICE}" "/etc/systemd/system/${SERVICE}"
-    systemctl enable "$SERVICE"
-  done
-
-  systemctl daemon-reload
-}
-
-echo -e "${GREEN}=== Services ===${NC}"
-_setup_services_
-
-# ------------------------------------------------------------------------------
 # ST Terminal
 # ------------------------------------------------------------------------------
 
 function _setup_st_() {
-  cd "$DOTS/st"
-  make
-  sudo make install
-  cd $DOTS
+  if ! command -v st; then
+    cd "$DOTS/st"
+    make
+    sudo make install
+    cd $DOTS
+  fi
 }
 
 echo -e "${GREEN}=== ST Terminal ===${NC}"
@@ -263,3 +250,4 @@ _setup_st_
 echo -e "${GREEN}=== Complete ===${NC}\n"
 echo "The following need to be setup manually:"
 echo "1) Firefox: profile / userChrome / surfingkeys"
+echo "2) Services (physlock)"

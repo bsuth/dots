@@ -122,7 +122,7 @@ end
 function telescope_favorites()
   local opts = {}
 
-  local favorites = { 'dots', 'projects' }
+  local favorites = { 'dots', 'repos' }
   local job = tbl_flatten({
     fd,
     tbl_flatten(tbl_map(function(v)

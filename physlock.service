@@ -4,5 +4,6 @@ Description=Physlock on Suspend
 [Service]
 User=bsuth
 ExecStart=/usr/bin/physlock
+
 [Install]
 WantedBy=sleep.target

@@ -72,7 +72,7 @@ local function ProfileWidget()
         {
           {
             text = 'bsuth',
-            font = 'Leckerli One 24',
+            font = 'Hack Regular 24',
             align = 'center',
             valign = 'center',
             widget = wibox.widget.textbox,
@@ -83,14 +83,14 @@ local function ProfileWidget()
         },
         {
           text = '“ Code is like humor. When you have to explain it, it’s bad.”',
-          font = 'Fredoka One 12',
+          font = 'Hack Regular 12',
           align = 'center',
           valign = 'center',
           widget = wibox.widget.textbox,
         },
         {
           text = '-Cory House',
-          font = 'Fredoka One 12',
+          font = 'Hack Regular 12',
           align = 'center',
           valign = 'center',
           widget = wibox.widget.textbox,
@@ -122,7 +122,7 @@ local function ClockGridWidget()
       {
         format = ('<span color="%s" font_family="%s" size="xx-large">%s</span>'):format(
           beautiful.colors.blue,
-          'Fredoka One',
+          'Hack Regular',
           '%H'
         ),
         widget = wibox.widget.textclock,
@@ -141,7 +141,7 @@ local function ClockGridWidget()
       {
         format = ('<span color="%s" font_family="%s" size="xx-large">%s</span>'):format(
           beautiful.colors.purple,
-          'Fredoka One',
+          'Hack Regular',
           '%M'
         ),
         widget = wibox.widget.textclock,
