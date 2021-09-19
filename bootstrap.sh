@@ -101,11 +101,8 @@ function _install_pacman_packages_() {
     python-pip
 
     # Input / Fonts
-    fcitx5
+    fcitx5-im
     fcitx5-mozc
-    fcitx5-configtool
-    fcitx5-gtk
-    fcitx5-qt
     adobe-source-han-sans-jp-fonts
     ttf-hack
 

@@ -1,40 +1,36 @@
 -- -----------------------------------------------------------------------------
--- Paq
+-- Packer
 -- -----------------------------------------------------------------------------
 
-local paqpath = os.getenv('HOME')
-  .. '/.local/share/nvim/site/pack/paqs/start/paq-nvim'
-
-local paqfile = io.open(paqpath)
-if paqfile == nil then
-  os.execute(([[
-    git clone --depth=1 https://github.com/savq/paq-nvim.git %s
-	]]):format(paqpath))
-  cmd('autocmd VimEnter * source $MYVIMRC | PaqSync | source $MYVIMRC')
-else
-  io.close(paqfile)
+local packer_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+if fn.empty(fn.glob(packer_path)) > 0 then
+  fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', packer_path})
 end
 
-require('paq')({
+cmd('packadd packer.nvim')
+require('packer').startup(function()
   -- core
-  'savq/paq-nvim',
-  'nvim-lua/plenary.nvim',
+  use('wbthomason/packer.nvim')
+  use('nvim-lua/plenary.nvim')
 
   -- syntax
-  'nvim-treesitter/nvim-treesitter',
-  'navarasu/onedark.nvim',
+  use('nvim-treesitter/nvim-treesitter')
+  use('navarasu/onedark.nvim')
 
   -- apps
-  'justinmk/vim-dirvish',
-  'hoob3rt/lualine.nvim',
-  'nvim-telescope/telescope.nvim',
+  use('justinmk/vim-dirvish')
+  use('hoob3rt/lualine.nvim')
+  use('nvim-telescope/telescope.nvim')
 
   -- util
-  'tpope/vim-surround',
-  'tpope/vim-commentary',
-  'matze/vim-move',
-  'lambdalisue/suda.vim',
-})
+  use('tpope/vim-surround')
+  use('tpope/vim-commentary')
+  use('matze/vim-move')
+  use('lambdalisue/suda.vim')
+
+  -- Local plugins can be included
+  use('~/repos/vim-erde')
+end)
 
 -- -----------------------------------------------------------------------------
 -- Misc
