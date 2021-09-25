@@ -1,4 +1,18 @@
 -- -----------------------------------------------------------------------------
+-- General
+-- -----------------------------------------------------------------------------
+
+function file_exists(filename)
+  local f = io.open(filename, 'r')
+  if f ~= nil then
+    io.close(f)
+    return true
+  else
+    return false
+  end
+end
+
+-- -----------------------------------------------------------------------------
 -- Visual Selection
 -- -----------------------------------------------------------------------------
 
@@ -97,20 +111,40 @@ end
 
 -- -----------------------------------------------------------------------------
 -- Stylua
--- TODO: deprecate this
 -- -----------------------------------------------------------------------------
 
-function apply_stylua()
-  local stylua = '~/.cargo/bin/stylua --config-path ~/dots/stylua.toml'
-  local target = fn.expand('%:p')
+function get_stylua_config(dir)
+  repeat
+    local config = dir .. '/' .. 'stylua.toml'
+    if file_exists(config) then return config end
+    dir = fn.fnamemodify(dir, ':h')
+  until (dir == '/')
+end
 
-  local handle = io.popen(stylua .. ' --check ' .. target .. ' 2>&1 >/dev/null')
-  local checkOutput = handle:read('*a')
+function apply_stylua()
+  local stylua = os.getenv('HOME')..'/.cargo/bin/stylua'
+  if not file_exists(stylua) then
+    return
+  end
+
+  local filename = fn.expand('%:p')
+  local stylua_config = get_stylua_config(fn.fnamemodify(filename, ':h'))
+  if not stylua_config then
+    return
+  end
+
+  local handle = io.popen(('%s --config-path %s --check %s 2>&1 >/dev/null'):format(
+    stylua,
+    stylua_config,
+    filename
+  ))
+  local check_output = handle:read('*a')
   handle:close()
 
-  if not checkOutput:match('^error') then
+  if not check_output:match('^error') then
     local cursor_pos = fn.getpos('.')
     cmd('silent exec "%! ' .. stylua .. ' -"')
+    -- if opt.modified then cmd('write') end
     fn.setpos('.', cursor_pos)
   end
 end

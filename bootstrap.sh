@@ -129,7 +129,6 @@ function _install_pacman_packages_() {
     firefox-developer-edition
     arandr
     inkscape
-    anki
   )
   sudo pacman -Syu --needed "${PACMAN_PACKAGES[@]}"
 }
@@ -150,6 +149,7 @@ function _install_luarocks_packages_() {
   )
 
   declare -a LUAROCKS_PACKAGES=(
+    ldoc
     lpeg
     luafilesystem
     lua-cjson

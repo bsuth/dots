@@ -76,7 +76,7 @@ cmd('au FileType * lua setupheaders()')
 
 -- Misc
 -- TODO: deprecate
--- cmd('au BufWritePost *.lua lua apply_stylua()')
+cmd('au BufWritePost *.lua lua apply_stylua()')
 
 cmd('augroup END')
 
@@ -132,6 +132,8 @@ map('n', '<leader><c-h>', ':aboveleft :vsp | :Dirvish<cr>')
 -- Movement
 --
 
+map('n', '<m-d>', '<c-d>')
+map('n', '<m-u>', '<c-u>')
 map('n', '<c-f>', 'l%')
 map('v', '<c-f>', 'l%')
 map('v', '<c-n>', ':lua search_visual_selection()<cr>')

@@ -122,8 +122,6 @@ export LUA_CPATH="$GENERATED_LUA_CPATH"
 # ALIASES
 # ------------------------------------------------------------------------------
 
-alias vi='nvim'
-alias vim='nvim'
 alias testwm='Xephyr -br -ac -noreset -screen 800x600 :1 &; DISPLAY=:1 awesome'
 
 alias lrocks5.1='luarocks --lua-version=5.1 --local'
