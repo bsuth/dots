@@ -122,8 +122,8 @@ function get_stylua_config(dir)
 end
 
 function apply_stylua()
-  local stylua = os.getenv('HOME')..'/.cargo/bin/stylua'
-  if not file_exists(stylua) then
+  local stylua_exec = os.getenv('HOME')..'/.cargo/bin/stylua'
+  if not file_exists(stylua_exec) then
     return
   end
 
@@ -133,18 +133,9 @@ function apply_stylua()
     return
   end
 
-  local handle = io.popen(('%s --config-path %s --check %s 2>&1 >/dev/null'):format(
-    stylua,
+  cmd(('silent exec "!%s --config-path %s %s" | e!'):format(
+    stylua_exec,
     stylua_config,
     filename
   ))
-  local check_output = handle:read('*a')
-  handle:close()
-
-  if not check_output:match('^error') then
-    local cursor_pos = fn.getpos('.')
-    cmd('silent exec "%! ' .. stylua .. ' -"')
-    -- if opt.modified then cmd('write') end
-    fn.setpos('.', cursor_pos)
-  end
 end

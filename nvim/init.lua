@@ -74,8 +74,7 @@ cmd('au TermOpen term://*zsh* startinsert')
 -- Headers
 cmd('au FileType * lua setupheaders()')
 
--- Misc
--- TODO: deprecate
+-- Stylua 
 cmd('au BufWritePost *.lua lua apply_stylua()')
 
 cmd('augroup END')
