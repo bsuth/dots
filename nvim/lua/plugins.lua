@@ -34,6 +34,7 @@ require('packer').startup(function()
   use('justinmk/vim-dirvish')
   use('hoob3rt/lualine.nvim')
   use('nvim-telescope/telescope.nvim')
+  use({'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
 
   -- util
   use('tpope/vim-surround')
@@ -155,6 +156,23 @@ local config = require('telescope.config').values
 local actions = require('telescope.actions')
 local action_set = require('telescope.actions.set')
 local action_state = require('telescope.actions.state')
+
+telescope.setup({
+  defaults = {
+    mappings = {
+      i = {
+        ['<c-space>'] = actions.toggle_selection,
+        ['<m-space>'] = actions.send_selected_to_qflist + actions.open_qflist,
+      },
+      n = {
+        ['<c-space>'] = actions.toggle_selection,
+        ['<m-space>'] = actions.send_selected_to_qflist + actions.open_qflist,
+      },
+    },
+  },
+})
+
+telescope.load_extension('fzf')
 
 --
 -- Helpers

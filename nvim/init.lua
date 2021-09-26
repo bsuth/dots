@@ -184,7 +184,7 @@ map('c', '<c-k>', '<C-f>d$A<C-c>')
 --
 
 map('n', '<leader>lsp', ':silent :LspRestart<cr>')
-map('i', '<c-space>', 'coc#refresh()', { expr = true, silent = true })
+-- map('i', '<c-space>', 'coc#refresh()', { expr = true, silent = true })
 
 -- map('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
 -- map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
@@ -212,4 +212,4 @@ map('n', '<leader><leader>', ':lua telescope_favorites()<cr>')
 map('n', '<leader>cd', ':lua telescope_change_dir()<cr>')
 map('n', '<leader>fd', ':Telescope find_files<cr>')
 map('n', '<leader>rg', ':Telescope live_grep<cr>')
-map('n', '<leader>ls', ':Telescope buffers<cr>')
+map('n', '<leader>buf', ':Telescope buffers<cr>')
