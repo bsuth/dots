@@ -13,7 +13,18 @@ require('packer').startup(function()
   -- core
   use('wbthomason/packer.nvim')
   use('nvim-lua/plenary.nvim')
+
+  -- lsp + completion
   use('neovim/nvim-lspconfig')
+  use('hrsh7th/nvim-cmp')
+  use('hrsh7th/vim-vsnip')
+  use('hrsh7th/vim-vsnip-integ')
+
+  -- completion sources
+  use('hrsh7th/cmp-buffer')
+  use('hrsh7th/cmp-path')
+  use('hrsh7th/cmp-nvim-lsp')
+  use('hrsh7th/cmp-vsnip')
 
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
@@ -89,16 +100,48 @@ require('nvim-treesitter.configs').setup({
 })
 
 -- -----------------------------------------------------------------------------
+-- LSP Completion
+-- https://github.com/hrsh7th/nvim-cmp/
+-- -----------------------------------------------------------------------------
+
+local cmp = require('cmp')
+
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      fn["vsnip#anonymous"](args.body)
+    end,
+  },
+  mapping = {
+    ['<c-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<c-f>'] = cmp.mapping.scroll_docs(4),
+    ['<c-Space>'] = cmp.mapping.complete(),
+    ['<c-c>'] = cmp.mapping.close(),
+    ['<cr>'] = cmp.mapping.confirm({ select = true }),
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'vsnip' },
+    { name = 'buffer' },
+  }
+})
+
+-- -----------------------------------------------------------------------------
 -- LSP Config
 -- https://github.com/neovim/nvim-lspconfig
 -- -----------------------------------------------------------------------------
 
 local lspconfig = require('lspconfig')
-lspconfig.cssls.setup({})
-lspconfig.graphql.setup({})
-lspconfig.jsonls.setup({})
-lspconfig.gopls.setup({})
-lspconfig.tsserver.setup({})
+local lspsetup = {
+  capabilities = require('cmp_nvim_lsp')
+    .update_capabilities(vim.lsp.protocol.make_client_capabilities()),
+}
+
+lspconfig.cssls.setup(lspsetup)
+lspconfig.graphql.setup(lspsetup)
+lspconfig.jsonls.setup(lspsetup)
+lspconfig.gopls.setup(lspsetup)
+lspconfig.tsserver.setup(lspsetup)
 
 -- -----------------------------------------------------------------------------
 -- Telescope
