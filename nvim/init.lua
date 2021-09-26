@@ -111,6 +111,9 @@ map('n', '<leader>v?', ':vert :help ')
 map('c', '<c-space>', '<c-f>')
 map('n', ':', ':<c-f><c-c>')
 
+map('n', '<c-_>', ':Commentary<cr>') -- secretly <c-/>
+map('v', '<c-_>', ':Commentary<cr>')
+
 --
 -- Splits
 --
@@ -177,6 +180,13 @@ map('c', '<c-u>', '<C-f>d^<C-c>')
 map('c', '<c-k>', '<C-f>d$A<C-c>')
 
 --
+-- LSP Config
+--
+
+map('n', '<leader>lsp', ':silent :LspRestart<cr>')
+map('i', '<c-space>', 'coc#refresh()', { expr = true, silent = true })
+
+--
 -- Telescope
 --
 
@@ -185,13 +195,3 @@ map('n', '<leader>cd', ':lua telescope_change_dir()<cr>')
 map('n', '<leader>fd', ':Telescope find_files<cr>')
 map('n', '<leader>rg', ':Telescope live_grep<cr>')
 map('n', '<leader>ls', ':Telescope buffers<cr>')
-
---
--- DEPRECATED
--- TODO: cleanup
---
-
-map('n', '<leader>coc', ':silent CocRestart<cr>')
-map('i', '<c-space>', 'coc#refresh()', { expr = true, silent = true })
-map('n', '<c-_>', ':Commentary<cr>') -- secretly <c-/>
-map('v', '<c-_>', ':Commentary<cr>')

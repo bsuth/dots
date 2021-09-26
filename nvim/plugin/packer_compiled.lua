@@ -73,6 +73,10 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/lualine.nvim"
   },
+  ["nvim-lspconfig"] = {
+    loaded = true,
+    path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/nvim-lspconfig"
+  },
   ["nvim-treesitter"] = {
     loaded = true,
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/nvim-treesitter"

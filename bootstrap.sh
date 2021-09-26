@@ -140,6 +140,29 @@ function _install_pip_packages_() {
   sudo pip install "${PYTHON_PACKAGES[@]}"
 }
 
+function _install_npm_packages_() {
+  declare -a NPM_PACKAGES=(
+    graphql-language-service-cli
+    vscode-langservers-extracted
+    typescript
+    typescript-language-server
+  )
+
+  SKIP=1
+  for PACKAGE in ${NPM_PACKAGES[@]}; do
+    if ! npm list -g $PACKAGE >/dev/null; then
+      SKIP=0
+      break
+    fi
+  done
+
+  if [[ $SKIP == 0 ]]; then
+    sudo npm i -g "${NPM_PACKAGES[@]}"
+  else
+    echo -e "Skipping npm"
+  fi
+}
+
 function _install_luarocks_packages_() {
   declare -a LUA_VERSIONS=(
     "5.1"
@@ -165,9 +188,23 @@ function _install_luarocks_packages_() {
   cd "$HOME/repos/luarocks"
   git pull
   for LUA_VERSION in ${LUA_VERSIONS[@]}; do
+    SKIP=1
+    for PACKAGE in ${LUAROCKS_PACKAGES[@]}; do
+      if ! luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE" >/dev/null; then
+        SKIP=0
+        break
+      fi
+    done
+
+    if [[ $SKIP == 1 ]]; then
+      echo -e "Skipping luarocks $LUA_VERSION"
+      continue
+    fi
+
     ./configure --lua-version="$LUA_VERSION"
     make
     sudo make install
+
     for PACKAGE in ${LUAROCKS_PACKAGES[@]}; do
       if ! luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE"; then
 	      echo "luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE""
@@ -181,6 +218,7 @@ function _install_luarocks_packages_() {
 echo -e "${GREEN}=== Packages ===${NC}"
 _install_pacman_packages_
 _install_pip_packages_
+_install_npm_packages_
 _install_luarocks_packages_
 
 # ------------------------------------------------------------------------------

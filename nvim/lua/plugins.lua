@@ -1,5 +1,6 @@
 -- -----------------------------------------------------------------------------
 -- Packer
+-- https://github.com/wbthomason/packer.nvim
 -- -----------------------------------------------------------------------------
 
 local packer_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
@@ -12,6 +13,7 @@ require('packer').startup(function()
   -- core
   use('wbthomason/packer.nvim')
   use('nvim-lua/plenary.nvim')
+  use('neovim/nvim-lspconfig')
 
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
@@ -45,6 +47,7 @@ cmd('colorscheme onedark')
 
 -- -----------------------------------------------------------------------------
 -- Lualine
+-- https://github.com/hoob3rt/lualine.nvim
 -- -----------------------------------------------------------------------------
 
 -- Lualine dissapears on rc reload unless we unload it completely before
@@ -65,6 +68,7 @@ require('lualine').setup({
 
 -- -----------------------------------------------------------------------------
 -- Treesitter
+-- https://github.com/nvim-treesitter/nvim-treesitter
 -- -----------------------------------------------------------------------------
 
 require('nvim-treesitter.configs').setup({
@@ -85,7 +89,20 @@ require('nvim-treesitter.configs').setup({
 })
 
 -- -----------------------------------------------------------------------------
+-- LSP Config
+-- https://github.com/neovim/nvim-lspconfig
+-- -----------------------------------------------------------------------------
+
+local lspconfig = require('lspconfig')
+lspconfig.cssls.setup({})
+lspconfig.graphql.setup({})
+lspconfig.jsonls.setup({})
+lspconfig.gopls.setup({})
+lspconfig.tsserver.setup({})
+
+-- -----------------------------------------------------------------------------
 -- Telescope
+-- https://github.com/nvim-telescope/telescope.nvim
 -- -----------------------------------------------------------------------------
 
 local telescope = require('telescope')
