@@ -6,8 +6,8 @@ local gears = require('gears')
 --
 
 local scratchpad = {
-  width = 900,
-  height = 550,
+  width = 1400,
+  height = 800,
 }
 local scratchrule = { class = 'scratch' }
 

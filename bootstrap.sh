@@ -93,6 +93,9 @@ function _install_pacman_packages_() {
     luajit
 
     # Languages
+    gcc
+    clang
+    bear
     nodejs
     npm
     rust
@@ -119,7 +122,7 @@ function _install_pacman_packages_() {
     fd
     fzf
     brightnessctl
-    clang
+    htop
 
     # Apps
     flameshot

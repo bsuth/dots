@@ -129,6 +129,8 @@ alias lrocks5.2='luarocks --lua-version=5.2 --local'
 alias lrocks5.3='luarocks --lua-version=5.3 --local'
 alias lrocks5.4='luarocks --lua-version=5.4 --local'
 
+alias erde='/home/bsuth/repos/erde/cli/init.lua'
+
 # ------------------------------------------------------------------------------
 # HOOKS
 # ------------------------------------------------------------------------------
