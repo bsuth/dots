@@ -14,11 +14,12 @@ require('packer').startup(function()
   use('wbthomason/packer.nvim')
   use('nvim-lua/plenary.nvim')
 
-  -- lsp + completion
+  -- lsp, completion, formatter
   use('neovim/nvim-lspconfig')
   use('hrsh7th/nvim-cmp')
   use('hrsh7th/vim-vsnip')
   use('hrsh7th/vim-vsnip-integ')
+  use('mhartington/formatter.nvim')
 
   -- completion sources
   use('hrsh7th/cmp-buffer')
@@ -117,8 +118,8 @@ cmp.setup({
     ['<c-d>'] = cmp.mapping.scroll_docs(-4),
     ['<c-f>'] = cmp.mapping.scroll_docs(4),
     ['<c-Space>'] = cmp.mapping.complete(),
-    ['<c-c>'] = cmp.mapping.close(),
-    ['<cr>'] = cmp.mapping.confirm({ select = true }),
+    -- ['<c-c>'] = cmp.mapping.close(),
+    -- ['<cr>'] = cmp.mapping.confirm({ select = true }),
   },
   sources = {
     { name = 'nvim_lsp' },
@@ -143,6 +144,31 @@ lspconfig.graphql.setup(lspsetup)
 lspconfig.jsonls.setup(lspsetup)
 lspconfig.gopls.setup(lspsetup)
 lspconfig.tsserver.setup(lspsetup)
+lspconfig.clangd.setup(lspsetup)
+
+-- -----------------------------------------------------------------------------
+-- Formatter
+-- https://github.com/mhartington/formatter.nvim
+-- -----------------------------------------------------------------------------
+
+local formatter = require('formatter')
+
+function prettierFormatter()
+  return {
+    exe = 'prettierd',
+    args = { nvim_buf_get_name(0) },
+    stdin = true
+  }
+end
+
+formatter.setup({
+  filetype = {
+    javascript = { prettierFormatter },
+    javascriptreact = { prettierFormatter },
+    typescript = { prettierFormatter },
+    typescriptreact = { prettierFormatter },
+  }
+})
 
 -- -----------------------------------------------------------------------------
 -- Telescope

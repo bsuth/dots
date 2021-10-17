@@ -149,6 +149,7 @@ function _install_npm_packages_() {
     vscode-langservers-extracted
     typescript
     typescript-language-server
+    @fsouza/prettierd
   )
 
   SKIP=1

@@ -85,6 +85,10 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/cmp-vsnip"
   },
+  ["formatter.nvim"] = {
+    loaded = true,
+    path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/formatter.nvim"
+  },
   ["lualine.nvim"] = {
     loaded = true,
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/lualine.nvim"

@@ -74,8 +74,9 @@ cmd('au TermOpen term://*zsh* startinsert')
 -- Headers
 cmd('au FileType * lua setupheaders()')
 
--- Stylua 
+-- Formatting
 cmd('au BufWritePost *.lua lua apply_stylua()')
+cmd('au BufWritePost *.js,*.jsx,*.ts,*.tsx FormatWrite')
 
 cmd('augroup END')
 
