@@ -125,6 +125,7 @@ cmp.setup({
     { name = 'nvim_lsp' },
     { name = 'vsnip' },
     { name = 'buffer' },
+    { name = 'path' },
   }
 })
 
@@ -134,17 +135,56 @@ cmp.setup({
 -- -----------------------------------------------------------------------------
 
 local lspconfig = require('lspconfig')
-local lspsetup = {
-  capabilities = require('cmp_nvim_lsp')
-    .update_capabilities(vim.lsp.protocol.make_client_capabilities()),
+local lspCapabilities = require('cmp_nvim_lsp')
+  .update_capabilities(vim.lsp.protocol.make_client_capabilities())
+
+local lspServers = {
+  clangd = {},
+  cssls = {},
+  graphql = {},
+  gopls = {},
+  jsonls= {
+    filetypes = {'json', 'jsonc'},
+    settings = {
+      json = {
+        -- https://www.schemastore.org
+        schemas = {
+          {
+            fileMatch = {'package.json'},
+            url = 'https://json.schemastore.org/package.json'
+          },
+          {
+            fileMatch = {'tsconfig*.json'},
+            url = 'https://json.schemastore.org/tsconfig.json'
+          },
+          {
+            fileMatch = {
+              '.prettierrc',
+              '.prettierrc.json',
+              'prettier.config.json'
+            },
+            url = 'https://json.schemastore.org/prettierrc.json'
+          },
+          {
+            fileMatch = {'.eslintrc', '.eslintrc.json'},
+            url = 'https://json.schemastore.org/eslintrc.json'
+          },
+          {
+            fileMatch = {'.babelrc', '.babelrc.json', 'babel.config.json'},
+            url = 'https://json.schemastore.org/babelrc.json'
+          },
+        },
+      },
+    },
+  },
+  tsserver = {},
 }
 
-lspconfig.cssls.setup(lspsetup)
-lspconfig.graphql.setup(lspsetup)
-lspconfig.jsonls.setup(lspsetup)
-lspconfig.gopls.setup(lspsetup)
-lspconfig.tsserver.setup(lspsetup)
-lspconfig.clangd.setup(lspsetup)
+for server, config in pairs(lspServers) do
+  lspconfig[server].setup(vim.tbl_deep_extend('force', {
+    capabilities = lspCapabilities 
+  }, config))
+end
 
 -- -----------------------------------------------------------------------------
 -- Formatter
@@ -167,6 +207,8 @@ formatter.setup({
     javascriptreact = { prettierFormatter },
     typescript = { prettierFormatter },
     typescriptreact = { prettierFormatter },
+    css = { prettierFormatter },
+    scss = { prettierFormatter },
   }
 })
 
