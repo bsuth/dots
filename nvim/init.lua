@@ -76,7 +76,7 @@ cmd('au FileType * lua setupheaders()')
 
 -- Formatting
 cmd('au BufWritePost *.lua lua apply_stylua()')
-cmd('au BufWritePost *.js,*.jsx,*.ts,*.tsx FormatWrite')
+cmd('au BufWritePost *.js,*.jsx,*.ts,*.tsx,*.css,*.scss FormatWrite')
 
 cmd('augroup END')
 
