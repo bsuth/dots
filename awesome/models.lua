@@ -17,9 +17,9 @@ local battery = gears.table.crush(gears.object(), {
   update = function(self)
     self.percent = device.percentage
     self.discharging = gears.table.hasitem({
-        upower.DeviceState.PENDING_DISCHARGE,
-        upower.DeviceState.DISCHARGING,
-      }, device.state) ~= nil
+      upower.DeviceState.PENDING_DISCHARGE,
+      upower.DeviceState.DISCHARGING,
+    }, device.state) ~= nil
     self:emit_signal('update')
   end,
 })
@@ -180,10 +180,7 @@ naughty.config.notify_callback = function(notification)
     notification.text = ([[
 <span size='small'>%s</span>
 <span size='small'>%s</span>
-		]]):format(
-      notification.title,
-      notification.text
-    )
+		]]):format(notification.title, notification.text)
   else
     notification.text = ([[
 <span size='small'>%s</span>

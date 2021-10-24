@@ -48,8 +48,8 @@ bindings.globalkeys = gears.table.join(
   --
 
   awful.key({ 'Mod4', 'Shift' }, 'Escape', function()
-      awesome.quit()
-    end),
+    awesome.quit()
+  end),
 
   awful.key({ 'Mod4', 'Shift' }, 'r', function()
     awesome.restart()
@@ -190,7 +190,7 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4' }, "'", function()
     awful.spawn('vivaldi-stable')
   end),
-  awful.key({ 'Mod4' }, ";", function()
+  awful.key({ 'Mod4' }, ';', function()
     scratchpad.toggle()
   end),
   awful.key({ 'Mod4' }, 'p', function()
@@ -204,8 +204,8 @@ bindings.globalkeys = gears.table.join(
 
 bindings.clientkeys = gears.table.join(
   awful.key({ 'Mod4', 'Shift' }, 'q', function(c)
-      c:kill()
-    end),
+    c:kill()
+  end),
 
   awful.key({ 'Mod4' }, 'f', function(c)
     c.fullscreen = not c.fullscreen
@@ -256,11 +256,7 @@ bindings.clientbuttons = gears.table.join(
 dashboard.wibox:connect_signal(
   'button::press',
   function(self, lx, ly, button, mods)
-    if
-      #mods == 1
-      and gears.table.hasitem(mods, 'Control')
-      and button == 3
-    then
+    if #mods == 1 and gears.table.hasitem(mods, 'Control') and button == 3 then
       dashboard:toggle()
     end
   end

@@ -301,7 +301,9 @@ end
 
 local function SystemStatWidget(args, isBattery)
   local iconWidget = wibox.widget({
-    image = isBattery and (args.model.discharging and args.dischargingIcon or args.chargingIcon) or args.icon,
+    image = isBattery
+        and (args.model.discharging and args.dischargingIcon or args.chargingIcon)
+      or args.icon,
     widget = wibox.widget.imagebox,
   })
 
@@ -325,8 +327,7 @@ local function SystemStatWidget(args, isBattery)
 
   if isBattery then
     args.model:connect_signal('update', function()
-      iconWidget.image = args.model.discharging
-          and args.dischargingIcon
+      iconWidget.image = args.model.discharging and args.dischargingIcon
         or args.chargingIcon
     end)
   end
