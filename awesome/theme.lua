@@ -2,9 +2,9 @@ local beautiful = require('beautiful')
 local gears = require('gears')
 local naughty = require('naughty')
 
---
+-- -----------------------------------------------------------------------------
 -- Colorscheme: OneDark
---
+-- -----------------------------------------------------------------------------
 
 local colors = {
   black = '#282c34',
@@ -25,9 +25,9 @@ local colors = {
   transparent = '#00000000',
 }
 
---
+-- -----------------------------------------------------------------------------
 -- Theme
---
+-- -----------------------------------------------------------------------------
 
 beautiful.init({
   colors = colors,
@@ -60,9 +60,9 @@ naughty.config.defaults.margin = 5
 naughty.config.defaults.border_width = 2
 naughty.config.defaults.position = 'top_left'
 
---
+-- -----------------------------------------------------------------------------
 -- Functions
---
+-- -----------------------------------------------------------------------------
 
 function beautiful.assets(path)
   return '/home/bsuth/dots/awesome/assets/' .. path
@@ -81,9 +81,9 @@ function beautiful.set_wallpaper(screen)
   gears.wallpaper.maximized(beautiful.assets('wallpaper.svg'), screen)
 end
 
---
+-- -----------------------------------------------------------------------------
 -- Signals
---
+-- -----------------------------------------------------------------------------
 
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
 screen.connect_signal('property::geometry', beautiful.set_wallpaper)
@@ -96,8 +96,8 @@ client.connect_signal('unfocus', function(c)
   c.border_color = beautiful.border_normal
 end)
 
---
+-- -----------------------------------------------------------------------------
 -- Return
---
+-- -----------------------------------------------------------------------------
 
 return beautiful

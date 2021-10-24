@@ -5,15 +5,15 @@ local models = require('models')
 local naughty = require('naughty')
 local scratchpad = require('scratchpad')
 
---
+-- -----------------------------------------------------------------------------
 -- Keybindings
---
+-- -----------------------------------------------------------------------------
 
 local bindings = {}
 
---
+-- -----------------------------------------------------------------------------
 -- Helpers
---
+-- -----------------------------------------------------------------------------
 
 local function grab_mouse_until_released()
   mousegrabber.run(function(mouse)
@@ -37,9 +37,9 @@ local function global_move_client(dir)
   end
 end
 
---
+-- -----------------------------------------------------------------------------
 -- Global Keys
---
+-- -----------------------------------------------------------------------------
 
 bindings.globalkeys = gears.table.join(
 
@@ -198,9 +198,9 @@ bindings.globalkeys = gears.table.join(
   end)
 )
 
---
+-- -----------------------------------------------------------------------------
 -- Client Keys
---
+-- -----------------------------------------------------------------------------
 
 bindings.clientkeys = gears.table.join(
   awful.key({ 'Mod4', 'Shift' }, 'q', function(c)
@@ -238,9 +238,9 @@ bindings.clientkeys = gears.table.join(
   end)
 )
 
---
+-- -----------------------------------------------------------------------------
 -- Client Buttons
---
+-- -----------------------------------------------------------------------------
 
 bindings.clientbuttons = gears.table.join(
   awful.button({}, 1, function(c)
@@ -262,9 +262,9 @@ dashboard.wibox:connect_signal(
   end
 )
 
---
+-- -----------------------------------------------------------------------------
 -- Return
---
+-- -----------------------------------------------------------------------------
 
 root.keys(bindings.globalkeys)
 return bindings

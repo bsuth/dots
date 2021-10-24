@@ -3,9 +3,9 @@ local beautiful = require('beautiful')
 local gears = require('gears')
 local naughty = require('naughty')
 
---
+-- -----------------------------------------------------------------------------
 -- Battery
---
+-- -----------------------------------------------------------------------------
 
 local upower = require('lgi').require('UPowerGlib')
 local device = upower.Client():get_display_device()
@@ -29,9 +29,9 @@ device.on_notify = function()
   battery:update()
 end
 
---
+-- -----------------------------------------------------------------------------
 -- Bluetooth
---
+-- -----------------------------------------------------------------------------
 
 local bluetooth = gears.table.crush(gears.object(), {
   active = false,
@@ -77,9 +77,9 @@ awful.spawn.easy_async_with_shell(
   end
 )
 
---
+-- -----------------------------------------------------------------------------
 -- Brightness
---
+-- -----------------------------------------------------------------------------
 
 local brightness = gears.table.crush(gears.object(), {
   percent = 0,
@@ -103,9 +103,9 @@ awful.spawn.easy_async_with_shell(
   end
 )
 
---
+-- -----------------------------------------------------------------------------
 -- Disk
---
+-- -----------------------------------------------------------------------------
 
 local disk = gears.table.crush(gears.object(), {
   percent = 0,
@@ -130,9 +130,9 @@ gears.timer({
   end,
 })
 
---
+-- -----------------------------------------------------------------------------
 -- Locale
---
+-- -----------------------------------------------------------------------------
 
 local locale = gears.table.crush(gears.object(), {
   index = 1,
@@ -156,9 +156,9 @@ local locale = gears.table.crush(gears.object(), {
   end,
 })
 
---
+-- -----------------------------------------------------------------------------
 -- Notifications
---
+-- -----------------------------------------------------------------------------
 
 local notifications = gears.table.crush(gears.object(), {
   active = true,
@@ -191,9 +191,9 @@ naughty.config.notify_callback = function(notification)
   return notification
 end
 
---
+-- -----------------------------------------------------------------------------
 -- Ram
---
+-- -----------------------------------------------------------------------------
 
 local ram = gears.table.crush(gears.object(), {
   percent = 0,
@@ -218,9 +218,9 @@ gears.timer({
   end,
 })
 
---
+-- -----------------------------------------------------------------------------
 -- Volume
---
+-- -----------------------------------------------------------------------------
 
 local volume = gears.table.crush(gears.object(), {
   percent = 0,
@@ -260,9 +260,9 @@ awful.spawn.easy_async_with_shell(
   end
 )
 
---
--- Models
---
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
 
 return {
   battery = battery,

@@ -10,9 +10,9 @@ require('theme')
 local Navbar = require('navbar')
 local bindings = require('bindings')
 
---
+-- -----------------------------------------------------------------------------
 -- Layout
---
+-- -----------------------------------------------------------------------------
 
 awful.layout.layouts = {
   {
@@ -27,9 +27,18 @@ awful.layout.layouts = {
   },
 }
 
---
+-- -----------------------------------------------------------------------------
+-- Buffers
+-- -----------------------------------------------------------------------------
+
+awful.clientbuffer = awful.tag.add('_clientbuffer', {
+  layout = awful.layout.suit.fair.horizontal,
+  screen = awful.screen.focused(),
+})
+
+-- -----------------------------------------------------------------------------
 -- Rules
---
+-- -----------------------------------------------------------------------------
 
 awful.rules.rules = {
   {
@@ -71,9 +80,9 @@ awful.rules.rules = {
   },
 }
 
---
--- Signals
---
+-- -----------------------------------------------------------------------------
+-- General Signals
+-- -----------------------------------------------------------------------------
 
 -- Signal function to execute when a new client appears.
 client.connect_signal('manage', function(c)
@@ -96,9 +105,9 @@ client.connect_signal('mouse::enter', function(c)
   c:emit_signal('request::activate', 'mouse_enter', { raise = false })
 end)
 
---
+-- -----------------------------------------------------------------------------
 -- Startup
---
+-- -----------------------------------------------------------------------------
 
 awful.screen.connect_for_each_screen(function(s)
   awful.tag({ '1' }, s, awful.layout.layouts[1])
@@ -116,11 +125,6 @@ awful.screen.connect_for_each_screen(function(s)
     end
   end)
 end)
-
-awful.clientbuffer = awful.tag.add('_clientbuffer', {
-  layout = awful.layout.suit.fair.horizontal,
-  screen = awful.screen.focused(),
-})
 
 awesome.connect_signal('startup', function()
   for s in screen do

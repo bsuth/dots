@@ -1,19 +1,12 @@
 local awful = require('awful')
 local gears = require('gears')
 
---
--- Scratchpad
---
-
 local scratchpad = {
   width = 1400,
   height = 800,
 }
-local scratchrule = { class = 'scratch' }
 
---
--- Functions
---
+local scratchrule = { class = 'scratch' }
 
 function scratchpad.toggle()
   local s = awful.screen.focused()
@@ -39,9 +32,5 @@ function scratchpad.toggle()
     awful.spawn('st -c scratchpad -e nvim -c ":Dirvish"')
   end
 end
-
---
--- Return
---
 
 return scratchpad
