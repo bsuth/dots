@@ -68,6 +68,7 @@ function _install_pacman_packages_() {
     xf86-video-amdgpu # AMD
     # xf86-video-intel # Intel
     xorg-server
+    xorg-server-xephyr
     xorg-xinit
     xorg-xev
     xclip

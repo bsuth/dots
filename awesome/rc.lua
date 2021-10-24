@@ -7,7 +7,7 @@ require('awful/autofocus')
 
 -- Order matters here!
 require('theme')
-local navbar = require('navbar')
+local Navbar = require('navbar')
 local bindings = require('bindings')
 
 --
@@ -104,7 +104,7 @@ awful.screen.connect_for_each_screen(function(s)
   awful.tag({ '1' }, s, awful.layout.layouts[1])
 
   beautiful.set_wallpaper(s)
-  s.navbar = navbar.new(s)
+  s.navbar = Navbar(s)
 
   s:connect_signal('tag::history::update', function()
     -- restore focus to above client
