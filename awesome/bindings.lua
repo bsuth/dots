@@ -139,6 +139,9 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4' }, 'space', function()
     awful.screen.focused().navbar:setMode('dmenu')
   end),
+  awful.key({ 'Mod4' }, 'BackSpace', function()
+    awful.screen.focused().navbar.statusbar:toggle()
+  end),
   awful.key({ 'Mod4' }, 't', function()
     awful.screen.focused().navbar.tabs:newTab()
   end),

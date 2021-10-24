@@ -15,11 +15,20 @@ local DMENU_COMMANDS = {
   inkscape = function()
     awful.spawn('inkscape')
   end,
+  reboot = function()
+    awful.spawn('reboot')
+  end,
   simplescreenrecorder = function()
     awful.spawn('simplescreenrecorder')
   end,
+  sleep = function()
+    awful.spawn('systemctl suspend')
+  end,
   term = function()
     awful.spawn('st -e nvim -c ":Dirvish"')
+  end,
+  poweroff = function()
+    awful.spawn('poweroff')
   end,
   vivaldi = function()
     awful.spawn('vivaldi-stable')

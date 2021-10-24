@@ -4,6 +4,7 @@ local gears = require('gears')
 local wibox = require('wibox')
 
 local Dmenu = require('navbar.dmenu')
+local Statusbar = require('navbar.statusbar')
 local Tabs = require('navbar.tabs')
 
 -- -----------------------------------------------------------------------------
@@ -35,6 +36,7 @@ local Navbar = setmetatable({}, {
     })
 
     newNavbar.dmenu = Dmenu(newNavbar)
+    newNavbar.statusbar = Statusbar(newNavbar)
     newNavbar.tabs = Tabs(newNavbar, screen)
     newNavbar:setMode('tabs')
 
@@ -44,6 +46,7 @@ local Navbar = setmetatable({}, {
           {
             {
               newNavbar.dmenu.widget,
+              newNavbar.statusbar.widget,
               newNavbar.tabs.widget,
               layout = wibox.layout.stack,
             },
@@ -72,11 +75,14 @@ local Navbar = setmetatable({}, {
 
 function Navbar:setMode(newMode)
   self.dmenu.widget.visible = false
+  self.statusbar.widget.visible = false
   self.tabs.widget.visible = false
 
   if newMode == 'dmenu' then
     self.dmenu.widget.visible = true
     self.dmenu:run()
+  elseif newMode == 'statusbar' then
+    self.statusbar.widget.visible = true
   elseif newMode == 'tabs' then
     self.tabs.widget.visible = true
   end
