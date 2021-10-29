@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# SETTINGS
+# Settings
 # ------------------------------------------------------------------------------
 
 # Emacs Bindings
@@ -12,12 +12,12 @@ unsetopt beep
 # Completion
 zstyle ':completion:*' completer _complete _ignored _approximate
 zstyle ':completion:*' matcher-list '' '' '' ''
-zstyle :compinstall filename '/home/bsuth/.zshrc'
+zstyle :compinstall filename "$HOME/.zshrc"
 autoload -Uz compinit
 compinit
 
 # ------------------------------------------------------------------------------
-# ZINIT
+# zinit
 # ------------------------------------------------------------------------------
 
 # Install zinit if not installed
@@ -41,7 +41,7 @@ zplugin light zdharma/history-search-multi-word
 zplugin light denysdovhan/spaceship-prompt
 
 # ------------------------------------------------------------------------------
-# ENVIRONMENT
+# Environment
 # ------------------------------------------------------------------------------
 
 export SHELL='/bin/zsh'
@@ -74,15 +74,15 @@ export PATH="$HOME/go/bin:$PATH"
 export PATH="$HOME/.luarocks/bin:$PATH"
 
 # ------------------------------------------------------------------------------
-# LUA
+# Lua
 # ------------------------------------------------------------------------------
 
 function _generate_lua_path_ {
   declare -a LUA_PATH_PARTS=(
     "./?.lua"
     "./?/init.lua"
-    "/home/bsuth/.luarocks/share/lua/$1/?.lua"
-    "/home/bsuth/.luarocks/share/lua/$1/?/init.lua"
+    "$HOME/.luarocks/share/lua/$1/?.lua"
+    "$HOME/.luarocks/share/lua/$1/?/init.lua"
     "/usr/local/share/lua/$1/?.lua"
     "/usr/local/share/lua/$1/?/init.lua"
     "/usr/share/lua/$1/?.lua"
@@ -94,7 +94,7 @@ function _generate_lua_path_ {
 
   declare -a LUA_CPATH_PARTS=(
     "./?.so"
-    "/home/bsuth/.luarocks/lib/lua/$1/?.so"
+    "$HOME/.luarocks/lib/lua/$1/?.so"
     "/usr/local/lib/lua/$1/?.so"
     "/usr/lib/lua/$1/?.so"
     "/usr/lib/lua/$1/loadall.so"
@@ -119,7 +119,17 @@ export LUA_PATH="$GENERATED_LUA_PATH"
 export LUA_CPATH="$GENERATED_LUA_CPATH"
 
 # ------------------------------------------------------------------------------
-# ALIASES
+# Hooks
+# ------------------------------------------------------------------------------
+
+function on_cd() {
+  (python3 $HOME/dots/nvim/onshellcd.py &)
+}
+
+chpwd_functions=(${chpwd_functions[@]} "on_cd")
+
+# ------------------------------------------------------------------------------
+# Aliases
 # ------------------------------------------------------------------------------
 
 alias testwm='Xephyr -br -ac -noreset -screen 800x600 :1 &; DISPLAY=:1 awesome'
@@ -129,18 +139,24 @@ alias lrocks5.2='luarocks --lua-version=5.2 --local'
 alias lrocks5.3='luarocks --lua-version=5.3 --local'
 alias lrocks5.4='luarocks --lua-version=5.4 --local'
 
-alias erde='/home/bsuth/repos/erde/cli/init.lua'
+alias erde="$HOME/repos/erde/cli/init.lua"
 alias aur='git pull && makepkg -si'
 
 alias single='~/.screenlayout/single.sh'
 alias double='~/.screenlayout/double.sh'
 
 # ------------------------------------------------------------------------------
-# HOOKS
+# Functions
 # ------------------------------------------------------------------------------
 
-function on_cd() {
-  (python3 $HOME/dots/nvim/onshellcd.py &)
+function ansi() {
+  setxkbmap us
+  ln -sf ~/dots/.ansi.Xmodmap ~/.Xmodmap
+  xmodmap ~/.Xmodmap
 }
 
-chpwd_functions=(${chpwd_functions[@]} "on_cd")
+function hhkb() {
+  setxkbmap us
+  ln -sf ~/dots/.hhkb.Xmodmap ~/.Xmodmap
+  xmodmap ~/.Xmodmap
+}

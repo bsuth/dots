@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-setxkbmap us
-ln -sf ~/dots/.ansi.Xmodmap ~/.Xmodmap
-xmodmap ~/.Xmodmap
