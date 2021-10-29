@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# ------------------------------------------------------------------------------
+# Prereqs
+#
+# As root:
+# 1) Creating a new user
+#   useradd -m -d /home/bsuth -s /bin/zsh -G sudo bsuth 
+#   passwd bsuth
+# 2) Creating the sudo group
+#   groupadd sudo
+# 3) Add user to sudoers by uncommenting following line in /etc/sudoers
+#   %sudo ALL=(ALL) ALL
+# 4) Change default shell
+#   chsh -s /bin/zsh bsuth
+# 5) Create systemd-networkd config file at /etc/systemd/network/1-wireless.network
+#    https://wiki.archlinux.org/title/systemd-networkd#Wireless_adapter
+#
+#   Ex)
+#    [Match]
+#    Name=wlan0
+#    
+#    [Network]
+#    DHCP=yes
+# 
+# As user:
+# 1) Enable services
+#   - systemd-networkd
+#   - systemd-resolved
+#   - iwd
+#   - bluetooth
+# 2) Restore Documents/ + symlinks
+# 3) Clone dots
+# ------------------------------------------------------------------------------
+
+set -e
+DOTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+$DOTS/bin/dots_pacman
+$DOTS/bin/dots_pip
+$DOTS/bin/dots_npm
+$DOTS/bin/dots_luarocks
+$DOTS/bin/dots_st
+$DOTS/bin/dots_symlinks
+
+echo "The following need to be setup manually:"
+echo "1) Firefox: profile / userChrome / surfingkeys"
+echo "2) Services (physlock)"

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+DOTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+cd "$DOTS/st"
+
+make
+sudo make install
+
+cd -

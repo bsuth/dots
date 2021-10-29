@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+declare -a NPM_PACKAGES=(
+  graphql-language-service-cli
+  vscode-langservers-extracted
+  typescript
+  typescript-language-server
+  @fsouza/prettierd
+)
+
+sudo npm i -g "${NPM_PACKAGES[@]}"

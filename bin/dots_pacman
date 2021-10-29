@@ -1,0 +1,83 @@
+#!/bin/bash
+
+set -e
+
+declare -a PACMAN_PACKAGES=(
+  # System
+  amd-ucode
+  efibootmgr
+  lvm2
+  upower
+
+  # X11
+  xf86-video-amdgpu # AMD
+  # xf86-video-intel # Intel
+  xorg-server
+  xorg-server-xephyr
+  xorg-xinit
+  xorg-xev
+  xclip
+  awesome
+  picom
+
+  # Wifi / Bluetooth
+  iwd
+  bluez
+  bluez-utils
+
+  # Audio
+  alsa-utils
+  pulseaudio
+  pulseaudio-alsa
+  pulseaudio-bluetooth
+
+  # Lua
+  lua51
+  lua52
+  lua53
+  lua
+  luajit
+
+  # Languages
+  gcc
+  clang
+  bear
+  nodejs
+  npm
+  rust
+  go
+  python3
+  python-pip
+
+  # Input / Fonts
+  fcitx5-im
+  fcitx5-mozc
+  adobe-source-han-sans-jp-fonts
+  ttf-hack
+
+  # Tools
+  reflector
+  base-devel
+  man-db
+  git
+  openssh
+  zsh
+  zip
+  unzip
+  ripgrep
+  fd
+  fzf
+  brightnessctl
+  htop
+
+  # Apps
+  flameshot
+  gpick
+  physlock
+  neovim
+  firefox-developer-edition
+  arandr
+  inkscape
+)
+
+sudo pacman -Syu --needed "${PACMAN_PACKAGES[@]}"

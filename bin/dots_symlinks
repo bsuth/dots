@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e
+shopt -s nullglob
+DOTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+declare -A SYMLINKS=(
+  ["$DOTS/awesome"]=".config/awesome"
+  ["$DOTS/nvim"]=".config/nvim"
+  ["$DOTS/.xinitrc"]=".xinitrc"
+  ["$DOTS/.zprofile"]=".zprofile"
+  ["$DOTS/.zshrc"]=".zshrc"
+)
+
+for SYMLINK in ${!SYMLINKS[@]}; do
+  echo "$SYMLINK -> ~/${SYMLINKS[$SYMLINK]}"
+  if [[ -d "$HOME/${SYMLINKS[$SYMLINK]}" ]]; then
+    rm -rf "$HOME/${SYMLINKS[$SYMLINK]}"
+  fi
+  mkdir -p $(dirname "$HOME/${SYMLINKS[$SYMLINK]}")
+  ln -sfn "$SYMLINK" "$HOME/${SYMLINKS[$SYMLINK]}"
+done
+
+declare -A DEEP_SYMLINKS=(
+  ["$DOTS/bin"]=".local/bin"
+)
+
+for SYMLINK_DIR in ${!DEEP_SYMLINKS[@]}; do
+  for FILE in $SYMLINK_DIR/*; do
+    if [[ -x $FILE ]]; then
+      echo "$FILE -> ~/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
+      mkdir -p "$HOME/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
+      ln -sf "$FILE" "$HOME/${DEEP_SYMLINKS[$SYMLINK_DIR]}"
+    fi
+  done
+done
