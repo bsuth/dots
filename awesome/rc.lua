@@ -67,9 +67,6 @@ awful.rules.rules = {
       name = {
         'Event Tester', -- xev
       },
-      class = {
-        'scratchpad',
-      },
       role = {
         'pop-up', -- Google Chrome's (detached) Developer Tools.
       },

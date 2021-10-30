@@ -3,7 +3,6 @@ local dashboard = require('dashboard')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
-local scratchpad = require('scratchpad')
 
 -- -----------------------------------------------------------------------------
 -- Keybindings
@@ -139,7 +138,7 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4' }, 'space', function()
     awful.screen.focused().navbar:setMode('dmenu')
   end),
-  awful.key({ 'Mod4' }, 'BackSpace', function()
+  awful.key({ 'Mod4' }, ';', function()
     awful.screen.focused().navbar.statusbar:toggle()
   end),
   awful.key({ 'Mod4' }, 't', function()
@@ -192,9 +191,6 @@ bindings.globalkeys = gears.table.join(
   end),
   awful.key({ 'Mod4' }, "'", function()
     awful.spawn('vivaldi-stable')
-  end),
-  awful.key({ 'Mod4' }, ';', function()
-    scratchpad.toggle()
   end),
   awful.key({ 'Mod4' }, 'p', function()
     dashboard:toggle()
