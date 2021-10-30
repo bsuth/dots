@@ -1,7 +1,10 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
-local models = require('models')
+local gears = require('gears')
 local wibox = require('wibox')
+
+local core = require('navbar.core')
+local models = require('models')
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -83,7 +86,10 @@ local function SystemStatWidget(args)
     end
   )
 
-  return systemStatWidget
+  return core.Select({
+    active = args.active,
+    widget = systemStatWidget,
+  })
 end
 
 -- -----------------------------------------------------------------------------
@@ -141,12 +147,120 @@ local function NotificationWidget()
 end
 
 -- -----------------------------------------------------------------------------
+-- Statusbar
+-- -----------------------------------------------------------------------------
+
+local Statusbar = {}
+local StatusbarMT = { __index = Statusbar }
+
+function Statusbar:focus(dir)
+  for i, selectable in pairs(self.selectables) do
+    if selectable == self.selected then
+      local newSelected = self.selectables[i + dir]
+      if newSelected then
+        self.selected = newSelected
+        self:refresh()
+      end
+      break
+    end
+  end
+end
+
+function Statusbar:refresh()
+  local children = {}
+
+  for _, staticWidget in pairs(self.staticWidgets) do
+    children[#children + 1] = staticWidget
+  end
+
+  for _, selectable in pairs(self.selectables) do
+    children[#children + 1] = core.Select({
+      active = selectable == self.selected,
+      widget = selectable.widget,
+    })
+  end
+
+  self.widget.children = children
+end
+
+-- -----------------------------------------------------------------------------
 -- Return
 -- -----------------------------------------------------------------------------
 
 return function(navbar)
-  local keygrabber = awful.keygrabber({
+  local newStatusbar = setmetatable({
+    navbar = navbar,
+
+    staticWidgets = {
+      wibox.widget({
+        format = markupText('%a %b %d', beautiful.colors.blue),
+        widget = wibox.widget.textclock,
+      }),
+      wibox.widget({
+        format = markupText(' %H:%M', beautiful.colors.purple),
+        widget = wibox.widget.textclock,
+      }),
+      BatteryWidget(),
+    },
+
+    widget = wibox.widget({
+      layout = wibox.layout.fixed.horizontal,
+    }),
+  }, StatusbarMT)
+
+  newStatusbar.selectables = {
+    {
+      widget = SystemStatWidget({
+        model = models.volume,
+        color = beautiful.colors.green,
+        icon = beautiful.assets('volume.svg'),
+      }),
+      keypressed_callback = function(mod, key)
+        if key == 'j' then
+          models.volume:set(models.volume.percent - 5)
+        elseif key == 'k' then
+          models.volume:set(models.volume.percent + 5)
+        elseif key == 'd' then
+          models.volume:set(models.volume.percent - 15)
+        elseif key == 'u' then
+          models.volume:set(models.volume.percent + 15)
+        elseif key == ' ' then
+          models.volume:toggle()
+        end
+      end,
+    },
+    {
+      widget = SystemStatWidget({
+        model = models.brightness,
+        color = beautiful.colors.yellow,
+        icon = beautiful.assets('brightness.svg'),
+      }),
+    },
+    {
+      widget = LocaleWidget(),
+    },
+    {
+      widget = NotificationWidget(),
+    },
+  }
+  newStatusbar.selected = newStatusbar.selectables[1]
+
+  newStatusbar.keygrabber = awful.keygrabber({
     keybindings = {
+      {
+        {},
+        'h',
+        function()
+          newStatusbar:focus(-1)
+        end,
+      },
+      {
+        {},
+        'l',
+        function()
+          newStatusbar:focus(1)
+        end,
+      },
       {
         { 'Mod4' },
         ';',
@@ -155,42 +269,15 @@ return function(navbar)
         end,
       },
     },
+    keypressed_callback = function(self, mod, key)
+      if type(newStatusbar.selected.keypressed_callback) == 'function' then
+        newStatusbar.selected.keypressed_callback(mod, key)
+      end
+    end,
     stop_callback = function()
       navbar:setMode('tabs')
     end,
   })
 
-  local widget = wibox.widget({
-    {
-      format = markupText('%a %b %d', beautiful.colors.blue),
-      widget = wibox.widget.textclock,
-    },
-    {
-      format = markupText(' %H:%M', beautiful.colors.purple),
-      widget = wibox.widget.textclock,
-    },
-
-    BatteryWidget(),
-    SystemStatWidget({
-      model = models.volume,
-      color = beautiful.colors.green,
-      icon = beautiful.assets('volume.svg'),
-    }),
-    SystemStatWidget({
-      model = models.brightness,
-      color = beautiful.colors.yellow,
-      icon = beautiful.assets('brightness.svg'),
-    }),
-
-    LocaleWidget(),
-    NotificationWidget(),
-
-    layout = wibox.layout.fixed.horizontal,
-  })
-
-  return {
-    keygrabber = keygrabber,
-    navbar = navbar,
-    widget = widget,
-  }
+  return newStatusbar
 end

@@ -2,68 +2,26 @@ local awful = require('awful')
 local beautiful = require('beautiful')
 local wibox = require('wibox')
 
--- -----------------------------------------------------------------------------
--- Constants
--- -----------------------------------------------------------------------------
-
-local TAB_HEIGHT = 50
-local ACTIVE_TAB_COLOR = beautiful.colors.white
-local INACTIVE_TAB_COLOR = beautiful.colors.dark_grey
+local core = require('navbar.core')
 
 -- -----------------------------------------------------------------------------
 -- Tab
 -- -----------------------------------------------------------------------------
 
-local function Tab(opts)
-  return wibox.widget({
-    {
-      opts.content or {
-        markup = ('<span foreground="%s">%s</span>'):format(
-          opts.active and ACTIVE_TAB_COLOR or INACTIVE_TAB_COLOR,
-          opts.name or 'Tab'
-        ),
-        halign = 'center',
-        valign = 'center',
-        font = 'Fredoka One 14',
-        forced_height = TAB_HEIGHT,
-        widget = wibox.widget.textbox,
-      },
-      left = 20,
-      right = 20,
-      widget = wibox.container.margin,
-    },
-
-    shape = function(cr, width, height)
-      if not opts.active then
-        return
-      end
-
-      local size = 6
-      local rgb = beautiful.hex2rgb(ACTIVE_TAB_COLOR)
-      cr:set_source_rgb(rgb[1], rgb[2], rgb[3])
-
-      cr:move_to(0, 0)
-      cr:line_to(size, 0)
-      cr:line_to(0, size)
-      cr:fill()
-
-      cr:move_to(width, 0)
-      cr:line_to(width - size, 0)
-      cr:line_to(width, size)
-      cr:fill()
-
-      cr:move_to(0, height)
-      cr:line_to(0, height - size)
-      cr:line_to(size, height)
-      cr:fill()
-
-      cr:move_to(width, height)
-      cr:line_to(width - size, height)
-      cr:line_to(width, height - size)
-      cr:fill()
-    end,
-
-    widget = wibox.container.background,
+local function Tab(args)
+  return core.Select({
+    active = args.active,
+    widget = args.widget or wibox.widget({
+      markup = ('<span foreground="%s">%s</span>'):format(
+        args.active and beautiful.colors.white or beautiful.colors.dark_grey,
+        args.name or 'Tab'
+      ),
+      halign = 'center',
+      valign = 'center',
+      font = core.FONT,
+      forced_height = core.HEIGHT,
+      widget = wibox.widget.textbox,
+    }),
   })
 end
 
@@ -71,36 +29,8 @@ end
 -- Tabs
 -- -----------------------------------------------------------------------------
 
-local Tabs = setmetatable({}, {
-  __call = function(self, navbar, screen)
-    local newTabs = setmetatable({
-      navbar = navbar,
-      screen = screen or awful.screen.focused(),
-      prompt = awful.widget.prompt({
-        prompt = '',
-        font = 'Fredoka One 14',
-        exe_callback = function(name)
-          screen.selected_tag.name = name
-        end,
-      }),
-      widget = wibox.widget({
-        layout = wibox.layout.fixed.horizontal,
-      }),
-    }, {
-      __index = self,
-    })
-
-    newTabs.prompt.done_callback = function(name)
-      newTabs:refresh()
-    end
-
-    screen:connect_signal('tag::history::update', function()
-      newTabs:refresh()
-    end)
-
-    return newTabs
-  end,
-})
+local Tabs = {}
+local TabsMT = { __index = Tabs }
 
 function Tabs:newTab()
   awful.tag.add(tostring(#self.screen.tags), {
@@ -153,17 +83,17 @@ function Tabs:focusTab(relidx)
   end
 end
 
-function Tabs:refresh(opts)
+function Tabs:refresh(args)
   local children = {}
 
   for _, tag in pairs(self.screen.tags) do
     if not tag.name:match('^_') then
-      local isRename = opts and opts.renameTag == tag
+      local isRename = args and args.renameTag == tag
 
       children[#children + 1] = Tab({
         name = tag.name,
         active = tag == self.screen.selected_tag,
-        content = isRename and self.prompt,
+        widget = isRename and self.prompt,
       })
     end
   end
@@ -175,4 +105,29 @@ end
 -- Return
 -- -----------------------------------------------------------------------------
 
-return Tabs
+return function(navbar, screen)
+  local newTabs = setmetatable({
+    navbar = navbar,
+    screen = screen or awful.screen.focused(),
+    prompt = awful.widget.prompt({
+      prompt = '',
+      font = core.FONT,
+      exe_callback = function(name)
+        screen.selected_tag.name = name
+      end,
+    }),
+    widget = wibox.widget({
+      layout = wibox.layout.fixed.horizontal,
+    }),
+  }, TabsMT)
+
+  newTabs.prompt.done_callback = function(name)
+    newTabs:refresh()
+  end
+
+  screen:connect_signal('tag::history::update', function()
+    newTabs:refresh()
+  end)
+
+  return newTabs
+end
