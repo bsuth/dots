@@ -80,9 +80,10 @@ function Navbar:setMode(newMode)
 
   if newMode == 'dmenu' then
     self.dmenu.widget.visible = true
-    self.dmenu:run()
+    self.dmenu.prompt:run()
   elseif newMode == 'statusbar' then
     self.statusbar.widget.visible = true
+    self.statusbar.keygrabber:start()
   elseif newMode == 'tabs' then
     self.tabs.widget.visible = true
   end

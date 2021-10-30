@@ -141,56 +141,56 @@ local function NotificationWidget()
 end
 
 -- -----------------------------------------------------------------------------
--- Statusbar
--- -----------------------------------------------------------------------------
-
-local Statusbar = setmetatable({}, {
-  __call = function(self, navbar)
-    return setmetatable({
-      navbar = navbar,
-      widget = wibox.widget({
-        {
-          format = markupText('%a %b %d', beautiful.colors.blue),
-          widget = wibox.widget.textclock,
-        },
-        {
-          format = markupText(' %H:%M', beautiful.colors.purple),
-          widget = wibox.widget.textclock,
-        },
-
-        BatteryWidget(),
-        SystemStatWidget({
-          model = models.volume,
-          color = beautiful.colors.green,
-          icon = beautiful.assets('volume.svg'),
-        }),
-        SystemStatWidget({
-          model = models.brightness,
-          color = beautiful.colors.yellow,
-          icon = beautiful.assets('brightness.svg'),
-        }),
-
-        LocaleWidget(),
-        NotificationWidget(),
-
-        layout = wibox.layout.fixed.horizontal,
-      }),
-    }, {
-      __index = self,
-    })
-  end,
-})
-
-function Statusbar:toggle()
-  if self.widget.visible then
-    self.navbar:setMode('tabs')
-  else
-    self.navbar:setMode('statusbar')
-  end
-end
-
--- -----------------------------------------------------------------------------
 -- Return
 -- -----------------------------------------------------------------------------
 
-return Statusbar
+return function(navbar)
+  local keygrabber = awful.keygrabber({
+    keybindings = {
+      {
+        { 'Mod4' },
+        ';',
+        function(self)
+          self:stop()
+        end,
+      },
+    },
+    stop_callback = function()
+      navbar:setMode('tabs')
+    end,
+  })
+
+  local widget = wibox.widget({
+    {
+      format = markupText('%a %b %d', beautiful.colors.blue),
+      widget = wibox.widget.textclock,
+    },
+    {
+      format = markupText(' %H:%M', beautiful.colors.purple),
+      widget = wibox.widget.textclock,
+    },
+
+    BatteryWidget(),
+    SystemStatWidget({
+      model = models.volume,
+      color = beautiful.colors.green,
+      icon = beautiful.assets('volume.svg'),
+    }),
+    SystemStatWidget({
+      model = models.brightness,
+      color = beautiful.colors.yellow,
+      icon = beautiful.assets('brightness.svg'),
+    }),
+
+    LocaleWidget(),
+    NotificationWidget(),
+
+    layout = wibox.layout.fixed.horizontal,
+  })
+
+  return {
+    keygrabber = keygrabber,
+    navbar = navbar,
+    widget = widget,
+  }
+end

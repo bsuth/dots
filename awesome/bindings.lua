@@ -139,7 +139,7 @@ bindings.globalkeys = gears.table.join(
     awful.screen.focused().navbar:setMode('dmenu')
   end),
   awful.key({ 'Mod4' }, ';', function()
-    awful.screen.focused().navbar.statusbar:toggle()
+    awful.screen.focused().navbar:setMode('statusbar')
   end),
   awful.key({ 'Mod4' }, 't', function()
     awful.screen.focused().navbar.tabs:newTab()
