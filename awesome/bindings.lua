@@ -1,5 +1,4 @@
 local awful = require('awful')
-local dashboard = require('dashboard')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
@@ -191,9 +190,6 @@ bindings.globalkeys = gears.table.join(
   end),
   awful.key({ 'Mod4' }, "'", function()
     awful.spawn('vivaldi-stable')
-  end),
-  awful.key({ 'Mod4' }, 'p', function()
-    dashboard:toggle()
   end)
 )
 
@@ -241,25 +237,9 @@ bindings.clientkeys = gears.table.join(
 -- Client Buttons
 -- -----------------------------------------------------------------------------
 
-bindings.clientbuttons = gears.table.join(
-  awful.button({}, 1, function(c)
-    c:emit_signal('request::activate', 'mouse_click', { raise = true })
-  end),
-
-  awful.button({ 'Control' }, 3, function(c)
-    dashboard:toggle()
-    grab_mouse_until_released()
-  end)
-)
-
-dashboard.wibox:connect_signal(
-  'button::press',
-  function(self, lx, ly, button, mods)
-    if #mods == 1 and gears.table.hasitem(mods, 'Control') and button == 3 then
-      dashboard:toggle()
-    end
-  end
-)
+bindings.clientbuttons = gears.table.join(awful.button({}, 1, function(c)
+  c:emit_signal('request::activate', 'mouse_click', { raise = true })
+end))
 
 -- -----------------------------------------------------------------------------
 -- Return
