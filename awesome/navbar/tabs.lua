@@ -118,10 +118,15 @@ return function(navbar, screen)
       end,
     }),
 
-    widget = wibox.widget({
+    tabsWidget = wibox.widget({
       layout = wibox.layout.fixed.horizontal,
     }),
   }, TabsMT)
+
+  newTabs.widget = wibox.widget({
+    newTabs.widget,
+    layout = wibox.container.place,
+  })
 
   newTabs.prompt.done_callback = function(name)
     newTabs:refresh()

@@ -73,11 +73,14 @@ return function(navbar)
     prompt = prompt,
     widget = wibox.widget({
       {
-        markup = core.markupText('➜ '),
-        widget = wibox.widget.textbox,
+        {
+          markup = core.markupText('➜ '),
+          widget = wibox.widget.textbox,
+        },
+        prompt,
+        layout = wibox.layout.fixed.horizontal,
       },
-      prompt,
-      layout = wibox.layout.fixed.horizontal,
+      widget = wibox.container.place,
     }),
   }
 end

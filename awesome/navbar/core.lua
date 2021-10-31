@@ -32,17 +32,22 @@ function core.Select(args)
     {
       args.widget,
       forced_height = core.HEIGHT,
-      left = 20,
-      right = 20,
+      left = 16,
+      right = 16,
       widget = wibox.container.margin,
     },
     shape = function(cr, width, height)
+      local size = 6
+      local rgb
+
       if not args.active then
         return
+      elseif args.disabled then
+        rgb = beautiful.hex2rgb(beautiful.colors.dark_grey)
+      else
+        rgb = beautiful.hex2rgb(beautiful.colors.white)
       end
 
-      local size = 6
-      local rgb = beautiful.hex2rgb(beautiful.colors.white)
       cr:set_source_rgb(rgb[1], rgb[2], rgb[3])
 
       cr:move_to(0, 0)

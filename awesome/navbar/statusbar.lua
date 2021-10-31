@@ -168,33 +168,38 @@ local Statusbar = {}
 local StatusbarMT = { __index = Statusbar }
 
 function Statusbar:focus(dir)
-  for i, selectable in pairs(self.selectables) do
-    if selectable == self.selected then
-      local newSelected = self.selectables[i + dir]
-      if newSelected then
-        self.selected = newSelected
-        self:refresh()
-      end
+  for key, component in pairs(self.components) do
+    if component.index == self.selectedComponent.index + dir then
+      self.selectedComponent = component
+      self:refresh()
       break
     end
   end
 end
 
+function Statusbar:renderComponent(component)
+  return core.Select({
+    active = component == self.selectedComponent,
+    disabled = component.disabled,
+    widget = component.widget,
+  })
+end
+
 function Statusbar:refresh()
-  local children = {}
+  self.leftWidget.children = {
+    self:renderComponent(self.components.datetime),
+  }
 
-  for _, staticWidget in pairs(self.staticWidgets) do
-    children[#children + 1] = staticWidget
-  end
+  self.middleWidget.children = {
+    self:renderComponent(self.components.battery),
+    self:renderComponent(self.components.volume),
+    self:renderComponent(self.components.brightness),
+  }
 
-  for _, selectable in pairs(self.selectables) do
-    children[#children + 1] = core.Select({
-      active = selectable == self.selected,
-      widget = selectable.widget,
-    })
-  end
-
-  self.widget.children = children
+  self.rightWidget.children = {
+    self:renderComponent(self.components.locale),
+    self:renderComponent(self.components.notification),
+  }
 end
 
 -- -----------------------------------------------------------------------------
@@ -205,24 +210,46 @@ return function(navbar)
   local newStatusbar = setmetatable({
     navbar = navbar,
 
-    widget = wibox.widget({
+    leftWidget = wibox.widget({
+      spacing = 16,
       layout = wibox.layout.fixed.horizontal,
     }),
 
-    staticWidgets = {
-      wibox.widget({
-        format = core.markupText('%a %b %d', beautiful.colors.blue),
-        widget = wibox.widget.textclock,
-      }),
-      wibox.widget({
-        format = core.markupText(' %H:%M', beautiful.colors.purple),
-        widget = wibox.widget.textclock,
-      }),
-      BatteryWidget(),
-    },
+    middleWidget = wibox.widget({
+      spacing = 16,
+      layout = wibox.layout.fixed.horizontal,
+    }),
 
-    selectables = {
-      {
+    rightWidget = wibox.widget({
+      spacing = 16,
+      layout = wibox.layout.fixed.horizontal,
+    }),
+
+    components = {
+      datetime = {
+        index = 1,
+        disabled = true,
+        widget = wibox.widget({
+          {
+            format = core.markupText('%a %b %d', beautiful.colors.blue),
+            widget = wibox.widget.textclock,
+          },
+          {
+            format = core.markupText(' %H:%M', beautiful.colors.purple),
+            widget = wibox.widget.textclock,
+          },
+          layout = wibox.layout.fixed.horizontal,
+        }),
+      },
+
+      battery = {
+        index = 2,
+        disabled = true,
+        widget = BatteryWidget(),
+      },
+
+      volume = {
+        index = 3,
         widget = VolumeWidget(),
         keypressed_callback = function(mod, key)
           if key == 'j' then
@@ -238,7 +265,9 @@ return function(navbar)
           end
         end,
       },
-      {
+
+      brightness = {
+        index = 4,
         widget = BrightnessWidget(),
         keypressed_callback = function(mod, key)
           if key == 'j' then
@@ -252,7 +281,9 @@ return function(navbar)
           end
         end,
       },
-      {
+
+      locale = {
+        index = 5,
         widget = LocaleWidget(),
         keypressed_callback = function(mod, key)
           if key == ' ' then
@@ -260,7 +291,9 @@ return function(navbar)
           end
         end,
       },
-      {
+
+      notification = {
+        index = 6,
         widget = NotificationWidget(),
         keypressed_callback = function(mod, key)
           if key == ' ' then
@@ -271,7 +304,16 @@ return function(navbar)
     },
   }, StatusbarMT)
 
-  newStatusbar.selected = newStatusbar.selectables[1]
+  newStatusbar.widget = wibox.widget({
+    newStatusbar.leftWidget,
+    {
+      newStatusbar.middleWidget,
+      layout = wibox.container.place,
+    },
+    newStatusbar.rightWidget,
+
+    layout = wibox.layout.align.horizontal,
+  })
 
   local function focusPrev()
     newStatusbar:focus(-1)
@@ -292,8 +334,9 @@ return function(navbar)
       { { 'Mod4' }, ';', stop },
     },
     keypressed_callback = function(self, mod, key)
-      if type(newStatusbar.selected.keypressed_callback) == 'function' then
-        newStatusbar.selected.keypressed_callback(mod, key)
+      local selectedComponent = newStatusbar.selectedComponent
+      if type(selectedComponent.keypressed_callback) == 'function' then
+        selectedComponent.keypressed_callback(mod, key)
       end
     end,
     stop_callback = function()
@@ -301,5 +344,6 @@ return function(navbar)
     end,
   })
 
+  newStatusbar.selectedComponent = newStatusbar.components.volume
   return newStatusbar
 end
