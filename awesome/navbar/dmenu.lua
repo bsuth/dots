@@ -1,6 +1,8 @@
 local awful = require('awful')
 local wibox = require('wibox')
 
+local core = require('navbar.core')
+
 -- -----------------------------------------------------------------------------
 -- Commands
 -- -----------------------------------------------------------------------------
@@ -47,7 +49,7 @@ end
 return function(navbar)
   local prompt = awful.widget.prompt({
     prompt = '',
-    font = 'Fredoka One 14',
+    font = core.FONT,
     completion_callback = function(currentCmd, cursorPos, nComp)
       return awful.completion.generic(
         currentCmd,
@@ -71,10 +73,7 @@ return function(navbar)
     prompt = prompt,
     widget = wibox.widget({
       {
-        markup = '➜ ',
-        font = 'Fredoka One 14',
-        align = 'center',
-        valign = 'center',
+        markup = core.markupText('➜ '),
         widget = wibox.widget.textbox,
       },
       prompt,

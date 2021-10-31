@@ -8,16 +8,17 @@ local core = {}
 -- -----------------------------------------------------------------------------
 
 core.HEIGHT = 50
-core.FONT = 'Fredoka One 14'
+core.FONT_FAMILY = 'Hack Regular'
+core.FONT = core.FONT_FAMILY .. ' 14'
 
 -- -----------------------------------------------------------------------------
 -- markupText
 -- -----------------------------------------------------------------------------
 
 function core.markupText(text, color)
-  return ('<span color="%s" font_family="%s" size="small">%s</span>'):format(
+  return ('<span color="%s" font_family="%s" size="medium">%s</span>'):format(
     color or beautiful.colors.white,
-    'Hack Regular',
+    core.FONT_FAMILY,
     tostring(text)
   )
 end

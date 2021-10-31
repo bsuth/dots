@@ -149,8 +149,6 @@ end
 
 local function NotificationWidget()
   local notificationWidget = wibox.widget({
-    forced_width = 50,
-    forced_height = 50,
     image = getNotificationIcon(),
     widget = wibox.widget.imagebox,
   })

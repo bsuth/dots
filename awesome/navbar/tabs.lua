@@ -12,9 +12,9 @@ local function Tab(args)
   return core.Select({
     active = args.active,
     widget = args.widget or wibox.widget({
-      markup = ('<span foreground="%s">%s</span>'):format(
-        args.active and beautiful.colors.white or beautiful.colors.dark_grey,
-        args.name or 'Tab'
+      markup = core.markupText(
+        args.name or 'Tab',
+        args.active and beautiful.colors.white or beautiful.colors.dark_grey
       ),
       halign = 'center',
       valign = 'center',
@@ -109,6 +109,7 @@ return function(navbar, screen)
   local newTabs = setmetatable({
     navbar = navbar,
     screen = screen or awful.screen.focused(),
+
     prompt = awful.widget.prompt({
       prompt = '',
       font = core.FONT,
@@ -116,6 +117,7 @@ return function(navbar, screen)
         screen.selected_tag.name = name
       end,
     }),
+
     widget = wibox.widget({
       layout = wibox.layout.fixed.horizontal,
     }),
