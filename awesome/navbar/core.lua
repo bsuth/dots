@@ -11,6 +11,18 @@ core.HEIGHT = 50
 core.FONT = 'Fredoka One 14'
 
 -- -----------------------------------------------------------------------------
+-- markupText
+-- -----------------------------------------------------------------------------
+
+function core.markupText(text, color)
+  return ('<span color="%s" font_family="%s" size="small">%s</span>'):format(
+    color or beautiful.colors.white,
+    'Hack Regular',
+    tostring(text)
+  )
+end
+
+-- -----------------------------------------------------------------------------
 -- Select
 -- -----------------------------------------------------------------------------
 

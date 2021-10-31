@@ -7,18 +7,6 @@ local core = require('navbar.core')
 local models = require('models')
 
 -- -----------------------------------------------------------------------------
--- Helpers
--- -----------------------------------------------------------------------------
-
-local function markupText(text, color)
-  return ('<span color="%s" font_family="%s" size="small">%s</span>'):format(
-    color or beautiful.colors.white,
-    'Hack Regular',
-    tostring(text)
-  )
-end
-
--- -----------------------------------------------------------------------------
 -- BatteryWidget
 -- -----------------------------------------------------------------------------
 
@@ -39,7 +27,7 @@ local function BatteryWidget()
   return wibox.widget({
     iconWidget,
     {
-      markup = markupText(
+      markup = core.markupText(
         math.ceil(models.battery.percent) .. '%',
         beautiful.colors.red
       ),
@@ -50,45 +38,73 @@ local function BatteryWidget()
 end
 
 -- -----------------------------------------------------------------------------
--- SystemStatWidgets (Volume + Brightness)
+-- VolumeWidget
 -- -----------------------------------------------------------------------------
 
-local function SystemStatWidget(args)
+local function getVolumeIcon()
+  -- TODO: muted icon
+  return models.volume.active and beautiful.assets('volume.svg')
+    or beautiful.assets('volume.svg')
+end
+
+local function getVolumeText()
+  return core.markupText(
+    math.ceil(models.volume.percent) .. '%',
+    beautiful.colors.green
+  )
+end
+
+local function VolumeWidget()
+  local iconWidget = wibox.widget({
+    image = getVolumeIcon(),
+    widget = wibox.widget.imagebox,
+  })
+
   local textWidget = wibox.widget({
-    markup = markupText(math.ceil(args.model.percent) .. '%', args.color),
+    markup = getVolumeText(),
     widget = wibox.widget.textbox,
   })
 
-  args.model:connect_signal('update', function()
-    textWidget.markup = markupText(
-      math.ceil(args.model.percent) .. '%',
-      args.color
-    )
+  models.volume:connect_signal('update', function()
+    iconWidget.image = getVolumeIcon()
+    textWidget.markup = getVolumeText()
   end)
 
-  local systemStatWidget = wibox.widget({
-    {
-      image = args.icon,
-      widget = wibox.widget.imagebox,
-    },
+  return wibox.widget({
+    iconWidget,
     textWidget,
     layout = wibox.layout.fixed.horizontal,
   })
+end
 
-  systemStatWidget:connect_signal(
-    'button::press',
-    function(self, lx, ly, button, mods)
-      if button == 4 then
-        args.model:set(args.model.percent + 5)
-      elseif button == 5 then
-        args.model:set(args.model.percent - 5)
-      end
-    end
+-- -----------------------------------------------------------------------------
+-- BrightnessWidget
+-- -----------------------------------------------------------------------------
+
+local function getBrightnessText()
+  return core.markupText(
+    math.ceil(models.brightness.percent) .. '%',
+    beautiful.colors.yellow
   )
+end
 
-  return core.Select({
-    active = args.active,
-    widget = systemStatWidget,
+local function BrightnessWidget()
+  local textWidget = wibox.widget({
+    markup = getBrightnessText(),
+    widget = wibox.widget.textbox,
+  })
+
+  models.brightness:connect_signal('update', function()
+    textWidget.markup = getBrightnessText()
+  end)
+
+  return wibox.widget({
+    wibox.widget({
+      image = beautiful.assets('brightness.svg'),
+      widget = wibox.widget.imagebox,
+    }),
+    textWidget,
+    layout = wibox.layout.fixed.horizontal,
   })
 end
 
@@ -191,83 +207,91 @@ return function(navbar)
   local newStatusbar = setmetatable({
     navbar = navbar,
 
+    widget = wibox.widget({
+      layout = wibox.layout.fixed.horizontal,
+    }),
+
     staticWidgets = {
       wibox.widget({
-        format = markupText('%a %b %d', beautiful.colors.blue),
+        format = core.markupText('%a %b %d', beautiful.colors.blue),
         widget = wibox.widget.textclock,
       }),
       wibox.widget({
-        format = markupText(' %H:%M', beautiful.colors.purple),
+        format = core.markupText(' %H:%M', beautiful.colors.purple),
         widget = wibox.widget.textclock,
       }),
       BatteryWidget(),
     },
 
-    widget = wibox.widget({
-      layout = wibox.layout.fixed.horizontal,
-    }),
+    selectables = {
+      {
+        widget = VolumeWidget(),
+        keypressed_callback = function(mod, key)
+          if key == 'j' then
+            models.volume:set(models.volume.percent - 5)
+          elseif key == 'k' then
+            models.volume:set(models.volume.percent + 5)
+          elseif key == 'd' then
+            models.volume:set(models.volume.percent - 15)
+          elseif key == 'u' then
+            models.volume:set(models.volume.percent + 15)
+          elseif key == ' ' then
+            models.volume:toggle()
+          end
+        end,
+      },
+      {
+        widget = BrightnessWidget(),
+        keypressed_callback = function(mod, key)
+          if key == 'j' then
+            models.brightness:set(models.brightness.percent - 5)
+          elseif key == 'k' then
+            models.brightness:set(models.brightness.percent + 5)
+          elseif key == 'd' then
+            models.brightness:set(models.brightness.percent - 15)
+          elseif key == 'u' then
+            models.brightness:set(models.brightness.percent + 15)
+          end
+        end,
+      },
+      {
+        widget = LocaleWidget(),
+        keypressed_callback = function(mod, key)
+          if key == ' ' then
+            models.locale:cycle()
+          end
+        end,
+      },
+      {
+        widget = NotificationWidget(),
+        keypressed_callback = function(mod, key)
+          if key == ' ' then
+            models.notifications:toggle()
+          end
+        end,
+      },
+    },
   }, StatusbarMT)
 
-  newStatusbar.selectables = {
-    {
-      widget = SystemStatWidget({
-        model = models.volume,
-        color = beautiful.colors.green,
-        icon = beautiful.assets('volume.svg'),
-      }),
-      keypressed_callback = function(mod, key)
-        if key == 'j' then
-          models.volume:set(models.volume.percent - 5)
-        elseif key == 'k' then
-          models.volume:set(models.volume.percent + 5)
-        elseif key == 'd' then
-          models.volume:set(models.volume.percent - 15)
-        elseif key == 'u' then
-          models.volume:set(models.volume.percent + 15)
-        elseif key == ' ' then
-          models.volume:toggle()
-        end
-      end,
-    },
-    {
-      widget = SystemStatWidget({
-        model = models.brightness,
-        color = beautiful.colors.yellow,
-        icon = beautiful.assets('brightness.svg'),
-      }),
-    },
-    {
-      widget = LocaleWidget(),
-    },
-    {
-      widget = NotificationWidget(),
-    },
-  }
   newStatusbar.selected = newStatusbar.selectables[1]
+
+  local function focusPrev()
+    newStatusbar:focus(-1)
+  end
+
+  local function focusNext()
+    newStatusbar:focus(1)
+  end
+
+  local function stop(self)
+    self:stop()
+  end
 
   newStatusbar.keygrabber = awful.keygrabber({
     keybindings = {
-      {
-        {},
-        'h',
-        function()
-          newStatusbar:focus(-1)
-        end,
-      },
-      {
-        {},
-        'l',
-        function()
-          newStatusbar:focus(1)
-        end,
-      },
-      {
-        { 'Mod4' },
-        ';',
-        function(self)
-          self:stop()
-        end,
-      },
+      { {}, 'h', focusPrev },
+      { {}, 'l', focusNext },
+      { { 'Mod4' }, ';', stop },
     },
     keypressed_callback = function(self, mod, key)
       if type(newStatusbar.selected.keypressed_callback) == 'function' then
