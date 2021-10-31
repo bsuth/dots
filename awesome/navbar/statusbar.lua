@@ -25,7 +25,11 @@ local function BatteryWidget()
   end)
 
   return wibox.widget({
-    iconWidget,
+    {
+      iconWidget,
+      right = 8,
+      widget = wibox.container.margin,
+    },
     {
       markup = core.markupText(
         math.ceil(models.battery.percent) .. '%',
@@ -71,7 +75,11 @@ local function VolumeWidget()
   end)
 
   return wibox.widget({
-    iconWidget,
+    {
+      iconWidget,
+      right = 8,
+      widget = wibox.container.margin,
+    },
     textWidget,
     layout = wibox.layout.fixed.horizontal,
   })
@@ -99,10 +107,14 @@ local function BrightnessWidget()
   end)
 
   return wibox.widget({
-    wibox.widget({
-      image = beautiful.assets('brightness.svg'),
-      widget = wibox.widget.imagebox,
-    }),
+    {
+      wibox.widget({
+        image = beautiful.assets('brightness.svg'),
+        widget = wibox.widget.imagebox,
+      }),
+      right = 8,
+      widget = wibox.container.margin,
+    },
     textWidget,
     layout = wibox.layout.fixed.horizontal,
   })
