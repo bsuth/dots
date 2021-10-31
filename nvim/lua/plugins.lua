@@ -3,9 +3,16 @@
 -- https://github.com/wbthomason/packer.nvim
 -- -----------------------------------------------------------------------------
 
-local packer_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
+local packer_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 if fn.empty(fn.glob(packer_path)) > 0 then
-  fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', packer_path})
+  fn.system({
+    'git',
+    'clone',
+    '--depth',
+    '1',
+    'https://github.com/wbthomason/packer.nvim',
+    packer_path,
+  })
 end
 
 cmd('packadd packer.nvim')
@@ -35,7 +42,7 @@ require('packer').startup(function()
   use('justinmk/vim-dirvish')
   use('hoob3rt/lualine.nvim')
   use('nvim-telescope/telescope.nvim')
-  use({'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
+  use({ 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
 
   -- util
   use('tpope/vim-surround')
@@ -111,7 +118,7 @@ local cmp = require('cmp')
 cmp.setup({
   snippet = {
     expand = function(args)
-      fn["vsnip#anonymous"](args.body)
+      fn['vsnip#anonymous'](args.body)
     end,
   },
   mapping = {
@@ -126,7 +133,7 @@ cmp.setup({
     { name = 'vsnip' },
     { name = 'buffer' },
     { name = 'path' },
-  }
+  },
 })
 
 -- -----------------------------------------------------------------------------
@@ -135,43 +142,44 @@ cmp.setup({
 -- -----------------------------------------------------------------------------
 
 local lspconfig = require('lspconfig')
-local lspCapabilities = require('cmp_nvim_lsp')
-  .update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local lspCapabilities = require('cmp_nvim_lsp').update_capabilities(
+  vim.lsp.protocol.make_client_capabilities()
+)
 
 local lspServers = {
   clangd = {},
   cssls = {},
   graphql = {},
   gopls = {},
-  jsonls= {
-    filetypes = {'json', 'jsonc'},
+  jsonls = {
+    filetypes = { 'json', 'jsonc' },
     settings = {
       json = {
         -- https://www.schemastore.org
         schemas = {
           {
-            fileMatch = {'package.json'},
-            url = 'https://json.schemastore.org/package.json'
+            fileMatch = { 'package.json' },
+            url = 'https://json.schemastore.org/package.json',
           },
           {
-            fileMatch = {'tsconfig*.json'},
-            url = 'https://json.schemastore.org/tsconfig.json'
+            fileMatch = { 'tsconfig*.json' },
+            url = 'https://json.schemastore.org/tsconfig.json',
           },
           {
             fileMatch = {
               '.prettierrc',
               '.prettierrc.json',
-              'prettier.config.json'
+              'prettier.config.json',
             },
-            url = 'https://json.schemastore.org/prettierrc.json'
+            url = 'https://json.schemastore.org/prettierrc.json',
           },
           {
-            fileMatch = {'.eslintrc', '.eslintrc.json'},
-            url = 'https://json.schemastore.org/eslintrc.json'
+            fileMatch = { '.eslintrc', '.eslintrc.json' },
+            url = 'https://json.schemastore.org/eslintrc.json',
           },
           {
-            fileMatch = {'.babelrc', '.babelrc.json', 'babel.config.json'},
-            url = 'https://json.schemastore.org/babelrc.json'
+            fileMatch = { '.babelrc', '.babelrc.json', 'babel.config.json' },
+            url = 'https://json.schemastore.org/babelrc.json',
           },
         },
       },
@@ -182,7 +190,7 @@ local lspServers = {
 
 for server, config in pairs(lspServers) do
   lspconfig[server].setup(vim.tbl_deep_extend('force', {
-    capabilities = lspCapabilities 
+    capabilities = lspCapabilities,
   }, config))
 end
 
@@ -197,7 +205,7 @@ function prettierFormatter()
   return {
     exe = 'prettierd',
     args = { nvim_buf_get_name(0) },
-    stdin = true
+    stdin = true,
   }
 end
 
@@ -209,7 +217,7 @@ formatter.setup({
     typescriptreact = { prettierFormatter },
     css = { prettierFormatter },
     scss = { prettierFormatter },
-  }
+  },
 })
 
 -- -----------------------------------------------------------------------------

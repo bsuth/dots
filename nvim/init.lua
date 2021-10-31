@@ -65,7 +65,9 @@ cmd('au BufEnter * lua track_cwd()')
 
 -- Dirvish
 cmd('au TermClose term://*zsh* Dirvish')
-cmd('au FileType dirvish nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>')
+cmd(
+  'au FileType dirvish nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>'
+)
 
 -- Term
 cmd('au TermOpen term://*zsh* setlocal nonumber wrap')

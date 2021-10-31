@@ -102,10 +102,12 @@ end
 function setupheaders()
   local comment = opt.commentstring._value:gsub('%%s', '')
   local colorcolumn = tonumber(opt.colorcolumn._value)
-  cmd(('iabbrev _h1 %s<cr><cr>%s<Up>'):format(
-    comment .. ' ' .. ('-'):rep(colorcolumn - #comment - 1),
-    ('-'):rep(colorcolumn - #comment - 1)
-  ))
+  cmd(
+    ('iabbrev _h1 %s<cr><cr>%s<Up>'):format(
+      comment .. ' ' .. ('-'):rep(colorcolumn - #comment - 1),
+      ('-'):rep(colorcolumn - #comment - 1)
+    )
+  )
   cmd(('iabbrev _h2 %s<cr><cr><Up>'):format(comment))
 end
 
@@ -116,13 +118,15 @@ end
 function get_stylua_config(dir)
   repeat
     local config = dir .. '/' .. 'stylua.toml'
-    if file_exists(config) then return config end
+    if file_exists(config) then
+      return config
+    end
     dir = fn.fnamemodify(dir, ':h')
-  until (dir == '/')
+  until dir == '/'
 end
 
 function apply_stylua()
-  local stylua_exec = os.getenv('HOME')..'/.cargo/bin/stylua'
+  local stylua_exec = os.getenv('HOME') .. '/.cargo/bin/stylua'
   if not file_exists(stylua_exec) then
     return
   end
@@ -133,9 +137,11 @@ function apply_stylua()
     return
   end
 
-  cmd(('silent exec "!%s --config-path %s %s" | e!'):format(
-    stylua_exec,
-    stylua_config,
-    filename
-  ))
+  cmd(
+    ('silent exec "!%s --config-path %s %s" | e!'):format(
+      stylua_exec,
+      stylua_config,
+      filename
+    )
+  )
 end
