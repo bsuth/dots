@@ -8,8 +8,8 @@ local core = {}
 -- -----------------------------------------------------------------------------
 
 core.HEIGHT = 50
-core.FONT_FAMILY = 'Hack Regular'
-core.FONT = core.FONT_FAMILY .. ' 14'
+core.FONT_FAMILY = 'Hack'
+core.FONT = core.FONT_FAMILY .. ' 12'
 
 -- -----------------------------------------------------------------------------
 -- markupText
