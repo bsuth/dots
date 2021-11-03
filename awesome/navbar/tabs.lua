@@ -98,7 +98,7 @@ function Tabs:refresh(args)
     end
   end
 
-  self.widget.children = children
+  self.tabsWidget.children = children
 end
 
 -- -----------------------------------------------------------------------------
@@ -124,7 +124,7 @@ return function(navbar, screen)
   }, TabsMT)
 
   newTabs.widget = wibox.widget({
-    newTabs.widget,
+    newTabs.tabsWidget,
     layout = wibox.container.place,
   })
 
