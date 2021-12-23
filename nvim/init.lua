@@ -79,6 +79,7 @@ cmd('au FileType * lua setupheaders()')
 -- Formatting
 cmd('au BufWritePost *.lua lua apply_stylua()')
 cmd('au BufWritePost *.js,*.jsx,*.ts,*.tsx,*.css,*.scss FormatWrite')
+cmd('au BufEnter *.vim :set syntax=vim')
 
 cmd('augroup END')
 
@@ -201,7 +202,7 @@ map('n', '<leader>lsp', ':silent :LspRestart<cr>')
 -- map('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
 -- map('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
 -- map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
--- map('n', '<space>e', '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>')
+map('n', "'e", '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>')
 -- map('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
 -- map('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
 -- map('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>')

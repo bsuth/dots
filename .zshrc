@@ -10,6 +10,7 @@ setopt appendhistory autocd extendedglob nomatch notify
 unsetopt beep
 
 # Completion
+setopt complete_aliases
 zstyle ':completion:*' completer _complete _ignored _approximate
 zstyle ':completion:*' matcher-list '' '' '' ''
 zstyle :compinstall filename "$HOME/.zshrc"
@@ -138,12 +139,20 @@ alias lrocks5.1='luarocks --lua-version=5.1 --local'
 alias lrocks5.2='luarocks --lua-version=5.2 --local'
 alias lrocks5.3='luarocks --lua-version=5.3 --local'
 alias lrocks5.4='luarocks --lua-version=5.4 --local'
+compdef lrocks5.1='luarocks'
+compdef lrocks5.2='luarocks'
+compdef lrocks5.3='luarocks'
+compdef lrocks5.4='luarocks'
 
-alias erde="$HOME/repos/erde/cli/init.lua"
+alias loverocks='luarocks --lua-version 5.1 --tree luarocks_modules'
+compdef loverocks='luarocks'
+
 alias aur='git pull && makepkg -si'
 
 alias single='~/.screenlayout/single.sh'
 alias double='~/.screenlayout/double.sh'
+
+alias erde="$HOME/repos/erde/bin/erde"
 
 # ------------------------------------------------------------------------------
 # Functions
