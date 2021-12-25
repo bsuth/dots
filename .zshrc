@@ -133,6 +133,9 @@ chpwd_functions=(${chpwd_functions[@]} "on_cd")
 # Aliases
 # ------------------------------------------------------------------------------
 
+alias aur='git pull && makepkg -si'
+alias single='~/.screenlayout/single.sh'
+alias double='~/.screenlayout/double.sh'
 alias testwm='Xephyr -br -ac -noreset -screen 800x600 :1 &; DISPLAY=:1 awesome'
 
 alias lrocks5.1='luarocks --lua-version=5.1 --local'
@@ -146,13 +149,6 @@ compdef lrocks5.4='luarocks'
 
 alias loverocks='luarocks --lua-version 5.1 --tree luarocks_modules'
 compdef loverocks='luarocks'
-
-alias aur='git pull && makepkg -si'
-
-alias single='~/.screenlayout/single.sh'
-alias double='~/.screenlayout/double.sh'
-
-alias erde="$HOME/repos/erde/bin/erde"
 
 # ------------------------------------------------------------------------------
 # Functions
@@ -168,4 +164,13 @@ function hhkb() {
   setxkbmap us
   ln -sf ~/dots/.hhkb.Xmodmap ~/.Xmodmap
   xmodmap ~/.Xmodmap
+}
+
+function erde() {
+  ERDE_ROOT="$HOME/repos/erde"
+  LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
+  LUA_PATH_5_2="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_2"
+  LUA_PATH_5_3="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_3"
+  LUA_PATH_5_4="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_4"
+  $HOME/repos/erde/bin/erde $@
 }
