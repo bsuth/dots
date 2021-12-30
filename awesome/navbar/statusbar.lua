@@ -18,10 +18,22 @@ local function BatteryWidget()
     widget = wibox.widget.imagebox,
   })
 
+  local markupWidget = wibox.widget({
+    markup = core.markupText(
+      math.ceil(models.battery.percent) .. '%',
+      beautiful.colors.red
+    ),
+    widget = wibox.widget.textbox,
+  })
+
   models.battery:connect_signal('update', function()
     iconWidget.image = models.battery.discharging
         and beautiful.assets('battery-discharging.svg')
       or beautiful.assets('battery-charging.svg')
+    markupWidget.markup = core.markupText(
+      math.ceil(models.battery.percent) .. '%',
+      beautiful.colors.red
+    )
   end)
 
   return wibox.widget({
@@ -30,13 +42,7 @@ local function BatteryWidget()
       right = 8,
       widget = wibox.container.margin,
     },
-    {
-      markup = core.markupText(
-        math.ceil(models.battery.percent) .. '%',
-        beautiful.colors.red
-      ),
-      widget = wibox.widget.textbox,
-    },
+    markupWidget,
     layout = wibox.layout.fixed.horizontal,
   })
 end
