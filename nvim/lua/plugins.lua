@@ -209,8 +209,16 @@ function prettierFormatter()
   }
 end
 
+cmd([[
+  augroup formatonsave
+    autocmd!
+    au BufWritePost *.json,*.js,*.jsx,*.ts,*.tsx,*.css,*.scss FormatWrite
+  augroup END
+]])
+
 formatter.setup({
   filetype = {
+    json = { prettierFormatter },
     javascript = { prettierFormatter },
     javascriptreact = { prettierFormatter },
     typescript = { prettierFormatter },

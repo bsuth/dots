@@ -150,6 +150,8 @@ compdef lrocks5.4='luarocks'
 alias loverocks='luarocks --lua-version 5.1 --tree luarocks_modules'
 compdef loverocks='luarocks'
 
+alias kaos='love ~/repos/kaos-love'
+
 # ------------------------------------------------------------------------------
 # Functions
 # ------------------------------------------------------------------------------
