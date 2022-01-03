@@ -38,6 +38,10 @@ function search_visual_selection()
   cmd('normal n')
 end
 
+function replace_visual_selection()
+  nvim_input(':s/' .. get_visual_selection() .. '//g<Left><Left>')
+end
+
 -- -----------------------------------------------------------------------------
 -- CWD Tracking
 -- -----------------------------------------------------------------------------

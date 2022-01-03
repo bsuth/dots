@@ -117,6 +117,9 @@ map('n', ':', ':<c-f><c-c>')
 map('n', '<c-_>', ':Commentary<cr>') -- secretly <c-/>
 map('v', '<c-_>', ':Commentary<cr>')
 
+map('v', '<c-n>', ':lua search_visual_selection()<cr>')
+map('v', '<c-s>', ':lua replace_visual_selection()<cr>')
+
 --
 -- Splits
 --
@@ -141,7 +144,6 @@ map('n', '<m-d>', '<c-d>')
 map('n', '<m-u>', '<c-u>')
 map('n', '<c-f>', 'l%')
 map('v', '<c-f>', 'l%')
-map('v', '<c-n>', ':lua search_visual_selection()<cr>')
 
 --
 -- Quickmarks
