@@ -1,6 +1,8 @@
 -- -----------------------------------------------------------------------------
--- Environment
+-- Helpers
 -- -----------------------------------------------------------------------------
+
+local terminalBufferPatterns = { 'term://*zsh*', 'term://*bash*' }
 
 -- Inject all vim.* properties into global space
 for k, v in pairs(vim) do
@@ -16,10 +18,44 @@ for k, v in pairs(vim.api) do
   end
 end
 
--- Unload local lua modules to allow re-sourcing
-for _, v in ipairs({ 'helpers', 'plugins' }) do
-  package.loaded[v] = nil
-  require(v)
+function file_exists(filename)
+  local f = io.open(filename, 'r')
+  if f ~= nil then
+    io.close(f)
+    return true
+  else
+    return false
+  end
+end
+
+function map(mode, lhs, rhs, opts)
+  opts = tbl_extend('force', { noremap = true }, opts or {})
+  nvim_set_keymap(mode, lhs, rhs, opts)
+end
+
+function autocmd(event, command, patterns)
+  return table.concat({
+    'au',
+    event,
+    type(patterns) == 'table' and table.concat(patterns, ',') or patterns,
+    command,
+  }, ' ')
+end
+
+function augroup(name, autocommands)
+  cmd('augroup ' .. name)
+  cmd('au!')
+
+  for i, autocommand in pairs(autocommands) do
+    cmd(autocommand)
+  end
+
+  cmd('augroup END')
+end
+
+function rerequire(moduleName)
+  package.loaded[moduleName] = nil -- Unload to allow re-sourcing
+  require(moduleName)
 end
 
 -- -----------------------------------------------------------------------------
@@ -56,60 +92,98 @@ opt.scrollback = 100000
 opt.commentstring = '//%s'
 
 -- -----------------------------------------------------------------------------
--- Autocommands
+-- Packer
+-- https://github.com/wbthomason/packer.nvim
 -- -----------------------------------------------------------------------------
 
-cmd('augroup bsuth')
-
--- CWD Tracking
-cmd('au TermOpen term://*zsh*,term://*bash* lua save_cwd()')
-cmd('au TermClose term://*zsh*,term://*bash* lua restore_cwd()')
-cmd('au BufEnter * lua track_cwd()')
-
--- Dirvish
-cmd('au TermClose term://*zsh*,term://*bash* Dirvish')
-cmd(
-  'au FileType dirvish nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>'
-)
-
--- Term
-cmd('au TermOpen term://*zsh*,term://*bash* setlocal nonumber wrap')
-cmd('au TermOpen term://*zsh*,term://*bash* startinsert')
-
--- Headers
-cmd('au FileType * lua setupheaders()')
-
--- Formatting
-cmd('au BufWritePost *.lua lua apply_stylua()')
-cmd('au BufEnter *.vim :set syntax=vim')
-
-cmd('augroup END')
-
--- -----------------------------------------------------------------------------
--- Mappings
--- -----------------------------------------------------------------------------
-
---
--- Setup
---
-
-g.mapleader = ' '
-
-local function map(mode, lhs, rhs, opts)
-  opts = tbl_extend('force', { noremap = true }, opts or {})
-  nvim_set_keymap(mode, lhs, rhs, opts)
+local packer_bootstrap
+local packer_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+if fn.empty(fn.glob(packer_path)) > 0 then
+  packer_bootstrap = fn.system({
+    'git',
+    'clone',
+    '--depth',
+    '1',
+    'https://github.com/wbthomason/packer.nvim',
+    packer_path,
+  })
 end
 
---
--- Core
---
+cmd('packadd packer.nvim')
+require('packer').startup(function()
+  -- core
+  use('wbthomason/packer.nvim')
+  use('nvim-lua/plenary.nvim')
+
+  -- lsp, completion, formatter
+  use('neovim/nvim-lspconfig')
+  use('hrsh7th/nvim-cmp')
+  use('hrsh7th/vim-vsnip')
+  use('hrsh7th/vim-vsnip-integ')
+  use('mhartington/formatter.nvim')
+  use('fatih/vim-go')
+
+  -- completion sources
+  use('hrsh7th/cmp-buffer')
+  use('hrsh7th/cmp-path')
+  use('hrsh7th/cmp-nvim-lsp')
+  use('hrsh7th/cmp-vsnip')
+
+  -- syntax
+  use('nvim-treesitter/nvim-treesitter')
+  use('navarasu/onedark.nvim')
+
+  -- apps
+  use('justinmk/vim-dirvish')
+  use('hoob3rt/lualine.nvim')
+  use('nvim-telescope/telescope.nvim')
+  use({ 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
+
+  -- util
+  use('tpope/vim-surround')
+  use('tpope/vim-commentary')
+  use('matze/vim-move')
+  use('lambdalisue/suda.vim')
+
+  -- Local plugins can be included
+  use('~/repos/vim-erde')
+
+  -- Automatically set up your configuration after cloning packer.nvim
+  -- Put this at the end after all plugins
+  if packer_bootstrap then
+    require('packer').sync()
+  end
+end)
+
+-- -----------------------------------------------------------------------------
+-- General
+-- -----------------------------------------------------------------------------
+
+rerequire('language-support')
+rerequire('telescope-config')
+
+-- prevent netrw from taking over:
+-- https://github.com/justinmk/vim-dirvish/issues/137
+g.loaded_netrwPlugin = true
+
+g.mapleader = ' '
+g.suda_smart_edit = true
+g.go_fmt_autosave = true
+
+cmd('colorscheme onedark')
+
+augroup('bsuth-general', {
+  autocmd('TermOpen', 'setlocal nonumber wrap', terminalBufferPatterns),
+  autocmd('TermOpen', 'startinsert', terminalBufferPatterns),
+})
 
 map('n', '<leader>ev', ':Dirvish ~/dots/nvim/lua<cr>')
 map('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
 map('n', '<c-space>', ':term<cr>')
-map('n', '<leader>/', ':nohlsearch<cr><c-l>')
 map('t', '<c-[>', '<c-\\><c-n>')
+
+map('n', '<leader>/', ':nohlsearch<cr><c-l>')
 
 map('n', '<leader>?', ':help ')
 map('n', '<leader>v?', ':vert :help ')
@@ -117,36 +191,21 @@ map('n', '<leader>v?', ':vert :help ')
 map('c', '<c-space>', '<c-f>')
 map('n', ':', ':<c-f><c-c>')
 
-map('n', '<c-_>', ':Commentary<cr>') -- secretly <c-/>
-map('v', '<c-_>', ':Commentary<cr>')
+map('n', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
+map('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 
-map('v', '<c-n>', ':lua search_visual_selection()<cr>')
-map('v', '<c-s>', ':lua replace_visual_selection()<cr>')
-
---
--- Splits
---
+map('n', '<c-f>', 'l%')
+map('v', '<c-f>', 'l%')
 
 map('n', '<leader>w', '<c-w>')
-
 map('n', '<c-h>', '<c-w>h')
 map('n', '<c-j>', '<c-w>j')
 map('n', '<c-k>', '<c-w>k')
 map('n', '<c-l>', '<c-w>l')
-
 map('n', '<leader><c-l>', ':rightbelow :vsp | :Dirvish<cr>')
 map('n', '<leader><c-k>', ':aboveleft :sp | :Dirvish<cr>')
 map('n', '<leader><c-j>', ':rightbelow :sp | :Dirvish<cr>')
 map('n', '<leader><c-h>', ':aboveleft :vsp | :Dirvish<cr>')
-
---
--- Movement
---
-
-map('n', '<m-d>', '<c-d>')
-map('n', '<m-u>', '<c-u>')
-map('n', '<c-f>', 'l%')
-map('v', '<c-f>', 'l%')
 
 --
 -- Quickmarks
@@ -188,31 +247,6 @@ map('c', '<c-u>', '<C-f>d^<C-c>')
 map('c', '<c-k>', '<C-f>d$A<C-c>')
 
 --
--- LSP Config
---
-
-map('n', '<leader>lsp', ':silent :LspRestart<cr>')
--- map('i', '<c-space>', 'coc#refresh()', { expr = true, silent = true })
-
--- map('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>')
--- map('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>')
--- map('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>')
--- map('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>')
--- map('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>')
--- map('n', '<space>wa', '<cmd>lua vim.lsp.buf.add_workspace_folder()<CR>')
--- map('n', '<space>wr', '<cmd>lua vim.lsp.buf.remove_workspace_folder()<CR>')
--- map('n', '<space>wl', '<cmd>lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<CR>')
--- map('n', '<space>D', '<cmd>lua vim.lsp.buf.type_definition()<CR>')
--- map('n', '<space>rn', '<cmd>lua vim.lsp.buf.rename()<CR>')
--- map('n', '<space>ca', '<cmd>lua vim.lsp.buf.code_action()<CR>')
--- map('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>')
-map('n', "'e", '<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>')
--- map('n', '[d', '<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>')
--- map('n', ']d', '<cmd>lua vim.lsp.diagnostic.goto_next()<CR>')
--- map('n', '<space>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>')
--- map('n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>')
-
---
 -- Telescope
 --
 
@@ -221,3 +255,166 @@ map('n', '<leader>cd', ':lua telescope_change_dir()<cr>')
 map('n', '<leader>fd', ':Telescope find_files<cr>')
 map('n', '<leader>rg', ':Telescope live_grep<cr>')
 map('n', '<leader>buf', ':Telescope buffers<cr>')
+
+-- -----------------------------------------------------------------------------
+-- Dirvish
+-- -----------------------------------------------------------------------------
+
+function dirvish_xdg_open()
+  local file = fn.expand('<cWORD>')
+  local dir = fn.fnamemodify(file, ':p:h')
+  local ext = fn.fnamemodify(file, ':e')
+
+  if ext == 'png' then
+    os.execute('xdg-open ' .. file .. ' &>/dev/null')
+  else
+    fn['dirvish#open']('edit', 0)
+    cmd('cd ' .. dir)
+  end
+end
+
+augroup('bsuth-dirvish', {
+  autocmd('TermClose', 'Dirvish', terminalBufferPatterns),
+  autocmd(
+    'FileType',
+    'nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>',
+    'dirvish'
+  ),
+})
+
+-- -----------------------------------------------------------------------------
+-- Visual Selection
+-- -----------------------------------------------------------------------------
+
+local function get_visual_selection()
+  local buffer, line_start, column_start = unpack(fn.getpos("'<"))
+  local buffer, line_end, column_end = unpack(fn.getpos("'>"))
+
+  local lines = fn.getline(line_start, line_end)
+  fn.setpos('.', { { 0, line_start, column_start, 0 } })
+
+  if #lines == 1 then
+    lines[1] = lines[1]:sub(column_start, column_end)
+  elseif #lines > 1 then
+    lines[1] = lines[1]:sub(column_start)
+    lines[#lines] = lines[#lines]:sub(1, column_end)
+  end
+
+  return table.concat(lines, '\n')
+end
+
+function search_visual_selection()
+  fn.setreg('/', get_visual_selection())
+  cmd('normal n')
+end
+
+function replace_visual_selection()
+  nvim_input(':s/' .. get_visual_selection() .. '//g<Left><Left>')
+end
+
+map('v', '<c-n>', ':lua search_visual_selection()<cr>')
+map('v', '<c-s>', ':lua replace_visual_selection()<cr>')
+
+-- -----------------------------------------------------------------------------
+-- CWD Tracking
+-- -----------------------------------------------------------------------------
+
+local cwd_cache = {}
+
+function save_cwd()
+  local bufname = nvim_buf_get_name(0)
+  cwd_cache[bufname] = fn.getcwd()
+end
+
+function restore_cwd()
+  local bufname = nvim_buf_get_name(0)
+  if cwd_cache[bufname] ~= nil then
+    cmd(('cd %s'):format(cwd_cache[bufname]))
+    cwd_cache[bufname] = nil
+  end
+end
+
+function track_cwd()
+  local bufname = nvim_buf_get_name(0)
+
+  if bufname:match('^term://') then
+    if cwd_cache[bufname] ~= nil then
+      cmd(('cd %s'):format(cwd_cache[bufname]))
+    end
+  else
+    -- Change to current buffer's parent directory
+    cmd(('cd %s'):format(fn.fnamemodify(bufname, ':p:h'):gsub('^suda://', '')))
+
+    -- refresh dirvish after cd
+    if nvim_buf_get_option(0, 'filetype') == 'dirvish' then
+      cmd('Dirvish')
+    end
+  end
+end
+
+augroup('bsuth-cwd-track', {
+  autocmd('BufEnter', 'lua track_cwd()', '*'),
+  autocmd('TermOpen', 'lua save_cwd()', terminalBufferPatterns),
+  autocmd('TermClose', 'lua restore_cwd()', terminalBufferPatterns),
+})
+
+-- -----------------------------------------------------------------------------
+-- Stylua
+-- https://github.com/JohnnyMorganz/StyLua
+-- -----------------------------------------------------------------------------
+
+local function get_stylua_config(dir)
+  repeat
+    local config = dir .. '/' .. 'stylua.toml'
+    if file_exists(config) then
+      return config
+    end
+    dir = fn.fnamemodify(dir, ':h')
+  until dir == '/'
+end
+
+function apply_stylua()
+  local stylua_exec = os.getenv('HOME') .. '/.cargo/bin/stylua'
+  if not file_exists(stylua_exec) then
+    return
+  end
+
+  local filename = fn.expand('%:p')
+  local stylua_config = get_stylua_config(fn.fnamemodify(filename, ':h'))
+  if not stylua_config then
+    return
+  end
+
+  cmd(
+    ('silent exec "!%s --config-path %s %s" | e!'):format(
+      stylua_exec,
+      stylua_config,
+      filename
+    )
+  )
+end
+
+augroup('bsuth-stylua', {
+  autocmd('BufWritePost', 'lua apply_stylua()', '*.lua'),
+})
+
+-- -----------------------------------------------------------------------------
+-- Lualine
+-- https://github.com/hoob3rt/lualine.nvim
+-- -----------------------------------------------------------------------------
+
+-- Lualine dissapears on rc reload unless we unload it completely before
+-- calling setup. Fixed but awaiting merge. Track here:
+-- https://github.com/hoob3rt/lualine.nvim/issues/276
+require('plenary.reload').reload_module('lualine', true)
+
+require('lualine').setup({
+  options = {
+    icons_enabled = false,
+    theme = 'onedark',
+  },
+
+  sections = {
+    lualine_x = {},
+  },
+})
