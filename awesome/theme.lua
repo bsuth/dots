@@ -65,7 +65,7 @@ naughty.config.defaults.position = 'top_left'
 -- -----------------------------------------------------------------------------
 
 function beautiful.assets(path)
-  return '/home/bsuth/dots/awesome/assets/' .. path
+  return os.getenv('HOME') .. '/dots/awesome/assets/' .. path
 end
 
 function beautiful.hex2rgb(hex)
