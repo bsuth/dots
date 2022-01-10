@@ -44,5 +44,5 @@ $DOTS/bin/dots_st
 $DOTS/bin/dots_symlinks
 
 echo "The following need to be setup manually:"
-echo "1) Firefox: profile / userChrome / surfingkeys"
+echo "1) Vivaldi"
 echo "2) Services (physlock)"

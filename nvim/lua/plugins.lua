@@ -27,6 +27,7 @@ require('packer').startup(function()
   use('hrsh7th/vim-vsnip')
   use('hrsh7th/vim-vsnip-integ')
   use('mhartington/formatter.nvim')
+  use('fatih/vim-go')
 
   -- completion sources
   use('hrsh7th/cmp-buffer')
@@ -63,6 +64,7 @@ end)
 g.loaded_netrwPlugin = true
 
 g.suda_smart_edit = true
+g.go_fmt_autosave = true
 cmd('colorscheme onedark')
 
 -- -----------------------------------------------------------------------------

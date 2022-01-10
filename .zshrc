@@ -23,11 +23,11 @@ compinit
 
 # Install zinit if not installed
 if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-    print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
-    command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-    command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
-        print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
-        print -P "%F{160}▓▒░ The clone has failed.%f"
+  print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
+  command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
+  command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
+    print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
+    print -P "%F{160}▓▒░ The clone has failed.%f"
 fi
 
 # Load zinit
@@ -150,8 +150,6 @@ compdef lrocks5.4='luarocks'
 alias loverocks='luarocks --lua-version 5.1 --tree luarocks_modules'
 compdef loverocks='luarocks'
 
-alias kaos='love ~/repos/kaos-love'
-
 # ------------------------------------------------------------------------------
 # Functions
 # ------------------------------------------------------------------------------
@@ -168,11 +166,25 @@ function hhkb() {
   xmodmap ~/.Xmodmap
 }
 
-function erde() {
-  ERDE_ROOT="$HOME/repos/erde"
-  LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
-  LUA_PATH_5_2="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_2"
-  LUA_PATH_5_3="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_3"
-  LUA_PATH_5_4="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_4"
-  $HOME/repos/erde/bin/erde $@
-}
+# ------------------------------------------------------------------------------
+# Personal vs Work
+# ------------------------------------------------------------------------------
+
+if [[ -f $HOME/dots/.zshwork ]]; then
+  source $HOME/dots/.zshwork
+else
+  alias kaos='love ~/repos/kaos-love'
+
+  function erde() {
+    ERDE_ROOT="$HOME/repos/erde"
+
+    if [[ $LUA_PATH != *"$ERDE_ROOT"* ]]; then
+      LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
+      LUA_PATH_5_2="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_2"
+      LUA_PATH_5_3="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_3"
+      LUA_PATH_5_4="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_4"
+    fi
+
+    $HOME/repos/erde/bin/erde $@
+  }
+fi
