@@ -134,8 +134,8 @@ cmp.setup({
     ['<c-d>'] = cmp.mapping.scroll_docs(-4),
     ['<c-f>'] = cmp.mapping.scroll_docs(4),
     ['<c-Space>'] = cmp.mapping.complete(),
-    -- ['<c-c>'] = cmp.mapping.close(),
-    -- ['<cr>'] = cmp.mapping.confirm({ select = true }),
+    ['<c-c>'] = cmp.mapping.close(),
+    ['<cr>'] = cmp.mapping.confirm({ select = true }),
   },
   sources = {
     { name = 'nvim_lsp' },
@@ -221,7 +221,9 @@ end
 cmd([[
   augroup formatonsave
     autocmd!
-    au BufWritePost *.json,*.js,*.jsx,*.ts,*.tsx,*.css,*.scss FormatWrite
+    au BufWritePost *.jsonc,*.json FormatWrite
+    au BufWritePost *.js,*.jsx,*.ts,*.tsx FormatWrite
+    au BufWritePost *.css,*.scss,*.less FormatWrite
   augroup END
 ]])
 

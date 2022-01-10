@@ -2,18 +2,21 @@
 -- Environment
 -- -----------------------------------------------------------------------------
 
+-- Inject all vim.* properties into global space
 for k, v in pairs(vim) do
   if _G[k] == nil then
     _G[k] = v
   end
 end
 
+-- Inject all vim.api.nvim_* functions into global space
 for k, v in pairs(vim.api) do
   if type(v) == 'function' and k:match('^nvim_') then
     _G[k] = v
   end
 end
 
+-- Unload local lua modules to allow re-sourcing
 for _, v in ipairs({ 'helpers', 'plugins' }) do
   package.loaded[v] = nil
   require(v)
