@@ -16,7 +16,7 @@ map('n', '<leader>lsp', ':silent :LspRestart<cr>')
 -- map('n', '<space>rn', ':lua vim.lsp.buf.rename()<cr>')
 -- map('n', '<space>ca', ':lua vim.lsp.buf.code_action()<cr>')
 -- map('n', 'gr', ':lua vim.lsp.buf.references()<cr>')
-map('n', "'e", ':lua lsp.diagnostic.show_line_diagnostics()<cr>')
+map('n', "'e", ':lua vim.lsp.diagnostic.show_line_diagnostics()<cr>')
 -- map('n', '[d', ':lua vim.lsp.diagnostic.goto_prev()<cr>')
 -- map('n', ']d', ':lua vim.lsp.diagnostic.goto_next()<cr>')
 -- map('n', '<space>q', ':lua vim.lsp.diagnostic.set_loclist()<cr>')
@@ -145,7 +145,7 @@ function prettierFormatter()
   }
 end
 
-cmd([[
+vim.cmd([[
   augroup formatonsave
     autocmd!
     au BufWritePost *.jsonc,*.json FormatWrite

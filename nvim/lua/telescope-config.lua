@@ -28,32 +28,46 @@ telescope.setup({
 
 telescope.load_extension('fzf')
 
---
--- Helpers
---
+map('n', '<leader><leader>', ':lua telescope_favorites()<cr>')
+map('n', '<leader>fd', ':lua telescope_open()<cr>')
+map('n', '<leader>rg', ':Telescope live_grep<cr>')
+map('n', '<leader>buf', ':Telescope buffers<cr>')
 
-local fd = { 'fd', '--follow', '--type', 'd' }
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
+
+local telescope_fd = {
+  'fd',
+  '--follow',
+  '--type',
+  'f',
+  '--type',
+  'd',
+  '--exclude',
+  'go',
+}
 
 local function telescope_edit_action(prompt_bufnr)
   local current_picker = action_state.get_current_picker(prompt_bufnr)
   actions.close(prompt_bufnr)
-  cmd(('edit %s'):format(table.concat({
+  vim.cmd(('edit %s'):format(table.concat({
     current_picker.cwd or '.',
     action_state.get_selected_entry().value,
   }, '/')))
 end
 
---
--- Picker: Favorites
---
+-- -----------------------------------------------------------------------------
+-- Pickers
+-- -----------------------------------------------------------------------------
 
 function telescope_favorites()
   local opts = {}
 
   local favorites = { 'dots', 'repos' }
-  local job = tbl_flatten({
-    fd,
-    tbl_flatten(tbl_map(function(v)
+  local job = vim.tbl_flatten({
+    telescope_fd,
+    vim.tbl_flatten(vim.tbl_map(function(v)
       return { '--search-path', v }
     end, favorites)),
   })
@@ -70,19 +84,15 @@ function telescope_favorites()
   }):find()
 end
 
---
--- Picker: Change Directory
---
-
-function telescope_change_dir()
+function telescope_open()
   local opts = {}
 
   local function cwd_tree_finder(cwd)
-    return finders.new_oneshot_job(fd, { cwd = cwd })
+    return finders.new_oneshot_job(telescope_fd, { cwd = cwd })
   end
 
   pickers.new(opts, {
-    prompt_title = 'Change Directory',
+    prompt_title = 'Open',
     finder = cwd_tree_finder(),
     sorter = config.generic_sorter(opts),
     attach_mappings = function(prompt_bufnr, map)

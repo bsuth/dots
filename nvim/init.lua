@@ -4,17 +4,10 @@
 
 local terminalBufferPatterns = { 'term://*zsh*', 'term://*bash*' }
 
--- Inject all vim.* properties into global space
-for k, v in pairs(vim) do
-  if _G[k] == nil then
-    _G[k] = v
-  end
-end
-
 -- Inject all vim.api.nvim_* functions into global space
-for k, v in pairs(vim.api) do
-  if type(v) == 'function' and k:match('^nvim_') then
-    _G[k] = v
+for key, value in pairs(vim.api) do
+  if type(value) == 'function' and key:match('^nvim_') then
+    _G[key] = value
   end
 end
 
@@ -29,7 +22,7 @@ function file_exists(filename)
 end
 
 function map(mode, lhs, rhs, opts)
-  opts = tbl_extend('force', { noremap = true }, opts or {})
+  opts = vim.tbl_extend('force', { noremap = true }, opts or {})
   nvim_set_keymap(mode, lhs, rhs, opts)
 end
 
@@ -43,14 +36,14 @@ function autocmd(event, command, patterns)
 end
 
 function augroup(name, autocommands)
-  cmd('augroup ' .. name)
-  cmd('au!')
+  vim.cmd('augroup ' .. name)
+  vim.cmd('au!')
 
   for i, autocommand in pairs(autocommands) do
-    cmd(autocommand)
+    vim.cmd(autocommand)
   end
 
-  cmd('augroup END')
+  vim.cmd('augroup END')
 end
 
 function rerequire(moduleName)
@@ -63,33 +56,33 @@ end
 -- -----------------------------------------------------------------------------
 
 -- casing
-opt.ignorecase = true
-opt.smartcase = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
 -- splitting
-opt.splitright = true
-opt.splitbelow = true
+vim.opt.splitright = true
+vim.opt.splitbelow = true
 
 -- tabs
-opt.tabstop = 2
-opt.softtabstop = 2
-opt.shiftwidth = 2
-opt.expandtab = true
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
 
 -- interface
-opt.termguicolors = true
-opt.number = true
-opt.signcolumn = 'yes'
-opt.showmode = false
-opt.colorcolumn = '80'
-cmd('highlight ColorColumn guibg=#585858')
+vim.opt.termguicolors = true
+vim.opt.number = true
+vim.opt.signcolumn = 'yes'
+vim.opt.showmode = false
+vim.opt.colorcolumn = '80'
+vim.cmd('highlight ColorColumn guibg=#585858')
 
 -- misc
-opt.wrap = false
-opt.clipboard = 'unnamedplus'
-opt.updatetime = 300
-opt.scrollback = 100000
-opt.commentstring = '//%s'
+vim.opt.wrap = false
+vim.opt.clipboard = 'unnamedplus'
+vim.opt.updatetime = 300
+vim.opt.scrollback = 100000
+vim.opt.commentstring = '//%s'
 
 -- -----------------------------------------------------------------------------
 -- Packer
@@ -97,9 +90,11 @@ opt.commentstring = '//%s'
 -- -----------------------------------------------------------------------------
 
 local packer_bootstrap
-local packer_path = fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
-if fn.empty(fn.glob(packer_path)) > 0 then
-  packer_bootstrap = fn.system({
+local packer_path = vim.fn.stdpath('data')
+  .. '/site/pack/packer/start/packer.nvim'
+
+if vim.fn.empty(vim.fn.glob(packer_path)) > 0 then
+  packer_bootstrap = vim.fn.system({
     'git',
     'clone',
     '--depth',
@@ -109,7 +104,7 @@ if fn.empty(fn.glob(packer_path)) > 0 then
   })
 end
 
-cmd('packadd packer.nvim')
+vim.cmd('packadd packer.nvim')
 require('packer').startup(function()
   -- core
   use('wbthomason/packer.nvim')
@@ -159,22 +154,20 @@ end)
 -- General
 -- -----------------------------------------------------------------------------
 
-rerequire('language-support')
-rerequire('telescope-config')
-
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
-g.loaded_netrwPlugin = true
+vim.g.loaded_netrwPlugin = true
 
-g.mapleader = ' '
-g.suda_smart_edit = true
-g.go_fmt_autosave = true
+vim.g.mapleader = ' '
+vim.g.suda_smart_edit = true
+vim.g.go_fmt_autosave = true
 
-cmd('colorscheme onedark')
+vim.cmd('colorscheme onedark')
 
 augroup('bsuth-general', {
   autocmd('TermOpen', 'setlocal nonumber wrap', terminalBufferPatterns),
   autocmd('TermOpen', 'startinsert', terminalBufferPatterns),
+  autocmd('TermClose', 'bd', terminalBufferPatterns),
 })
 
 map('n', '<leader>ev', ':Dirvish ~/dots/nvim/lua<cr>')
@@ -246,30 +239,20 @@ map('c', '<m-backspace>', '<C-f>db<C-c>')
 map('c', '<c-u>', '<C-f>d^<C-c>')
 map('c', '<c-k>', '<C-f>d$A<C-c>')
 
---
--- Telescope
---
-
-map('n', '<leader><leader>', ':lua telescope_favorites()<cr>')
-map('n', '<leader>cd', ':lua telescope_change_dir()<cr>')
-map('n', '<leader>fd', ':Telescope find_files<cr>')
-map('n', '<leader>rg', ':Telescope live_grep<cr>')
-map('n', '<leader>buf', ':Telescope buffers<cr>')
-
 -- -----------------------------------------------------------------------------
 -- Dirvish
 -- -----------------------------------------------------------------------------
 
 function dirvish_xdg_open()
-  local file = fn.expand('<cWORD>')
-  local dir = fn.fnamemodify(file, ':p:h')
-  local ext = fn.fnamemodify(file, ':e')
+  local file = vim.fn.expand('<cWORD>')
+  local dir = vim.fn.fnamemodify(file, ':p:h')
+  local ext = vim.fn.fnamemodify(file, ':e')
 
   if ext == 'png' then
     os.execute('xdg-open ' .. file .. ' &>/dev/null')
   else
-    fn['dirvish#open']('edit', 0)
-    cmd('cd ' .. dir)
+    vim.fn['dirvish#open']('edit', 0)
+    vim.cmd('cd ' .. dir)
   end
 end
 
@@ -287,11 +270,11 @@ augroup('bsuth-dirvish', {
 -- -----------------------------------------------------------------------------
 
 local function get_visual_selection()
-  local buffer, line_start, column_start = unpack(fn.getpos("'<"))
-  local buffer, line_end, column_end = unpack(fn.getpos("'>"))
+  local buffer, line_start, column_start = unpack(vim.fn.getpos("'<"))
+  local buffer, line_end, column_end = unpack(vim.fn.getpos("'>"))
 
-  local lines = fn.getline(line_start, line_end)
-  fn.setpos('.', { { 0, line_start, column_start, 0 } })
+  local lines = vim.fn.getline(line_start, line_end)
+  vim.fn.setpos('.', { { 0, line_start, column_start, 0 } })
 
   if #lines == 1 then
     lines[1] = lines[1]:sub(column_start, column_end)
@@ -304,8 +287,8 @@ local function get_visual_selection()
 end
 
 function search_visual_selection()
-  fn.setreg('/', get_visual_selection())
-  cmd('normal n')
+  vim.fn.setreg('/', get_visual_selection())
+  vim.cmd('normal n')
 end
 
 function replace_visual_selection()
@@ -323,13 +306,13 @@ local cwd_cache = {}
 
 function save_cwd()
   local bufname = nvim_buf_get_name(0)
-  cwd_cache[bufname] = fn.getcwd()
+  cwd_cache[bufname] = vim.fn.getcwd()
 end
 
 function restore_cwd()
   local bufname = nvim_buf_get_name(0)
   if cwd_cache[bufname] ~= nil then
-    cmd(('cd %s'):format(cwd_cache[bufname]))
+    vim.cmd(('cd %s'):format(cwd_cache[bufname]))
     cwd_cache[bufname] = nil
   end
 end
@@ -339,15 +322,16 @@ function track_cwd()
 
   if bufname:match('^term://') then
     if cwd_cache[bufname] ~= nil then
-      cmd(('cd %s'):format(cwd_cache[bufname]))
+      vim.cmd(('cd %s'):format(cwd_cache[bufname]))
     end
   else
     -- Change to current buffer's parent directory
-    cmd(('cd %s'):format(fn.fnamemodify(bufname, ':p:h'):gsub('^suda://', '')))
+    local parentDir = vim.fn.fnamemodify(bufname, ':p:h'):gsub('^suda://', '')
+    vim.cmd('cd ' .. parentDir)
 
     -- refresh dirvish after cd
     if nvim_buf_get_option(0, 'filetype') == 'dirvish' then
-      cmd('Dirvish')
+      vim.cmd('Dirvish')
     end
   end
 end
@@ -369,7 +353,7 @@ local function get_stylua_config(dir)
     if file_exists(config) then
       return config
     end
-    dir = fn.fnamemodify(dir, ':h')
+    dir = vim.fn.fnamemodify(dir, ':h')
   until dir == '/'
 end
 
@@ -379,13 +363,13 @@ function apply_stylua()
     return
   end
 
-  local filename = fn.expand('%:p')
-  local stylua_config = get_stylua_config(fn.fnamemodify(filename, ':h'))
+  local filename = vim.fn.expand('%:p')
+  local stylua_config = get_stylua_config(vim.fn.fnamemodify(filename, ':h'))
   if not stylua_config then
     return
   end
 
-  cmd(
+  vim.cmd(
     ('silent exec "!%s --config-path %s %s" | e!'):format(
       stylua_exec,
       stylua_config,
@@ -418,3 +402,10 @@ require('lualine').setup({
     lualine_x = {},
   },
 })
+
+-- -----------------------------------------------------------------------------
+-- Modules
+-- -----------------------------------------------------------------------------
+
+rerequire('language-support')
+rerequire('telescope-config')
