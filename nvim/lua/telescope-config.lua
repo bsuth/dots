@@ -1,3 +1,5 @@
+local lfs = require('lfs')
+
 -- -----------------------------------------------------------------------------
 -- Telescope
 -- https://github.com/nvim-telescope/telescope.nvim
@@ -46,6 +48,8 @@ local telescope_fd = {
   'd',
   '--exclude',
   'go',
+  '--exclude',
+  'bin',
 }
 
 local function telescope_edit_action(prompt_bufnr)
@@ -87,22 +91,45 @@ end
 function telescope_open()
   local opts = {}
 
-  local function cwd_tree_finder(cwd)
-    return finders.new_oneshot_job(telescope_fd, { cwd = cwd })
+  local function fd_finder(dir)
+    return finders.new_oneshot_job(telescope_fd, { cwd = dir })
+  end
+
+  local function picker_cd(picker, dir)
+    picker.cwd = dir
+    picker:refresh(fd_finder(dir), { reset_prompt = true })
   end
 
   pickers.new(opts, {
     prompt_title = 'Open',
-    finder = cwd_tree_finder(),
+    finder = fd_finder(),
     sorter = config.generic_sorter(opts),
     attach_mappings = function(prompt_bufnr, map)
       local current_picker = action_state.get_current_picker(prompt_bufnr)
       action_set.select:replace(telescope_edit_action)
-      map('i', '<c-b>', function()
-        local cwd = table.concat({ '..', current_picker.cwd }, '/')
-        current_picker.cwd = cwd
-        current_picker:refresh(cwd_tree_finder(cwd), { reset_prompt = true })
+
+      map('i', '<c-i>', function()
+        local newCwd = (current_picker.cwd or '.')
+          .. '/'
+          .. action_state.get_selected_entry()[1]
+
+        local newCwdAttr = lfs.attributes(newCwd)
+        if newCwdAttr and newCwdAttr.mode == 'file' then
+          newCwd = newCwd:gsub('/[^/]*$', '')
+        end
+
+        picker_cd(current_picker, newCwd)
       end)
+
+      map('i', '<c-o>', function()
+        picker_cd(current_picker, (current_picker.cwd or '.') .. '/..')
+      end)
+
+      map('i', '<c-space>', function()
+        actions.close(prompt_bufnr)
+        vim.cmd('Dirvish ' .. current_picker.cwd)
+      end)
+
       return true
     end,
   }):find()
