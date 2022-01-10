@@ -59,19 +59,19 @@ opt.commentstring = '//%s'
 cmd('augroup bsuth')
 
 -- CWD Tracking
-cmd('au TermOpen term://*zsh* lua save_cwd()')
-cmd('au TermClose term://*zsh* lua restore_cwd()')
+cmd('au TermOpen term://*zsh*,term://*bash* lua save_cwd()')
+cmd('au TermClose term://*zsh*,term://*bash* lua restore_cwd()')
 cmd('au BufEnter * lua track_cwd()')
 
 -- Dirvish
-cmd('au TermClose term://*zsh* Dirvish')
+cmd('au TermClose term://*zsh*,term://*bash* Dirvish')
 cmd(
   'au FileType dirvish nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>'
 )
 
 -- Term
-cmd('au TermOpen term://*zsh* setlocal nonumber wrap')
-cmd('au TermOpen term://*zsh* startinsert')
+cmd('au TermOpen term://*zsh*,term://*bash* setlocal nonumber wrap')
+cmd('au TermOpen term://*zsh*,term://*bash* startinsert')
 
 -- Headers
 cmd('au FileType * lua setupheaders()')

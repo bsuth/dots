@@ -10,3 +10,6 @@ bundle/
 # st terminal
 st/st
 *.o
+
+# work
+.zshwork
