@@ -54,7 +54,7 @@ local cmp = require('cmp')
 cmp.setup({
   snippet = {
     expand = function(args)
-      fn['vsnip#anonymous'](args.body)
+      vim.fn['vsnip#anonymous'](args.body)
     end,
   },
   mapping = {
@@ -87,6 +87,7 @@ local lspServers = {
   cssls = {},
   graphql = {},
   gopls = {},
+  eslint = {},
   jsonls = {
     filetypes = { 'json', 'jsonc' },
     settings = {
@@ -129,6 +130,13 @@ for server, config in pairs(lspServers) do
     capabilities = lspCapabilities,
   }, config))
 end
+
+vim.cmd([[
+  augroup lintonsave
+    autocmd!
+    au BufWritePre *.js,*.jsx,*.ts,*.tsx EslintFixAll
+  augroup END
+]])
 
 -- -----------------------------------------------------------------------------
 -- Formatter
