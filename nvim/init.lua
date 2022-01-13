@@ -164,17 +164,8 @@ vim.g.go_fmt_autosave = true
 
 vim.cmd('colorscheme onedark')
 
-augroup('bsuth-general', {
-  autocmd('TermOpen', 'setlocal nonumber wrap', terminalBufferPatterns),
-  autocmd('TermOpen', 'startinsert', terminalBufferPatterns),
-  autocmd('TermClose', 'bd', terminalBufferPatterns),
-})
-
 map('n', '<leader>ev', ':Dirvish ~/dots/nvim/lua<cr>')
 map('n', '<leader>sv', ':source $MYVIMRC<cr>')
-
-map('n', '<c-space>', ':term<cr>')
-map('t', '<c-[>', '<c-\\><c-n>')
 
 map('n', '<leader>/', ':nohlsearch<cr><c-l>')
 
@@ -240,6 +231,27 @@ map('c', '<c-u>', '<C-f>d^<C-c>')
 map('c', '<c-k>', '<C-f>d$A<C-c>')
 
 -- -----------------------------------------------------------------------------
+-- Terminal
+-- -----------------------------------------------------------------------------
+
+map('n', '<c-space>', ':term<cr>')
+map('t', '<c-[>', '<c-\\><c-n>')
+
+function on_term_close()
+  local termBuffer = nvim_win_get_buf(0)
+  -- Dirvish throws an error when using :Dirvish from a term buffer, but it
+  -- still works so just silence it.
+  vim.cmd('silent Dirvish ' .. vim.fn.getcwd())
+  nvim_buf_delete(termBuffer, {})
+end
+
+augroup('bsuth-terminal', {
+  autocmd('TermOpen', 'setlocal nonumber wrap', terminalBufferPatterns),
+  autocmd('TermOpen', 'startinsert', terminalBufferPatterns),
+  autocmd('TermClose', 'lua on_term_close()', terminalBufferPatterns),
+})
+
+-- -----------------------------------------------------------------------------
 -- Dirvish
 -- -----------------------------------------------------------------------------
 
@@ -257,7 +269,6 @@ function dirvish_xdg_open()
 end
 
 augroup('bsuth-dirvish', {
-  autocmd('TermClose', 'Dirvish', terminalBufferPatterns),
   autocmd(
     'FileType',
     'nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>',
@@ -304,15 +315,14 @@ map('v', '<c-s>', ':lua replace_visual_selection()<cr>')
 
 local cwd_cache = {}
 
-function save_cwd()
+function save_term_cwd()
   local bufname = nvim_buf_get_name(0)
   cwd_cache[bufname] = vim.fn.getcwd()
 end
 
-function restore_cwd()
+function clear_term_cwd()
   local bufname = nvim_buf_get_name(0)
   if cwd_cache[bufname] ~= nil then
-    vim.cmd(('cd %s'):format(cwd_cache[bufname]))
     cwd_cache[bufname] = nil
   end
 end
@@ -322,7 +332,7 @@ function track_cwd()
 
   if bufname:match('^term://') then
     if cwd_cache[bufname] ~= nil then
-      vim.cmd(('cd %s'):format(cwd_cache[bufname]))
+      vim.cmd('cd ' .. cwd_cache[bufname])
     end
   else
     -- Change to current buffer's parent directory
@@ -338,8 +348,8 @@ end
 
 augroup('bsuth-cwd-track', {
   autocmd('BufEnter', 'lua track_cwd()', '*'),
-  autocmd('TermOpen', 'lua save_cwd()', terminalBufferPatterns),
-  autocmd('TermClose', 'lua restore_cwd()', terminalBufferPatterns),
+  autocmd('TermOpen', 'lua save_term_cwd()', terminalBufferPatterns),
+  autocmd('TermClose', 'lua clear_term_cwd()', terminalBufferPatterns),
 })
 
 -- -----------------------------------------------------------------------------
