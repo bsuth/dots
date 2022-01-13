@@ -11,7 +11,7 @@ for key, value in pairs(vim.api) do
   end
 end
 
-function file_exists(filename)
+function fileExists(filename)
   local f = io.open(filename, 'r')
   if f ~= nil then
     io.close(f)
@@ -89,18 +89,18 @@ vim.opt.commentstring = '//%s'
 -- https://github.com/wbthomason/packer.nvim
 -- -----------------------------------------------------------------------------
 
-local packer_bootstrap
-local packer_path = vim.fn.stdpath('data')
+local packerBootstrap
+local packerPath = vim.fn.stdpath('data')
   .. '/site/pack/packer/start/packer.nvim'
 
-if vim.fn.empty(vim.fn.glob(packer_path)) > 0 then
-  packer_bootstrap = vim.fn.system({
+if vim.fn.empty(vim.fn.glob(packerPath)) > 0 then
+  packerBootstrap = vim.fn.system({
     'git',
     'clone',
     '--depth',
     '1',
     'https://github.com/wbthomason/packer.nvim',
-    packer_path,
+    packerPath,
   })
 end
 
@@ -145,7 +145,7 @@ require('packer').startup(function()
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
-  if packer_bootstrap then
+  if packerBootstrap then
     require('packer').sync()
   end
 end)
@@ -237,7 +237,7 @@ map('c', '<c-k>', '<C-f>d$A<C-c>')
 map('n', '<c-space>', ':term<cr>')
 map('t', '<c-[>', '<c-\\><c-n>')
 
-function on_term_close()
+function onTermClose()
   local termBuffer = nvim_win_get_buf(0)
   -- Dirvish throws an error when using :Dirvish from a term buffer, but it
   -- still works so just silence it.
@@ -248,14 +248,14 @@ end
 augroup('bsuth-terminal', {
   autocmd('TermOpen', 'setlocal nonumber wrap', terminalBufferPatterns),
   autocmd('TermOpen', 'startinsert', terminalBufferPatterns),
-  autocmd('TermClose', 'lua on_term_close()', terminalBufferPatterns),
+  autocmd('TermClose', 'lua onTermClose()', terminalBufferPatterns),
 })
 
 -- -----------------------------------------------------------------------------
 -- Dirvish
 -- -----------------------------------------------------------------------------
 
-function dirvish_xdg_open()
+function dirvishXdgOpen()
   local file = vim.fn.expand('<cWORD>')
   local dir = vim.fn.fnamemodify(file, ':p:h')
   local ext = vim.fn.fnamemodify(file, ':e')
@@ -271,7 +271,7 @@ end
 augroup('bsuth-dirvish', {
   autocmd(
     'FileType',
-    'nnoremap <buffer><silent> <cr> :lua dirvish_xdg_open()<cr>',
+    'nnoremap <buffer><silent> <cr> :lua dirvishXdgOpen()<cr>',
     'dirvish'
   ),
 })
@@ -280,7 +280,7 @@ augroup('bsuth-dirvish', {
 -- Visual Selection
 -- -----------------------------------------------------------------------------
 
-local function get_visual_selection()
+local function getVisualSelection()
   local buffer, line_start, column_start = unpack(vim.fn.getpos("'<"))
   local buffer, line_end, column_end = unpack(vim.fn.getpos("'>"))
 
@@ -297,42 +297,42 @@ local function get_visual_selection()
   return table.concat(lines, '\n')
 end
 
-function search_visual_selection()
-  vim.fn.setreg('/', get_visual_selection())
+function searchVisualSelection()
+  vim.fn.setreg('/', getVisualSelection())
   vim.cmd('normal n')
 end
 
-function replace_visual_selection()
-  nvim_input(':s/' .. get_visual_selection() .. '//g<Left><Left>')
+function replaceVisualSelection()
+  nvim_input(':s/' .. getVisualSelection() .. '//g<Left><Left>')
 end
 
-map('v', '<c-n>', ':lua search_visual_selection()<cr>')
-map('v', '<c-s>', ':lua replace_visual_selection()<cr>')
+map('v', '<c-n>', ':lua searchVisualSelection()<cr>')
+map('v', '<c-s>', ':lua replaceVisualSelection()<cr>')
 
 -- -----------------------------------------------------------------------------
 -- CWD Tracking
 -- -----------------------------------------------------------------------------
 
-local cwd_cache = {}
+local cwdCache = {}
 
-function save_term_cwd()
+function saveTermCwd()
   local bufname = nvim_buf_get_name(0)
-  cwd_cache[bufname] = vim.fn.getcwd()
+  cwdCache[bufname] = vim.fn.getcwd()
 end
 
-function clear_term_cwd()
+function clearTermCwd()
   local bufname = nvim_buf_get_name(0)
-  if cwd_cache[bufname] ~= nil then
-    cwd_cache[bufname] = nil
+  if cwdCache[bufname] ~= nil then
+    cwdCache[bufname] = nil
   end
 end
 
-function track_cwd()
+function trackCwd()
   local bufname = nvim_buf_get_name(0)
 
   if bufname:match('^term://') then
-    if cwd_cache[bufname] ~= nil then
-      vim.cmd('cd ' .. cwd_cache[bufname])
+    if cwdCache[bufname] ~= nil then
+      vim.cmd('cd ' .. cwdCache[bufname])
     end
   else
     -- Change to current buffer's parent directory
@@ -347,9 +347,9 @@ function track_cwd()
 end
 
 augroup('bsuth-cwd-track', {
-  autocmd('BufEnter', 'lua track_cwd()', '*'),
-  autocmd('TermOpen', 'lua save_term_cwd()', terminalBufferPatterns),
-  autocmd('TermClose', 'lua clear_term_cwd()', terminalBufferPatterns),
+  autocmd('BufEnter', 'lua trackCwd()', '*'),
+  autocmd('TermOpen', 'lua saveTermCwd()', terminalBufferPatterns),
+  autocmd('TermClose', 'lua clearTermCwd()', terminalBufferPatterns),
 })
 
 -- -----------------------------------------------------------------------------
@@ -357,24 +357,24 @@ augroup('bsuth-cwd-track', {
 -- https://github.com/JohnnyMorganz/StyLua
 -- -----------------------------------------------------------------------------
 
-local function get_stylua_config(dir)
+local function getStyluaConfig(dir)
   repeat
     local config = dir .. '/' .. 'stylua.toml'
-    if file_exists(config) then
+    if fileExists(config) then
       return config
     end
     dir = vim.fn.fnamemodify(dir, ':h')
   until dir == '/'
 end
 
-function apply_stylua()
+function applyStylua()
   local stylua_exec = os.getenv('HOME') .. '/.cargo/bin/stylua'
-  if not file_exists(stylua_exec) then
+  if not fileExists(stylua_exec) then
     return
   end
 
   local filename = vim.fn.expand('%:p')
-  local stylua_config = get_stylua_config(vim.fn.fnamemodify(filename, ':h'))
+  local stylua_config = getStyluaConfig(vim.fn.fnamemodify(filename, ':h'))
   if not stylua_config then
     return
   end
@@ -389,7 +389,7 @@ function apply_stylua()
 end
 
 augroup('bsuth-stylua', {
-  autocmd('BufWritePost', 'lua apply_stylua()', '*.lua'),
+  autocmd('BufWritePost', 'lua applyStylua()', '*.lua'),
 })
 
 -- -----------------------------------------------------------------------------

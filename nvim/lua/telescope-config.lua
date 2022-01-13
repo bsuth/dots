@@ -12,8 +12,8 @@ local finders = require('telescope.finders')
 local previewers = require('telescope.previewers')
 local config = require('telescope.config').values
 local actions = require('telescope.actions')
-local action_set = require('telescope.actions.set')
-local action_state = require('telescope.actions.state')
+local actionSet = require('telescope.actions.set')
+local actionState = require('telescope.actions.state')
 
 telescope.setup({
   defaults = {
@@ -32,8 +32,8 @@ telescope.setup({
 
 telescope.load_extension('fzf')
 
-map('n', '<leader><leader>', ':lua telescope_favorites()<cr>')
-map('n', '<leader>fd', ':lua telescope_open()<cr>')
+map('n', '<leader><leader>', ':lua telescopeFavorites()<cr>')
+map('n', '<leader>fd', ':lua telescopeOpen()<cr>')
 map('n', '<leader>rg', ':Telescope live_grep<cr>')
 map('n', '<leader>buf', ':Telescope buffers<cr>')
 
@@ -41,7 +41,7 @@ map('n', '<leader>buf', ':Telescope buffers<cr>')
 -- Helpers
 -- -----------------------------------------------------------------------------
 
-local telescope_fd = {
+local telescopeFd = {
   'fd',
   '--follow',
   '--type',
@@ -54,16 +54,16 @@ local telescope_fd = {
   'bin',
 }
 
-local function fd_picker(root, opts)
+local function fdPicker(root, opts)
   local cwd = root
 
-  local function fd_finder()
-    return finders.new_oneshot_job(telescope_fd, { cwd = cwd })
+  local function fdFinder()
+    return finders.new_oneshot_job(telescopeFd, { cwd = cwd })
   end
 
-  local function refresh_picker(picker)
+  local function refreshPicker(picker)
     picker.cwd = cwd
-    picker:refresh(fd_finder(), { reset_prompt = true })
+    picker:refresh(fdFinder(), { reset_prompt = true })
   end
 
   -- Telescope gives us no way to set the current dir of previewers so we have
@@ -83,32 +83,32 @@ local function fd_picker(root, opts)
   })
 
   return pickers.new(opts, {
-    finder = fd_finder(),
+    finder = fdFinder(),
     previewer = previewer,
     sorter = config.generic_sorter(),
     attach_mappings = function(prompt_bufnr, map)
-      local current_picker = action_state.get_current_picker(prompt_bufnr)
+      local currentPicker = actionState.get_current_picker(prompt_bufnr)
 
-      action_set.select:replace(function()
-        local selection = action_state.get_selected_entry().value
+      actionSet.select:replace(function()
+        local selection = actionState.get_selected_entry().value
         actions.close(prompt_bufnr)
         vim.cmd('edit ' .. cwd .. '/' .. selection)
       end)
 
       map('i', '<c-i>', function()
-        cwd = cwd .. '/' .. action_state.get_selected_entry()[1]
+        cwd = cwd .. '/' .. actionState.get_selected_entry()[1]
 
         local cwdAttr = lfs.attributes(cwd)
         if cwdAttr and cwdAttr.mode == 'file' then
           cwd = cwd:gsub('/[^/]*$', '')
         end
 
-        refresh_picker(current_picker)
+        refreshPicker(currentPicker)
       end)
 
       map('i', '<c-o>', function()
         cwd = cwd .. '/..'
-        refresh_picker(current_picker)
+        refreshPicker(currentPicker)
       end)
 
       map('i', '<c-space>', function()
@@ -125,15 +125,15 @@ end
 -- Pickers
 -- -----------------------------------------------------------------------------
 
-function telescope_favorites()
+function telescopeFavorites()
   local home = os.getenv('HOME')
   local favorites = { 'dots', 'repos' }
 
-  fd_picker(home, {
+  fdPicker(home, {
     prompt_title = 'Favorites',
     finder = finders.new_oneshot_job(
       vim.tbl_flatten({
-        telescope_fd,
+        telescopeFd,
         vim.tbl_flatten(vim.tbl_map(function(value)
           return { '--search-path', value }
         end, favorites)),
@@ -143,6 +143,6 @@ function telescope_favorites()
   }):find()
 end
 
-function telescope_open()
-  fd_picker('.', { prompt_title = 'Open' }):find()
+function telescopeOpen()
+  fdPicker('.', { prompt_title = 'Open' }):find()
 end
