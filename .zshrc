@@ -130,8 +130,10 @@ function on_cd() {
 chpwd_functions=(${chpwd_functions[@]} "on_cd")
 
 # ------------------------------------------------------------------------------
-# Functions
+# Alias / Functions
 # ------------------------------------------------------------------------------
+
+alias lj='luajit'
 
 function ansi() {
   setxkbmap us
