@@ -34,7 +34,7 @@ telescope.load_extension('fzf')
 
 map('n', '<leader><leader>', ':lua telescopeFavorites()<cr>')
 map('n', '<leader>fd', ':lua telescopeOpen()<cr>')
-map('n', '<leader>rg', ':Telescope live_grep<cr>')
+map('n', '<leader>rg', ':Telescope grep_string search=<cr>')
 map('n', '<leader>buf', ':Telescope buffers<cr>')
 
 -- -----------------------------------------------------------------------------

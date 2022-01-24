@@ -171,5 +171,6 @@ formatter.setup({
     typescriptreact = { prettierFormatter },
     css = { prettierFormatter },
     scss = { prettierFormatter },
+    less = { prettierFormatter },
   },
 })
