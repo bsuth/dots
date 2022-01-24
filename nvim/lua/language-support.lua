@@ -4,23 +4,25 @@
 
 map('n', '<leader>lsp', ':silent :LspRestart<cr>')
 
--- map('n', 'gD', ':lua vim.lsp.buf.declaration()<cr>')
--- map('n', 'gd', ':lua vim.lsp.buf.definition()<cr>')
--- map('n', 'K', ':lua vim.lsp.buf.hover()<cr>')
--- map('n', 'gi', ':lua vim.lsp.buf.implementation()<cr>')
--- map('n', '<C-k>', ':lua vim.lsp.buf.signature_help()<cr>')
--- map('n', '<space>wa', ':lua vim.lsp.buf.add_workspace_folder()<cr>')
--- map('n', '<space>wr', ':lua vim.lsp.buf.remove_workspace_folder()<cr>')
--- map('n', '<space>wl', ':lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<cr>')
--- map('n', '<space>D', ':lua vim.lsp.buf.type_definition()<cr>')
--- map('n', '<space>rn', ':lua vim.lsp.buf.rename()<cr>')
--- map('n', '<space>ca', ':lua vim.lsp.buf.code_action()<cr>')
--- map('n', 'gr', ':lua vim.lsp.buf.references()<cr>')
 map('n', "'e", ':lua vim.lsp.diagnostic.show_line_diagnostics()<cr>')
--- map('n', '[d', ':lua vim.lsp.diagnostic.goto_prev()<cr>')
--- map('n', ']d', ':lua vim.lsp.diagnostic.goto_next()<cr>')
--- map('n', '<space>q', ':lua vim.lsp.diagnostic.set_loclist()<cr>')
--- map('n', '<space>f', ':lua vim.lsp.buf.formatting()<cr>')
+map('n', "'h", ':lua vim.lsp.buf.hover()<cr>')
+map('n', "'d", ':lua vim.lsp.buf.definition()<cr>')
+map('n', "'D", ':lua vim.lsp.buf.declaration()<cr>')
+map('n', "'p", ':lua vim.diagnostic.goto_prev()<cr>')
+map('n', "'n", ':lua vim.diagnostic.goto_next()<cr>')
+map('n', "'r", ':lua vim.lsp.buf.references()<cr>')
+map('n', "'q", ':lua vim.diagnostic.setloclist()<cr>')
+map('n', "'s", ':lua vim.lsp.buf.rename()<cr>')
+
+-- map('n', "'i", ':lua vim.lsp.buf.implementation()<cr>')
+-- map('n', "'k", ':lua vim.lsp.buf.signature_help()<cr>')
+-- map('n', "'c", ':lua vim.lsp.buf.code_action()<cr>')
+-- map('n', "<space>D", ':lua vim.lsp.buf.type_definition()<cr>')
+-- map('n', "'f", ':lua vim.lsp.buf.formatting()<cr>')
+
+-- map('n', "'wa", ':lua vim.lsp.buf.add_workspace_folder()<cr>')
+-- map('n', "'wr", ':lua vim.lsp.buf.remove_workspace_folder()<cr>')
+-- map('n', "'wl", ':lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<cr>')
 
 -- -----------------------------------------------------------------------------
 -- Treesitter
