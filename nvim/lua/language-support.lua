@@ -4,7 +4,7 @@
 
 map('n', '<leader>lsp', ':silent :LspRestart<cr>')
 
-map('n', "'e", ':lua vim.lsp.diagnostic.show_line_diagnostics()<cr>')
+map('n', "'e", ':lua vim.diagnostic.open_float()<cr>')
 map('n', "'h", ':lua vim.lsp.buf.hover()<cr>')
 map('n', "'d", ':lua vim.lsp.buf.definition()<cr>')
 map('n', "'D", ':lua vim.lsp.buf.declaration()<cr>')
