@@ -31,14 +31,14 @@ declare -a PACMAN_PACKAGES=(
   pulseaudio-alsa
   pulseaudio-bluetooth
 
-  # Lua
-  lua51
-  lua52
-  lua53
-  lua
-  luajit
+  # Input / Fonts
+  fcitx5-im
+  fcitx5-mozc
+  adobe-source-han-sans-jp-fonts
+  ttf-hack
 
   # Languages
+  luajit
   gcc
   clang
   bear
@@ -49,11 +49,8 @@ declare -a PACMAN_PACKAGES=(
   python3
   python-pip
 
-  # Input / Fonts
-  fcitx5-im
-  fcitx5-mozc
-  adobe-source-han-sans-jp-fonts
-  ttf-hack
+  # Libraries
+  goocanvas
 
   # Tools
   reflector
