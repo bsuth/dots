@@ -147,7 +147,7 @@ vim.cmd([[
 
 local formatter = require('formatter')
 
-function prettierFormatter()
+function applyPrettier()
   return {
     exe = 'prettierd',
     args = { nvim_buf_get_name(0) },
@@ -155,9 +155,18 @@ function prettierFormatter()
   }
 end
 
+function applyStylua()
+  return {
+    exe = 'stylua -s',
+    args = { nvim_buf_get_name(0) },
+    stdin = false,
+  }
+end
+
 vim.cmd([[
   augroup formatonsave
     autocmd!
+    au BufWritePost *.lua FormatWrite
     au BufWritePost *.jsonc,*.json FormatWrite
     au BufWritePost *.js,*.jsx,*.ts,*.tsx FormatWrite
     au BufWritePost *.css,*.scss,*.less FormatWrite
@@ -166,13 +175,14 @@ vim.cmd([[
 
 formatter.setup({
   filetype = {
-    json = { prettierFormatter },
-    javascript = { prettierFormatter },
-    javascriptreact = { prettierFormatter },
-    typescript = { prettierFormatter },
-    typescriptreact = { prettierFormatter },
-    css = { prettierFormatter },
-    scss = { prettierFormatter },
-    less = { prettierFormatter },
+    lua = { applyStylua },
+    json = { applyPrettier },
+    javascript = { applyPrettier },
+    javascriptreact = { applyPrettier },
+    typescript = { applyPrettier },
+    typescriptreact = { applyPrettier },
+    css = { applyPrettier },
+    scss = { applyPrettier },
+    less = { applyPrettier },
   },
 })

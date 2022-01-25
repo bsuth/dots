@@ -353,46 +353,6 @@ augroup('bsuth-cwd-track', {
 })
 
 -- -----------------------------------------------------------------------------
--- Stylua
--- https://github.com/JohnnyMorganz/StyLua
--- -----------------------------------------------------------------------------
-
-local function getStyluaConfig(dir)
-  repeat
-    local config = dir .. '/' .. 'stylua.toml'
-    if fileExists(config) then
-      return config
-    end
-    dir = vim.fn.fnamemodify(dir, ':h')
-  until dir == '/'
-end
-
-function applyStylua()
-  local stylua_exec = os.getenv('HOME') .. '/.cargo/bin/stylua'
-  if not fileExists(stylua_exec) then
-    return
-  end
-
-  local filename = vim.fn.expand('%:p')
-  local stylua_config = getStyluaConfig(vim.fn.fnamemodify(filename, ':h'))
-  if not stylua_config then
-    return
-  end
-
-  vim.cmd(
-    ('silent exec "!%s --config-path %s %s" | e!'):format(
-      stylua_exec,
-      stylua_config,
-      filename
-    )
-  )
-end
-
-augroup('bsuth-stylua', {
-  autocmd('BufWritePost', 'lua applyStylua()', '*.lua'),
-})
-
--- -----------------------------------------------------------------------------
 -- Lualine
 -- https://github.com/hoob3rt/lualine.nvim
 -- -----------------------------------------------------------------------------
@@ -419,3 +379,10 @@ require('lualine').setup({
 
 rerequire('language-support')
 rerequire('telescope-config')
+
+-- -----------------------------------------------------------------------------
+-- Mujin
+-- -----------------------------------------------------------------------------
+
+vim.cmd('iabbrev _rhed // eslint-disable-line react-hooks/exhaustive-deps')
+vim.cmd('iabbrev _tsi // eslint-disable-next-line<cr>@ts-ignore')

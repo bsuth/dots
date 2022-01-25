@@ -188,6 +188,11 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4' }, 'Return', function()
     awful.spawn('st -e nvim -c ":Dirvish"')
   end),
+
+  awful.key({ 'Mod4', 'Shift' }, 'Return', function()
+    awful.spawn('st')
+  end),
+
   awful.key({ 'Mod4' }, "'", function()
     awful.spawn('vivaldi-stable')
   end)
