@@ -381,7 +381,7 @@ rerequire('language-support')
 rerequire('telescope-config')
 
 -- -----------------------------------------------------------------------------
--- Mujin
+-- Abbreviations
 -- -----------------------------------------------------------------------------
 
 vim.cmd('iabbrev _rhed // eslint-disable-line react-hooks/exhaustive-deps')
