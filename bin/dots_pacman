@@ -49,9 +49,6 @@ declare -a PACMAN_PACKAGES=(
   python3
   python-pip
 
-  # Libraries
-  goocanvas
-
   # Tools
   reflector
   base-devel
