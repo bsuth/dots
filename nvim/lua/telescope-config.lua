@@ -58,6 +58,18 @@ local function telescopeRun(cwd, job, opts)
     finder = finders.new_oneshot_job(job, { cwd = cwd }),
     previewer = previewers.vim_buffer_cat.new({ cwd = cwd }),
     sorter = config.generic_sorter(),
+    attach_mappings = function(prompt_bufnr, map)
+      local currentPicker = actionState.get_current_picker(prompt_bufnr)
+
+      -- Default select does not consider cwd from finder
+      actionSet.select:replace(function()
+        local selection = actionState.get_selected_entry().value
+        actions.close(prompt_bufnr)
+        vim.cmd('edit ' .. cwd .. '/' .. selection)
+      end)
+
+      return true
+    end,
   }):find()
 end
 
