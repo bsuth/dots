@@ -46,7 +46,8 @@ awful.screen.connect_for_each_screen(function(s)
   local backupFile = io.open(getScreenBackupFileName(s), 'rb')
 
   if not backupFile then
-    -- TODO: notify of error
+    -- Default tags
+    awful.tag({ '1' }, s, layout)
   else
     local backup = cjson.decode(backupFile:read('*a'))
     backupFile:close()
@@ -59,9 +60,14 @@ awful.screen.connect_for_each_screen(function(s)
       end
     end
 
-    -- Need to use awful.tag here, since awful.tag.add fails to set the screen's
-    -- selected_tag appropriately
-    awful.tag(tagNames, s, layout)
+    if #tagNames == 0 then
+      -- Default tags
+      awful.tag({ '1' }, s, layout)
+    else
+      -- Need to use awful.tag here, since awful.tag.add fails to set the screen's
+      -- selected_tag appropriately
+      awful.tag(tagNames, s, layout)
+    end
 
     -- Wait until startup to assign clients. For some reason s.tags is not
     -- actually set until startup.
@@ -83,11 +89,16 @@ end)
 
 -- -----------------------------------------------------------------------------
 -- Backup Tags
--- TODO: add more signals to backup, this is not enough
 -- -----------------------------------------------------------------------------
 
-awful.screen.connect_for_each_screen(function(s)
-  s:connect_signal('tag::history::update', function()
-    backupScreenTags(s)
-  end)
+awful.tag.attached_connect_signal(nil, 'tagged', function(tag)
+  backupScreenTags(tag.screen)
+end)
+
+awful.tag.attached_connect_signal(nil, 'untagged', function(tag)
+  backupScreenTags(tag.screen)
+end)
+
+client.connect_signal('swapped', function(c)
+  backupScreenTags(c.screen)
 end)
