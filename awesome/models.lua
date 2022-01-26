@@ -1,6 +1,7 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
+local naughty = require('naughty')
 local notify = require('notify')
 
 -- -----------------------------------------------------------------------------
@@ -172,6 +173,9 @@ local locale = gears.table.crush(gears.object(), {
 -- -----------------------------------------------------------------------------
 
 local notifications = gears.table.crush(gears.object(), {
+  -- Use custom active property instead of naughty's suspended state, since
+  -- suspended state will save and queue all notifications during suspension,
+  -- which we don't want
   active = true,
 
   toggle = function(self)
@@ -179,6 +183,16 @@ local notifications = gears.table.crush(gears.object(), {
     self:emit_signal('update')
   end,
 })
+
+naughty.config.notify_callback = function(notification)
+  -- notification.urgent is a custom property attached by notify.lua.
+  if not notification.urgent and not notifications.active then
+    return nil
+  end
+
+  beautiful.styleNotification(notification)
+  return notification
+end
 
 -- -----------------------------------------------------------------------------
 -- Ram
