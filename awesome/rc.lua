@@ -1,40 +1,19 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
+local naughty = require('naughty')
+local cjson = require('cjson')
 
 -- Autofocus another client when the current one is closed
 require('awful/autofocus')
 
 -- Order matters here!
 require('theme')
+require('tags')
 local Navbar = require('navbar')
 local bindings = require('bindings')
 
--- -----------------------------------------------------------------------------
--- Layout
--- -----------------------------------------------------------------------------
-
-awful.layout.layouts = {
-  {
-    name = 'mylayout',
-    arrange = function(p)
-      if #p.clients < 4 then
-        awful.layout.suit.spiral.dwindle.arrange(p)
-      else
-        awful.layout.suit.fair.horizontal.arrange(p)
-      end
-    end,
-  },
-}
-
--- -----------------------------------------------------------------------------
--- Buffers
--- -----------------------------------------------------------------------------
-
-awful.clientbuffer = awful.tag.add('_clientbuffer', {
-  layout = awful.layout.suit.fair.horizontal,
-  screen = awful.screen.focused(),
-})
+awful.layout.layouts = { require('layout') }
 
 -- -----------------------------------------------------------------------------
 -- Rules
@@ -78,8 +57,35 @@ awful.rules.rules = {
 }
 
 -- -----------------------------------------------------------------------------
--- General Signals
+-- Startup
 -- -----------------------------------------------------------------------------
+
+awful.screen.connect_for_each_screen(function(s)
+  beautiful.set_wallpaper(s)
+  s.navbar = Navbar(s)
+
+  s:connect_signal('tag::history::update', function()
+    -- restore focus to above client
+    for i, c in ipairs(s.selected_tag:clients()) do
+      if c.above then
+        c:emit_signal('request::activate')
+        return
+      end
+    end
+  end)
+end)
+
+awesome.connect_signal('startup', function()
+  for s in screen do
+    for i, tag in ipairs(s.tags) do
+      for i, c in ipairs(tag:clients()) do
+        if c.minimized then
+          c:move_to_tag(awful.clientbuffer)
+        end
+      end
+    end
+  end
+end)
 
 -- Signal function to execute when a new client appears.
 client.connect_signal('manage', function(c)
@@ -100,37 +106,4 @@ end)
 -- Enable sloppy focus, so that focus follows mouse.
 client.connect_signal('mouse::enter', function(c)
   c:emit_signal('request::activate', 'mouse_enter', { raise = false })
-end)
-
--- -----------------------------------------------------------------------------
--- Startup
--- -----------------------------------------------------------------------------
-
-awful.screen.connect_for_each_screen(function(s)
-  awful.tag({ '1' }, s, awful.layout.layouts[1])
-
-  beautiful.set_wallpaper(s)
-  s.navbar = Navbar(s)
-
-  s:connect_signal('tag::history::update', function()
-    -- restore focus to above client
-    for _, c in ipairs(s.selected_tag:clients()) do
-      if c.above then
-        c:emit_signal('request::activate')
-        return
-      end
-    end
-  end)
-end)
-
-awesome.connect_signal('startup', function()
-  for s in screen do
-    for _, tag in ipairs(s.tags) do
-      for _, c in ipairs(tag:clients()) do
-        if c.minimized then
-          c:move_to_tag(awful.clientbuffer)
-        end
-      end
-    end
-  end
 end)

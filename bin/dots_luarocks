@@ -4,14 +4,10 @@ set -e
 
 declare -a LUA_VERSIONS=(
   "5.1"
-  "5.2"
-  "5.3"
   "5.4"
 )
 
 declare -a LUAROCKS_PACKAGES=(
-  ldoc
-  lpeg
   luafilesystem
   lua-cjson
   busted

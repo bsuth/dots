@@ -147,6 +147,13 @@ function hhkb() {
   xmodmap ~/.Xmodmap
 }
 
+function wm {
+  SIZE="${1:-800x600}"
+  Xephyr -br -ac -noreset -screen $SIZE :1 &
+  export DISPLAY=:1
+  awesome
+}
+
 # ------------------------------------------------------------------------------
 # Personal vs Work
 # ------------------------------------------------------------------------------
