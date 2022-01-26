@@ -1,7 +1,7 @@
 local awful = require('awful')
 local gears = require('gears')
 local models = require('models')
-local notify = require('notify')
+local naughty = require('naughty')
 
 -- -----------------------------------------------------------------------------
 -- Keybindings
@@ -228,7 +228,7 @@ bindings.clientkeys = gears.table.join(
       msg = ('%s\n%s: %s'):format(msg, attr, c[attr])
     end
 
-    notify(msg, true)
+    naughty.notify({ text = msg, force = true })
   end),
 
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'i', function(c)

@@ -2,7 +2,6 @@ local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
 local naughty = require('naughty')
-local notify = require('notify')
 
 -- -----------------------------------------------------------------------------
 -- Battery
@@ -25,7 +24,7 @@ local battery = gears.table.crush(gears.object(), {
 
     if self.percent < 15 then
       if not self.sentLowWarning then
-        notify('Low Battery', true)
+        naughty.notify({ text = 'Low Battery', force = true })
         self.sentLowWarning = true
       end
     elseif self.sentLowWarning then
@@ -185,8 +184,8 @@ local notifications = gears.table.crush(gears.object(), {
 })
 
 naughty.config.notify_callback = function(notification)
-  -- notification.urgent is a custom property attached by notify.lua.
-  if not notification.urgent and not notifications.active then
+  -- notification.force is a custom property to bypass notifications.active
+  if not notification.force and not notifications.active then
     return nil
   end
 
