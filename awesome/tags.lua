@@ -3,19 +3,17 @@ local naughty = require('naughty')
 local cjson = require('cjson')
 local layout = require('layout')
 
-local tags = {}
-
 -- Private tag used to move clients around tags
 awful.clientbuffer = awful.tag.add('_clientbuffer', {
   screen = awful.screen.focused(),
   layout = layout,
 })
 
-function tags.getScreenBackupFileName(s)
+local function getScreenBackupFileName(s)
   return '/tmp/awesome_tag_backup_screen' .. tostring(s.index)
 end
 
-function tags.backup(s)
+local function backupScreenTags(s)
   local newBackup = {}
   for i, tag in pairs(s.tags) do
     if #tag.name > 0 and not tag.name:match('^_') then
@@ -30,7 +28,7 @@ function tags.backup(s)
     end
   end
 
-  local backupFile = io.open(tags.getScreenBackupFileName(s), 'w')
+  local backupFile = io.open(getScreenBackupFileName(s), 'w')
 
   if not backupFile then
     -- TODO: notify of error
@@ -45,7 +43,7 @@ end
 -- -----------------------------------------------------------------------------
 
 awful.screen.connect_for_each_screen(function(s)
-  local backupFile = io.open(tags.getScreenBackupFileName(s), 'rb')
+  local backupFile = io.open(getScreenBackupFileName(s), 'rb')
 
   if not backupFile then
     -- TODO: notify of error
@@ -90,6 +88,6 @@ end)
 
 awful.screen.connect_for_each_screen(function(s)
   s:connect_signal('tag::history::update', function()
-    tags.backup(s)
+    backupScreenTags(s)
   end)
 end)
