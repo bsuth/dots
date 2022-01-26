@@ -1,7 +1,7 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
-local naughty = require('naughty')
+local notify = require('notify')
 
 -- -----------------------------------------------------------------------------
 -- Battery
@@ -13,6 +13,7 @@ local device = upower.Client():get_display_device()
 local battery = gears.table.crush(gears.object(), {
   percent = 0,
   discharging = true,
+  sentLowWarning = false,
 
   update = function(self)
     self.percent = device.percentage
@@ -20,6 +21,16 @@ local battery = gears.table.crush(gears.object(), {
       upower.DeviceState.PENDING_DISCHARGE,
       upower.DeviceState.DISCHARGING,
     }, device.state) ~= nil
+
+    if self.percent < 15 then
+      if not self.sentLowWarning then
+        notify('Low Battery', true)
+        self.sentLowWarning = true
+      end
+    elseif self.sentLowWarning then
+      self.sentLowWarning = false
+    end
+
     self:emit_signal('update')
   end,
 })
