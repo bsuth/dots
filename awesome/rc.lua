@@ -61,7 +61,6 @@ awful.rules.rules = {
 -- -----------------------------------------------------------------------------
 
 awful.screen.connect_for_each_screen(function(s)
-  beautiful.set_wallpaper(s)
   s.navbar = Navbar(s)
 
   s:connect_signal('tag::history::update', function()

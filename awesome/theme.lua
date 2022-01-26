@@ -1,3 +1,4 @@
+local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
 local naughty = require('naughty')
@@ -77,8 +78,26 @@ function beautiful.hex2rgb(hex)
   }
 end
 
-function beautiful.set_wallpaper(screen)
+function beautiful.setWallpaper(screen)
   gears.wallpaper.maximized(beautiful.assets('wallpaper.svg'), screen)
+end
+
+function beautiful.styleNotification(notification)
+  notification.icon = beautiful.assets('notifications-active.svg')
+
+  if notification.title ~= nil then
+    notification.text = ([[
+<span size='small'>%s</span>
+<span size='small'>%s</span>
+		]]):format(notification.title, notification.text)
+  else
+    notification.text = ([[
+<span size='small'>%s</span>
+		]]):format(notification.text)
+  end
+
+  notification.title = 'Notification'
+  return notification
 end
 
 -- -----------------------------------------------------------------------------
@@ -86,7 +105,11 @@ end
 -- -----------------------------------------------------------------------------
 
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
-screen.connect_signal('property::geometry', beautiful.set_wallpaper)
+screen.connect_signal('property::geometry', beautiful.setWallpaper)
+
+awful.screen.connect_for_each_screen(function(s)
+  beautiful.setWallpaper(s)
+end)
 
 client.connect_signal('focus', function(c)
   c.border_color = beautiful.border_focus

@@ -169,28 +169,6 @@ local notifications = gears.table.crush(gears.object(), {
   end,
 })
 
-naughty.config.notify_callback = function(notification)
-  notification.icon = beautiful.assets('notifications-active.svg')
-
-  if not notifications.active then
-    return nil
-  end
-
-  if notification.title ~= nil then
-    notification.text = ([[
-<span size='small'>%s</span>
-<span size='small'>%s</span>
-		]]):format(notification.title, notification.text)
-  else
-    notification.text = ([[
-<span size='small'>%s</span>
-		]]):format(notification.text)
-  end
-
-  notification.title = 'Incoming Broadcast'
-  return notification
-end
-
 -- -----------------------------------------------------------------------------
 -- Ram
 -- -----------------------------------------------------------------------------
