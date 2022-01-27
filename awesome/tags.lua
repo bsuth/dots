@@ -15,24 +15,27 @@ end
 
 local function backupScreenTags(s)
   local newBackup = {}
-  for i, tag in pairs(s.tags) do
-    if #tag.name > 0 and not tag.name:match('^_') then
-      newBackup[tag.name] = {}
 
-      for j, c in pairs(tag:clients()) do
+  for i, tag in ipairs(s.tags) do
+    if #tag.name > 0 and not tag.name:match('^_') then
+      local clients = {}
+      for j, c in ipairs(tag:clients()) do
         -- check if PID is actually available
         if type(c.pid) == 'number' then
-          table.insert(newBackup[tag.name], c.pid)
+          clients[#clients + 1] = c.pid
         end
       end
+
+      newBackup[#newBackup + 1] = {
+        name = tag.name,
+        clients = clients,
+      }
     end
   end
 
   local backupFile = io.open(getScreenBackupFileName(s), 'w')
 
-  if not backupFile then
-    -- TODO: notify of error
-  else
+  if backupFile then
     backupFile:write(cjson.encode(newBackup))
     backupFile:close()
   end
@@ -54,9 +57,9 @@ awful.screen.connect_for_each_screen(function(s)
 
     local tagNames = {}
 
-    for tagName, clientPids in pairs(backup) do
-      if not tagName:match('^_') then
-        tagNames[#tagNames + 1] = tagName
+    for i, tagBackup in ipairs(backup) do
+      if not tagBackup.name:match('^_') then
+        tagNames[#tagNames + 1] = tagBackup.name
       end
     end
 
@@ -72,13 +75,26 @@ awful.screen.connect_for_each_screen(function(s)
     -- Wait until startup to assign clients. For some reason s.tags is not
     -- actually set until startup.
     awesome.connect_signal('startup', function()
-      for i, tag in pairs(s.tags) do
-        if backup[tag.name] then
-          for j, pid in pairs(backup[tag.name]) do
-            for c in awful.client.iterate() do
-              if c.pid == pid then
-                c:move_to_tag(tag)
-              end
+      local tagNameLookup = {}
+      for i, tag in ipairs(s.tags) do
+        tagNameLookup[tag.name] = tag
+      end
+
+      local clientPidLookup = {}
+      for c in awful.client.iterate() do
+        -- check if PID is actually available
+        if type(c.pid) == 'number' then
+          clientPidLookup[c.pid] = c
+        end
+      end
+
+      for i, tagBackup in ipairs(backup) do
+        local tag = tagNameLookup[tagBackup.name]
+        if tag ~= nil then
+          for j, pid in ipairs(tagBackup.clients) do
+            local c = clientPidLookup[pid]
+            if c ~= nil then
+              c:move_to_tag(tag)
             end
           end
         end
@@ -90,6 +106,13 @@ end)
 -- -----------------------------------------------------------------------------
 -- Backup Tags
 -- -----------------------------------------------------------------------------
+
+awful.screen.connect_for_each_screen(function(s)
+  -- Required when adding or deleting tags
+  s:connect_signal('tag::history::update', function()
+    backupScreenTags(s)
+  end)
+end)
 
 awful.tag.attached_connect_signal(nil, 'tagged', function(tag)
   backupScreenTags(tag.screen)
