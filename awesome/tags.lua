@@ -1,7 +1,10 @@
 local awful = require('awful')
+local gears = require('gears')
 local naughty = require('naughty')
 local cjson = require('cjson')
 local layout = require('layout')
+
+local tags = gears.object()
 
 -- Private tag used to move clients around tags
 awful.clientbuffer = awful.tag.add('_clientbuffer', {
@@ -11,34 +14,6 @@ awful.clientbuffer = awful.tag.add('_clientbuffer', {
 
 local function getScreenBackupFileName(s)
   return '/tmp/awesome_tag_backup_screen' .. tostring(s.index)
-end
-
-local function backupScreenTags(s)
-  local newBackup = {}
-
-  for i, tag in ipairs(s.tags) do
-    if #tag.name > 0 and not tag.name:match('^_') then
-      local clients = {}
-      for j, c in ipairs(tag:clients()) do
-        -- check if PID is actually available
-        if type(c.pid) == 'number' then
-          clients[#clients + 1] = c.pid
-        end
-      end
-
-      newBackup[#newBackup + 1] = {
-        name = tag.name,
-        clients = clients,
-      }
-    end
-  end
-
-  local backupFile = io.open(getScreenBackupFileName(s), 'w')
-
-  if backupFile then
-    backupFile:write(cjson.encode(newBackup))
-    backupFile:close()
-  end
 end
 
 -- -----------------------------------------------------------------------------
@@ -107,21 +82,55 @@ end)
 -- Backup Tags
 -- -----------------------------------------------------------------------------
 
+tags:connect_signal('request::backup', function(self, s)
+  local newBackup = {}
+
+  for i, tag in ipairs(s.tags) do
+    if #tag.name > 0 and not tag.name:match('^_') then
+      local clients = {}
+      for j, c in ipairs(tag:clients()) do
+        -- check if PID is actually available
+        if type(c.pid) == 'number' then
+          clients[#clients + 1] = c.pid
+        end
+      end
+
+      newBackup[#newBackup + 1] = {
+        name = tag.name,
+        clients = clients,
+      }
+    end
+  end
+
+  local backupFile = io.open(getScreenBackupFileName(s), 'w')
+
+  if backupFile then
+    backupFile:write(cjson.encode(newBackup))
+    backupFile:close()
+  end
+end)
+
 awful.screen.connect_for_each_screen(function(s)
   -- Required when adding or deleting tags
   s:connect_signal('tag::history::update', function()
-    backupScreenTags(s)
+    tags:emit_signal('request::backup', s)
   end)
 end)
 
 awful.tag.attached_connect_signal(nil, 'tagged', function(tag)
-  backupScreenTags(tag.screen)
+  tags:emit_signal('request::backup', tag.screen)
 end)
 
 awful.tag.attached_connect_signal(nil, 'untagged', function(tag)
-  backupScreenTags(tag.screen)
+  tags:emit_signal('request::backup', tag.screen)
 end)
 
 client.connect_signal('swapped', function(c)
-  backupScreenTags(c.screen)
+  tags:emit_signal('request::backup', c.screen)
 end)
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return tags
