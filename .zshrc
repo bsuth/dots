@@ -10,7 +10,7 @@ setopt appendhistory autocd extendedglob nomatch notify
 unsetopt beep
 
 # Completion
-setopt complete_aliases
+# setopt complete_aliases
 zstyle ':completion:*' completer _complete _ignored _approximate
 zstyle ':completion:*' matcher-list '' '' '' ''
 zstyle :compinstall filename "$HOME/.zshrc"
@@ -135,6 +135,10 @@ chpwd_functions=(${chpwd_functions[@]} "on_cd")
 
 alias lj='luajit'
 
+alias ga='git add'
+alias gc='git commit -m'
+alias gls='git fetch --prune; git ls-remote origin | grep refs/head'
+
 function ansi() {
   setxkbmap us
   ln -sf ~/dots/.ansi.Xmodmap ~/.Xmodmap
@@ -149,8 +153,10 @@ function hhkb() {
 
 function wm {
   SIZE="${1:-800x600}"
+  export DISPLAY=:0
   Xephyr -br -ac -noreset -screen $SIZE :1 &
   export DISPLAY=:1
+  sleep 0.1 # wait for display
   awesome
 }
 
