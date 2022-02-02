@@ -137,7 +137,11 @@ alias lj='luajit'
 
 alias ga='git add'
 alias gc='git commit -m'
-alias gls='git fetch --prune; git ls-remote origin | grep refs/head'
+
+function gls() {
+  git fetch --prune --quiet
+  git ls-remote origin | rg refs/head | sed -E "s/.*refs\/heads\/(.*)/\1/"
+}
 
 function ansi() {
   setxkbmap us
