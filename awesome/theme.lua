@@ -29,7 +29,7 @@ local palette = {
   white = '#A38D78',
 
   -- Custom
-  pale = '#B2AF99',
+  pale = '#FEF5D6',
   void = '#000000',
   dimmed = '#000000C8',
   transparent = '#00000000',
