@@ -127,7 +127,6 @@ require('packer').startup(function()
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
   use('savq/melange')
-  use('junegunn/seoul256.vim')
 
   -- apps
   use('justinmk/vim-dirvish')
