@@ -9,11 +9,17 @@ require('awful/autofocus')
 
 -- Order matters here!
 require('theme')
-require('tags')
+require('tagState')
 local Navbar = require('navbar')
 local bindings = require('bindings')
 
 awful.layout.layouts = { require('layout') }
+
+-- Private tag used to move clients around tags
+awful.clientbuffer = awful.tag.add('_clientbuffer', {
+  screen = awful.screen.focused(),
+  layout = layout,
+})
 
 -- -----------------------------------------------------------------------------
 -- Rules

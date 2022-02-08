@@ -70,10 +70,12 @@ return function(screen)
         widget = wibox.container.margin,
       },
 
-      shape = gears.shape.rectangle,
-      shape_border_width = 2,
-      shape_border_color = beautiful.colors.dark_grey,
-      bg = beautiful.colors.black,
+      shape = function(cr, width, height)
+        gears.shape.rounded_rect(cr, width, height, 2)
+      end,
+      shape_border_width = 4,
+      shape_border_color = beautiful.colors.void,
+      bg = '#B2AF99',
       widget = wibox.container.background,
     },
 

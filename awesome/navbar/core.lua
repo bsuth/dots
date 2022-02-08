@@ -8,19 +8,17 @@ local core = {}
 -- -----------------------------------------------------------------------------
 
 core.HEIGHT = 50
-core.FONT_FAMILY = 'Hack'
-core.FONT = core.FONT_FAMILY .. ' 12'
+core.FONT_FAMILY = 'Kalam'
+core.FONT = core.FONT_FAMILY .. ' 14'
 
 -- -----------------------------------------------------------------------------
 -- markupText
 -- -----------------------------------------------------------------------------
 
 function core.markupText(text, color)
-  return ('<span color="%s" font_family="%s" size="medium">%s</span>'):format(
-    color or beautiful.colors.white,
-    core.FONT_FAMILY,
-    tostring(text)
-  )
+  return (
+    '<span color="%s" font_family="%s" weight="bold" size="medium">%s</span>'
+  ):format(color or beautiful.colors.void, core.FONT_FAMILY, tostring(text))
 end
 
 -- -----------------------------------------------------------------------------
@@ -39,7 +37,7 @@ function core.Select(args)
         elseif args.disabled then
           rgb = beautiful.hex2rgb(beautiful.colors.dark_grey)
         else
-          rgb = beautiful.hex2rgb(beautiful.colors.white)
+          rgb = beautiful.hex2rgb(beautiful.colors.void)
         end
 
         cr:set_source_rgb(rgb[1], rgb[2], rgb[3])

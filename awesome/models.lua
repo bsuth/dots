@@ -175,7 +175,7 @@ local notifications = gears.table.crush(gears.object(), {
   -- Use custom active property instead of naughty's suspended state, since
   -- suspended state will save and queue all notifications during suspension,
   -- which we don't want
-  active = true,
+  active = false,
 
   toggle = function(self)
     self.active = not self.active

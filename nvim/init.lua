@@ -126,7 +126,8 @@ require('packer').startup(function()
 
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
-  use('navarasu/onedark.nvim')
+  use('savq/melange')
+  use('junegunn/seoul256.vim')
 
   -- apps
   use('justinmk/vim-dirvish')
@@ -162,7 +163,7 @@ vim.g.mapleader = ' '
 vim.g.suda_smart_edit = true
 vim.g.go_fmt_autosave = true
 
-vim.cmd('colorscheme onedark')
+vim.cmd('colorscheme melange')
 
 map('n', '<leader>ev', ':Dirvish ~/dots/nvim/lua<cr>')
 map('n', '<leader>sv', ':source $MYVIMRC<cr>')
@@ -365,7 +366,7 @@ require('plenary.reload').reload_module('lualine', true)
 require('lualine').setup({
   options = {
     icons_enabled = false,
-    theme = 'onedark',
+    theme = 'gruvbox_dark',
   },
 
   sections = {

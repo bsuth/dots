@@ -79,7 +79,7 @@ function beautiful.hex2rgb(hex)
 end
 
 function beautiful.setWallpaper(screen)
-  gears.wallpaper.maximized(beautiful.assets('wallpaper.svg'), screen)
+  gears.wallpaper.maximized(beautiful.assets('wallpaper.png'), screen)
 end
 
 function beautiful.styleNotification(notification)

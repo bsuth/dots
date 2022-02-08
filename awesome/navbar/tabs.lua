@@ -3,7 +3,7 @@ local beautiful = require('beautiful')
 local wibox = require('wibox')
 
 local core = require('navbar.core')
-local tags = require('tags')
+local tagState = require('tagState')
 
 -- -----------------------------------------------------------------------------
 -- Tab
@@ -15,7 +15,7 @@ local function Tab(args)
     widget = args.widget or wibox.widget({
       markup = core.markupText(
         args.name or 'Tab',
-        args.active and beautiful.colors.white or beautiful.colors.dark_grey
+        args.active and beautiful.colors.void or '#292B33'
       ),
       halign = 'center',
       valign = 'center',
@@ -43,7 +43,7 @@ end
 function Tabs:closeTab()
   if #self.screen.tags > 1 then
     self.screen.selected_tag:delete()
-    tags:emit_signal('request::backup', self.screen)
+    tagState:emit_signal('request::backup', self.screen)
   end
 end
 
@@ -61,7 +61,7 @@ function Tabs:shiftTab(relidx)
     if swapTag and not swapTag.name:match('^_.*') then
       currentTag:swap(swapTag)
       self:refresh()
-      tags:emit_signal('request::backup', self.screen)
+      tagState:emit_signal('request::backup', self.screen)
       break
     end
   end
@@ -118,7 +118,7 @@ return function(navbar, screen)
       font = core.FONT,
       exe_callback = function(name)
         screen.selected_tag.name = name
-        tags:emit_signal('request::backup', screen)
+        tagState:emit_signal('request::backup', screen)
       end,
     }),
 

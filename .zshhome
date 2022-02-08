@@ -4,14 +4,19 @@ alias double='~/.screenlayout/double.sh'
 alias loverocks='luarocks --lua-version 5.1 --tree luarocks_modules'
 compdef loverocks='luarocks'
 
-alias kaos='love ~/repos/kaos-love'
-
-function erde() {
+function load_erde() {
   ERDE_ROOT="$HOME/repos/erde"
-
   if [[ $LUA_PATH != *"$ERDE_ROOT"* ]]; then
     LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
   fi
+}
 
+function erde() {
+  load_erde
   $HOME/repos/erde/bin/erde $@
+}
+
+function kaos() {
+  load_erde
+  love ~/repos/kaos-love
 }
