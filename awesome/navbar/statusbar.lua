@@ -21,7 +21,7 @@ local function BatteryWidget()
   local markupWidget = wibox.widget({
     markup = core.markupText(
       math.ceil(models.battery.percent) .. '%',
-      beautiful.colors.red
+      beautiful.red
     ),
     widget = wibox.widget.textbox,
   })
@@ -32,7 +32,7 @@ local function BatteryWidget()
       or beautiful.assets('battery-charging.svg')
     markupWidget.markup = core.markupText(
       math.ceil(models.battery.percent) .. '%',
-      beautiful.colors.red
+      beautiful.red
     )
   end)
 
@@ -60,7 +60,7 @@ end
 local function getVolumeText()
   return core.markupText(
     math.ceil(models.volume.percent) .. '%',
-    beautiful.colors.green
+    beautiful.green
   )
 end
 
@@ -98,7 +98,7 @@ end
 local function getBrightnessText()
   return core.markupText(
     math.ceil(models.brightness.percent) .. '%',
-    beautiful.colors.yellow
+    beautiful.yellow
   )
 end
 
@@ -249,11 +249,11 @@ return function(navbar)
         disabled = true,
         widget = wibox.widget({
           {
-            format = core.markupText('%a %b %d', beautiful.colors.blue),
+            format = core.markupText('%a %b %d', beautiful.blue),
             widget = wibox.widget.textclock,
           },
           {
-            format = core.markupText(' %H:%M', beautiful.colors.purple),
+            format = core.markupText(' %H:%M', beautiful.magenta),
             widget = wibox.widget.textclock,
           },
           layout = wibox.layout.fixed.horizontal,

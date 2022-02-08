@@ -13,10 +13,7 @@ local function Tab(args)
   return core.Select({
     active = args.active,
     widget = args.widget or wibox.widget({
-      markup = core.markupText(
-        args.name or 'Tab',
-        args.active and beautiful.colors.void or '#292B33'
-      ),
+      markup = core.markupText(args.name or 'Tab'),
       halign = 'center',
       valign = 'center',
       font = core.FONT,

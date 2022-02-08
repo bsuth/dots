@@ -18,7 +18,7 @@ core.FONT = core.FONT_FAMILY .. ' 14'
 function core.markupText(text, color)
   return (
     '<span color="%s" font_family="%s" weight="bold" size="medium">%s</span>'
-  ):format(color or beautiful.colors.void, core.FONT_FAMILY, tostring(text))
+  ):format(color or beautiful.void, core.FONT_FAMILY, tostring(text))
 end
 
 -- -----------------------------------------------------------------------------
@@ -35,9 +35,9 @@ function core.Select(args)
         if not args.active then
           return
         elseif args.disabled then
-          rgb = beautiful.hex2rgb(beautiful.colors.dark_grey)
+          rgb = beautiful.hex2rgb(beautiful.darkGrey)
         else
-          rgb = beautiful.hex2rgb(beautiful.colors.void)
+          rgb = beautiful.hex2rgb(beautiful.void)
         end
 
         cr:set_source_rgb(rgb[1], rgb[2], rgb[3])

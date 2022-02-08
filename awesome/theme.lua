@@ -4,24 +4,33 @@ local gears = require('gears')
 local naughty = require('naughty')
 
 -- -----------------------------------------------------------------------------
--- Colorscheme: OneDark
+-- Palette
 -- -----------------------------------------------------------------------------
 
-local colors = {
-  black = '#282c34',
-  red = '#e06c75',
-  green = '#98c379',
-  yellow = '#e5c07b',
-  blue = '#61afef',
-  purple = '#c678dd',
-  cyan = '#56b6c2',
-  white = '#abb2bf',
+local palette = {
+  -- Melange
+  red = '#B65C60',
+  green = '#78997A',
+  yellow = '#EBC06D',
+  blue = '#9AACCE',
+  magenta = '#B380B0',
+  cyan = '#86A3A3',
 
-  dark_grey = '#545862',
-  light_grey = '#c8ccd4',
-  blacker = '#212328',
+  brightRed = '#F17C64',
+  brightGreen = '#99D59D',
+  brightYellow = '#EBC06D',
+  brightBlue = '#9AACCE',
+  brightMagenta = '#CE9BCB',
+  brightCyan = '#88B3B2',
+
+  black = '#352F2A',
+  darkGrey = '#4D453E',
+  lightGrey = '#C1A78E',
+  white = '#A38D78',
+
+  -- Custom
+  pale = '#B2AF99',
   void = '#000000',
-
   dimmed = '#000000C8',
   transparent = '#00000000',
 }
@@ -33,24 +42,28 @@ local colors = {
 beautiful.init({
   colors = colors,
 
-  font = 'Hack Regular 16',
-
-  fg_normal = colors.white,
-  bg_focus = colors.white,
-  fg_focus = colors.black,
+  font = 'Kalam Bold 16',
+  fg_normal = palette.void,
+  bg_focus = palette.white,
+  fg_focus = palette.void,
 
   useless_gap = 5,
   border_width = 2,
-  border_normal = colors.dark_grey,
-  border_focus = colors.white,
-  border_marked = colors.red,
+  border_normal = palette.darkGrey,
+  border_focus = palette.pale,
 
   notification_font = 'Hack Regular 16',
-  notification_bg = '#181818',
-  notification_fg = colors.white,
-  notification_border_color = colors.white,
+  notification_bg = palette.pale,
+  notification_fg = palette.void,
+  notification_border_color = palette.void,
   notification_icon_size = 40,
 })
+
+-- Copy palette into `beautiful` for convenience. This must be done after
+-- `beautiful.init({ ... })`.
+for color, hex in pairs(palette) do
+  beautiful[color] = hex
+end
 
 -- Some notification theme properties don't get overridden by the beautiful
 -- variables, so we have to directly set them here. See defaults here:

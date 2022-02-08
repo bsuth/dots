@@ -46,7 +46,7 @@ return function(screen)
       width = screen.geometry.width - 4 * beautiful.useless_gap,
       height = core.HEIGHT,
 
-      bg = beautiful.colors.transparent,
+      bg = beautiful.transparent,
       type = 'dock', -- remove box shadows
     }),
   }, NavbarMT)
@@ -74,8 +74,8 @@ return function(screen)
         gears.shape.rounded_rect(cr, width, height, 2)
       end,
       shape_border_width = 4,
-      shape_border_color = beautiful.colors.void,
-      bg = '#B2AF99',
+      shape_border_color = beautiful.void,
+      bg = beautiful.pale,
       widget = wibox.container.background,
     },
 
