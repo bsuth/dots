@@ -49,7 +49,7 @@ beautiful.init({
 
   useless_gap = 5,
   border_width = 2,
-  border_normal = palette.darkGrey,
+  border_normal = palette.void,
   border_focus = palette.pale,
 
   notification_font = 'Hack Regular 16',
