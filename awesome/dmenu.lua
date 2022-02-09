@@ -125,6 +125,14 @@ local prompt = awful.widget.prompt({
   end,
   hooks = {
     {
+      {},
+      'Tab',
+      function()
+        -- Disable tab completion
+        return true, false
+      end,
+    },
+    {
       { 'Control' },
       'n',
       function(command)
