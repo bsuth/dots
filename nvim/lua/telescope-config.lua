@@ -37,6 +37,8 @@ map('n', '<leader>fd', ':lua telescopeFd()<cr>')
 map('n', '<leader>cd', ':lua telescopeCd()<cr>')
 map('n', '<leader>rg', ':Telescope grep_string search=<cr>')
 map('n', '<leader>buf', ':Telescope buffers<cr>')
+map('n', '<leader>ma', ':Telescope marks<cr>')
+map('n', '<leader>jl', ':Telescope marks<cr>')
 
 -- -----------------------------------------------------------------------------
 -- Helpers

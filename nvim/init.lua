@@ -139,6 +139,7 @@ require('packer').startup(function()
   use('tpope/vim-commentary')
   use('matze/vim-move')
   use('lambdalisue/suda.vim')
+  use('tpope/vim-dadbod')
 
   -- Local plugins can be included
   use('~/repos/vim-erde')
@@ -190,13 +191,6 @@ map('n', '<leader><c-l>', ':rightbelow :vsp | :Dirvish<cr>')
 map('n', '<leader><c-k>', ':aboveleft :sp | :Dirvish<cr>')
 map('n', '<leader><c-j>', ':rightbelow :sp | :Dirvish<cr>')
 map('n', '<leader><c-h>', ':aboveleft :vsp | :Dirvish<cr>')
-
---
--- Quickmarks
---
-
-map('n', "'r", ':cd / | :Dirvish<cr>')
-map('n', "'h", ':cd ~ | :Dirvish<cr>')
 
 --
 -- Emacs Bindings
@@ -351,6 +345,22 @@ augroup('bsuth-cwd-track', {
   autocmd('TermOpen', 'lua saveTermCwd()', terminalBufferPatterns),
   autocmd('TermClose', 'lua clearTermCwd()', terminalBufferPatterns),
 })
+
+-- -----------------------------------------------------------------------------
+-- Marks
+-- -----------------------------------------------------------------------------
+
+-- Clear all marks on startup
+vim.cmd('delm!')
+vim.cmd('delm A-Z0-9')
+local markCounter = 0
+
+function pushMark()
+  vim.cmd('normal m' .. tostring(markCounter))
+  markCounter = (markCounter + 1) % 10
+end
+
+map('n', '<leader>mm', ':lua pushMark()<cr>')
 
 -- -----------------------------------------------------------------------------
 -- Lualine
