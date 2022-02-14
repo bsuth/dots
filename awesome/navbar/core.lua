@@ -9,7 +9,7 @@ local core = {}
 
 core.HEIGHT = 50
 core.FONT_FAMILY = 'Kalam'
-core.FONT = core.FONT_FAMILY .. ' 14'
+core.FONT = core.FONT_FAMILY .. ' Bold 14'
 
 -- -----------------------------------------------------------------------------
 -- markupText

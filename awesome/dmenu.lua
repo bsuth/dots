@@ -30,7 +30,7 @@ local DMENU_CONFIG = {
     awful.spawn('inkscape')
   end,
   reboot = function()
-    awful.spawn('reboot')
+    awful.spawn('/sbin/reboot')
   end,
   simplescreenrecorder = function()
     awful.spawn('simplescreenrecorder')
@@ -39,7 +39,7 @@ local DMENU_CONFIG = {
     awful.spawn('systemctl suspend')
   end,
   poweroff = function()
-    awful.spawn('poweroff')
+    awful.spawn('/sbin/poweroff')
   end,
   vivaldi = function()
     awful.spawn('vivaldi-stable')
