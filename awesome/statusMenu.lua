@@ -42,7 +42,7 @@ local function DialWidget(opts)
         -- 98 is close enough so round (plus, battery percent never reaches
         -- 100% on some computers)
         if opts.model.percent < 98 then
-          -- If (theta_end - theta_start) is too small, then cairo will shift
+          -- If (thetaEnd - thetaStart) is too small, then cairo will shift
           -- theta_end slightly in an attempt to draw something over nothing.
           -- This causes a sort of "jump" when the percent gets to low, so to
           -- avoid this, we always draw a small circle centered at theta_end
@@ -56,8 +56,8 @@ local function DialWidget(opts)
             2 * math.pi
           )
 
-          local theta_end = 3 * math.pi / 2
-          local theta_start = theta_end
+          local thetaEnd = 3 * math.pi / 2
+          local thetaStart = thetaEnd
             - (opts.model.percent / 100) * (2 * math.pi)
 
           gears.shape.arc(
@@ -65,8 +65,8 @@ local function DialWidget(opts)
             m,
             m,
             DIAL_BORDER_WIDTH,
-            theta_start,
-            theta_end,
+            thetaStart,
+            thetaEnd,
             true,
             false
           )
@@ -81,7 +81,7 @@ local function DialWidget(opts)
   })
 
   opts.model:connect_signal('update', function()
-    dialWidget:emit_signal('request::redraw_needed')
+    dialWidget:emit_signal('widget::redraw_needed')
   end)
 
   return dialWidget
@@ -309,6 +309,10 @@ local popup = awful.popup({
   ontop = true,
 })
 
+-- =============================================================================
+-- Keygrabber
+-- =============================================================================
+
 local function focusStatus(dir)
   local newSelectedItemIndex = math.min(
     #statusRowWidget.children,
@@ -351,7 +355,7 @@ local keygrabber = awful.keygrabber({
     end
   end,
   stop_callback = function()
-    popup.visible = true
+    popup.visible = false
   end,
 })
 
