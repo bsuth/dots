@@ -135,11 +135,9 @@ bindings.globalkeys = gears.table.join(
   --
 
   awful.key({ 'Mod4' }, 'space', function()
-    -- awful.screen.focused().navbar:setMode('dmenu')
     require('dmenu')()
   end),
   awful.key({ 'Mod4' }, ';', function()
-    -- awful.screen.focused().navbar:setMode('statusbar')
     require('statusMenu')()
   end),
   awful.key({ 'Mod4' }, 't', function()
