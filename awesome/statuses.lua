@@ -81,18 +81,17 @@ local function DialWidget(opts)
   })
 
   opts.model:connect_signal('update', function()
-    dialWidget:emit_signal('request::layout_changed')
     dialWidget:emit_signal('request::redraw_needed')
   end)
 
   return dialWidget
 end
 
-local function StatusItemWidget(widget)
+local function StatusItemWidget(opts)
   local statusItemWidget = wibox.widget({
     {
       {
-        widget,
+        opts.widget,
         widget = wibox.container.place,
       },
       margins = 16,
@@ -111,13 +110,18 @@ local function StatusItemWidget(widget)
   })
 
   statusItemWidget:connect_signal('request::select', function()
-    statusItemWidget.shape_border_color = beautiful.pale
+    if opts.keypressed_callback ~= nil then
+      statusItemWidget.shape_border_color = beautiful.pale
+    else
+      statusItemWidget.shape_border_color = beautiful.darkGrey
+    end
   end)
 
   statusItemWidget:connect_signal('request::unselect', function()
     statusItemWidget.shape_border_color = beautiful.void
   end)
 
+  statusItemWidget.keypressed_callback = opts.keypressed_callback
   return statusItemWidget
 end
 
@@ -144,11 +148,13 @@ models.battery:connect_signal('update', function()
   batteryIconWidget.image = getBatteryIcon()
 end)
 
-local batteryWidget = StatusItemWidget(DialWidget({
-  model = models.battery,
-  color = beautiful.red,
-  widget = batteryIconWidget,
-}))
+local batteryWidget = StatusItemWidget({
+  widget = DialWidget({
+    model = models.battery,
+    color = beautiful.red,
+    widget = batteryIconWidget,
+  }),
+})
 
 -- -----------------------------------------------------------------------------
 -- VolumeWidget
@@ -169,40 +175,56 @@ models.volume:connect_signal('update', function()
   volumeIconWidget.image = getVolumeIcon()
 end)
 
-local volumeWidget = StatusItemWidget(DialWidget({
-  model = models.volume,
-  color = beautiful.green,
-  widget = volumeIconWidget,
-}))
-
-function volumeWidget.keypressed_callback(mod, key)
-  if #mod == 0 then
-    if key == 'j' then
-      models.volume:set(models.volume.percent - 5)
-    elseif key == 'k' then
-      models.volume:set(models.volume.percent + 5)
-    elseif key == 'd' then
-      models.volume:set(models.volume.percent - 15)
-    elseif key == 'u' then
-      models.volume:set(models.volume.percent + 15)
-    elseif key == ' ' then
-      models.volume:toggle()
+local volumeWidget = StatusItemWidget({
+  widget = DialWidget({
+    model = models.volume,
+    color = beautiful.green,
+    widget = volumeIconWidget,
+  }),
+  keypressed_callback = function(mod, key)
+    if #mod == 0 then
+      if key == 'j' then
+        models.volume:set(models.volume.percent - 5)
+      elseif key == 'k' then
+        models.volume:set(models.volume.percent + 5)
+      elseif key == 'd' then
+        models.volume:set(models.volume.percent - 15)
+      elseif key == 'u' then
+        models.volume:set(models.volume.percent + 15)
+      elseif key == ' ' then
+        models.volume:toggle()
+      end
     end
-  end
-end
+  end,
+})
 
 -- -----------------------------------------------------------------------------
 -- BrightnessWidget
 -- -----------------------------------------------------------------------------
 
-local brightnessWidget = StatusItemWidget(DialWidget({
-  model = models.brightness,
-  color = beautiful.yellow,
-  widget = {
-    image = beautiful.assets('brightness.svg'),
-    widget = wibox.widget.imagebox,
-  },
-}))
+local brightnessWidget = StatusItemWidget({
+  widget = DialWidget({
+    model = models.brightness,
+    color = beautiful.yellow,
+    widget = {
+      image = beautiful.assets('brightness.svg'),
+      widget = wibox.widget.imagebox,
+    },
+  }),
+  keypressed_callback = function(mod, key)
+    if #mod == 0 then
+      if key == 'j' then
+        models.brightness:set(models.brightness.percent - 5)
+      elseif key == 'k' then
+        models.brightness:set(models.brightness.percent + 5)
+      elseif key == 'd' then
+        models.brightness:set(models.brightness.percent - 15)
+      elseif key == 'u' then
+        models.brightness:set(models.brightness.percent + 15)
+      end
+    end
+  end,
+})
 
 -- -----------------------------------------------------------------------------
 -- NotificationWidget
@@ -225,7 +247,16 @@ models.notifications:connect_signal('update', function()
   notificationIconWidget.image = getNotificationIcon()
 end)
 
-local notificationWidget = StatusItemWidget(notificationIconWidget)
+local notificationWidget = StatusItemWidget({
+  widget = notificationIconWidget,
+  keypressed_callback = function(mod, key)
+    if #mod == 0 then
+      if key == ' ' then
+        models.notifications:toggle()
+      end
+    end
+  end,
+})
 
 -- -----------------------------------------------------------------------------
 -- Popup
