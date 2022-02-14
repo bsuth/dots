@@ -161,9 +161,8 @@ local batteryWidget = StatusItemWidget({
 -- -----------------------------------------------------------------------------
 
 local function getVolumeIcon()
-  -- TODO: muted icon
   return models.volume.active and beautiful.assets('volume.svg')
-    or beautiful.assets('volume.svg')
+    or beautiful.assets('volume-muted.svg')
 end
 
 local volumeIconWidget = wibox.widget({
@@ -277,24 +276,40 @@ local popup = awful.popup({
       {
         {
           {
-            format = ('<span color="%s">%s</span>'):format(
-              beautiful.blue,
-              '%a %b %d'
-            ),
-            font = 'Kalam Bold 30',
-            align = 'center',
-            widget = wibox.widget.textclock,
+            {
+              {
+                format = ('<span color="%s" line_height="0.7">%s</span>'):format(
+                  beautiful.void,
+                  '%H:%M'
+                ),
+                font = 'Kalam Bold 40',
+                align = 'center',
+                widget = wibox.widget.textclock,
+              },
+              {
+                format = ('<span color="%s" line_height="0.7">%s</span>'):format(
+                  beautiful.void,
+                  '%a %b %d'
+                ),
+                font = 'Kalam Bold 20',
+                align = 'center',
+                widget = wibox.widget.textclock,
+              },
+              layout = wibox.layout.fixed.vertical,
+            },
+            top = 16,
+            bottom = 16,
+            left = 96,
+            right = 96,
+            widget = wibox.container.margin,
           },
-          {
-            format = ('<span color="%s">%s</span>'):format(
-              beautiful.magenta,
-              '%H:%M'
-            ),
-            font = 'Kalam Bold 20',
-            align = 'center',
-            widget = wibox.widget.textclock,
-          },
-          layout = wibox.layout.fixed.vertical,
+          shape = function(cr, width, height)
+            gears.shape.rounded_rect(cr, width, height, 2)
+          end,
+          shape_border_width = 4,
+          shape_border_color = beautiful.void,
+          bg = beautiful.pale,
+          widget = wibox.container.background,
         },
         widget = wibox.container.place,
       },
