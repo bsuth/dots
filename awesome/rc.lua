@@ -10,7 +10,7 @@ require('awful/autofocus')
 -- Order matters here!
 require('theme')
 require('tagState')
-local Navbar = require('navbar')
+local Tagbar = require('tagbar')
 local bindings = require('bindings')
 
 awful.layout.layouts = { require('layout') }
@@ -67,7 +67,7 @@ awful.rules.rules = {
 -- -----------------------------------------------------------------------------
 
 awful.screen.connect_for_each_screen(function(s)
-  s.navbar = Navbar(s)
+  s.tagbar = Tagbar(s)
 
   s:connect_signal('tag::history::update', function()
     -- restore focus to above client

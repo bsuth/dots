@@ -278,7 +278,7 @@ local popup = awful.popup({
           {
             {
               {
-                format = ('<span color="%s" line_height="0.7">%s</span>'):format(
+                format = ('<span color="%s">%s</span>'):format(
                   beautiful.void,
                   '%H:%M'
                 ),
@@ -287,7 +287,7 @@ local popup = awful.popup({
                 widget = wibox.widget.textclock,
               },
               {
-                format = ('<span color="%s" line_height="0.7">%s</span>'):format(
+                format = ('<span color="%s">%s</span>'):format(
                   beautiful.void,
                   '%a %b %d'
                 ),

@@ -131,7 +131,7 @@ bindings.globalkeys = gears.table.join(
   end),
 
   --
-  -- Navbar
+  -- Tarbar
   --
 
   awful.key({ 'Mod4' }, 'space', function()
@@ -141,25 +141,25 @@ bindings.globalkeys = gears.table.join(
     require('statusMenu')()
   end),
   awful.key({ 'Mod4' }, 't', function()
-    awful.screen.focused().navbar.tabs:newTab()
+    awful.screen.focused().tagbar:newTab()
   end),
   awful.key({ 'Mod4' }, 'w', function()
-    awful.screen.focused().navbar.tabs:closeTab()
+    awful.screen.focused().tagbar:closeTab()
   end),
   awful.key({ 'Mod4', 'Shift' }, ',', function()
-    awful.screen.focused().navbar.tabs:shiftTab(-1)
+    awful.screen.focused().tagbar:shiftTab(-1)
   end),
   awful.key({ 'Mod4', 'Shift' }, '.', function()
-    awful.screen.focused().navbar.tabs:shiftTab(1)
+    awful.screen.focused().tagbar:shiftTab(1)
   end),
   awful.key({ 'Mod4' }, 'Tab', function()
-    awful.screen.focused().navbar.tabs:focusTab(1)
+    awful.screen.focused().tagbar:focusTab(1)
   end),
   awful.key({ 'Mod4', 'Shift' }, 'Tab', function()
-    awful.screen.focused().navbar.tabs:focusTab(-1)
+    awful.screen.focused().tagbar:focusTab(-1)
   end),
   awful.key({ 'Mod4' }, 'r', function()
-    awful.screen.focused().navbar.tabs:renameTab()
+    awful.screen.focused().tagbar:renameTab()
   end),
 
   --
