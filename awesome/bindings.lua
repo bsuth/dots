@@ -131,7 +131,7 @@ bindings.globalkeys = gears.table.join(
   end),
 
   --
-  -- Tarbar
+  -- Tagbar
   --
 
   awful.key({ 'Mod4' }, 'space', function()
