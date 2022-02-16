@@ -67,6 +67,7 @@ declare -a PACMAN_PACKAGES=(
   # Apps
   flameshot
   gpick
+  simplescreenrecorder
   physlock
   neovim
   firefox-developer-edition
