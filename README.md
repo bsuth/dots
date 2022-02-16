@@ -28,6 +28,11 @@
 
 ## Screenshots
 
+![screenshot1](https://github.com/bsuth/dots/raw/master/assets/readme1.png)
+![screenshot2](https://github.com/bsuth/dots/raw/master/assets/readme2.png)
+![screenshot3](https://github.com/bsuth/dots/raw/master/assets/readme3.png)
+![screenshot4](https://github.com/bsuth/dots/raw/master/assets/readme4.png)
+
 ## Dynamic Awesomewm Tags as Tabs
 
 ## Using Neovim as a Terminal
