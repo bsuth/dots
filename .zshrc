@@ -107,17 +107,20 @@ _generate_lua_path_ "5.4"
 export LUA_PATH_5_4="$GENERATED_LUA_PATH"
 export LUA_CPATH_5_4="$GENERATED_LUA_CPATH"
 
-_generate_lua_path_ "5.3"
-export LUA_PATH_5_3="$GENERATED_LUA_PATH"
-export LUA_CPATH_5_3="$GENERATED_LUA_CPATH"
+# _generate_lua_path_ "5.3"
+# export LUA_PATH_5_3="$GENERATED_LUA_PATH"
+# export LUA_CPATH_5_3="$GENERATED_LUA_CPATH"
 
-_generate_lua_path_ "5.2"
-export LUA_PATH_5_2="$GENERATED_LUA_PATH"
-export LUA_CPATH_5_2="$GENERATED_LUA_CPATH"
+# _generate_lua_path_ "5.2"
+# export LUA_PATH_5_2="$GENERATED_LUA_PATH"
+# export LUA_CPATH_5_2="$GENERATED_LUA_CPATH"
 
 _generate_lua_path_ "5.1"
 export LUA_PATH="$GENERATED_LUA_PATH"
 export LUA_CPATH="$GENERATED_LUA_CPATH"
+
+export LUA_INCDIR="/usr/include/luajit-2.1"
+export LUA_LIBDIR="/usr/include/luajit-2.1"
 
 # ------------------------------------------------------------------------------
 # Hooks
