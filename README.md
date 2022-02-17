@@ -35,7 +35,7 @@
 
 ## Workflow Preview
 
-![workflow-preview](https://github.com/bsuth/dots/raw/master/assets/workflow.mp4)
+https://user-images.githubusercontent.com/15937361/154474492-7a2871ad-ec4c-4153-ac50-3fa42c84a24d.mp4
 
 ## Dynamic Awesomewm Tags as Tabs
 
