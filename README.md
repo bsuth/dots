@@ -33,6 +33,10 @@
 ![screenshot3](https://github.com/bsuth/dots/raw/master/assets/readme3.png)
 ![screenshot4](https://github.com/bsuth/dots/raw/master/assets/readme4.png)
 
+## Workflow Preview
+
+![workflow-preview](https://github.com/bsuth/dots/raw/master/assets/workflow.mp4)
+
 ## Dynamic Awesomewm Tags as Tabs
 
 Most information that would normally be displayed in a statusbar (battery, 
