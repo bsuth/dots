@@ -2,7 +2,12 @@
 -- Helpers
 -- -----------------------------------------------------------------------------
 
-local terminalBufferPatterns = { 'term://*zsh*', 'term://*bash*' }
+bufferPatterns = {
+  term = { 'term://*zsh*', 'term://*bash*' },
+  json = { '*.js', '*.jsx', '*.ts', '*.tsx' },
+  js = { '*.js', '*.jsx', '*.ts', '*.tsx' },
+  css = { '*.css', '*.scss', '*.less' },
+}
 
 -- Inject all vim.api.nvim_* functions into global space
 for key, value in pairs(vim.api) do
@@ -240,9 +245,9 @@ function onTermClose()
 end
 
 augroup('bsuth-terminal', {
-  autocmd('TermOpen', 'setlocal nonumber wrap', terminalBufferPatterns),
-  autocmd('TermOpen', 'startinsert', terminalBufferPatterns),
-  autocmd('TermClose', 'lua onTermClose()', terminalBufferPatterns),
+  autocmd('TermOpen', 'setlocal nonumber wrap', bufferPatterns.term),
+  autocmd('TermOpen', 'startinsert', bufferPatterns.term),
+  autocmd('TermClose', 'lua onTermClose()', bufferPatterns.term),
 })
 
 -- -----------------------------------------------------------------------------
@@ -342,8 +347,8 @@ end
 
 augroup('bsuth-cwd-track', {
   autocmd('BufEnter', 'lua trackCwd()', '*'),
-  autocmd('TermOpen', 'lua saveTermCwd()', terminalBufferPatterns),
-  autocmd('TermClose', 'lua clearTermCwd()', terminalBufferPatterns),
+  autocmd('TermOpen', 'lua saveTermCwd()', bufferPatterns.term),
+  autocmd('TermClose', 'lua clearTermCwd()', bufferPatterns.term),
 })
 
 -- -----------------------------------------------------------------------------

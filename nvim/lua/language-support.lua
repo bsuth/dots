@@ -133,12 +133,9 @@ for server, config in pairs(lspServers) do
   }, config))
 end
 
-vim.cmd([[
-  augroup lintonsave
-    autocmd!
-    au BufWritePre *.js,*.jsx,*.ts,*.tsx EslintFixAll
-  augroup END
-]])
+augroup('bsuth-fix-on-save', {
+  autocmd('BufWritePre', 'EslintFixAll', bufferPatterns.js),
+})
 
 -- -----------------------------------------------------------------------------
 -- Formatter
@@ -163,15 +160,12 @@ function applyStylua()
   }
 end
 
-vim.cmd([[
-  augroup formatonsave
-    autocmd!
-    au BufWritePost *.lua FormatWrite
-    au BufWritePost *.jsonc,*.json FormatWrite
-    au BufWritePost *.js,*.jsx,*.ts,*.tsx FormatWrite
-    au BufWritePost *.css,*.scss,*.less FormatWrite
-  augroup END
-]])
+augroup('bsuth-format-on-save', {
+  autocmd('BufWritePost', 'FormatWrite', { '*.lua' }),
+  autocmd('BufWritePost', 'FormatWrite', bufferPatterns.json),
+  autocmd('BufWritePost', 'FormatWrite', bufferPatterns.css),
+  autocmd('BufWritePost', 'FormatWrite', bufferPatterns.js),
+})
 
 formatter.setup({
   filetype = {
