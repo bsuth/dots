@@ -4,7 +4,7 @@
 
 bufferPatterns = {
   term = { 'term://*zsh*', 'term://*bash*' },
-  json = { '*.js', '*.jsx', '*.ts', '*.tsx' },
+  json = { '*.json', '*.cjson' },
   js = { '*.js', '*.jsx', '*.ts', '*.tsx' },
   css = { '*.css', '*.scss', '*.less' },
 }
