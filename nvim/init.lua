@@ -241,14 +241,13 @@ map('c', '<c-k>', '<C-f>d$A<C-c>')
 -- Git
 --
 
+map('n', '<leader><leader>g', ':Git ')
 map('n', '<leader>git', ':Git<cr>')
-map('n', '<leader>gadd', ':Git add .<cr>')
-map('n', '<leader>gcommit', ':Git commit<cr>')
-map('n', '<leader>gpull', ':Git pull<cr>')
-map('n', '<leader>gpush', ':Git push<cr>')
-map('n', '<leader>gdiff', ':Git diff<cr>')
-map('n', '<leader>glog', ':Git log<cr>')
-map('n', '<leader>gblame', ':Git blame<cr>')
+map('n', '<leader>ga', ':Git add .<cr>')
+map('n', '<leader>gc', ':Git commit<cr>')
+map('n', '<leader>gd', ':Git diff<cr>')
+map('n', '<leader>gl', ':Git log<cr>')
+map('n', '<leader>gb', ':Git blame<cr>')
 
 --
 -- Abbreviations
