@@ -29,6 +29,9 @@ local DMENU_CONFIG = {
   inkscape = function()
     awful.spawn('inkscape')
   end,
+  discord = function()
+    awful.spawn('discord')
+  end,
   reboot = function()
     awful.spawn('/sbin/reboot')
   end,

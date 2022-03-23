@@ -54,11 +54,6 @@ require('nvim-treesitter.configs').setup({
 local cmp = require('cmp')
 
 cmp.setup({
-  snippet = {
-    expand = function(args)
-      vim.fn['vsnip#anonymous'](args.body)
-    end,
-  },
   mapping = {
     ['<c-d>'] = cmp.mapping.scroll_docs(-4),
     ['<c-f>'] = cmp.mapping.scroll_docs(4),
@@ -68,7 +63,6 @@ cmp.setup({
   },
   sources = {
     { name = 'nvim_lsp' },
-    { name = 'vsnip' },
     { name = 'buffer' },
     { name = 'path' },
   },
@@ -134,7 +128,7 @@ for server, config in pairs(lspServers) do
 end
 
 augroup('bsuth-fix-on-save', {
-  autocmd('BufWritePre', 'EslintFixAll', bufferPatterns.js),
+  autocmd('BufWritePre', 'EslintFixAll', BUFFER_PATTERNS.js),
 })
 
 -- -----------------------------------------------------------------------------
@@ -162,9 +156,9 @@ end
 
 augroup('bsuth-format-on-save', {
   autocmd('BufWritePost', 'FormatWrite', { '*.lua' }),
-  autocmd('BufWritePost', 'FormatWrite', bufferPatterns.json),
-  autocmd('BufWritePost', 'FormatWrite', bufferPatterns.css),
-  autocmd('BufWritePost', 'FormatWrite', bufferPatterns.js),
+  autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.json),
+  autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.css),
+  autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.js),
 })
 
 formatter.setup({

@@ -1,13 +1,17 @@
 -- -----------------------------------------------------------------------------
--- Helpers
+-- Constants
 -- -----------------------------------------------------------------------------
 
-bufferPatterns = {
+BUFFER_PATTERNS = {
   term = { 'term://*zsh*', 'term://*bash*' },
   json = { '*.json', '*.cjson' },
   js = { '*.js', '*.jsx', '*.ts', '*.tsx' },
   css = { '*.css', '*.scss', '*.less' },
 }
+
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
 
 -- Inject all vim.api.nvim_* functions into global space
 for key, value in pairs(vim.api) do
@@ -118,8 +122,6 @@ require('packer').startup(function()
   -- lsp, completion, formatter
   use('neovim/nvim-lspconfig')
   use('hrsh7th/nvim-cmp')
-  use('hrsh7th/vim-vsnip')
-  use('hrsh7th/vim-vsnip-integ')
   use('mhartington/formatter.nvim')
   use('fatih/vim-go')
 
@@ -127,7 +129,6 @@ require('packer').startup(function()
   use('hrsh7th/cmp-buffer')
   use('hrsh7th/cmp-path')
   use('hrsh7th/cmp-nvim-lsp')
-  use('hrsh7th/cmp-vsnip')
 
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
@@ -142,6 +143,7 @@ require('packer').startup(function()
   -- util
   use('tpope/vim-surround')
   use('tpope/vim-commentary')
+  use('tpope/vim-fugitive')
   use('matze/vim-move')
   use('lambdalisue/suda.vim')
   use('tpope/vim-dadbod')
@@ -187,6 +189,12 @@ map('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 map('n', '<c-f>', 'l%')
 map('v', '<c-f>', 'l%')
 
+map('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
+
+--
+-- Windows
+--
+
 map('n', '<leader>w', '<c-w>')
 map('n', '<c-h>', '<c-w>h')
 map('n', '<c-j>', '<c-w>j')
@@ -229,6 +237,26 @@ map('c', '<m-backspace>', '<C-f>db<C-c>')
 map('c', '<c-u>', '<C-f>d^<C-c>')
 map('c', '<c-k>', '<C-f>d$A<C-c>')
 
+--
+-- Git
+--
+
+map('n', '<leader>git', ':Git<cr>')
+map('n', '<leader>gadd', ':Git add .<cr>')
+map('n', '<leader>gcommit', ':Git commit<cr>')
+map('n', '<leader>gpull', ':Git pull<cr>')
+map('n', '<leader>gpush', ':Git push<cr>')
+map('n', '<leader>gdiff', ':Git diff<cr>')
+map('n', '<leader>glog', ':Git log<cr>')
+map('n', '<leader>gblame', ':Git blame<cr>')
+
+--
+-- Abbreviations
+--
+
+vim.cmd('iabbrev _rhed // eslint-disable-line react-hooks/exhaustive-deps')
+vim.cmd('iabbrev _tsi // eslint-disable-next-line<cr>@ts-ignore')
+
 -- -----------------------------------------------------------------------------
 -- Terminal
 -- -----------------------------------------------------------------------------
@@ -245,9 +273,9 @@ function onTermClose()
 end
 
 augroup('bsuth-terminal', {
-  autocmd('TermOpen', 'setlocal nonumber wrap', bufferPatterns.term),
-  autocmd('TermOpen', 'startinsert', bufferPatterns.term),
-  autocmd('TermClose', 'lua onTermClose()', bufferPatterns.term),
+  autocmd('TermOpen', 'setlocal nonumber wrap', BUFFER_PATTERNS.term),
+  autocmd('TermOpen', 'startinsert', BUFFER_PATTERNS.term),
+  autocmd('TermClose', 'lua onTermClose()', BUFFER_PATTERNS.term),
 })
 
 -- -----------------------------------------------------------------------------
@@ -347,8 +375,8 @@ end
 
 augroup('bsuth-cwd-track', {
   autocmd('BufEnter', 'lua trackCwd()', '*'),
-  autocmd('TermOpen', 'lua saveTermCwd()', bufferPatterns.term),
-  autocmd('TermClose', 'lua clearTermCwd()', bufferPatterns.term),
+  autocmd('TermOpen', 'lua saveTermCwd()', BUFFER_PATTERNS.term),
+  autocmd('TermClose', 'lua clearTermCwd()', BUFFER_PATTERNS.term),
 })
 
 -- -----------------------------------------------------------------------------
@@ -394,10 +422,3 @@ require('lualine').setup({
 
 rerequire('language-support')
 rerequire('telescope-config')
-
--- -----------------------------------------------------------------------------
--- Abbreviations
--- -----------------------------------------------------------------------------
-
-vim.cmd('iabbrev _rhed // eslint-disable-line react-hooks/exhaustive-deps')
-vim.cmd('iabbrev _tsi // eslint-disable-next-line<cr>@ts-ignore')
