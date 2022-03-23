@@ -241,7 +241,7 @@ map('c', '<c-k>', '<C-f>d$A<C-c>')
 -- Git
 --
 
-map('n', '<leader><leader>g', ':Git ')
+map('n', '<leader>gg', ':Git ')
 map('n', '<leader>git', ':Git<cr>')
 map('n', '<leader>ga', ':Git add .<cr>')
 map('n', '<leader>gc', ':Git commit<cr>')

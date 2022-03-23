@@ -17,6 +17,12 @@ local actionState = require('telescope.actions.state')
 
 telescope.setup({
   defaults = {
+    layout_strategy = 'flex',
+    layout_config = {
+      flex = {
+        flip_columns = 120,
+      },
+    },
     mappings = {
       i = {
         ['<c-space>'] = actions.toggle_selection,
