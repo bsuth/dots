@@ -198,6 +198,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/home/mujin/.local/share/nvim/site/pack/packer/start/vim-vsnip-integ",
     url = "https://github.com/hrsh7th/vim-vsnip-integ"
+  },
+  ["vista.vim"] = {
+    loaded = true,
+    path = "/home/mujin/.local/share/nvim/site/pack/packer/start/vista.vim",
+    url = "https://github.com/liuchengxu/vista.vim"
   }
 }
 

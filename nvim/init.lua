@@ -127,6 +127,7 @@ require('packer').startup(function()
   use('rafamadriz/friendly-snippets')
   use('mhartington/formatter.nvim')
   use('fatih/vim-go')
+  use('liuchengxu/vista.vim')
 
   -- completion sources
   use('hrsh7th/cmp-buffer')
@@ -173,7 +174,9 @@ vim.g.loaded_netrwPlugin = true
 vim.g.mapleader = ' '
 vim.g.suda_smart_edit = true
 vim.g.go_fmt_autosave = true
-
+vim.g.vista_default_executive = 'nvim_lsp'
+vim.g.vista_renderer_enable_icon = 0
+vim.cmd('let g:vista#renderer#enable_icon = 0')
 vim.cmd('colorscheme melange')
 
 map('n', '<leader>ev', ':Dirvish ~/dots/nvim/lua<cr>')
@@ -194,6 +197,7 @@ map('n', '<c-f>', 'l%')
 map('v', '<c-f>', 'l%')
 
 map('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
+map('n', '<leader>tag', ':Vista!!<cr>')
 
 --
 -- Windows
