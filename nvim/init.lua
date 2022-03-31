@@ -122,6 +122,9 @@ require('packer').startup(function()
   -- lsp, completion, formatter
   use('neovim/nvim-lspconfig')
   use('hrsh7th/nvim-cmp')
+  use('hrsh7th/vim-vsnip')
+  use('hrsh7th/vim-vsnip-integ')
+  use('rafamadriz/friendly-snippets')
   use('mhartington/formatter.nvim')
   use('fatih/vim-go')
 
@@ -129,6 +132,7 @@ require('packer').startup(function()
   use('hrsh7th/cmp-buffer')
   use('hrsh7th/cmp-path')
   use('hrsh7th/cmp-nvim-lsp')
+  use('hrsh7th/cmp-vsnip')
 
   -- syntax
   use('nvim-treesitter/nvim-treesitter')

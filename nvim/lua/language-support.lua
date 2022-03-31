@@ -14,15 +14,36 @@ map('n', "'r", ':lua vim.lsp.buf.references()<cr>')
 map('n', "'q", ':lua vim.diagnostic.setloclist()<cr>')
 map('n', "'s", ':lua vim.lsp.buf.rename()<cr>')
 
+map(
+  'i',
+  '<Tab>',
+  "vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<Tab>'",
+  { noremap = false, expr = true }
+)
+map(
+  's',
+  '<Tab>',
+  "vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<Tab>'",
+  { noremap = false, expr = true }
+)
+map(
+  'i',
+  '<S-Tab>',
+  "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<Tab>'",
+  { noremap = false, expr = true }
+)
+map(
+  's',
+  '<S-Tab>',
+  "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<Tab>'",
+  { noremap = false, expr = true }
+)
+
 -- map('n', "'i", ':lua vim.lsp.buf.implementation()<cr>')
 -- map('n', "'k", ':lua vim.lsp.buf.signature_help()<cr>')
 -- map('n', "'c", ':lua vim.lsp.buf.code_action()<cr>')
 -- map('n', "<space>D", ':lua vim.lsp.buf.type_definition()<cr>')
 -- map('n', "'f", ':lua vim.lsp.buf.formatting()<cr>')
-
--- map('n', "'wa", ':lua vim.lsp.buf.add_workspace_folder()<cr>')
--- map('n', "'wr", ':lua vim.lsp.buf.remove_workspace_folder()<cr>')
--- map('n', "'wl", ':lua print(vim.inspect(vim.lsp.buf.list_workspace_folders()))<cr>')
 
 -- -----------------------------------------------------------------------------
 -- Treesitter
@@ -54,6 +75,11 @@ require('nvim-treesitter.configs').setup({
 local cmp = require('cmp')
 
 cmp.setup({
+  snippet = {
+    expand = function(args)
+      vim.fn['vsnip#anonymous'](args.body)
+    end,
+  },
   mapping = {
     ['<c-d>'] = cmp.mapping.scroll_docs(-4),
     ['<c-f>'] = cmp.mapping.scroll_docs(4),
@@ -63,6 +89,7 @@ cmp.setup({
   },
   sources = {
     { name = 'nvim_lsp' },
+    { name = 'vsnip' },
     { name = 'buffer' },
     { name = 'path' },
   },
