@@ -179,7 +179,7 @@ vim.g.vista_renderer_enable_icon = 0
 vim.cmd('let g:vista#renderer#enable_icon = 0')
 vim.cmd('colorscheme melange')
 
-map('n', '<leader>ev', ':Dirvish ~/dots/nvim/lua<cr>')
+map('n', '<leader>ev', ':Dirvish ~/dots/nvim<cr>')
 map('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
 map('n', '<leader>/', ':nohlsearch<cr><c-l>')
@@ -198,6 +198,14 @@ map('v', '<c-f>', 'l%')
 
 map('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
 map('n', '<leader>tag', ':Vista!!<cr>')
+
+--
+-- Quick Links
+--
+
+map('n', '<leader>home', ':Dirvish ~<cr>')
+map('n', '<leader>root', ':Dirvish /<cr>')
+map('n', '<leader>dots', ':Dirvish ~/dots<cr>')
 
 --
 -- Windows

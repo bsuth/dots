@@ -13,6 +13,7 @@ map('n', "'n", ':lua vim.diagnostic.goto_next()<cr>')
 map('n', "'r", ':lua vim.lsp.buf.references()<cr>')
 map('n', "'q", ':lua vim.diagnostic.setloclist()<cr>')
 map('n', "'s", ':lua vim.lsp.buf.rename()<cr>')
+map('n', "'c", ':lua vim.lsp.buf.code_action()<cr>')
 
 map(
   'i',
@@ -41,7 +42,6 @@ map(
 
 -- map('n', "'i", ':lua vim.lsp.buf.implementation()<cr>')
 -- map('n', "'k", ':lua vim.lsp.buf.signature_help()<cr>')
--- map('n', "'c", ':lua vim.lsp.buf.code_action()<cr>')
 -- map('n', "<space>D", ':lua vim.lsp.buf.type_definition()<cr>')
 -- map('n', "'f", ':lua vim.lsp.buf.formatting()<cr>')
 
