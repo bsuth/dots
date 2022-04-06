@@ -34,6 +34,18 @@ telescope.setup({
       },
     },
   },
+  pickers = {
+    buffers = {
+      mappings = {
+        i = {
+          ['<c-q>'] = actions.delete_buffer,
+        },
+        n = {
+          ['<c-q>'] = actions.delete_buffer,
+        },
+      },
+    },
+  },
 })
 
 telescope.load_extension('fzf')
@@ -86,15 +98,7 @@ end
 
 function telescopeFavorites()
   local home = os.getenv('HOME')
-  local favorites = { 'dots', 'repos' }
-
-  local job = newTelescopeFdJob({ '--type', 'd' })
-  for i, favorite in pairs(favorites) do
-    job[#job + 1] = '--search-path'
-    job[#job + 1] = favorite
-  end
-
-  telescopeRun(home, job, { prompt_title = 'Favorites' })
+  telescopeRun(home, { FD_FAVORITES_PATH }, { prompt_title = 'Favorites' })
 end
 
 function telescopeFd()

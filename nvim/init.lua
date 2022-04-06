@@ -196,12 +196,18 @@ map('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 map('n', '<c-f>', 'l%')
 map('v', '<c-f>', 'l%')
 
-map('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
 map('n', '<leader>tag', ':Vista!!<cr>')
 
 --
 -- Quick Links
 --
+
+map('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
+map(
+  'n',
+  '<leader>pack',
+  ':Dirvish ~/.local/share/nvim/site/pack/packer/start<cr>'
+)
 
 map('n', '<leader>home', ':Dirvish ~<cr>')
 map('n', '<leader>root', ':Dirvish /<cr>')
@@ -430,6 +436,16 @@ require('lualine').setup({
     lualine_x = {},
   },
 })
+
+-- -----------------------------------------------------------------------------
+-- Home vs Work
+-- -----------------------------------------------------------------------------
+
+FD_FAVORITES_PATH = os.getenv('HOME') .. '/dots/nvim/telescope_favorites_home'
+
+pcall(function()
+  rerequire('work')
+end)
 
 -- -----------------------------------------------------------------------------
 -- Modules

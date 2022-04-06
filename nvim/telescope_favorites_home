@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+function telescope_favorites_fd {
+  fd --follow --exclude go --exclude bin --type d $@
+}
+
+telescope_favorites_fd --search-path dots --search-path repos
