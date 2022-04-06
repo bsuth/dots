@@ -12,4 +12,4 @@ st/st
 *.o
 
 # work
-.zshwork
+*work*
