@@ -186,6 +186,7 @@ augroup('bsuth-format-on-save', {
   autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.json),
   autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.css),
   autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.js),
+  autocmd('BufWritePost', 'FormatWrite', { '*.graphql' }),
 })
 
 formatter.setup({
@@ -196,6 +197,7 @@ formatter.setup({
     javascriptreact = { applyPrettier },
     typescript = { applyPrettier },
     typescriptreact = { applyPrettier },
+    graphql = { applyPrettier },
     css = { applyPrettier },
     scss = { applyPrettier },
     less = { applyPrettier },

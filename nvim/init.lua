@@ -179,6 +179,7 @@ vim.g.vista_renderer_enable_icon = 0
 vim.cmd('let g:vista#renderer#enable_icon = 0')
 vim.cmd('colorscheme melange')
 
+map('n', 'K', ':echo<cr>')
 map('n', '<leader>ev', ':Dirvish ~/dots/nvim<cr>')
 map('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
