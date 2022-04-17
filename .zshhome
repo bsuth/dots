@@ -19,6 +19,6 @@ function tide() {
   fi
 
   cd ~/repos/tide
-  erde run tidecore/init.erde
+  erde run bin/tide.erde
   cd -
 }
