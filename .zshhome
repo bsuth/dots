@@ -12,7 +12,13 @@ function erde() {
 }
 
 function tide() {
+  TIDE_ROOT="$HOME/repos/tide"
+
+  if [[ $LUA_PATH != *"$TIDE_ROOT"* ]]; then
+    LUA_PATH="$TIDE_ROOT/?.lua;$TIDE_ROOT/?/init.lua;$LUA_PATH"
+  fi
+
   cd ~/repos/tide
-  erde run tide/init.erde & disown
+  erde run tidecore/init.erde
   cd -
 }
