@@ -285,6 +285,7 @@ vim.cmd('iabbrev _tsi // eslint-disable-next-line<cr>@ts-ignore')
 
 map('n', '<c-space>', ':term<cr>')
 map('t', '<c-[>', '<c-\\><c-n>')
+map('t', '<esc>', '<c-\\><c-n>')
 
 function onTermClose()
   local termBuffer = nvim_win_get_buf(0)

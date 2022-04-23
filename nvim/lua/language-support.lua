@@ -51,7 +51,7 @@ map(
 -- -----------------------------------------------------------------------------
 
 require('nvim-treesitter.configs').setup({
-  ensure_installed = 'maintained',
+  ensure_installed = 'all',
   indent = {
     enable = true,
   },
@@ -175,14 +175,14 @@ end
 
 function applyStylua()
   return {
-    exe = 'stylua -s',
+    exe = 'stylua --search-parent-directories',
     args = { nvim_buf_get_name(0) },
     stdin = false,
   }
 end
 
 augroup('bsuth-format-on-save', {
-  autocmd('BufWritePost', 'FormatWrite', { '*.lua' }),
+  -- autocmd('BufWritePost', 'FormatWrite', { '*.lua' }),
   autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.json),
   autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.css),
   autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.js),
