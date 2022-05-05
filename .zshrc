@@ -192,7 +192,7 @@ function erde() {
 
 function tide() {
   cd ~/repos/tide
-  erde run bin/tide.erde
+  bin/tide
   cd -
 }
 
