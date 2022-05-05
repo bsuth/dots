@@ -174,23 +174,23 @@ function wm {
 # Projects
 # ------------------------------------------------------------------------------
 
+TIDE_ROOT="$HOME/repos/tide"
+
+if [[ $LUA_PATH != *"$TIDE_ROOT"* ]]; then
+  LUA_PATH="$TIDE_ROOT/?.lua;$TIDE_ROOT/?/init.lua;$LUA_PATH"
+fi
+
+ERDE_ROOT="$HOME/repos/erde"
+
+if [[ $LUA_PATH != *"$ERDE_ROOT"* ]]; then
+  LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
+fi
+
 function erde() {
-  ERDE_ROOT="$HOME/repos/erde"
-
-  if [[ $LUA_PATH != *"$ERDE_ROOT"* ]]; then
-    LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
-  fi
-
   $HOME/repos/erde/bin/erde $@
 }
 
 function tide() {
-  TIDE_ROOT="$HOME/repos/tide"
-
-  if [[ $LUA_PATH != *"$TIDE_ROOT"* ]]; then
-    LUA_PATH="$TIDE_ROOT/?.lua;$TIDE_ROOT/?/init.lua;$LUA_PATH"
-  fi
-
   cd ~/repos/tide
   erde run bin/tide.erde
   cd -
