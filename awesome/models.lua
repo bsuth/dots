@@ -142,32 +142,6 @@ gears.timer({
 })
 
 -- -----------------------------------------------------------------------------
--- Locale
--- -----------------------------------------------------------------------------
-
-local locale = gears.table.crush(gears.object(), {
-  index = 1,
-  list = {
-    'keyboard-us',
-    'mozc',
-  },
-
-  set = function(self, newindex)
-    self.index = newindex
-    awful.spawn.easy_async_with_shell(
-      'fcitx5-remote -s ' .. self.list[self.index],
-      function()
-        self:emit_signal('update')
-      end
-    )
-  end,
-
-  cycle = function(self)
-    self:set(self.index == #self.list and 1 or self.index + 1)
-  end,
-})
-
--- -----------------------------------------------------------------------------
 -- Notifications
 -- -----------------------------------------------------------------------------
 
@@ -271,7 +245,6 @@ return {
   bluetooth = bluetooth,
   brightness = brightness,
   disk = disk,
-  locale = locale,
   notifications = notifications,
   ram = ram,
   volume = volume,

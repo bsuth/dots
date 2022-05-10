@@ -70,10 +70,6 @@ bindings.globalkeys = gears.table.join(
     models.brightness:set(models.brightness.percent + 8)
   end),
 
-  awful.key({ 'Mod4', 'Control' }, 'space', function()
-    models.locale:cycle()
-  end),
-
   --
   -- Movement
   --
