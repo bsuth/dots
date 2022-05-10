@@ -191,8 +191,8 @@ function erde() {
 }
 
 function tide() {
-  cd ~/repos/tide
-  bin/tide
+  cd ~/dots/tide
+  erde run init.erde
   cd -
 }
 

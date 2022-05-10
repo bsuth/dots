@@ -1,0 +1,14 @@
+local { Gtk }  = require('lgi')
+local { createWindow } = require('tide.window')
+local { createWebview } = require('tide.webview')
+
+require('tide.userConfig') -- init config
+require('maps')
+
+local window = createWindow()
+local webview = createWebview()
+webview:show()
+window.child = webview
+
+-- print(require('inspect')(Gtk.Window:_resolve(true)))
+Gtk:main()
