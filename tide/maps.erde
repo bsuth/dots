@@ -1,7 +1,9 @@
 local { addMapping } = require("tide.mappings")
 local utils = require("tide.utils")
 
-addMapping("j", () -> utils.scroll(0, 100))
-addMapping("k", () -> utils.scroll(0, -100))
-addMapping("d", () -> utils.scroll(0, 500))
-addMapping("u", () -> utils.scroll(0, -500))
+addMapping('j', () -> utils.scroll(0, 100))
+addMapping('k', () -> utils.scroll(0, -100))
+addMapping('d', () -> utils.scroll(0, 500))
+addMapping('u', () -> utils.scroll(0, -500))
+addMapping('u', () -> utils.scroll(0, -500))
+addMapping('G', () -> utils.scrollTo(0, 'document.body.scrollHeight'))
