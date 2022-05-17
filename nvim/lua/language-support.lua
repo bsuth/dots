@@ -81,12 +81,7 @@ local lspServers = {
   gopls = {},
   eslint = {},
   tsserver = {},
-  stylelint_lsp = {
-    settings = {
-      autoFixOnSave = true,
-      autoFixOnFormat = true,
-    }
-  },
+  stylelint_lsp = {},
   jsonls = {
     filetypes = { 'json', 'jsonc' },
     settings = {
