@@ -7,6 +7,7 @@ declare -a NPM_PACKAGES=(
   vscode-langservers-extracted
   typescript
   typescript-language-server
+  stylelint-lsp
   @fsouza/prettierd
 )
 

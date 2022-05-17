@@ -111,6 +111,8 @@ local lspServers = {
   graphql = {},
   gopls = {},
   eslint = {},
+  stylelint_lsp = {},
+  tsserver = {},
   jsonls = {
     filetypes = { 'json', 'jsonc' },
     settings = {
@@ -145,7 +147,6 @@ local lspServers = {
       },
     },
   },
-  tsserver = {},
 }
 
 for server, config in pairs(lspServers) do
