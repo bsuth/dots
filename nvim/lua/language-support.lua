@@ -15,31 +15,6 @@ map('n', "'q", ':lua vim.diagnostic.setloclist()<cr>')
 map('n', "'s", ':lua vim.lsp.buf.rename()<cr>')
 map('n', "'c", ':lua vim.lsp.buf.code_action()<cr>')
 
-map(
-  'i',
-  '<Tab>',
-  "vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<Tab>'",
-  { noremap = false, expr = true }
-)
-map(
-  's',
-  '<Tab>',
-  "vsnip#jumpable(1) ? '<Plug>(vsnip-jump-next)' : '<Tab>'",
-  { noremap = false, expr = true }
-)
-map(
-  'i',
-  '<S-Tab>',
-  "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<Tab>'",
-  { noremap = false, expr = true }
-)
-map(
-  's',
-  '<S-Tab>',
-  "vsnip#jumpable(-1) ? '<Plug>(vsnip-jump-prev)' : '<Tab>'",
-  { noremap = false, expr = true }
-)
-
 -- map('n', "'i", ':lua vim.lsp.buf.implementation()<cr>')
 -- map('n', "'k", ':lua vim.lsp.buf.signature_help()<cr>')
 -- map('n', "<space>D", ':lua vim.lsp.buf.type_definition()<cr>')
@@ -111,6 +86,8 @@ local lspServers = {
   graphql = {},
   gopls = {},
   eslint = {},
+  tsserver = {},
+  stylelint_lsp = {},
   jsonls = {
     filetypes = { 'json', 'jsonc' },
     settings = {
@@ -145,7 +122,6 @@ local lspServers = {
       },
     },
   },
-  tsserver = {},
 }
 
 for server, config in pairs(lspServers) do
@@ -154,16 +130,20 @@ for server, config in pairs(lspServers) do
   }, config))
 end
 
-augroup('bsuth-fix-on-save', {
-  autocmd('BufWritePre', 'EslintFixAll', BUFFER_PATTERNS.js),
-})
-
 -- -----------------------------------------------------------------------------
 -- Formatter
 -- https://github.com/mhartington/formatter.nvim
 -- -----------------------------------------------------------------------------
 
 local formatter = require('formatter')
+
+function applyStylelint()
+  return {
+    exe = 'npx stylelint --quiet --fix',
+    args = { nvim_buf_get_name(0) },
+    stdin = false,
+  }
+end
 
 function applyPrettier()
   return {
@@ -180,6 +160,10 @@ function applyStylua()
     stdin = false,
   }
 end
+
+augroup('bsuth-fix-on-save', {
+  autocmd('BufWritePre', 'EslintFixAll', BUFFER_PATTERNS.js),
+})
 
 augroup('bsuth-format-on-save', {
   -- autocmd('BufWritePost', 'FormatWrite', { '*.lua' }),
@@ -198,8 +182,8 @@ formatter.setup({
     typescript = { applyPrettier },
     typescriptreact = { applyPrettier },
     graphql = { applyPrettier },
-    css = { applyPrettier },
-    scss = { applyPrettier },
-    less = { applyPrettier },
+    css = { applyStylelint, applyPrettier },
+    scss = { applyStylelint, applyPrettier },
+    less = { applyStylelint, applyPrettier },
   },
 })
