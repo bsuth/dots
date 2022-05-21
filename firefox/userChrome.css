@@ -1,0 +1,39 @@
+#customizableui-special-spring1,
+#customizableui-special-spring2,
+#star-button-box {
+  display: none;
+}
+
+#nav-bar {
+  margin-top: -40px;
+  z-index: -1;
+}
+
+#nav-bar:focus-within {
+  z-index: 99;
+}
+
+#tabbrowser-tabs {
+  --tab-border-radius: 0;
+}
+
+.tabbrowser-tab {
+  height: 40px;
+  padding: 0px !important;
+}
+
+.tab-background {
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+#tabs-newtab-button {
+  --tabs-navbar-shadow-size: 0;
+  padding: 0 !important;
+}
+
+#tabs-newtab-button .toolbarbutton-icon {
+  width: 40px !important;
+  height: 40px !important;
+  padding: calc((40px - 16px) / 2) !important;
+}

@@ -190,7 +190,7 @@ bindings.globalkeys = gears.table.join(
   end),
 
   awful.key({ 'Mod4' }, "'", function()
-    awful.spawn('vivaldi-stable')
+    awful.spawn('firefox-developer-edition')
   end)
 )
 
