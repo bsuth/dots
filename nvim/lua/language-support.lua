@@ -182,8 +182,8 @@ formatter.setup({
     typescript = { applyPrettier },
     typescriptreact = { applyPrettier },
     graphql = { applyPrettier },
-    css = { applyStylelint, applyPrettier },
-    scss = { applyStylelint, applyPrettier },
-    less = { applyStylelint, applyPrettier },
+    css = { applyPrettier },
+    scss = { applyPrettier },
+    less = { applyPrettier },
   },
 })
