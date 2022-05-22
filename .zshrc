@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-# Settings
+# Zsh
 # ------------------------------------------------------------------------------
 
 # Emacs Bindings
@@ -10,36 +10,37 @@ setopt appendhistory autocd extendedglob nomatch notify
 unsetopt beep
 
 # Completion
-# setopt complete_aliases
 zstyle ':completion:*' completer _complete _ignored _approximate
 zstyle ':completion:*' matcher-list '' '' '' ''
 zstyle :compinstall filename "$HOME/.zshrc"
-autoload -Uz compinit
-compinit
+autoload -Uz compinit; compinit
 
 # ------------------------------------------------------------------------------
-# zinit
+# Zgenom
 # ------------------------------------------------------------------------------
 
-# Install zinit if not installed
-if [[ ! -f $HOME/.zinit/bin/zinit.zsh ]]; then
-  print -P "%F{33}▓▒░ %F{220}Installing DHARMA Initiative Plugin Manager (zdharma/zinit)…%f"
-  command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
-  command git clone https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
-    print -P "%F{33}▓▒░ %F{34}Installation successful.%f" || \
-    print -P "%F{160}▓▒░ The clone has failed.%f"
+export ZGENOM_ROOT="$HOME/extern/zgenom"
+
+if [[ ! -d $ZGENOM_ROOT ]]; then
+  echo "Installing zgenom"
+  mkdir -p $ZGENOM_ROOT
+  git clone https://github.com/jandamm/zgenom.git $ZGENOM_ROOT
 fi
 
-# Load zinit
-source "$HOME/.zinit/bin/zinit.zsh"
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
+source "$ZGENOM_ROOT/zgenom.zsh"
 
-# Plugins
-zplugin light zdharma/fast-syntax-highlighting
-zplugin light zsh-users/zsh-autosuggestions
-zplugin light zdharma/history-search-multi-word
-zplugin light denysdovhan/spaceship-prompt
+zgenom load zsh-users/zsh-completions
+zgenom load zsh-users/zsh-autosuggestions
+zgenom load zsh-users/zsh-syntax-highlighting
+zgenom load zsh-users/zsh-history-substring-search
+zgenom load sindresorhus/pure
+
+autoload -U promptinit; promptinit
+prompt pure
+PURE_PROMPT_SYMBOL="➜"
+
+zgenom autoupdate
+! zgenom saved && zgenom save
 
 # ------------------------------------------------------------------------------
 # Environment
@@ -53,21 +54,6 @@ export BROWSER='none'
 export HISTFILE=~/.zsh_history
 export HISTSIZE=1000
 export SAVEHIST=1000
-
-export SPACESHIP_PROMPT_ORDER=(
-  time          # Time stamps section
-  user          # Username section
-  dir           # Current directory section
-  host          # Hostname section
-  git           # Git section (git_branch + git_status)
-  node          # Node.js section
-  line_sep      # Line break
-  battery       # Battery level and status
-  vi_mode       # Vi-mode indicator
-  jobs          # Background jobs indicator
-  exit_code     # Exit code section
-  char          # Prompt character
-)
 
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"
@@ -107,19 +93,19 @@ _generate_lua_path_ "5.4"
 export LUA_PATH_5_4="$GENERATED_LUA_PATH"
 export LUA_CPATH_5_4="$GENERATED_LUA_CPATH"
 
-# _generate_lua_path_ "5.3"
-# export LUA_PATH_5_3="$GENERATED_LUA_PATH"
-# export LUA_CPATH_5_3="$GENERATED_LUA_CPATH"
+_generate_lua_path_ "5.3"
+export LUA_PATH_5_3="$GENERATED_LUA_PATH"
+export LUA_CPATH_5_3="$GENERATED_LUA_CPATH"
 
-# _generate_lua_path_ "5.2"
-# export LUA_PATH_5_2="$GENERATED_LUA_PATH"
-# export LUA_CPATH_5_2="$GENERATED_LUA_CPATH"
+_generate_lua_path_ "5.2"
+export LUA_PATH_5_2="$GENERATED_LUA_PATH"
+export LUA_CPATH_5_2="$GENERATED_LUA_CPATH"
 
 _generate_lua_path_ "5.1"
 export LUA_PATH="$GENERATED_LUA_PATH"
 export LUA_CPATH="$GENERATED_LUA_CPATH"
 
-# Add paths for .jit modules (required for `luajit -b`
+# Add paths for .jit modules (required for `luajit -b`)
 export LUA_PATH="$LUA_PATH;/usr/share/luajit-2.0.4/?/init.lua;/usr/share/luajit-2.0.4/?.lua"
 
 export LUA_INCDIR="/usr/include/luajit-2.1"
@@ -140,9 +126,6 @@ chpwd_functions=(${chpwd_functions[@]} "on_cd")
 # ------------------------------------------------------------------------------
 
 alias lj='luajit'
-
-alias ga='git add'
-alias gc='git commit -m'
 
 function gls() {
   git fetch --prune --quiet
@@ -174,12 +157,6 @@ function wm {
 # Projects
 # ------------------------------------------------------------------------------
 
-TIDE_ROOT="$HOME/repos/tide"
-
-if [[ $LUA_PATH != *"$TIDE_ROOT"* ]]; then
-  LUA_PATH="$TIDE_ROOT/?.lua;$TIDE_ROOT/?/init.lua;$LUA_PATH"
-fi
-
 ERDE_ROOT="$HOME/repos/erde"
 
 if [[ $LUA_PATH != *"$ERDE_ROOT"* ]]; then
@@ -188,12 +165,6 @@ fi
 
 function erde() {
   $HOME/repos/erde/bin/erde $@
-}
-
-function tide() {
-  cd ~/dots/tide
-  erde run init.erde
-  cd -
 }
 
 # ------------------------------------------------------------------------------
