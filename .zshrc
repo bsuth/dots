@@ -31,7 +31,7 @@ source "$ZGENOM_ROOT/zgenom.zsh"
 
 zgenom load zsh-users/zsh-completions
 zgenom load zsh-users/zsh-autosuggestions
-zgenom load zsh-users/zsh-syntax-highlighting
+zgenom load z-shell/F-Sy-H
 zgenom load z-shell/H-S-MW
 zgenom load sindresorhus/pure
 
