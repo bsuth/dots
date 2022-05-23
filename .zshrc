@@ -157,15 +157,9 @@ function wm {
 # Projects
 # ------------------------------------------------------------------------------
 
-ERDE_ROOT="$HOME/repos/erde"
-
-if [[ $LUA_PATH != *"$ERDE_ROOT"* ]]; then
-  LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
-fi
-
-function erde() {
-  $HOME/repos/erde/bin/erde $@
-}
+export ERDE_ROOT="$HOME/repos/erde"
+export LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
+export PATH="$ERDE_ROOT/bin:$PATH"
 
 # ------------------------------------------------------------------------------
 # Personal vs Work
