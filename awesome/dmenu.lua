@@ -20,11 +20,20 @@ local selectedItemIndex = 1
 -- -----------------------------------------------------------------------------
 
 local DMENU_CONFIG = {
-  flameshot = function()
-    awful.spawn('flameshot gui')
+  sleep = function()
+    awful.spawn('systemctl suspend')
+  end,
+  reboot = function()
+    awful.spawn('/sbin/reboot')
+  end,
+  poweroff = function()
+    awful.spawn('/sbin/poweroff')
   end,
   gpick = function()
     awful.spawn.with_shell('gpick -s -o | tr -d "\n" | xclip -sel c')
+  end,
+  flameshot = function()
+    awful.spawn('flameshot gui')
   end,
   inkscape = function()
     awful.spawn('inkscape')
@@ -32,20 +41,8 @@ local DMENU_CONFIG = {
   discord = function()
     awful.spawn('discord')
   end,
-  reboot = function()
-    awful.spawn('/sbin/reboot')
-  end,
   simplescreenrecorder = function()
     awful.spawn('simplescreenrecorder')
-  end,
-  sleep = function()
-    awful.spawn('systemctl suspend')
-  end,
-  poweroff = function()
-    awful.spawn('/sbin/poweroff')
-  end,
-  vivaldi = function()
-    awful.spawn('vivaldi-stable')
   end,
 }
 

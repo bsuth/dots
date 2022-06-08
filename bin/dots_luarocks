@@ -4,28 +4,31 @@ set -e
 
 declare -a LUA_VERSIONS=(
   "5.1"
+  "5.2"
+  "5.3"
   "5.4"
 )
 
 declare -a LUAROCKS_PACKAGES=(
+  argparse
   luafilesystem
   lua-cjson
   busted
   inspect
 )
 
-mkdir -p "$HOME/repos"
-if ! [[ -d $HOME/repos/luarocks ]]; then
-  git clone git://github.com/luarocks/luarocks.git "$HOME/repos/luarocks"
+if ! [[ -d $HOME/extern/luarocks ]]; then
+  mkdir -p "$HOME/extern"
+  git clone git://github.com/luarocks/luarocks.git "$HOME/extern/luarocks"
 fi
 
-cd "$HOME/repos/luarocks"
-git pull
+cd "$HOME/extern/luarocks"
 
 for LUA_VERSION in ${LUA_VERSIONS[@]}; do
   SKIP=1
+
   for PACKAGE in ${LUAROCKS_PACKAGES[@]}; do
-    if ! luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE" >/dev/null; then
+    if ! luarocks --local --lua-version="$LUA_VERSION" show "$PACKAGE" >/dev/null 2>/dev/null; then
       SKIP=0
       break
     fi

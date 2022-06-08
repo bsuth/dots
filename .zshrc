@@ -105,12 +105,6 @@ _generate_lua_path_ "5.1"
 export LUA_PATH="$GENERATED_LUA_PATH"
 export LUA_CPATH="$GENERATED_LUA_CPATH"
 
-# Add paths for .jit modules (required for `luajit -b`)
-export LUA_PATH="$LUA_PATH;/usr/share/luajit-2.0.4/?/init.lua;/usr/share/luajit-2.0.4/?.lua"
-
-export LUA_INCDIR="/usr/include/luajit-2.1"
-export LUA_LIBDIR="/usr/include/luajit-2.1"
-
 # ------------------------------------------------------------------------------
 # Hooks
 # ------------------------------------------------------------------------------
