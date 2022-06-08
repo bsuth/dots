@@ -44,6 +44,12 @@ local DMENU_CONFIG = {
   simplescreenrecorder = function()
     awful.spawn('simplescreenrecorder')
   end,
+  firefox = function()
+    awful.spawn('firefox-developer-edition')
+  end,
+  aseprite = function()
+    awful.spawn('aseprite')
+  end,
 }
 
 local DMENU_COMMANDS = {}
