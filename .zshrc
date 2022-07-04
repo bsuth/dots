@@ -153,6 +153,9 @@ function wm {
 
 export ERDE_ROOT="$HOME/repos/erde"
 export LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
+export LUA_PATH_5_2="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_2"
+export LUA_PATH_5_3="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_3"
+export LUA_PATH_5_4="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_4"
 export PATH="$ERDE_ROOT/bin:$PATH"
 
 # ------------------------------------------------------------------------------

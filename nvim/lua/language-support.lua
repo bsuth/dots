@@ -87,7 +87,6 @@ local lspServers = {
   gopls = {},
   eslint = {},
   tsserver = {},
-  stylelint_lsp = {},
   jsonls = {
     filetypes = { 'json', 'jsonc' },
     settings = {
@@ -136,14 +135,6 @@ end
 -- -----------------------------------------------------------------------------
 
 local formatter = require('formatter')
-
-function applyStylelint()
-  return {
-    exe = 'npx stylelint --quiet --fix',
-    args = { nvim_buf_get_name(0) },
-    stdin = false,
-  }
-end
 
 function applyPrettier()
   return {
