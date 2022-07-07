@@ -30,7 +30,7 @@ local function DialWidget(opts)
     bgimage = function(_, cr, width, height)
       local m = math.min(width, height)
 
-      local bg = beautiful.hex2rgb(beautiful.void)
+      local bg = beautiful.hex2rgb(beautiful.lightGray)
       cr:set_source_rgb(bg[1], bg[2], bg[3])
       gears.shape.arc(cr, m, m, DIAL_BORDER_WIDTH, 0, 2 * math.pi)
       cr:fill()
@@ -97,28 +97,21 @@ local function StatusItemWidget(opts)
       margins = 16,
       widget = wibox.container.margin,
     },
-    shape = function(cr, width, height)
-      gears.shape.rounded_rect(cr, width, height, 2)
-    end,
-    shape_border_width = 4,
-    shape_border_color = beautiful.void,
-    fg = beautiful.pale,
-    bg = '#2A2520',
+    shape_border_width = 1,
+    shape_border_color = beautiful.darkGray,
+    fg = beautiful.white,
+    bg = beautiful.darkGray,
     forced_width = STATUS_ITEM_SIZE,
     forced_height = STATUS_ITEM_SIZE,
     widget = wibox.container.background,
   })
 
   statusItemWidget:connect_signal('request::select', function()
-    if opts.keypressed_callback ~= nil then
-      statusItemWidget.shape_border_color = beautiful.pale
-    else
-      statusItemWidget.shape_border_color = beautiful.darkGrey
-    end
+    statusItemWidget.shape_border_color = beautiful.white
   end)
 
   statusItemWidget:connect_signal('request::unselect', function()
-    statusItemWidget.shape_border_color = beautiful.void
+    statusItemWidget.shape_border_color = beautiful.darkGray
   end)
 
   statusItemWidget.keypressed_callback = opts.keypressed_callback
@@ -279,7 +272,7 @@ local popup = awful.popup({
             {
               {
                 format = ('<span color="%s">%s</span>'):format(
-                  beautiful.void,
+                  beautiful.white,
                   '%H:%M'
                 ),
                 font = 'Kalam Bold 40',
@@ -288,7 +281,7 @@ local popup = awful.popup({
               },
               {
                 format = ('<span color="%s">%s</span>'):format(
-                  beautiful.void,
+                  beautiful.white,
                   '%a %b %d'
                 ),
                 font = 'Kalam Bold 20',
@@ -303,12 +296,7 @@ local popup = awful.popup({
             right = 96,
             widget = wibox.container.margin,
           },
-          shape = function(cr, width, height)
-            gears.shape.rounded_rect(cr, width, height, 2)
-          end,
-          shape_border_width = 4,
-          shape_border_color = beautiful.void,
-          bg = beautiful.pale,
+          bg = beautiful.darkGray,
           widget = wibox.container.background,
         },
         widget = wibox.container.place,

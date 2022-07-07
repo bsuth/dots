@@ -71,13 +71,10 @@ local function DmenuItemWidget(widget, selected)
       right = 16,
       widget = wibox.container.margin,
     },
-    shape = function(cr, width, height)
-      gears.shape.rounded_rect(cr, width, height, 2)
-    end,
-    shape_border_width = 4,
-    shape_border_color = beautiful.void,
-    fg = selected and beautiful.pale or beautiful.void,
-    bg = selected and '#2A2520' or beautiful.pale,
+    shape_border_width = selected and 1 or 0,
+    shape_border_color = beautiful.white,
+    fg = beautiful.white,
+    bg = beautiful.darkGray,
     forced_width = DMENU_WIDTH,
     widget = wibox.container.background,
   })
@@ -110,6 +107,7 @@ end)
 
 local prompt = awful.widget.prompt({
   prompt = '',
+  fg = beautiful.white,
   changed_callback = function(promptValue)
     filteredCommands = {}
 

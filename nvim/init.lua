@@ -137,6 +137,7 @@ require('packer').startup(function()
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
   use('savq/melange')
+  use('navarasu/onedark.nvim')
 
   -- apps
   use('justinmk/vim-dirvish')
@@ -173,10 +174,14 @@ vim.g.loaded_netrwPlugin = true
 vim.g.mapleader = ' '
 vim.g.suda_smart_edit = true
 vim.g.go_fmt_autosave = true
+
 vim.g.vista_default_executive = 'nvim_lsp'
 vim.g.vista_renderer_enable_icon = 0
 vim.cmd('let g:vista#renderer#enable_icon = 0')
-vim.cmd('colorscheme melange')
+
+-- dark, darker, cool, deep, warm, warmer
+require('onedark').setup({ style = 'warmer' })
+require('onedark').load()
 
 map('n', 'K', ':echo<cr>')
 map('n', '<leader>ev', ':Dirvish ~/dots/nvim<cr>')
@@ -430,7 +435,7 @@ require('plenary.reload').reload_module('lualine', true)
 require('lualine').setup({
   options = {
     icons_enabled = false,
-    theme = 'gruvbox_dark',
+    theme = 'onedark',
   },
 
   sections = {

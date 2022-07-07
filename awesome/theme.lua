@@ -8,30 +8,23 @@ local naughty = require('naughty')
 -- -----------------------------------------------------------------------------
 
 local palette = {
-  -- Melange
-  red = '#B65C60',
-  green = '#78997A',
-  yellow = '#EBC06D',
-  blue = '#9AACCE',
-  magenta = '#B380B0',
-  cyan = '#86A3A3',
+  -- onedark warmer
+  -- https://github.com/navarasu/onedark.nvim/blob/master/lua/onedark/palette.lua
+  red = '#de5d68',
+  green = '#8fb573',
+  yellow = '#dbb671',
+  blue = '#57a5e5',
+  magenta = '#bb70d2',
+  cyan = '#51a8b3',
 
-  brightRed = '#F17C64',
-  brightGreen = '#99D59D',
-  brightYellow = '#EBC06D',
-  brightBlue = '#9AACCE',
-  brightMagenta = '#CE9BCB',
-  brightCyan = '#88B3B2',
-
-  black = '#352F2A',
-  darkGrey = '#4D453E',
-  lightGrey = '#C1A78E',
-  white = '#A38D78',
+  black = '#101012',
+  darkGray = '#232326',
+  lightGray = '#35353b',
 
   -- Custom
-  pale = '#FEF5D6',
+  white = '#e8e8e8',
   void = '#000000',
-  dimmed = '#000000C8',
+  dimmed = '#00000088',
   transparent = '#00000000',
 }
 
@@ -48,12 +41,12 @@ beautiful.init({
   fg_focus = palette.void,
 
   useless_gap = 5,
-  border_width = 2,
+  border_width = 1,
   border_normal = palette.void,
-  border_focus = palette.pale,
+  border_focus = palette.white,
 
   notification_font = 'Hack Regular 16',
-  notification_bg = palette.pale,
+  notification_bg = palette.white,
   notification_fg = palette.void,
   notification_border_color = palette.void,
   notification_icon_size = 40,

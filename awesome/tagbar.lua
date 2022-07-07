@@ -4,7 +4,7 @@ local gears = require('gears')
 local tagState = require('tagState')
 local wibox = require('wibox')
 
-local TAGBAR_HEIGHT = 50
+local TAGBAR_HEIGHT = 48
 local TAGBAR_FONT = 'Kalam Bold 14'
 
 -- -----------------------------------------------------------------------------
@@ -14,55 +14,18 @@ local TAGBAR_FONT = 'Kalam Bold 14'
 local function Tab(opts)
   return wibox.widget({
     {
-      bgimage = function(_, cr, width, height)
-        if not opts.active then
-          return
-        end
-
-        local size = 6
-        local rgb = beautiful.hex2rgb(beautiful.void)
-
-        cr:set_source_rgb(rgb[1], rgb[2], rgb[3])
-
-        cr:move_to(0, 0)
-        cr:line_to(size, 0)
-        cr:line_to(0, size)
-        cr:fill()
-
-        cr:move_to(width, 0)
-        cr:line_to(width - size, 0)
-        cr:line_to(width, size)
-        cr:fill()
-
-        cr:move_to(0, height)
-        cr:line_to(0, height - size)
-        cr:line_to(size, height)
-        cr:fill()
-
-        cr:move_to(width, height)
-        cr:line_to(width - size, height)
-        cr:line_to(width, height - size)
-        cr:fill()
-      end,
-      widget = wibox.container.background,
-    },
-    {
-      {
-        opts.widget or {
-          text = opts.name,
-          halign = 'center',
-          valign = 'center',
-          font = TAGBAR_FONT,
-          widget = wibox.widget.textbox,
-        },
-        widget = wibox.container.place,
+      opts.widget or {
+        text = opts.name,
+        halign = 'center',
+        valign = 'center',
+        font = TAGBAR_FONT,
+        widget = wibox.widget.textbox,
       },
-      left = 16,
-      right = 16,
-      forced_height = TAGBAR_HEIGHT,
-      widget = wibox.container.margin,
+      widget = wibox.container.place,
     },
-    layout = wibox.layout.stack,
+    fg = beautiful.white,
+    bg = opts.active and beautiful.lightGray or beautiful.darkGray,
+    widget = wibox.container.background,
   })
 end
 
@@ -150,11 +113,13 @@ return function(screen)
   local tagbar = {
     screen = screen,
     tabListWidget = wibox.widget({
-      layout = wibox.layout.fixed.horizontal,
+      forced_width = screen.geometry.width,
+      layout  = wibox.layout.flex.horizontal,
     }),
     renamePrompt = awful.widget.prompt({
       prompt = '',
       font = TAGBAR_FONT,
+      fg = beautiful.white,
       exe_callback = function(name)
         screen.selected_tag.name = name
         tagState:emit_signal('request::backup', screen)
@@ -164,40 +129,17 @@ return function(screen)
     wibar = awful.wibar({
       screen = screen,
       position = 'top',
-
-      width = screen.geometry.width - 4 * beautiful.useless_gap,
+      bg = beautiful.darkGray,
       height = TAGBAR_HEIGHT,
-
-      bg = beautiful.transparent,
       type = 'dock', -- remove box shadows
     }),
   }
 
+  tagbar.wibar.widget = tagbar.tabListWidget
+
   tagbar.renamePrompt.done_callback = function(name)
     tagbar:refresh()
   end
-
-  tagbar.wibar:setup({
-    {
-      {
-        {
-          tagbar.tabListWidget,
-          layout = wibox.container.place,
-        },
-        margins = 8,
-        widget = wibox.container.margin,
-      },
-      shape = function(cr, width, height)
-        gears.shape.rounded_rect(cr, width, height, 2)
-      end,
-      shape_border_width = 4,
-      shape_border_color = beautiful.void,
-      bg = beautiful.pale,
-      widget = wibox.container.background,
-    },
-    top = 2 * beautiful.useless_gap,
-    widget = wibox.container.margin,
-  })
 
   screen:connect_signal('tag::history::update', function()
     tagbar:refresh()
