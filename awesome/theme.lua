@@ -35,7 +35,7 @@ local palette = {
 beautiful.init({
   colors = colors,
 
-  font = 'Kalam Bold 16',
+  font = 'Quicksand Regular 16',
   fg_normal = palette.void,
   bg_focus = palette.white,
   fg_focus = palette.void,

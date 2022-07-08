@@ -255,7 +255,7 @@ local popup = awful.popup({
                   beautiful.blue,
                   '%a %b %d'
                 ),
-                font = 'Kalam Bold 18',
+                font = 'Quicksand Regular 18',
                 widget = wibox.widget.textclock,
               },
               {
@@ -263,7 +263,7 @@ local popup = awful.popup({
                   beautiful.magenta,
                   '%H:%M'
                 ),
-                font = 'Kalam Bold 18',
+                font = 'Quicksand Regular 18',
                 widget = wibox.widget.textclock,
               },
               spacing = 16,

@@ -5,7 +5,7 @@ local tagState = require('tagState')
 local wibox = require('wibox')
 
 local TAGBAR_HEIGHT = 48
-local TAGBAR_FONT = 'Kalam Bold 14'
+local TAGBAR_FONT = 'Quicksand Regular 14'
 
 -- -----------------------------------------------------------------------------
 -- Components
