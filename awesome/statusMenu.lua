@@ -8,7 +8,7 @@ local wibox = require('wibox')
 -- State / Config
 -- =============================================================================
 
-local STATUS_ITEM_SIZE = 100
+local STATUS_ITEM_SIZE = 64
 local DIAL_BORDER_WIDTH = 6
 
 local selectedItemIndex = 1
@@ -89,29 +89,19 @@ end
 
 local function StatusItemWidget(opts)
   local statusItemWidget = wibox.widget({
-    {
-      {
-        opts.widget,
-        widget = wibox.container.place,
-      },
-      margins = 16,
-      widget = wibox.container.margin,
-    },
-    shape_border_width = 1,
-    shape_border_color = beautiful.darkGray,
-    fg = beautiful.white,
-    bg = beautiful.darkGray,
+    opts.widget,
     forced_width = STATUS_ITEM_SIZE,
     forced_height = STATUS_ITEM_SIZE,
+    opacity = 0.4,
     widget = wibox.container.background,
   })
 
   statusItemWidget:connect_signal('request::select', function()
-    statusItemWidget.shape_border_color = beautiful.white
+    statusItemWidget.opacity = 1
   end)
 
   statusItemWidget:connect_signal('request::unselect', function()
-    statusItemWidget.shape_border_color = beautiful.darkGray
+    statusItemWidget.opacity = 0.4
   end)
 
   statusItemWidget.keypressed_callback = opts.keypressed_callback
@@ -230,37 +220,27 @@ local function getNotificationIcon()
   end
 end
 
-local notificationIconWidget = wibox.widget({
+local notificationWidget = wibox.widget({
   image = getNotificationIcon(),
+  forced_width = 32,
+  forced_height = 32,
   widget = wibox.widget.imagebox,
 })
 
 models.notifications:connect_signal('update', function()
-  notificationIconWidget.image = getNotificationIcon()
+  notificationWidget.image = getNotificationIcon()
 end)
-
-local notificationWidget = StatusItemWidget({
-  widget = notificationIconWidget,
-  keypressed_callback = function(mod, key)
-    if #mod == 0 then
-      if key == ' ' then
-        models.notifications:toggle()
-      end
-    end
-  end,
-})
 
 -- -----------------------------------------------------------------------------
 -- Popup
 -- -----------------------------------------------------------------------------
 
 local statusRowWidget = wibox.widget({
-  batteryWidget,
-  volumeWidget,
   brightnessWidget,
-  notificationWidget,
-  spacing = 16,
-  layout = wibox.layout.fixed.horizontal,
+  volumeWidget,
+  batteryWidget,
+  spacing = 24,
+  layout = wibox.layout.flex.horizontal,
 })
 
 local popup = awful.popup({
@@ -272,44 +252,47 @@ local popup = awful.popup({
             {
               {
                 format = ('<span color="%s">%s</span>'):format(
-                  beautiful.white,
-                  '%H:%M'
+                  beautiful.blue,
+                  '%a %b %d'
                 ),
-                font = 'Kalam Bold 40',
-                align = 'center',
+                font = 'Kalam Bold 18',
                 widget = wibox.widget.textclock,
               },
               {
                 format = ('<span color="%s">%s</span>'):format(
-                  beautiful.white,
-                  '%a %b %d'
+                  beautiful.magenta,
+                  '%H:%M'
                 ),
-                font = 'Kalam Bold 20',
-                align = 'center',
+                font = 'Kalam Bold 18',
                 widget = wibox.widget.textclock,
               },
-              layout = wibox.layout.fixed.vertical,
+              spacing = 16,
+              layout = wibox.layout.fixed.horizontal,
             },
-            top = 16,
-            bottom = 16,
-            left = 96,
-            right = 96,
-            widget = wibox.container.margin,
+            notificationWidget,
+            spacing = 32,
+            layout = wibox.layout.fixed.horizontal,
           },
-          bg = beautiful.darkGray,
-          widget = wibox.container.background,
+          statusRowWidget,
+          spacing = 16,
+          layout = wibox.layout.fixed.vertical,
         },
-        widget = wibox.container.place,
+        margins = 16,
+        widget = wibox.container.margin,
       },
-      statusRowWidget,
-      spacing = 16,
-      layout = wibox.layout.fixed.vertical,
+      shape_border_width = 1,
+      shape_border_color = beautiful.white,
+      bg = beautiful.darkGray,
+      widget = wibox.container.background,
     },
-    widget = wibox.container.place,
+    margins = 16,
+    widget = wibox.container.margin,
   },
-  bg = beautiful.dimmed,
+  placement = awful.placement.bottom_right,
+  bg = beautiful.transparent,
   visible = false,
   ontop = true,
+  type = 'dock',
 })
 
 -- =============================================================================
@@ -344,6 +327,13 @@ local keygrabber = awful.keygrabber({
       end,
     },
     {
+      {},
+      'm',
+      function()
+        models.notifications:toggle()
+      end,
+    },
+    {
       { 'Mod4' },
       ';',
       function(self)
@@ -373,10 +363,6 @@ return function()
     popup.visible = false
   else
     popup.screen = awful.screen.focused()
-    popup.minimum_width = popup.screen.geometry.width
-    popup.minimum_height = popup.screen.geometry.height
-    popup.maximum_width = popup.screen.geometry.width
-    popup.maximum_height = popup.screen.geometry.height
     popup.visible = true
     keygrabber:start()
   end
