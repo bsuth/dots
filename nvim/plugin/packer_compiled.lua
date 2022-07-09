@@ -99,11 +99,6 @@ _G.packer_plugins = {
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/lualine.nvim",
     url = "https://github.com/hoob3rt/lualine.nvim"
   },
-  melange = {
-    loaded = true,
-    path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/melange",
-    url = "https://github.com/savq/melange"
-  },
   ["nvim-cmp"] = {
     loaded = true,
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/nvim-cmp",

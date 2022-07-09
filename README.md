@@ -23,9 +23,8 @@
 
 #### Misc
 
-- Browser: [vivaldi](https://vivaldi.com)
-- Color Scheme: [melange](https://github.com/savq/melange)
-- Wallpapers: [cysketch](https://twitter.com/cysketch)
+- Browser: [firefox developer edition](https://www.mozilla.org/en-US/firefox/developer/)
+- Color Scheme: [onedark](https://github.com/navarasu/onedark.nvim) (warmer)
 
 ## Screenshots
 
@@ -33,10 +32,6 @@
 ![screenshot2](https://github.com/bsuth/dots/raw/master/assets/readme2.png)
 ![screenshot3](https://github.com/bsuth/dots/raw/master/assets/readme3.png)
 ![screenshot4](https://github.com/bsuth/dots/raw/master/assets/readme4.png)
-
-## Workflow Preview
-
-https://user-images.githubusercontent.com/15937361/154474492-7a2871ad-ec4c-4153-ac50-3fa42c84a24d.mp4
 
 ## Dynamic Awesomewm Tags as Tabs
 

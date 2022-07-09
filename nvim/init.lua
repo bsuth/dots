@@ -136,7 +136,6 @@ require('packer').startup(function()
 
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
-  use('savq/melange')
   use('navarasu/onedark.nvim')
 
   -- apps
