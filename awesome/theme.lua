@@ -62,7 +62,7 @@ end
 -- https://awesomewm.org/doc/api/libraries/naughty.html#config.defaults
 naughty.config.padding = 16
 naughty.config.defaults.timeout = 8
-naughty.config.defaults.margin = 16
+naughty.config.defaults.margin = 24
 naughty.config.defaults.border_width = 1
 naughty.config.defaults.position = 'top_right'
 

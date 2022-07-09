@@ -8,7 +8,7 @@ local wibox = require('wibox')
 -- State / Config
 -- =============================================================================
 
-local STATUS_ITEM_SIZE = 64
+local STATUS_ITEM_SIZE = 32
 local DIAL_BORDER_WIDTH = 6
 
 local selectedItemIndex = 1
@@ -88,20 +88,42 @@ local function DialWidget(opts)
 end
 
 local function StatusItemWidget(opts)
+  local textWidget = wibox.widget({
+    text = tostring(opts.model.percent) .. '%',
+    align = 'center',
+    valign = 'center',
+    widget = wibox.widget.textbox,
+  })
+
   local statusItemWidget = wibox.widget({
-    opts.widget,
-    forced_width = STATUS_ITEM_SIZE,
-    forced_height = STATUS_ITEM_SIZE,
-    opacity = 0.4,
+    {
+      {
+        {
+          opts.widget,
+          widget = wibox.container.place,
+        },
+        textWidget,
+        spacing = 16,
+        layout = wibox.layout.fixed.vertical,
+      },
+      margins = 16,
+      widget = wibox.container.margin,
+    },
+    fg = opts.color,
+    bg = beautiful.darkGray,
     widget = wibox.container.background,
   })
 
+  opts.model:connect_signal('update', function()
+    textWidget.text = tostring(opts.model.percent) .. '%'
+  end)
+
   statusItemWidget:connect_signal('request::select', function()
-    statusItemWidget.opacity = 1
+    statusItemWidget.bg = beautiful.lightGray
   end)
 
   statusItemWidget:connect_signal('request::unselect', function()
-    statusItemWidget.opacity = 0.4
+    statusItemWidget.bg = beautiful.darkGray
   end)
 
   statusItemWidget.keypressed_callback = opts.keypressed_callback
@@ -124,6 +146,8 @@ end
 
 local batteryIconWidget = wibox.widget({
   image = getBatteryIcon(),
+  forced_width = STATUS_ITEM_SIZE,
+  forced_height = STATUS_ITEM_SIZE,
   widget = wibox.widget.imagebox,
 })
 
@@ -132,11 +156,9 @@ models.battery:connect_signal('update', function()
 end)
 
 local batteryWidget = StatusItemWidget({
-  widget = DialWidget({
-    model = models.battery,
-    color = beautiful.red,
-    widget = batteryIconWidget,
-  }),
+  model = models.battery,
+  color = beautiful.red,
+  widget = batteryIconWidget,
 })
 
 -- -----------------------------------------------------------------------------
@@ -150,6 +172,8 @@ end
 
 local volumeIconWidget = wibox.widget({
   image = getVolumeIcon(),
+  forced_width = STATUS_ITEM_SIZE,
+  forced_height = STATUS_ITEM_SIZE,
   widget = wibox.widget.imagebox,
 })
 
@@ -158,11 +182,9 @@ models.volume:connect_signal('update', function()
 end)
 
 local volumeWidget = StatusItemWidget({
-  widget = DialWidget({
-    model = models.volume,
-    color = beautiful.green,
-    widget = volumeIconWidget,
-  }),
+  model = models.volume,
+  color = beautiful.green,
+  widget = volumeIconWidget,
   keypressed_callback = function(mod, key)
     if #mod == 0 then
       if key == 'j' then
@@ -185,14 +207,14 @@ local volumeWidget = StatusItemWidget({
 -- -----------------------------------------------------------------------------
 
 local brightnessWidget = StatusItemWidget({
-  widget = DialWidget({
-    model = models.brightness,
-    color = beautiful.yellow,
-    widget = {
-      image = beautiful.assets('brightness.svg'),
-      widget = wibox.widget.imagebox,
-    },
-  }),
+  model = models.brightness,
+  color = beautiful.yellow,
+  widget = {
+    image = beautiful.assets('brightness.svg'),
+    forced_width = STATUS_ITEM_SIZE,
+    forced_height = STATUS_ITEM_SIZE,
+    widget = wibox.widget.imagebox,
+  },
   keypressed_callback = function(mod, key)
     if #mod == 0 then
       if key == 'j' then
@@ -222,8 +244,8 @@ end
 
 local notificationWidget = wibox.widget({
   image = getNotificationIcon(),
-  forced_width = 32,
-  forced_height = 32,
+  forced_width = 64,
+  forced_height = 64,
   widget = wibox.widget.imagebox,
 })
 
@@ -252,32 +274,39 @@ local popup = awful.popup({
             {
               {
                 format = ('<span color="%s">%s</span>'):format(
-                  beautiful.blue,
-                  '%a %b %d'
+                  beautiful.magenta,
+                  '%H:%M'
                 ),
-                font = 'Quicksand Regular 18',
+                font = 'Quicksand Regular 50',
+                forced_height = 50, -- match line height to font size
                 widget = wibox.widget.textclock,
               },
               {
                 format = ('<span color="%s">%s</span>'):format(
-                  beautiful.magenta,
-                  '%H:%M'
+                  beautiful.blue,
+                  '%a %b %d'
                 ),
-                font = 'Quicksand Regular 18',
+                font = 'Quicksand Regular 20',
+                forced_height = 20, -- match line height to font size
                 widget = wibox.widget.textclock,
               },
               spacing = 16,
-              layout = wibox.layout.fixed.horizontal,
+              -- Force width to prevent resizing on time change
+              forced_width = 200,
+              layout = wibox.layout.fixed.vertical,
             },
-            notificationWidget,
+            {
+              notificationWidget,
+              widget = wibox.container.place,
+            },
             spacing = 32,
             layout = wibox.layout.fixed.horizontal,
           },
           statusRowWidget,
-          spacing = 16,
+          spacing = 32,
           layout = wibox.layout.fixed.vertical,
         },
-        margins = 16,
+        margins = 32,
         widget = wibox.container.margin,
       },
       shape_border_width = 1,
