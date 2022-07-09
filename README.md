@@ -1,8 +1,7 @@
 # dots
 
 - [Setup](#setup)
-- [Screenshots](#features)
-- [Workflow Preview](#workflow-preview)
+- [Screenshots](#screenshots)
 - [Dynamic Awesomewm Tags as Tabs](#dynamic-awesomewm-tags-as-tabs)
 - [Using Neovim as a Terminal](#using-neovim-as-a-terminal)
 
