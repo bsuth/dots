@@ -65,10 +65,7 @@ local function DmenuItemWidget(widget, selected)
   return wibox.widget({
     {
       widget,
-      top = 8,
-      bottom = 8,
-      left = 16,
-      right = 16,
+      margins = 16,
       widget = wibox.container.margin,
     },
     fg = beautiful.white,
@@ -95,8 +92,20 @@ dmenuItemList:connect_signal('request::rerender', function()
   )
 
   for i = itemIndexOffset, itemIndexLimit do
+    local command = filteredCommands[i]
+    local markup = command
+
+    if #promptValue > 0 then
+      local matchStart, matchEnd = command:find(promptValue)
+      markup = table.concat({
+        command:sub(1, matchStart - 1),
+        ('<span color="%s">%s</span>'):format(beautiful.cyan, promptValue),
+        command:sub(matchEnd + 1),
+      })
+    end
+
     dmenuItemList.children[#dmenuItemList.children + 1] = DmenuItemWidget({
-      markup = filteredCommands[i],
+      markup = markup,
       widget = wibox.widget.textbox,
     }, i == selectedItemIndex)
   end
