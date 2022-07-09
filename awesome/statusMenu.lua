@@ -281,7 +281,7 @@ local popup = awful.popup({
         widget = wibox.container.margin,
       },
       shape_border_width = 1,
-      shape_border_color = beautiful.white,
+      shape_border_color = beautiful.cyan,
       bg = beautiful.darkGray,
       widget = wibox.container.background,
     },

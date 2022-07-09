@@ -45,11 +45,10 @@ beautiful.init({
   border_normal = palette.void,
   border_focus = palette.white,
 
-  notification_font = 'Hack Regular 16',
-  notification_bg = palette.white,
-  notification_fg = palette.void,
-  notification_border_color = palette.void,
-  notification_icon_size = 40,
+  notification_font = 'Quicksand Regular 14',
+  notification_bg = palette.darkGray,
+  notification_fg = palette.white,
+  notification_border_color = palette.cyan,
 })
 
 -- Copy palette into `beautiful` for convenience. This must be done after
@@ -61,11 +60,11 @@ end
 -- Some notification theme properties don't get overridden by the beautiful
 -- variables, so we have to directly set them here. See defaults here:
 -- https://awesomewm.org/doc/api/libraries/naughty.html#config.defaults
-naughty.config.padding = 20
+naughty.config.padding = 16
 naughty.config.defaults.timeout = 8
-naughty.config.defaults.margin = 5
-naughty.config.defaults.border_width = 2
-naughty.config.defaults.position = 'top_left'
+naughty.config.defaults.margin = 16
+naughty.config.defaults.border_width = 1
+naughty.config.defaults.position = 'top_right'
 
 -- -----------------------------------------------------------------------------
 -- Functions
@@ -89,20 +88,18 @@ function beautiful.setWallpaper(screen)
 end
 
 function beautiful.styleNotification(notification)
-  notification.icon = beautiful.assets('notifications-active.svg')
+  -- if notification.title ~= nil then
+  --   notification.text = ([[
+-- <span size='small'>%s</span>
+-- <span size='small'>%s</span>
+		-- ]]):format(notification.title, notification.text)
+  -- else
+  --   notification.text = ([[
+-- <span size='small'>%s</span>
+		-- ]]):format(notification.text)
+  -- end
 
-  if notification.title ~= nil then
-    notification.text = ([[
-<span size='small'>%s</span>
-<span size='small'>%s</span>
-		]]):format(notification.title, notification.text)
-  else
-    notification.text = ([[
-<span size='small'>%s</span>
-		]]):format(notification.text)
-  end
-
-  notification.title = 'Notification'
+  -- notification.title = 'Notification'
   return notification
 end
 

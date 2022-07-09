@@ -8,12 +8,12 @@ local wibox = require('wibox')
 -- -----------------------------------------------------------------------------
 
 local DMENU_WIDTH = 400
-local DMENU_SPACING = 8
 local DMENU_PAGE_SIZE = 5
 
 local filteredCommands = {}
 local itemIndexOffset = 1
 local selectedItemIndex = 1
+local promptValue = ''
 
 -- -----------------------------------------------------------------------------
 -- Commands
@@ -71,10 +71,8 @@ local function DmenuItemWidget(widget, selected)
       right = 16,
       widget = wibox.container.margin,
     },
-    shape_border_width = selected and 1 or 0,
-    shape_border_color = beautiful.white,
     fg = beautiful.white,
-    bg = beautiful.darkGray,
+    bg = selected and beautiful.lightGray or beautiful.darkGray,
     forced_width = DMENU_WIDTH,
     widget = wibox.container.background,
   })
@@ -85,7 +83,6 @@ end
 -- -----------------------------------------------------------------------------
 
 local dmenuItemList = wibox.widget({
-  spacing = DMENU_SPACING,
   layout = wibox.layout.fixed.vertical,
 })
 
@@ -108,18 +105,23 @@ end)
 local prompt = awful.widget.prompt({
   prompt = '',
   fg = beautiful.white,
-  changed_callback = function(promptValue)
-    filteredCommands = {}
+  changed_callback = function(newPromptValue)
+    -- Need to explicitly check if the prompt _actually_ changed, since
+    -- changed_callback also fires on just modifier keypresses.
+    if newPromptValue ~= promptValue then
+      filteredCommands = {}
 
-    for i, command in ipairs(DMENU_COMMANDS) do
-      if command:find(promptValue) then
-        filteredCommands[#filteredCommands + 1] = command
+      for i, command in ipairs(DMENU_COMMANDS) do
+        if command:find(newPromptValue) then
+          filteredCommands[#filteredCommands + 1] = command
+        end
       end
-    end
 
-    itemIndexOffset = 1
-    selectedItemIndex = 1
-    dmenuItemList:emit_signal('request::rerender')
+      itemIndexOffset = math.max(1, #filteredCommands - DMENU_PAGE_SIZE + 1)
+      selectedItemIndex = #filteredCommands
+      promptValue = newPromptValue
+      dmenuItemList:emit_signal('request::rerender')
+    end
   end,
   exe_callback = function(command)
     local command = filteredCommands[selectedItemIndex]
@@ -165,23 +167,31 @@ local prompt = awful.widget.prompt({
 local popup = awful.popup({
   widget = {
     {
-      DmenuItemWidget({
-        {
-          markup = '➜ ',
-          widget = wibox.widget.textbox,
-        },
-        prompt,
-        layout = wibox.layout.fixed.horizontal,
-      }),
-      dmenuItemList,
-      spacing = DMENU_SPACING,
-      layout = wibox.layout.fixed.vertical,
+      {
+        dmenuItemList,
+        DmenuItemWidget({
+          {
+            markup = '➜ ',
+            widget = wibox.widget.textbox,
+          },
+          prompt,
+          layout = wibox.layout.fixed.horizontal,
+        }),
+        layout = wibox.layout.fixed.vertical,
+      },
+      shape_border_width = 1,
+      shape_border_color = beautiful.cyan,
+      bg = beautiful.darkGray,
+      widget = wibox.container.background,
     },
-    widget = wibox.container.place,
+    margins = 16,
+    widget = wibox.container.margin,
   },
-  bg = beautiful.dimmed,
+  placement = awful.placement.bottom_right,
+  bg = beautiful.transparent,
   visible = false,
   ontop = true,
+  type = 'dock',
 })
 
 -- -----------------------------------------------------------------------------
@@ -197,16 +207,12 @@ return function()
     popup.visible = false
   else
     filteredCommands = DMENU_COMMANDS
-    itemIndexOffset = 1
-    selectedItemIndex = 1
+    itemIndexOffset = math.max(1, #filteredCommands - DMENU_PAGE_SIZE + 1)
+    selectedItemIndex = #filteredCommands
+    promptValue = ''
     dmenuItemList:emit_signal('request::rerender')
 
     popup.screen = awful.screen.focused()
-    popup.minimum_width = popup.screen.geometry.width
-    popup.minimum_height = popup.screen.geometry.height
-    popup.maximum_width = popup.screen.geometry.width
-    popup.maximum_height = popup.screen.geometry.height
-
     prompt:run()
     popup.visible = true
   end
