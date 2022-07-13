@@ -23,7 +23,7 @@ local function Tab(opts)
       },
       widget = wibox.container.place,
     },
-    fg = beautiful.white,
+    fg = opts.isBackgroundTab and '#888888' or beautiful.white,
     bg = opts.active and beautiful.lightGray or beautiful.darkGray,
     widget = wibox.container.background,
   })
@@ -49,6 +49,12 @@ function Tagbar:closeTab()
   end
 end
 
+function Tagbar:toggleBackgroundTab()
+  local tag = self.screen.selected_tag
+  tag.isInTagbarBackground = not tag.isInTagbarBackground
+  self:refresh()
+end
+
 function Tagbar:renameTab()
   self.renamePrompt:run()
   self:refresh({ renameTag = self.screen.selected_tag })
@@ -69,7 +75,7 @@ function Tagbar:shiftTab(relidx)
   end
 end
 
-function Tagbar:focusTab(relidx)
+function Tagbar:focusTab(relidx, iterateBackgroundTags)
   local newTagIndex = self.screen.selected_tag.index
   local numTags = #self.screen.tags
 
@@ -81,9 +87,13 @@ function Tagbar:focusTab(relidx)
     end
 
     local newTag = self.screen.tags[newTagIndex]
-    if not newTag.name:match('^_.*') then
-      newTag:view_only()
-      break
+
+    if iterateBackgroundTags or not newTag.isInTagbarBackground then
+      -- Do not match private tags (ex. client buffer)
+      if not newTag.name:match('^_.*') then
+        newTag:view_only()
+        break
+      end
     end
   end
 end
@@ -97,6 +107,7 @@ function Tagbar:refresh(opts)
       children[#children + 1] = Tab({
         name = tag.name,
         active = tag == self.screen.selected_tag,
+        isBackgroundTab = tag.isInTagbarBackground,
         widget = isRename and self.renamePrompt,
       })
     end

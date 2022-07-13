@@ -154,8 +154,20 @@ bindings.globalkeys = gears.table.join(
   awful.key({ 'Mod4', 'Shift' }, 'Tab', function()
     awful.screen.focused().tagbar:focusTab(-1)
   end),
+  awful.key({ 'Mod4', 'Mod1' }, 'Tab', function()
+    awful.screen.focused().tagbar:focusTab(1, true)
+  end),
+  awful.key({ 'Mod4', 'Mod1', 'Shift' }, 'Tab', function()
+    awful.screen.focused().tagbar:focusTab(-1, true)
+  end),
   awful.key({ 'Mod4' }, 'r', function()
     awful.screen.focused().tagbar:renameTab()
+  end),
+  awful.key({ 'Mod4' }, 'p', function()
+    awful.screen.focused().tagbar:toggleBackgroundTab()
+  end),
+  awful.key({ 'Mod4', 'Mod1' }, 'p', function()
+    awful.screen.focused().tagbar:toggleBackgroundTab()
   end),
 
   --
