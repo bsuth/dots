@@ -8,7 +8,7 @@ local wibox = require('wibox')
 -- State / Config
 -- =============================================================================
 
-local STATUS_ITEM_SIZE = 32
+local STATUS_ITEM_SIZE = 36
 local DIAL_BORDER_WIDTH = 6
 
 local selectedItemIndex = 1
@@ -261,7 +261,7 @@ local statusRowWidget = wibox.widget({
   brightnessWidget,
   volumeWidget,
   batteryWidget,
-  spacing = 24,
+  spacing = 16,
   layout = wibox.layout.flex.horizontal,
 })
 
