@@ -341,34 +341,15 @@ end
 
 local keygrabber = awful.keygrabber({
   keybindings = {
-    {
-      {},
-      'h',
-      function()
-        focusStatus(-1)
-      end,
-    },
-    {
-      {},
-      'l',
-      function()
-        focusStatus(1)
-      end,
-    },
-    {
-      {},
-      'm',
-      function()
-        models.notifications:toggle()
-      end,
-    },
-    {
-      { 'Mod4' },
-      ';',
-      function(self)
-        self:stop()
-      end,
-    },
+    { {}, 'h', function() focusStatus(-1) end },
+    { {}, 'l', function() focusStatus(1) end },
+    { {}, 'm', function() models.notifications:toggle() end },
+    { {}, 'XF86AudioLowerVolume', function() models.volume:set(models.volume.percent - 5) end },
+    { {}, 'XF86AudioRaiseVolume', function() models.volume:set(models.volume.percent + 5) end },
+    { {}, 'XF86AudioMute', function() models.volume:toggle() end },
+    { {}, 'XF86MonBrightnessDown', function() models.brightness:set(models.brightness.percent - 8) end },
+    { {}, 'XF86MonBrightnessUp', function() models.brightness:set(models.brightness.percent + 8) end },
+    { { 'Mod4' }, ';', function(self) self:stop() end },
   },
   keypressed_callback = function(self, mod, key)
     local selectedWidget = statusRowWidget.children[selectedItemIndex]
