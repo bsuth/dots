@@ -1,6 +1,8 @@
 xmodmap ~/.Xmodmap
 eval $(ssh-agent -s)
 
+fcitx5 -d
+
 picom -b \
   --no-fading-openclose \
   --no-fading-destroyed-argb \
