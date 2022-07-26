@@ -126,7 +126,6 @@ require('packer').startup(function()
   use('hrsh7th/vim-vsnip-integ')
   use('mhartington/formatter.nvim')
   use('fatih/vim-go')
-  use('liuchengxu/vista.vim')
 
   -- completion sources
   use('hrsh7th/cmp-buffer')
@@ -150,7 +149,6 @@ require('packer').startup(function()
   use('tpope/vim-fugitive')
   use('matze/vim-move')
   use('lambdalisue/suda.vim')
-  use('tpope/vim-dadbod')
 
   -- Local plugins can be included
   use('~/repos/vim-erde')
