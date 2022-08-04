@@ -9,11 +9,12 @@ require('awful/autofocus')
 
 -- Order matters here!
 require('theme')
-require('tagState')
+local tagState = require('tagState')
 local Tagbar = require('tagbar')
 local bindings = require('bindings')
 
-awful.layout.layouts = { require('layout') }
+local layout = require('layout')
+awful.layout.layouts = { layout }
 
 -- Private tag used to move clients around tags
 awful.clientbuffer = awful.tag.add('_clientbuffer', {
@@ -70,9 +71,13 @@ awful.rules.rules = {
 awful.screen.connect_for_each_screen(function(s)
   s.tagbar = Tagbar(s)
 
+  if not tagState.restoreScreen(s) then
+    awful.tag({ '1' }, s, layout)
+  end
+
   s:connect_signal('tag::history::update', function()
     -- restore focus to above client
-    for i, c in ipairs(s.selected_tag:clients()) do
+    for _, c in ipairs(s.selected_tag:clients()) do
       if c.above then
         c:emit_signal('request::activate')
         return
@@ -83,8 +88,8 @@ end)
 
 awesome.connect_signal('startup', function()
   for s in screen do
-    for i, tag in ipairs(s.tags) do
-      for i, c in ipairs(tag:clients()) do
+    for _, tag in ipairs(s.tags) do
+      for _, c in ipairs(tag:clients()) do
         if c.minimized then
           c:move_to_tag(awful.clientbuffer)
         end

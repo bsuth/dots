@@ -1,7 +1,6 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
-local tagState = require('tagState')
 local wibox = require('wibox')
 
 local TAGBAR_HEIGHT = 48
@@ -45,7 +44,6 @@ end
 function Tagbar:closeTab()
   if #self.screen.tags > 1 then
     self.screen.selected_tag:delete()
-    tagState:emit_signal('request::backup', self.screen)
   end
 end
 
@@ -69,7 +67,6 @@ function Tagbar:shiftTab(relidx)
     if swapTag and not swapTag.name:match('^_.*') then
       currentTag:swap(swapTag)
       self:refresh()
-      tagState:emit_signal('request::backup', self.screen)
       break
     end
   end
@@ -133,8 +130,6 @@ return function(screen)
       fg = beautiful.white,
       exe_callback = function(name)
         screen.selected_tag.name = name
-        tagState:emit_signal('request::backup', screen)
-        print('exec')
       end,
     }),
     wibar = awful.wibar({

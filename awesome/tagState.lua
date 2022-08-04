@@ -4,124 +4,102 @@ local naughty = require('naughty')
 local cjson = require('cjson')
 local layout = require('layout')
 
-local tagState = gears.object()
+local tagState = {}
+local TAGSTATE_BACKUP_FILENAME = '/tmp/awesomewm_tag_state_backup'
+local tagStateBackup = {}
 
-local function getScreenBackupFileName(s)
-  return '/tmp/awesome_tag_backup_screen' .. tostring(s.index)
+do
+  local tagStateBackupFile = io.open(TAGSTATE_BACKUP_FILENAME, 'rb')
+  if tagStateBackupFile then
+    tagStateBackup = cjson.decode(tagStateBackupFile:read('*a'))
+    tagStateBackupFile:close()
+  end
 end
 
 -- -----------------------------------------------------------------------------
 -- Restore Tags
 -- -----------------------------------------------------------------------------
 
-awful.screen.connect_for_each_screen(function(s)
-  local backupFile = io.open(getScreenBackupFileName(s), 'rb')
+function tagState.clear()
+  local tagStateBackupFile = io.open(TAGSTATE_BACKUP_FILENAME, 'w')
+  if tagStateBackupFile then
+    tagStateBackupFile:write('{}')
+    tagStateBackupFile:close()
+  end
+end
 
-  if not backupFile then
-    -- Default tags
-    awful.tag({ '1' }, s, layout)
-  else
-    local backup = cjson.decode(backupFile:read('*a'))
-    backupFile:close()
+function tagState.backup()
+  tagStateBackup = {}
 
-    local tagNames = {}
+  for s in screen do
+    local screenBackup = {}
 
-    for i, tagBackup in ipairs(backup) do
-      if not tagBackup.name:match('^_') then
-        tagNames[#tagNames + 1] = tagBackup.name
-      end
-    end
+    for _, tag in ipairs(s.tags) do
+      if not tag.name:match('^_') then
+        local tagBackup = { name = tag.name }
 
-    if #tagNames == 0 then
-      -- Default tags
-      awful.tag({ '1' }, s, layout)
-    else
-      -- Need to use awful.tag here, since awful.tag.add fails to set the screen's
-      -- selected_tag appropriately
-      awful.tag(tagNames, s, layout)
-    end
-
-    -- Wait until startup to assign clients. For some reason s.tags is not
-    -- actually set until startup.
-    awesome.connect_signal('startup', function()
-      local tagNameLookup = {}
-      for i, tag in ipairs(s.tags) do
-        tagNameLookup[tag.name] = tag
-      end
-
-      local clientPidLookup = {}
-      for c in awful.client.iterate() do
-        -- check if PID is actually available
-        if type(c.pid) == 'number' then
-          clientPidLookup[c.pid] = c
-        end
-      end
-
-      for i, tagBackup in ipairs(backup) do
-        local tag = tagNameLookup[tagBackup.name]
-        if tag ~= nil then
-          for j, pid in ipairs(tagBackup.clients) do
-            local c = clientPidLookup[pid]
-            if c ~= nil then
-              c:move_to_tag(tag)
-            end
+        for _, c in ipairs(tag:clients()) do
+          -- check if PID is actually available
+          if type(c.pid) == 'number' then
+            table.insert(tagBackup, c.pid)
           end
         end
+
+        table.insert(screenBackup, tagBackup)
       end
-    end)
-  end
-end)
-
--- -----------------------------------------------------------------------------
--- Backup Tags
--- -----------------------------------------------------------------------------
-
-tagState:connect_signal('request::backup', function(self, s)
-  local newBackup = {}
-
-  for i, tag in ipairs(s.tags) do
-    if #tag.name > 0 and not tag.name:match('^_') then
-      local clients = {}
-      for j, c in ipairs(tag:clients()) do
-        -- check if PID is actually available
-        if type(c.pid) == 'number' then
-          clients[#clients + 1] = c.pid
-        end
-      end
-
-      newBackup[#newBackup + 1] = {
-        name = tag.name,
-        clients = clients,
-      }
     end
+    
+    tagStateBackup[s.index] = screenBackup
   end
 
-  local backupFile = io.open(getScreenBackupFileName(s), 'w')
+  local tagStateBackupFile = io.open(TAGSTATE_BACKUP_FILENAME, 'w')
 
-  if backupFile then
-    backupFile:write(cjson.encode(newBackup))
-    backupFile:close()
+  if tagStateBackupFile then
+    tagStateBackupFile:write(cjson.encode(tagStateBackup))
+    tagStateBackupFile:close()
   end
-end)
+end
 
-awful.screen.connect_for_each_screen(function(s)
-  -- Required when adding or deleting tags
-  s:connect_signal('tag::history::update', function()
-    tagState:emit_signal('request::backup', s)
+function tagState.restoreScreen(s)
+  local screenBackup = tagStateBackup[s.index]
+
+  if not screenBackup then
+    return false
+  end
+
+  do
+    local tagNames = {}
+
+    for _, tagBackup in ipairs(screenBackup) do
+      table.insert(tagNames, tagBackup.name)
+    end
+
+    -- Need to use awful.tag here, since awful.tag.add fails to set the screen's
+    -- selected_tag appropriately
+    awful.tag(tagNames, s, layout)
+  end
+
+  -- Wait until startup to assign clients. For some reason s.tags is not
+  -- actually set until startup.
+  awesome.connect_signal('startup', function()
+    local clientPidLookup = {}
+    for c in awful.client.iterate() do
+      -- check if PID is actually available
+      if type(c.pid) == 'number' then
+        clientPidLookup[c.pid] = c
+      end
+    end
+
+    for i, tagBackup in ipairs(screenBackup) do
+      for _, clientPid in ipairs(tagBackup) do
+        local c = clientPidLookup[clientPid]
+        if c ~= nil then c:move_to_tag(s.tags[i]) end
+      end
+    end
   end)
-end)
 
-awful.tag.attached_connect_signal(nil, 'tagged', function(tag)
-  tagState:emit_signal('request::backup', tag.screen)
-end)
-
-awful.tag.attached_connect_signal(nil, 'untagged', function(tag)
-  tagState:emit_signal('request::backup', tag.screen)
-end)
-
-client.connect_signal('swapped', function(c)
-  tagState:emit_signal('request::backup', c.screen)
-end)
+  return true
+end
 
 -- -----------------------------------------------------------------------------
 -- Return

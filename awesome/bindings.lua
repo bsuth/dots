@@ -2,6 +2,7 @@ local awful = require('awful')
 local gears = require('gears')
 local models = require('models')
 local naughty = require('naughty')
+local tagState = require('tagState')
 
 -- -----------------------------------------------------------------------------
 -- Keybindings
@@ -46,10 +47,12 @@ bindings.globalkeys = gears.table.join(
   --
 
   awful.key({ 'Mod4', 'Shift' }, 'Escape', function()
+    tagState.clear()
     awesome.quit()
   end),
 
   awful.key({ 'Mod4', 'Shift' }, 'r', function()
+    tagState.backup()
     awesome.restart()
   end),
 
