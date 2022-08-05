@@ -42,7 +42,15 @@ function Tagbar:newTab()
 end
 
 function Tagbar:closeTab()
-  if #self.screen.tags > 1 then
+  local numVisibleTags = 0
+
+  for _, tag in ipairs(self.screen.tags) do
+    if not tag.name:match('^_') then
+      numVisibleTags = numVisibleTags + 1
+    end
+  end
+
+  if numVisibleTags > 1 then
     self.screen.selected_tag:delete()
   end
 end

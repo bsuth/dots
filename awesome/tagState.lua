@@ -67,36 +67,29 @@ function tagState.restoreScreen(s)
     return false
   end
 
-  do
-    local tagNames = {}
-
-    for _, tagBackup in ipairs(screenBackup) do
-      table.insert(tagNames, tagBackup.name)
+  local clientPidLookup = {}
+  for c in awful.client.iterate() do
+    -- check if PID is actually available
+    if type(c.pid) == 'number' then
+      clientPidLookup[c.pid] = c
     end
-
-    -- Need to use awful.tag here, since awful.tag.add fails to set the screen's
-    -- selected_tag appropriately
-    awful.tag(tagNames, s, layout)
   end
 
-  -- Wait until startup to assign clients. For some reason s.tags is not
-  -- actually set until startup.
-  awesome.connect_signal('startup', function()
-    local clientPidLookup = {}
-    for c in awful.client.iterate() do
-      -- check if PID is actually available
-      if type(c.pid) == 'number' then
-        clientPidLookup[c.pid] = c
-      end
-    end
+  local tagNames = {}
+  for _, tagBackup in ipairs(screenBackup) do
+    table.insert(tagNames, tagBackup.name)
+  end
 
-    for i, tagBackup in ipairs(screenBackup) do
-      for _, clientPid in ipairs(tagBackup) do
-        local c = clientPidLookup[clientPid]
-        if c ~= nil then c:move_to_tag(s.tags[i]) end
-      end
+  -- Need to use awful.tag here, since awful.tag.add fails to set the screen's
+  -- selected_tag appropriately
+  local tags = awful.tag(tagNames, s, layout)
+
+  for i, tagBackup in ipairs(screenBackup) do
+    for _, clientPid in ipairs(tagBackup) do
+      local c = clientPidLookup[clientPid]
+      if c ~= nil then c:move_to_tag(tags[i]) end
     end
-  end)
+  end
 
   return true
 end
