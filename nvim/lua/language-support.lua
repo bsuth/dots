@@ -153,7 +153,7 @@ function applyStylua()
 end
 
 augroup('bsuth-fix-on-save', {
-  autocmd('BufWritePre', 'EslintFixAll', BUFFER_PATTERNS.js),
+  autocmd('BufWritePre', 'if exists(":EslintFixAll") | EslintFixAll', BUFFER_PATTERNS.js),
 })
 
 augroup('bsuth-format-on-save', {
