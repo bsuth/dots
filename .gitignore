@@ -13,6 +13,7 @@ st/st
 
 # zsh
 .zcompdump
+.zhistory
 
 # work
 *work*

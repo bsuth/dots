@@ -47,7 +47,7 @@ zgenom autoupdate
 # other environment variables should be placed in .zshenv
 # ------------------------------------------------------------------------------
 
-export HISTFILE=~/.zsh_history
+export HISTFILE="$ZDOTDIR/.zhistory"
 export HISTSIZE=1000
 export SAVEHIST=1000
 
