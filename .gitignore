@@ -11,5 +11,8 @@ bundle/
 st/st
 *.o
 
+# zsh
+.zcompdump
+
 # work
 *work*

@@ -174,6 +174,11 @@ _G.packer_plugins = {
     path = "/home/mujin/.local/share/nvim/site/pack/packer/start/vim-move",
     url = "https://github.com/matze/vim-move"
   },
+  ["vim-qml"] = {
+    loaded = true,
+    path = "/home/mujin/.local/share/nvim/site/pack/packer/start/vim-qml",
+    url = "https://github.com/peterhoeg/vim-qml"
+  },
   ["vim-surround"] = {
     loaded = true,
     path = "/home/mujin/.local/share/nvim/site/pack/packer/start/vim-surround",

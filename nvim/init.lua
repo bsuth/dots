@@ -1,3 +1,5 @@
+-- require('erde').load('jit')
+
 -- -----------------------------------------------------------------------------
 -- Constants
 -- -----------------------------------------------------------------------------
@@ -136,6 +138,7 @@ require('packer').startup(function()
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
   use('navarasu/onedark.nvim')
+  use('peterhoeg/vim-qml')
 
   -- apps
   use('justinmk/vim-dirvish')

@@ -9,8 +9,7 @@ declare -A SYMLINKS=(
   ["$DOTS/nvim"]=".config/nvim"
   ["$DOTS/flameshot"]=".config/flameshot"
   ["$DOTS/.xinitrc"]=".xinitrc"
-  ["$DOTS/.zprofile"]=".zprofile"
-  ["$DOTS/.zshrc"]=".zshrc"
+  ["$DOTS/.zshenv"]=".zshenv"
 )
 
 for SYMLINK in ${!SYMLINKS[@]}; do

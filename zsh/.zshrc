@@ -42,21 +42,14 @@ zgenom autoupdate
 
 # ------------------------------------------------------------------------------
 # Environment
+#
+# This should only include environment variables for interactive shells. All
+# other environment variables should be placed in .zshenv
 # ------------------------------------------------------------------------------
-
-export SHELL='/bin/zsh'
-export EDITOR=nvim
-export WORDCHARS=${WORDCHARS//[\/\.]}
-export BROWSER='none'
 
 export HISTFILE=~/.zsh_history
 export HISTSIZE=1000
 export SAVEHIST=1000
-
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.cargo/bin:$PATH"
-export PATH="$HOME/go/bin:$PATH"
-export PATH="$HOME/.luarocks/bin:$PATH"
 
 SPACESHIP_PROMPT_ORDER=(
   time          # Time stamps section
@@ -97,51 +90,6 @@ SPACESHIP_PROMPT_ORDER=(
   exit_code     # Exit code section
   char          # Prompt character
 )
-
-# ------------------------------------------------------------------------------
-# Lua
-# ------------------------------------------------------------------------------
-
-function _generate_lua_path_ {
-  declare -a LUA_PATH_PARTS=(
-    "./?.lua"
-    "./?/init.lua"
-    "$HOME/.luarocks/share/lua/$1/?.lua"
-    "$HOME/.luarocks/share/lua/$1/?/init.lua"
-    "/usr/local/share/lua/$1/?.lua"
-    "/usr/local/share/lua/$1/?/init.lua"
-    "/usr/share/lua/$1/?.lua"
-    "/usr/share/lua/$1/?/init.lua"
-    "/usr/lib/lua/$1/?.lua"
-    "/usr/lib/lua/$1/?/init.lua"
-  )
-  GENERATED_LUA_PATH=$(IFS=";"; echo "${LUA_PATH_PARTS[*]}")
-
-  declare -a LUA_CPATH_PARTS=(
-    "./?.so"
-    "$HOME/.luarocks/lib/lua/$1/?.so"
-    "/usr/local/lib/lua/$1/?.so"
-    "/usr/lib/lua/$1/?.so"
-    "/usr/lib/lua/$1/loadall.so"
-  )
-  GENERATED_LUA_CPATH=$(IFS=";"; echo "${LUA_CPATH_PARTS[*]}")
-}
-
-_generate_lua_path_ "5.4"
-export LUA_PATH_5_4="$GENERATED_LUA_PATH"
-export LUA_CPATH_5_4="$GENERATED_LUA_CPATH"
-
-_generate_lua_path_ "5.3"
-export LUA_PATH_5_3="$GENERATED_LUA_PATH"
-export LUA_CPATH_5_3="$GENERATED_LUA_CPATH"
-
-_generate_lua_path_ "5.2"
-export LUA_PATH_5_2="$GENERATED_LUA_PATH"
-export LUA_CPATH_5_2="$GENERATED_LUA_CPATH"
-
-_generate_lua_path_ "5.1"
-export LUA_PATH="$GENERATED_LUA_PATH"
-export LUA_CPATH="$GENERATED_LUA_CPATH"
 
 # ------------------------------------------------------------------------------
 # Hooks
@@ -186,22 +134,11 @@ function wm {
 }
 
 # ------------------------------------------------------------------------------
-# Projects
-# ------------------------------------------------------------------------------
-
-export ERDE_ROOT="$HOME/repos/erde"
-export LUA_PATH="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH"
-export LUA_PATH_5_2="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_2"
-export LUA_PATH_5_3="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_3"
-export LUA_PATH_5_4="$ERDE_ROOT/?.lua;$ERDE_ROOT/?/init.lua;$LUA_PATH_5_4"
-export PATH="$ERDE_ROOT/bin:$PATH"
-
-# ------------------------------------------------------------------------------
 # Personal vs Work
 # ------------------------------------------------------------------------------
 
-if [[ -f $HOME/dots/.zshwork ]]; then
-  source $HOME/dots/.zshwork
+if [[ -f $ZDOTDIR/.zwork ]]; then
+  source $ZDOTDIR/.zwork
 else
-  source $HOME/dots/.zshhome
+  source $ZDOTDIR/.zhome
 fi
