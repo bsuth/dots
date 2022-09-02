@@ -1,4 +1,16 @@
--- require('erde').load('jit')
+DOTS = os.getenv('DOTS')
+
+-- When resolving modules, neovim looks for 'lua/?.lua;lua/?/init.lua' for all
+-- paths in `runtimepath`. However, since package managers often manipulate this
+-- value at runtime, neovim opts to provide a custom package loader in order to
+-- always get the correct `runtimepath` value _at require time_. This means that
+-- the package.path is not updated and erde cannot find our neovim files, so we
+-- have to manually provide the path.
+--
+-- @see https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_init_packages.lua
+package.path = ('%s/nvim/lua/?.lua;%s/lua/?/init.lua;%s'):format(DOTS, DOTS, package.path)
+
+require('erde').load('jit')
 
 -- -----------------------------------------------------------------------------
 -- Constants
