@@ -1,30 +1,5 @@
-DOTS = os.getenv('DOTS')
-
--- When resolving modules, neovim looks for 'lua/?.lua;lua/?/init.lua' for all
--- paths in `runtimepath`. However, since package managers often manipulate this
--- value at runtime, neovim opts to provide a custom package loader in order to
--- always get the correct `runtimepath` value _at require time_. This means that
--- the package.path is not updated and erde cannot find our neovim files, so we
--- have to manually provide the path.
---
--- @see https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_init_packages.lua
-package.path = ('%s/nvim/lua/?.lua;%s/lua/?/init.lua;%s'):format(DOTS, DOTS, package.path)
-
-require('erde').load('jit')
-
 -- -----------------------------------------------------------------------------
--- Constants
--- -----------------------------------------------------------------------------
-
-BUFFER_PATTERNS = {
-  term = { 'term://*zsh*', 'term://*bash*' },
-  json = { '*.json', '*.cjson' },
-  js = { '*.js', '*.jsx', '*.ts', '*.tsx' },
-  css = { '*.css', '*.scss', '*.less' },
-}
-
--- -----------------------------------------------------------------------------
--- Helpers
+-- Setup
 -- -----------------------------------------------------------------------------
 
 -- Inject all vim.api.nvim_* functions into global space
@@ -34,78 +9,27 @@ for key, value in pairs(vim.api) do
   end
 end
 
-function fileExists(filename)
-  local f = io.open(filename, 'r')
-  if f ~= nil then
-    io.close(f)
-    return true
-  else
-    return false
-  end
-end
+-- Unload to allow re-sourcing
+package.loaded['constants'] = nil
+package.loaded['language-support'] = nil
+package.loaded['telescope-config'] = nil
+package.loaded['work'] = nil
 
-function map(mode, lhs, rhs, opts)
-  opts = vim.tbl_extend('force', { noremap = true }, opts or {})
-  nvim_set_keymap(mode, lhs, rhs, opts)
-end
+local C = require('constants')
 
-function autocmd(event, command, patterns)
-  return table.concat({
-    'au',
-    event,
-    type(patterns) == 'table' and table.concat(patterns, ',') or patterns,
-    command,
-  }, ' ')
-end
+-- When resolving modules, neovim looks for 'lua/?.lua;lua/?/init.lua' for all
+-- paths in `runtimepath`. However, since package managers often manipulate this
+-- value at runtime, neovim opts to provide a custom package loader instead of
+-- manipulating package.path in order to always get the correct `runtimepath`
+-- value _at require time_.
+--
+-- This causes some problems (such as erde not being able to find our neovim
+-- modules), so we adjust package.path for our neovim modules manually.
+--
+-- @see https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_init_packages.lua
+package.path = ('%s/nvim/lua/?.lua;%s/lua/?/init.lua;%s'):format(C.DOTS, C.DOTS, package.path)
 
-function augroup(name, autocommands)
-  vim.cmd('augroup ' .. name)
-  vim.cmd('au!')
-
-  for i, autocommand in pairs(autocommands) do
-    vim.cmd(autocommand)
-  end
-
-  vim.cmd('augroup END')
-end
-
-function rerequire(moduleName)
-  package.loaded[moduleName] = nil -- Unload to allow re-sourcing
-  require(moduleName)
-end
-
--- -----------------------------------------------------------------------------
--- Options
--- -----------------------------------------------------------------------------
-
--- casing
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
-
--- splitting
-vim.opt.splitright = true
-vim.opt.splitbelow = true
-
--- tabs
-vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
-vim.opt.expandtab = true
-
--- interface
-vim.opt.termguicolors = true
-vim.opt.number = true
-vim.opt.signcolumn = 'yes'
-vim.opt.showmode = false
-vim.opt.colorcolumn = '80'
-vim.cmd('highlight ColorColumn guibg=#585858')
-
--- misc
-vim.opt.wrap = false
-vim.opt.clipboard = 'unnamedplus'
-vim.opt.updatetime = 300
-vim.opt.scrollback = 100000
-vim.opt.commentstring = '//%s'
+require('erde').load('jit')
 
 -- -----------------------------------------------------------------------------
 -- Packer
@@ -176,117 +100,147 @@ require('packer').startup(function()
 end)
 
 -- -----------------------------------------------------------------------------
--- General
+-- Settings
 -- -----------------------------------------------------------------------------
+
+vim.g.mapleader = ' '
+
+-- Create general augroup
+nvim_create_augroup('bsuth', {})
 
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
 vim.g.loaded_netrwPlugin = true
 
-vim.g.mapleader = ' '
-vim.g.suda_smart_edit = true
-vim.g.go_fmt_autosave = true
+--
+-- Options
+--
 
-vim.g.vista_default_executive = 'nvim_lsp'
-vim.g.vista_renderer_enable_icon = 0
-vim.cmd('let g:vista#renderer#enable_icon = 0')
+-- casing
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
--- dark, darker, cool, deep, warm, warmer
-require('onedark').setup({ style = 'warmer' })
-require('onedark').load()
+-- splitting
+vim.opt.splitright = true
+vim.opt.splitbelow = true
 
-map('n', 'K', ':echo<cr>')
-map('n', '<leader>ev', ':Dirvish ~/dots/nvim<cr>')
-map('n', '<leader>sv', ':source $MYVIMRC<cr>')
+-- tabs
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
 
-map('n', '<leader>/', ':nohlsearch<cr><c-l>')
+-- interface
+vim.opt.termguicolors = true
+vim.opt.number = true
+vim.opt.signcolumn = 'yes'
+vim.opt.showmode = false
+vim.opt.colorcolumn = '80'
+vim.cmd('highlight ColorColumn guibg=#585858')
 
-map('n', '<leader>?', ':help ')
-map('n', '<leader>v?', ':vert :help ')
+-- misc
+vim.opt.wrap = false
+vim.opt.clipboard = 'unnamedplus'
+vim.opt.updatetime = 300
+vim.opt.scrollback = 100000
+vim.opt.commentstring = '//%s'
 
-map('c', '<c-space>', '<c-f>')
-map('n', ':', ':<c-f><c-c>')
+--
+-- General Mappings
+--
 
-map('n', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
-map('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
+-- Remove annoying default map of K to manual
+vim.keymap.set('n', 'K', function() end)
 
-map('n', '<c-f>', 'l%')
-map('v', '<c-f>', 'l%')
+vim.keymap.set('n', '<leader>ev', ':Dirvish ~/dots/nvim<cr>')
+vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
-map('n', '<leader>tag', ':Vista!!<cr>')
+vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
+
+vim.keymap.set('n', '<leader>?', ':help ')
+vim.keymap.set('n', '<leader>v?', ':vert :help ')
+
+vim.keymap.set('c', '<c-space>', '<c-f>')
+vim.keymap.set('n', ':', ':<c-f><c-c>')
+
+vim.keymap.set('n', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
+vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
+
+vim.keymap.set('n', '<c-f>', 'l%')
+vim.keymap.set('v', '<c-f>', 'l%')
 
 --
 -- Quick Links
 --
 
-map('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
-map(
+vim.keymap.set('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
+vim.keymap.set(
   'n',
   '<leader>pack',
   ':Dirvish ~/.local/share/nvim/site/pack/packer/start<cr>'
 )
 
-map('n', '<leader>home', ':Dirvish ~<cr>')
-map('n', '<leader>root', ':Dirvish /<cr>')
-map('n', '<leader>dots', ':Dirvish ~/dots<cr>')
+vim.keymap.set('n', '<leader>home', ':Dirvish ~<cr>')
+vim.keymap.set('n', '<leader>root', ':Dirvish /<cr>')
+vim.keymap.set('n', '<leader>dots', ':Dirvish ~/dots<cr>')
 
 --
--- Windows
+-- Window Management
 --
 
-map('n', '<leader>w', '<c-w>')
-map('n', '<c-h>', '<c-w>h')
-map('n', '<c-j>', '<c-w>j')
-map('n', '<c-k>', '<c-w>k')
-map('n', '<c-l>', '<c-w>l')
-map('n', '<leader><c-l>', ':rightbelow :vsp | :Dirvish<cr>')
-map('n', '<leader><c-k>', ':aboveleft :sp | :Dirvish<cr>')
-map('n', '<leader><c-j>', ':rightbelow :sp | :Dirvish<cr>')
-map('n', '<leader><c-h>', ':aboveleft :vsp | :Dirvish<cr>')
+vim.keymap.set('n', '<leader>w', '<c-w>')
+vim.keymap.set('n', '<c-h>', '<c-w>h')
+vim.keymap.set('n', '<c-j>', '<c-w>j')
+vim.keymap.set('n', '<c-k>', '<c-w>k')
+vim.keymap.set('n', '<c-l>', '<c-w>l')
+vim.keymap.set('n', '<leader><c-l>', ':rightbelow :vsp | :Dirvish<cr>')
+vim.keymap.set('n', '<leader><c-k>', ':aboveleft :sp | :Dirvish<cr>')
+vim.keymap.set('n', '<leader><c-j>', ':rightbelow :sp | :Dirvish<cr>')
+vim.keymap.set('n', '<leader><c-h>', ':aboveleft :vsp | :Dirvish<cr>')
 
 --
 -- Emacs Bindings
 --
 
-map('i', '<c-b>', '<Left>')
-map('i', '<c-f>', '<Right>')
-map('i', '<m-b>', '<c-o>b')
-map('i', '<m-f>', '<c-o>w')
-map('i', '<c-a>', '<Home>')
-map('i', '<c-e>', '<End>')
+vim.keymap.set('i', '<c-b>', '<Left>')
+vim.keymap.set('i', '<c-f>', '<Right>')
+vim.keymap.set('i', '<m-b>', '<c-o>b')
+vim.keymap.set('i', '<m-f>', '<c-o>w')
+vim.keymap.set('i', '<c-a>', '<Home>')
+vim.keymap.set('i', '<c-e>', '<End>')
 
-map('i', '<c-d>', '<Delete>')
-map('i', '<c-h>', '<BS>')
-map('i', '<m-d>', '<c-o>dw')
-map('i', '<m-backspace>', '<c-o>db')
-map('i', '<c-u>', '<c-o>d^')
-map('i', '<c-k>', '<c-o>d$')
+vim.keymap.set('i', '<c-d>', '<Delete>')
+vim.keymap.set('i', '<c-h>', '<BS>')
+vim.keymap.set('i', '<m-d>', '<c-o>dw')
+vim.keymap.set('i', '<m-backspace>', '<c-o>db')
+vim.keymap.set('i', '<c-u>', '<c-o>d^')
+vim.keymap.set('i', '<c-k>', '<c-o>d$')
 
-map('c', '<c-b>', '<Left>')
-map('c', '<c-f>', '<Right>')
-map('c', '<m-b>', '<c-f>bi<c-c>')
-map('c', '<m-f>', '<c-f>wi<c-c>')
-map('c', '<c-a>', '<Home>')
-map('c', '<c-e>', '<End>')
+vim.keymap.set('c', '<c-b>', '<Left>')
+vim.keymap.set('c', '<c-f>', '<Right>')
+vim.keymap.set('c', '<m-b>', '<c-f>bi<c-c>')
+vim.keymap.set('c', '<m-f>', '<c-f>wi<c-c>')
+vim.keymap.set('c', '<c-a>', '<Home>')
+vim.keymap.set('c', '<c-e>', '<End>')
 
-map('c', '<c-d>', '<Delete>')
-map('c', '<c-h>', '<BS>')
-map('c', '<m-d>', '<C-f>dw<C-c>')
-map('c', '<m-backspace>', '<C-f>db<C-c>')
-map('c', '<c-u>', '<C-f>d^<C-c>')
-map('c', '<c-k>', '<C-f>d$A<C-c>')
+vim.keymap.set('c', '<c-d>', '<Delete>')
+vim.keymap.set('c', '<c-h>', '<BS>')
+vim.keymap.set('c', '<m-d>', '<C-f>dw<C-c>')
+vim.keymap.set('c', '<m-backspace>', '<C-f>db<C-c>')
+vim.keymap.set('c', '<c-u>', '<C-f>d^<C-c>')
+vim.keymap.set('c', '<c-k>', '<C-f>d$A<C-c>')
 
 --
 -- Git
 --
 
-map('n', '<leader>gg', ':Git ')
-map('n', '<leader>git', ':Git<cr>')
-map('n', '<leader>ga', ':Git add .<cr>')
-map('n', '<leader>gc', ':Git commit<cr>')
-map('n', '<leader>gd', ':Git diff<cr>')
-map('n', '<leader>gl', ':Git log<cr>')
-map('n', '<leader>gb', ':Git blame<cr>')
+vim.keymap.set('n', '<leader>gg', ':Git ')
+vim.keymap.set('n', '<leader>git', ':Git<cr>')
+vim.keymap.set('n', '<leader>ga', ':Git add .<cr>')
+vim.keymap.set('n', '<leader>gc', ':Git commit<cr>')
+vim.keymap.set('n', '<leader>gd', ':Git diff<cr>')
+vim.keymap.set('n', '<leader>gl', ':Git log<cr>')
+vim.keymap.set('n', '<leader>gb', ':Git blame<cr>')
 
 --
 -- Abbreviations
@@ -295,15 +249,26 @@ map('n', '<leader>gb', ':Git blame<cr>')
 vim.cmd('iabbrev _rhed // eslint-disable-line react-hooks/exhaustive-deps')
 vim.cmd('iabbrev _tsi // eslint-disable-next-line<cr>@ts-ignore')
 
+--
+-- Plugins
+--
+
+vim.g.suda_smart_edit = true
+vim.g.go_fmt_autosave = true
+
+-- dark, darker, cool, deep, warm, warmer
+require('onedark').setup({ style = 'warmer' })
+require('onedark').load()
+
 -- -----------------------------------------------------------------------------
 -- Terminal
 -- -----------------------------------------------------------------------------
 
-map('n', '<c-space>', ':term<cr>')
-map('t', '<c-[>', '<c-\\><c-n>')
-map('t', '<esc>', '<c-\\><c-n>')
+vim.keymap.set('n', '<c-space>', ':term<cr>')
+vim.keymap.set('t', '<c-[>', '<c-\\><c-n>')
+vim.keymap.set('t', '<esc>', '<c-\\><c-n>')
 
-function onTermClose()
+local function onTermClose()
   local termBuffer = nvim_win_get_buf(0)
   -- Dirvish throws an error when using :Dirvish from a term buffer, but it
   -- still works so just silence it.
@@ -311,10 +276,22 @@ function onTermClose()
   nvim_buf_delete(termBuffer, {})
 end
 
-augroup('bsuth-terminal', {
-  autocmd('TermOpen', 'setlocal nonumber wrap', BUFFER_PATTERNS.term),
-  autocmd('TermOpen', 'startinsert', BUFFER_PATTERNS.term),
-  autocmd('TermClose', 'lua onTermClose()', BUFFER_PATTERNS.term),
+nvim_create_autocmd('TermOpen', {
+  group = 'bsuth',
+  pattern = C.TERM_PATTERNS,
+  command = 'setlocal nonumber wrap',
+})
+
+nvim_create_autocmd('TermOpen', {
+  group = 'bsuth',
+  pattern = C.TERM_PATTERNS,
+  command = 'startinsert',
+})
+
+nvim_create_autocmd('TermClose', {
+  group = 'bsuth',
+  pattern = C.TERM_PATTERNS,
+  callback = onTermClose,
 })
 
 -- -----------------------------------------------------------------------------
@@ -334,12 +311,15 @@ function dirvishXdgOpen()
   end
 end
 
-augroup('bsuth-dirvish', {
-  autocmd(
-    'FileType',
-    'nnoremap <buffer><silent> <cr> :lua dirvishXdgOpen()<cr>',
-    'dirvish'
-  ),
+nvim_create_autocmd('FileType', {
+  group = 'bsuth',
+  pattern = 'dirvish',
+  callback = function()
+    vim.keymap.set('n', '<cr>', dirvishXdgOpen, {
+      buffer = true,
+      silent = true,
+    })
+  end,
 })
 
 -- -----------------------------------------------------------------------------
@@ -347,8 +327,11 @@ augroup('bsuth-dirvish', {
 -- -----------------------------------------------------------------------------
 
 local function getVisualSelection()
-  local buffer, line_start, column_start = unpack(vim.fn.getpos("'<"))
-  local buffer, line_end, column_end = unpack(vim.fn.getpos("'>"))
+  -- Do not use '> and '< registers in getpos! These registers are only updated 
+  -- _after_ leaving visual mode.
+  -- @see https://github.com/neovim/neovim/pull/13896#issuecomment-774680224
+  local _, line_start, column_start = unpack(vim.fn.getpos('v'))
+  local _, line_end, column_end = unpack(vim.fn.getcurpos())
 
   local lines = vim.fn.getline(line_start, line_end)
   vim.fn.setpos('.', { { 0, line_start, column_start, 0 } })
@@ -363,17 +346,11 @@ local function getVisualSelection()
   return table.concat(lines, '\n')
 end
 
-function searchVisualSelection()
+vim.keymap.set('v', '<c-n>', function()
   vim.fn.setreg('/', getVisualSelection())
+  nvim_feedkeys(nvim_replace_termcodes('<esc>', true, false, true), 'n', false)
   vim.cmd('normal n')
-end
-
-function replaceVisualSelection()
-  nvim_input(':s/' .. getVisualSelection() .. '//g<Left><Left>')
-end
-
-map('v', '<c-n>', ':lua searchVisualSelection()<cr>')
-map('v', '<c-s>', ':lua replaceVisualSelection()<cr>')
+end)
 
 -- -----------------------------------------------------------------------------
 -- CWD Tracking
@@ -381,19 +358,20 @@ map('v', '<c-s>', ':lua replaceVisualSelection()<cr>')
 
 local cwdCache = {}
 
+-- Do not make this local! zsh needs this for cd hook in nested terminal.
 function saveTermCwd()
   local bufname = nvim_buf_get_name(0)
   cwdCache[bufname] = vim.fn.getcwd()
 end
 
-function clearTermCwd()
+local function clearTermCwd()
   local bufname = nvim_buf_get_name(0)
   if cwdCache[bufname] ~= nil then
     cwdCache[bufname] = nil
   end
 end
 
-function trackCwd()
+local function trackCwd()
   local bufname = nvim_buf_get_name(0)
 
   if bufname:match('^term://') then
@@ -412,10 +390,22 @@ function trackCwd()
   end
 end
 
-augroup('bsuth-cwd-track', {
-  autocmd('BufEnter', 'lua trackCwd()', '*'),
-  autocmd('TermOpen', 'lua saveTermCwd()', BUFFER_PATTERNS.term),
-  autocmd('TermClose', 'lua clearTermCwd()', BUFFER_PATTERNS.term),
+nvim_create_autocmd('BufEnter', {
+  group = 'bsuth',
+  pattern = '*',
+  callback = trackCwd,
+})
+
+nvim_create_autocmd('TermOpen', {
+  group = 'bsuth',
+  pattern = C.TERM_PATTERNS,
+  callback = saveTermCwd,
+})
+
+nvim_create_autocmd('TermClose', {
+  group = 'bsuth',
+  pattern = C.TERM_PATTERNS,
+  callback = clearTermCwd,
 })
 
 -- -----------------------------------------------------------------------------
@@ -427,12 +417,12 @@ vim.cmd('delm!')
 vim.cmd('delm A-Z0-9')
 local markCounter = 0
 
-function pushMark()
+local function pushMark()
   vim.cmd('normal m' .. tostring(markCounter))
   markCounter = (markCounter + 1) % 10
 end
 
-map('n', '<leader>mm', ':lua pushMark()<cr>')
+vim.keymap.set('n', '<leader>mm', pushMark)
 
 -- -----------------------------------------------------------------------------
 -- Lualine
@@ -459,15 +449,13 @@ require('lualine').setup({
 -- Home vs Work
 -- -----------------------------------------------------------------------------
 
-FD_FAVORITES_PATH = os.getenv('HOME') .. '/dots/nvim/telescope_favorites_home'
-
 pcall(function()
-  rerequire('work')
+  require('work')
 end)
 
 -- -----------------------------------------------------------------------------
 -- Modules
 -- -----------------------------------------------------------------------------
 
-rerequire('language-support')
-rerequire('telescope-config')
+require('language-support')
+require('telescope-config')

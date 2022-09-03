@@ -1,19 +1,20 @@
+local C = require('constants')
+
 -- -----------------------------------------------------------------------------
 -- Mappings
 -- -----------------------------------------------------------------------------
 
-map('n', '<leader>lsp', ':silent :LspRestart<cr>')
-
-map('n', "'e", ':lua vim.diagnostic.open_float()<cr>')
-map('n', "'h", ':lua vim.lsp.buf.hover()<cr>')
-map('n', "'d", ':lua vim.lsp.buf.definition()<cr>')
-map('n', "'D", ':lua vim.lsp.buf.declaration()<cr>')
-map('n', "'p", ':lua vim.diagnostic.goto_prev()<cr>')
-map('n', "'n", ':lua vim.diagnostic.goto_next()<cr>')
-map('n', "'r", ':lua vim.lsp.buf.references()<cr>')
-map('n', "'q", ':lua vim.diagnostic.setloclist()<cr>')
-map('n', "'s", ':lua vim.lsp.buf.rename()<cr>')
-map('n', "'c", ':lua vim.lsp.buf.code_action()<cr>')
+vim.keymap.set('n', '<leader>lsp', ':silent :LspRestart<cr>')
+vim.keymap.set('n', "'e", vim.diagnostic.open_float)
+vim.keymap.set('n', "'h", vim.lsp.buf.hover)
+vim.keymap.set('n', "'d", vim.lsp.buf.definition)
+vim.keymap.set('n', "'D", vim.lsp.buf.declaration)
+vim.keymap.set('n', "'p", vim.diagnostic.goto_prev)
+vim.keymap.set('n', "'n", vim.diagnostic.goto_next)
+vim.keymap.set('n', "'r", vim.lsp.buf.references)
+vim.keymap.set('n', "'q", vim.diagnostic.setloclist)
+vim.keymap.set('n', "'s", vim.lsp.buf.rename)
+vim.keymap.set('n', "'c", vim.lsp.buf.code_action)
 
 -- map('n', "'i", ':lua vim.lsp.buf.implementation()<cr>')
 -- map('n', "'k", ':lua vim.lsp.buf.signature_help()<cr>')
@@ -136,7 +137,7 @@ end
 
 local formatter = require('formatter')
 
-function applyPrettier()
+local function applyPrettier()
   return {
     exe = 'prettierd',
     args = { nvim_buf_get_name(0) },
@@ -144,7 +145,7 @@ function applyPrettier()
   }
 end
 
-function applyStylua()
+local function applyStylua()
   return {
     exe = 'stylua --search-parent-directories',
     args = { nvim_buf_get_name(0) },
@@ -152,16 +153,21 @@ function applyStylua()
   }
 end
 
-augroup('bsuth-fix-on-save', {
-  autocmd('BufWritePre', 'if exists(":EslintFixAll") | EslintFixAll', BUFFER_PATTERNS.js),
+nvim_create_autocmd('BufWritePre', {
+  group = 'bsuth',
+  pattern = C.JS_PATTERNS,
+  command = 'if exists(":EslintFixAll") | EslintFixAll',
 })
 
-augroup('bsuth-format-on-save', {
-  -- autocmd('BufWritePost', 'FormatWrite', { '*.lua' }),
-  autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.json),
-  autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.css),
-  autocmd('BufWritePost', 'FormatWrite', BUFFER_PATTERNS.js),
-  autocmd('BufWritePost', 'FormatWrite', { '*.graphql' }),
+nvim_create_autocmd('BufWritePre', {
+  group = 'bsuth',
+  command = 'FormatWrite',
+  pattern = vim.tbl_flatten({
+    C.JSON_PATTERNS,
+    C.CSS_PATTERNS,
+    C.JS_PATTERNS,
+    { '*.graphql' },
+  }),
 })
 
 formatter.setup({

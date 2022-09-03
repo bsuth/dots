@@ -1,4 +1,4 @@
-local lfs = require('lfs')
+local C = require('constants')
 
 -- -----------------------------------------------------------------------------
 -- Telescope
@@ -6,7 +6,6 @@ local lfs = require('lfs')
 -- -----------------------------------------------------------------------------
 
 local telescope = require('telescope')
-local from_entry = require('telescope.from_entry')
 local pickers = require('telescope.pickers')
 local finders = require('telescope.finders')
 local previewers = require('telescope.previewers')
@@ -50,13 +49,6 @@ telescope.setup({
 
 telescope.load_extension('fzf')
 
-map('n', '<leader><leader>', ':lua telescopeFavorites()<cr>')
-map('n', '<leader>fd', ':lua telescopeFd()<cr>')
-map('n', '<leader>cd', ':lua telescopeCd()<cr>')
-map('n', '<leader>rg', ':Telescope grep_string only_sort_text=true search=<cr>')
-map('n', '<leader>buf', ':Telescope buffers<cr>')
-map('n', '<leader>ma', ':Telescope marks<cr>')
-
 -- -----------------------------------------------------------------------------
 -- Helpers
 -- -----------------------------------------------------------------------------
@@ -96,17 +88,28 @@ end
 -- Pickers
 -- -----------------------------------------------------------------------------
 
-function telescopeFavorites()
+local function telescopeFavorites()
   local home = os.getenv('HOME')
-  telescopeRun(home, { FD_FAVORITES_PATH }, { prompt_title = 'Favorites' })
+  telescopeRun(home, { C.FD_FAVORITES_PATH }, { prompt_title = 'Favorites' })
 end
 
-function telescopeFd()
+local function telescopeFd()
   local job = newTelescopeFdJob({ '--type', 'f' })
   telescopeRun('.', job, { prompt_title = 'fd' })
 end
 
-function telescopeCd()
+local function telescopeCd()
   local job = newTelescopeFdJob({ '--type', 'd' })
   telescopeRun('.', job, { prompt_title = 'cd' })
 end
+
+-- -----------------------------------------------------------------------------
+-- Mappings
+-- -----------------------------------------------------------------------------
+
+vim.keymap.set('n', '<leader><leader>', telescopeFavorites)
+vim.keymap.set('n', '<leader>fd', telescopeFd)
+vim.keymap.set('n', '<leader>cd', telescopeCd)
+vim.keymap.set('n', '<leader>rg', ':Telescope grep_string only_sort_text=true search=<cr>')
+vim.keymap.set('n', '<leader>buf', ':Telescope buffers<cr>')
+vim.keymap.set('n', '<leader>ma', ':Telescope marks<cr>')
