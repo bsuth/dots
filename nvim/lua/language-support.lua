@@ -51,23 +51,39 @@ require('nvim-treesitter.configs').setup({
 local cmp = require('cmp')
 
 cmp.setup({
+  mapping = {
+    ['<c-Space>'] = cmp.mapping.complete(),
+    ['<c-p>'] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
+    ['<c-n>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
+    ['<cr>'] = cmp.mapping(cmp.mapping.confirm(), { 'i', 'c' }),
+    ['<c-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<c-u>'] = cmp.mapping.scroll_docs(4),
+    ['<c-c>'] = cmp.mapping.close(),
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'vsnip' },
+    { name = 'nvim_lua' },
+    { name = 'nvim_lsp_signature_help' },
+    { name = 'buffer' },
+    { name = 'path' },
+  },
   snippet = {
     expand = function(args)
       vim.fn['vsnip#anonymous'](args.body)
     end,
   },
-  mapping = {
-    ['<c-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<c-f>'] = cmp.mapping.scroll_docs(4),
-    ['<c-Space>'] = cmp.mapping.complete(),
-    ['<c-c>'] = cmp.mapping.close(),
-    ['<cr>'] = cmp.mapping.confirm({ select = true }),
-  },
+})
+
+cmp.setup.cmdline('/', {
   sources = {
-    { name = 'nvim_lsp' },
-    { name = 'vsnip' },
-    { name = 'buffer' },
-    { name = 'path' },
+    { name = 'buffer' }
+  },
+})
+
+cmp.setup.cmdline(':', {
+  sources = {
+    { name = 'cmdline' }
   },
 })
 

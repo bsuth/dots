@@ -59,17 +59,17 @@ require('packer').startup(function()
 
   -- lsp, completion, formatter
   use('neovim/nvim-lspconfig')
-  use('hrsh7th/nvim-cmp')
-  use('hrsh7th/vim-vsnip')
-  use('hrsh7th/vim-vsnip-integ')
   use('mhartington/formatter.nvim')
   use('fatih/vim-go')
-
-  -- completion sources
-  use('hrsh7th/cmp-buffer')
-  use('hrsh7th/cmp-path')
-  use('hrsh7th/cmp-nvim-lsp')
-  use('hrsh7th/cmp-vsnip')
+  use('hrsh7th/nvim-cmp')
+  use('hrsh7th/cmp-nvim-lsp') -- lsp
+  use('hrsh7th/vim-vsnip') -- lsp snippets
+  use('hrsh7th/cmp-vsnip') -- lsp snippets
+  use('hrsh7th/cmp-buffer') -- words in current buffer
+  use('hrsh7th/cmp-path') -- file paths
+  use('hrsh7th/cmp-cmdline') -- command mode
+  use('hrsh7th/cmp-nvim-lua') -- neovim lua api
+  use('hrsh7th/cmp-nvim-lsp-signature-help') -- fancy function signature highlighting
 
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
