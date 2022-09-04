@@ -91,6 +91,7 @@ require('packer').startup(function()
 
   -- Local plugins can be included
   use('~/repos/vim-erde')
+  use('~/repos/emacs-bindings.nvim')
 
   -- Automatically set up your configuration after cloning packer.nvim
   -- Put this at the end after all plugins
@@ -174,6 +175,7 @@ vim.keymap.set('v', '<c-f>', 'l%')
 --
 
 vim.keymap.set('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
+vim.keymap.set('n', '<leader>pack', ':Dirvish ~/.local/share/nvim/site/pack/packer/start<cr>')
 vim.keymap.set(
   'n',
   '<leader>pack',
@@ -197,38 +199,6 @@ vim.keymap.set('n', '<leader><c-l>', ':rightbelow :vsp | :Dirvish<cr>')
 vim.keymap.set('n', '<leader><c-k>', ':aboveleft :sp | :Dirvish<cr>')
 vim.keymap.set('n', '<leader><c-j>', ':rightbelow :sp | :Dirvish<cr>')
 vim.keymap.set('n', '<leader><c-h>', ':aboveleft :vsp | :Dirvish<cr>')
-
---
--- Emacs Bindings
---
-
-vim.keymap.set('i', '<c-b>', '<Left>')
-vim.keymap.set('i', '<c-f>', '<Right>')
-vim.keymap.set('i', '<m-b>', '<c-o>b')
-vim.keymap.set('i', '<m-f>', '<c-o>w')
-vim.keymap.set('i', '<c-a>', '<Home>')
-vim.keymap.set('i', '<c-e>', '<End>')
-
-vim.keymap.set('i', '<c-d>', '<Delete>')
-vim.keymap.set('i', '<c-h>', '<BS>')
-vim.keymap.set('i', '<m-d>', '<c-o>dw')
-vim.keymap.set('i', '<m-backspace>', '<c-o>db')
-vim.keymap.set('i', '<c-u>', '<c-o>d^')
-vim.keymap.set('i', '<c-k>', '<c-o>d$')
-
-vim.keymap.set('c', '<c-b>', '<Left>')
-vim.keymap.set('c', '<c-f>', '<Right>')
-vim.keymap.set('c', '<m-b>', '<c-f>bi<c-c>')
-vim.keymap.set('c', '<m-f>', '<c-f>wi<c-c>')
-vim.keymap.set('c', '<c-a>', '<Home>')
-vim.keymap.set('c', '<c-e>', '<End>')
-
-vim.keymap.set('c', '<c-d>', '<Delete>')
-vim.keymap.set('c', '<c-h>', '<BS>')
-vim.keymap.set('c', '<m-d>', '<C-f>dw<C-c>')
-vim.keymap.set('c', '<m-backspace>', '<C-f>db<C-c>')
-vim.keymap.set('c', '<c-u>', '<C-f>d^<C-c>')
-vim.keymap.set('c', '<c-k>', '<C-f>d$A<C-c>')
 
 --
 -- Git

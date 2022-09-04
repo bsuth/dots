@@ -104,6 +104,11 @@ _G.packer_plugins = {
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/cmp-vsnip",
     url = "https://github.com/hrsh7th/cmp-vsnip"
   },
+  ["emacs-bindings.nvim"] = {
+    loaded = true,
+    path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/emacs-bindings.nvim",
+    url = "/home/bsuth/repos/emacs-bindings.nvim"
+  },
   ["formatter.nvim"] = {
     loaded = true,
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/formatter.nvim",
