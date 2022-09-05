@@ -133,6 +133,13 @@ function wm {
   awesome
 }
 
+function lua_install {
+  luarocks --local --lua-version="5.1" install "$1"
+  luarocks --local --lua-version="5.2" install "$1"
+  luarocks --local --lua-version="5.3" install "$1"
+  luarocks --local --lua-version="5.4" install "$1"
+}
+
 # ------------------------------------------------------------------------------
 # Personal vs Work
 # ------------------------------------------------------------------------------
