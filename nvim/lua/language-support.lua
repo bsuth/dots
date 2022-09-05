@@ -53,9 +53,9 @@ local cmp = require('cmp')
 cmp.setup({
   mapping = {
     ['<c-Space>'] = cmp.mapping.complete(),
-    ['<c-p>'] = cmp.mapping(cmp.mapping.select_prev_item(), { 'i', 'c' }),
-    ['<c-n>'] = cmp.mapping(cmp.mapping.select_next_item(), { 'i', 'c' }),
-    ['<cr>'] = cmp.mapping(cmp.mapping.confirm(), { 'i', 'c' }),
+    ['<c-p>'] = cmp.mapping.select_prev_item(),
+    ['<c-n>'] = cmp.mapping.select_next_item(),
+    ['<cr>'] = cmp.mapping.confirm(),
     ['<c-d>'] = cmp.mapping.scroll_docs(-4),
     ['<c-u>'] = cmp.mapping.scroll_docs(4),
     ['<c-c>'] = cmp.mapping.close(),
@@ -72,12 +72,6 @@ cmp.setup({
     expand = function(args)
       vim.fn['vsnip#anonymous'](args.body)
     end,
-  },
-})
-
-cmp.setup.cmdline(':', {
-  sources = {
-    { name = 'cmdline' }
   },
 })
 
