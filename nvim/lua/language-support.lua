@@ -163,7 +163,7 @@ nvim_create_autocmd('BufWritePre', {
   command = 'if exists(":EslintFixAll") | EslintFixAll',
 })
 
-nvim_create_autocmd('BufWritePre', {
+nvim_create_autocmd('BufWritePost', {
   group = 'bsuth',
   command = 'FormatWrite',
   pattern = vim.tbl_flatten({
