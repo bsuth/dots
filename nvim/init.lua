@@ -212,13 +212,6 @@ vim.keymap.set('n', '<leader>gl', ':Git log<cr>')
 vim.keymap.set('n', '<leader>gb', ':Git blame<cr>')
 
 --
--- Abbreviations
---
-
-vim.cmd('iabbrev _rhed // eslint-disable-line react-hooks/exhaustive-deps')
-vim.cmd('iabbrev _tsi // eslint-disable-next-line<cr>@ts-ignore')
-
---
 -- Plugins
 --
 

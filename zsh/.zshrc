@@ -107,6 +107,7 @@ chpwd_functions=(${chpwd_functions[@]} "on_cd")
 # Alias / Functions
 # ------------------------------------------------------------------------------
 
+alias ls='ls --color=auto'
 alias lj='luajit'
 
 function gls() {
