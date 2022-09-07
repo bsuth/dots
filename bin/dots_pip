@@ -1,9 +1,0 @@
-#!/bin/bash
-
-set -e
-
-declare -a PYTHON_PACKAGES=(
-  pynvim
-)
-
-sudo pip install "${PYTHON_PACKAGES[@]}"

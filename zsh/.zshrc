@@ -96,7 +96,9 @@ SPACESHIP_PROMPT_ORDER=(
 # ------------------------------------------------------------------------------
 
 function on_cd() {
-  (python3 $HOME/dots/nvim/onshellcd.py &)
+  if [[ ! -z $NVIM ]]; then
+    nvim --server $NVIM --remote-send "<c-[>:cd $(pwd)<cr>i"
+  fi
 }
 
 chpwd_functions=(${chpwd_functions[@]} "on_cd")

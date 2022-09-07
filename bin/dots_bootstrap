@@ -37,7 +37,6 @@ set -e
 DOTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 $DOTS/bin/dots_pacman
-$DOTS/bin/dots_pip
 $DOTS/bin/dots_npm
 $DOTS/bin/dots_luarocks
 $DOTS/bin/dots_st
