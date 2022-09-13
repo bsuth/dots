@@ -4,6 +4,7 @@
 
 # Emacs Bindings
 bindkey -e
+bindkey \^U backward-kill-line
 
 # Options
 setopt appendhistory autocd extendedglob nomatch notify
