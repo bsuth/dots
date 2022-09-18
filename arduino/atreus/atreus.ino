@@ -8,14 +8,8 @@
 #define Key_Caret       LSHIFT(Key_6)
 #define Key_And         LSHIFT(Key_7)
 #define Key_Star        LSHIFT(Key_8)
-#define Key_Plus        LSHIFT(Key_Equals)
-#define Key_LessThan    LSHIFT(Key_Comma)
-#define Key_GreaterThan LSHIFT(Key_Period)
+
 #define Key_DoubleQuote LSHIFT(Key_Quote)
-#define Key_Tilde       LSHIFT(Key_Backtick)
-#define Key_Question    LSHIFT(Key_Slash)
-#define Key_Pipe        LSHIFT(Key_Backslash)
-#define Key_Underscore  LSHIFT(Key_Minus)
 #define Key_LeftBrace   LSHIFT(Key_LeftBracket)
 #define Key_RightBrace  LSHIFT(Key_RightBracket)
 
@@ -24,6 +18,7 @@ enum {
   NUMBERS,
   SYMBOLS_LEFT,
   SYMBOLS_RIGHT,
+  ARROWS,
 };
 
 KEYMAPS(
@@ -31,12 +26,12 @@ KEYMAPS(
     Key_Q, Key_W, Key_E, Key_R, Key_T,
     Key_A, Key_S, Key_D, Key_F, Key_G,
     Key_Z, Key_X, Key_C, Key_V, Key_B, ___,
-    Key_Esc, ___, ShiftToLayer(NUMBERS), Key_Backspace, ShiftToLayer(SYMBOLS_LEFT), Key_Tab,
+    Key_Esc, Key_CapsLock, ShiftToLayer(NUMBERS), Key_Backspace, ShiftToLayer(SYMBOLS_LEFT), Key_Tab,
 
     Key_Y, Key_U, Key_I, Key_O, Key_P,
     Key_H, Key_J, Key_K, Key_L, Key_Semicolon,
     ___, Key_N, Key_M, Key_Comma, Key_Period, Key_Slash,
-    Key_Enter, ShiftToLayer(SYMBOLS_RIGHT), Key_Space, ShiftToLayer(NUMBERS), ___, ___
+    Key_Enter, ShiftToLayer(SYMBOLS_RIGHT), Key_Space, ShiftToLayer(NUMBERS), Key_CapsLock, ___
   ),
 
   [NUMBERS] = KEYMAP_STACKED(
@@ -52,9 +47,9 @@ KEYMAPS(
   ),
 
   [SYMBOLS_LEFT] = KEYMAP_STACKED(
-    Key_LessThan, Key_GreaterThan, Key_LeftParen, Key_RightParen, Key_Tilde,
-    ___, Key_LeftAlt, Key_LeftShift, Key_LeftControl, Key_LeftGui,
-    Key_Plus, Key_Equals, Key_Minus, Key_Quote, Key_DoubleQuote, ___,
+    Key_Backtick, Key_Backslash, Key_LeftBracket, Key_RightBracket, ___,
+    Key_LeftAlt, Key_LeftGui, Key_LeftShift, Key_LeftControl, Key_Esc,
+    ShiftToLayer(ARROWS), ___, Key_DoubleQuote, Key_Quote, ___, ___,
     ___, ___, ___, ___, ___, ___,
 
     ___, ___, ___, ___, ___,
@@ -69,9 +64,21 @@ KEYMAPS(
     ___, ___, ___, ___, ___, ___,
     ___, ___, ___, ___, ___, ___,
 
-    Key_Backtick, Key_LeftBracket, Key_RightBracket, Key_LeftBrace, Key_RightBrace,
-    Key_RightGui, Key_RightControl, Key_RightShift, Key_RightAlt, ___,
-    ___, Key_Backslash, Key_Slash, Key_Underscore, Key_Pipe, Key_Question,
+    ___, Key_LeftParen, Key_RightParen, Key_Minus, Key_Equals,
+    Key_Esc, Key_RightControl, Key_RightShift, Key_RightGui, Key_RightAlt,
+    ___, ___, Key_LeftBrace, Key_RightBrace, ___, ShiftToLayer(ARROWS),
+    ___, ___, ___, ___, ___, ___
+  ),
+
+  [ARROWS] = KEYMAP_STACKED(
+    ___, ___, ___, ___, ___,
+    ___, ___, ___, ___, ___,
+    ___, ___, ___, ___, ___, ___,
+    ___, ___, ___, ___, ___, ___,
+
+    ___, ___, ___, ___, ___,
+    Key_LeftArrow, Key_DownArrow, Key_UpArrow, Key_RightArrow, ___,
+    ___, ___, ___, ___, ___, ___,
     ___, ___, ___, ___, ___, ___
   )
 )

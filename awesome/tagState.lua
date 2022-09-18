@@ -36,7 +36,7 @@ function tagState.backup()
 
     for _, tag in ipairs(s.tags) do
       if not tag.name:match('^_') then
-        local tagBackup = { name = tag.name }
+        local tagBackup = { name = tag.name, selected = tag.selected }
 
         for _, c in ipairs(tag:clients()) do
           -- check if PID is actually available
@@ -88,6 +88,12 @@ function tagState.restoreScreen(s)
     for _, clientPid in ipairs(tagBackup) do
       local c = clientPidLookup[clientPid]
       if c ~= nil then c:move_to_tag(tags[i]) end
+    end
+  end
+
+  for i, tagBackup in ipairs(screenBackup) do
+    if tagBackup.selected then
+      tags[i]:view_only()
     end
   end
 
