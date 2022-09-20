@@ -1,4 +1,5 @@
 #include "Kaleidoscope.h"
+#include "Kaleidoscope-Qukeys.h"
 
 #define Key_Exclamation LSHIFT(Key_1)
 #define Key_At          LSHIFT(Key_2)
@@ -83,7 +84,18 @@ KEYMAPS(
   )
 )
 
+KALEIDOSCOPE_INIT_PLUGINS(Qukeys);
 void setup() {
+  QUKEYS(
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 0), Key_LeftAlt),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 1), Key_LeftGui),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 2), Key_LeftShift),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 3), Key_LeftControl),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 8), Key_RightControl),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 9), Key_RightShift),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 10), Key_RightGui),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 11), Key_RightAlt)
+  )
   Kaleidoscope.setup();
 }
 

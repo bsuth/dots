@@ -155,6 +155,9 @@ vim.keymap.set('n', 'K', function() end)
 vim.keymap.set('n', '<leader>ev', ':Dirvish ~/dots/nvim<cr>')
 vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
+vim.keymap.set('n', '<c-w>', ':write<cr>')
+vim.keymap.set('n', '<c-q>', ':quit<cr>')
+
 vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
 
 vim.keymap.set('n', '<leader>?', ':help ')
