@@ -10,16 +10,21 @@
 #define Key_And         LSHIFT(Key_7)
 #define Key_Star        LSHIFT(Key_8)
 
-#define Key_DoubleQuote LSHIFT(Key_Quote)
 #define Key_LeftBrace   LSHIFT(Key_LeftBracket)
 #define Key_RightBrace  LSHIFT(Key_RightBracket)
+#define Key_GreaterThan LSHIFT(Key_Comma)
+#define Key_LessThan    LSHIFT(Key_Period)
+#define Key_Underscore  LSHIFT(Key_Minus)
+#define Key_DoubleQuote LSHIFT(Key_Quote)
+#define Key_Tilde       LSHIFT(Key_Backtick)
+#define Key_Plus        LSHIFT(Key_Equals)
 
 enum {
   QWERTY,
   NUMBERS,
-  SYMBOLS_LEFT,
-  SYMBOLS_RIGHT,
+  SYMBOLS,
   ARROWS,
+  ESC,
 };
 
 KEYMAPS(
@@ -27,12 +32,12 @@ KEYMAPS(
     Key_Q, Key_W, Key_E, Key_R, Key_T,
     Key_A, Key_S, Key_D, Key_F, Key_G,
     Key_Z, Key_X, Key_C, Key_V, Key_B, ___,
-    Key_Esc, Key_CapsLock, ShiftToLayer(NUMBERS), Key_Backspace, ShiftToLayer(SYMBOLS_LEFT), Key_Tab,
+    Key_Esc, Key_CapsLock, ___, ShiftToLayer(NUMBERS), Key_Enter, Key_Tab,
 
     Key_Y, Key_U, Key_I, Key_O, Key_P,
     Key_H, Key_J, Key_K, Key_L, Key_Semicolon,
     ___, Key_N, Key_M, Key_Comma, Key_Period, Key_Slash,
-    Key_Enter, ShiftToLayer(SYMBOLS_RIGHT), Key_Space, ShiftToLayer(NUMBERS), Key_CapsLock, ___
+    Key_Backspace, Key_Space, ShiftToLayer(NUMBERS), ___, Key_CapsLock, ___
   ),
 
   [NUMBERS] = KEYMAP_STACKED(
@@ -47,28 +52,16 @@ KEYMAPS(
     ___, ___, ___, ___, ___, ___
   ),
 
-  [SYMBOLS_LEFT] = KEYMAP_STACKED(
-    Key_Backtick, Key_Backslash, Key_LeftBracket, Key_RightBracket, ___,
-    Key_LeftAlt, Key_LeftGui, Key_LeftShift, Key_LeftControl, Key_Esc,
-    ShiftToLayer(ARROWS), ___, Key_DoubleQuote, Key_Quote, ___, ___,
+  [SYMBOLS] = KEYMAP_STACKED(
+    ___, Key_DoubleQuote, Key_Quote, Key_Backtick, ___,
+    Key_LeftBracket, Key_RightBracket, Key_LeftBrace, Key_RightBrace, ___,
+    ___, ___, Key_Backslash, Key_Pipe, ___, ___,
     ___, ___, ___, ___, ___, ___,
 
-    ___, ___, ___, ___, ___,
-    ___, ___, ___, ___, ___,
-    ___, ___, ___, ___, ___, ___,
-    ___, ___, ___, ___, ___, ___
-  ),
-
-  [SYMBOLS_RIGHT] = KEYMAP_STACKED(
-    ___, ___, ___, ___, ___,
-    ___, ___, ___, ___, ___,
-    ___, ___, ___, ___, ___, ___,
-    ___, ___, ___, ___, ___, ___,
-
-    ___, Key_LeftParen, Key_RightParen, Key_Minus, Key_Equals,
-    Key_Esc, Key_RightControl, Key_RightShift, Key_RightGui, Key_RightAlt,
-    ___, ___, Key_LeftBrace, Key_RightBrace, ___, ShiftToLayer(ARROWS),
-    ___, ___, ___, ___, ___, ___
+    ___, Key_Equals, Key_Minus, Key_Underscore, ___,
+    ___, Key_LeftParen, Key_RightParen, Key_LessThan, Key_GreaterThan,
+    ___, ___, Key_Tilde, Key_Plus, ___, ___,
+    ___, Key_Esc, ___, ___, ___, ___
   ),
 
   [ARROWS] = KEYMAP_STACKED(
@@ -89,12 +82,17 @@ void setup() {
   QUKEYS(
     kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 0), Key_LeftAlt),
     kaleidoscope::plugin::Qukey(0, KeyAddr(1, 1), Key_LeftGui),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 2), Key_LeftShift),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 3), Key_LeftControl),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 8), Key_RightControl),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 9), Key_RightShift),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 2), Key_LeftControl),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 3), Key_LeftShift),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 4), ShiftToLayer(ARROWS)),
+
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 7), Key_Esc),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 8), Key_RightShift),
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 9), Key_RightControl),
     kaleidoscope::plugin::Qukey(0, KeyAddr(1, 10), Key_RightGui),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 11), Key_RightAlt)
+    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 11), Key_RightAlt),
+
+    kaleidoscope::plugin::Qukey(0, KeyAddr(3, 4), ShiftToLayer(SYMBOLS))
   )
   Kaleidoscope.setup();
 }
