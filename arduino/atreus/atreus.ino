@@ -24,7 +24,6 @@ enum {
   NUMBERS,
   SYMBOLS,
   ARROWS,
-  ESC,
 };
 
 KEYMAPS(
@@ -32,12 +31,12 @@ KEYMAPS(
     Key_Q, Key_W, Key_E, Key_R, Key_T,
     Key_A, Key_S, Key_D, Key_F, Key_G,
     Key_Z, Key_X, Key_C, Key_V, Key_B, ___,
-    Key_Esc, Key_CapsLock, ___, ShiftToLayer(NUMBERS), Key_Enter, Key_Tab,
+    Key_Esc, Key_CapsLock, ___, Key_Tab, Key_Enter, ___,
 
     Key_Y, Key_U, Key_I, Key_O, Key_P,
     Key_H, Key_J, Key_K, Key_L, Key_Semicolon,
     ___, Key_N, Key_M, Key_Comma, Key_Period, Key_Slash,
-    Key_Backspace, Key_Space, ShiftToLayer(NUMBERS), ___, Key_CapsLock, ___
+    ___, Key_Space, Key_Backspace, ___, Key_CapsLock, ___
   ),
 
   [NUMBERS] = KEYMAP_STACKED(
@@ -81,18 +80,21 @@ KALEIDOSCOPE_INIT_PLUGINS(Qukeys);
 void setup() {
   QUKEYS(
     kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 0), Key_LeftAlt),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 1), Key_LeftGui),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 2), Key_LeftControl),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 3), Key_LeftShift),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 4), ShiftToLayer(ARROWS)),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 1), Key_LeftGui),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 2), Key_LeftControl),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 3), Key_LeftShift),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 4), ShiftToLayer(ARROWS)),
 
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 7), Key_Esc),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 8), Key_RightShift),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 9), Key_RightControl),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 10), Key_RightGui),
-    kaleidoscope::plugin::Qukey(0, KeyAddr(1, 11), Key_RightAlt),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 7), Key_Esc),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 8), Key_RightShift),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 9), Key_RightControl),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 10), Key_RightGui),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 11), Key_RightAlt),
 
-    kaleidoscope::plugin::Qukey(0, KeyAddr(3, 4), ShiftToLayer(SYMBOLS))
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 3), ShiftToLayer(NUMBERS)),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 4), ShiftToLayer(SYMBOLS)),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 7), ShiftToLayer(SYMBOLS)),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(3, 8), ShiftToLayer(NUMBERS))
   )
   Kaleidoscope.setup();
 }
