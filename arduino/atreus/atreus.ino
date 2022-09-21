@@ -12,8 +12,8 @@
 
 #define Key_LeftBrace   LSHIFT(Key_LeftBracket)
 #define Key_RightBrace  LSHIFT(Key_RightBracket)
-#define Key_GreaterThan LSHIFT(Key_Comma)
-#define Key_LessThan    LSHIFT(Key_Period)
+#define Key_LessThan    LSHIFT(Key_Comma)
+#define Key_GreaterThan LSHIFT(Key_Period)
 #define Key_Underscore  LSHIFT(Key_Minus)
 #define Key_DoubleQuote LSHIFT(Key_Quote)
 #define Key_Tilde       LSHIFT(Key_Backtick)
