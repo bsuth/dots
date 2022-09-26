@@ -43,5 +43,5 @@ $DOTS/bin/dots_st
 $DOTS/bin/dots_symlinks
 
 echo "The following need to be setup manually:"
-echo "1) Vivaldi"
+echo "1) Browser"
 echo "2) Services (physlock)"
