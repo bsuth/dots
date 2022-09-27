@@ -60,7 +60,6 @@ require('packer').startup(function()
   -- lsp, completion, formatter
   use('neovim/nvim-lspconfig')
   use('mhartington/formatter.nvim')
-  use('fatih/vim-go')
   use('hrsh7th/nvim-cmp')
   use('hrsh7th/cmp-nvim-lsp') -- lsp
   use('hrsh7th/vim-vsnip') -- lsp snippets
@@ -73,7 +72,11 @@ require('packer').startup(function()
   -- syntax
   use('nvim-treesitter/nvim-treesitter')
   use('navarasu/onedark.nvim')
+ 
+  -- languages
   use('peterhoeg/vim-qml')
+  use('fatih/vim-go')
+  use('habamax/vim-godot')
 
   -- apps
   use('justinmk/vim-dirvish')

@@ -50,6 +50,9 @@ local DMENU_CONFIG = {
   aseprite = function()
     awful.spawn('aseprite')
   end,
+  godot = function()
+    awful.spawn('godot')
+  end,
 }
 
 local DMENU_COMMANDS = {}
