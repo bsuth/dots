@@ -2,7 +2,7 @@ local awful = require('awful')
 local gears = require('gears')
 local naughty = require('naughty')
 local cjson = require('cjson')
-local layout = require('layout')
+local layouts = require('layouts')
 
 local tagState = {}
 local TAGSTATE_BACKUP_FILENAME = '/tmp/awesomewm_tag_state_backup'
@@ -82,7 +82,7 @@ function tagState.restoreScreen(s)
 
   -- Need to use awful.tag here, since awful.tag.add fails to set the screen's
   -- selected_tag appropriately
-  local tags = awful.tag(tagNames, s, layout)
+  local tags = awful.tag(tagNames, s, s.geometry.width > s.geometry.height and layouts[1] or layouts[2])
 
   for i, tagBackup in ipairs(screenBackup) do
     for _, clientPid in ipairs(tagBackup) do

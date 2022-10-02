@@ -13,8 +13,7 @@ local tagState = require('tagState')
 local Tagbar = require('tagbar')
 local bindings = require('bindings')
 
-local layout = require('layout')
-awful.layout.layouts = { layout }
+awful.layout.layouts = require('layouts')
 
 -- Private tag used to move clients around tags
 awful.clientbuffer = awful.tag.add('_clientbuffer', {
