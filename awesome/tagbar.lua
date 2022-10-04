@@ -2,6 +2,7 @@ local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
 local wibox = require('wibox')
+local layouts = require('layouts')
 
 local TAGBAR_HEIGHT = 48
 local TAGBAR_FONT = 'Quicksand Regular 14'
@@ -36,7 +37,7 @@ local Tagbar = {}
 
 function Tagbar:newTab()
   awful.tag.add(tostring(#self.screen.tags), {
-    layout = awful.layout.layouts[1],
+    layout = self.screen.geometry.width > self.screen.geometry.height and layouts[1] or layouts[2],
     screen = self.screen,
   }):view_only()
 end
