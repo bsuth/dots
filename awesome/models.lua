@@ -159,12 +159,7 @@ local notifications = gears.table.crush(gears.object(), {
 
 naughty.config.notify_callback = function(notification)
   -- notification.force is a custom property to bypass notifications.active
-  if not notification.force and not notifications.active then
-    return nil
-  end
-
-  beautiful.styleNotification(notification)
-  return notification
+  return (notifications.active or notification.force) and notification or nil
 end
 
 -- -----------------------------------------------------------------------------

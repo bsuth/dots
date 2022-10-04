@@ -84,23 +84,10 @@ function beautiful.hex2rgb(hex)
 end
 
 function beautiful.setWallpaper(screen)
-  gears.wallpaper.maximized(beautiful.assets('wallpaper.png'), screen)
-end
-
-function beautiful.styleNotification(notification)
-  -- if notification.title ~= nil then
-  --   notification.text = ([[
--- <span size='small'>%s</span>
--- <span size='small'>%s</span>
-		-- ]]):format(notification.title, notification.text)
-  -- else
-  --   notification.text = ([[
--- <span size='small'>%s</span>
-		-- ]]):format(notification.text)
-  -- end
-
-  -- notification.title = 'Notification'
-  return notification
+  local wallpaper = screen.geometry.width > screen.geometry.height
+    and beautiful.assets('horizontal-wallpaper.svg')
+    or beautiful.assets('vertical-wallpaper.svg')
+  gears.wallpaper.maximized(wallpaper, screen)
 end
 
 -- -----------------------------------------------------------------------------
