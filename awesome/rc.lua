@@ -18,7 +18,7 @@ awful.layout.layouts = require('layouts')
 -- Private tag used to move clients around tags
 awful.clientbuffer = awful.tag.add('_clientbuffer', {
   screen = awful.screen.focused(),
-  layout = layout,
+  layout = awful.layout.layouts[1],
 })
 
 -- -----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ awful.screen.connect_for_each_screen(function(s)
   s.tagbar = Tagbar(s)
 
   if not tagState.restoreScreen(s) then
-    awful.tag({ '1' }, s, layout)
+    awful.tag({ '1' }, s, awful.layout.layouts[1])
   end
 
   s:connect_signal('tag::history::update', function()
