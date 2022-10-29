@@ -1,8 +1,5 @@
 local awful = require('awful')
 local beautiful = require('beautiful')
-local gears = require('gears')
-local naughty = require('naughty')
-local cjson = require('cjson')
 
 -- Autofocus another client when the current one is closed
 require('awful/autofocus')
