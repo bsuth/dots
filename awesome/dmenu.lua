@@ -2,6 +2,7 @@ local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
 local wibox = require('wibox')
+local cjson = require('cjson')
 
 -- -----------------------------------------------------------------------------
 -- State / Config
@@ -10,55 +11,12 @@ local wibox = require('wibox')
 local DMENU_WIDTH = 400
 local DMENU_PAGE_SIZE = 5
 
+local dmenuConfig = {}
+local dmenuCommands = {}
 local filteredCommands = {}
 local itemIndexOffset = 1
 local selectedItemIndex = 1
 local promptValue = ''
-
--- -----------------------------------------------------------------------------
--- Commands
--- -----------------------------------------------------------------------------
-
-local DMENU_CONFIG = {
-  sleep = function()
-    awful.spawn('systemctl suspend')
-  end,
-  reboot = function()
-    awful.spawn('/sbin/reboot')
-  end,
-  poweroff = function()
-    awful.spawn('/sbin/poweroff')
-  end,
-  gpick = function()
-    awful.spawn.with_shell('gpick -s -o | tr -d "\n" | xclip -sel c')
-  end,
-  flameshot = function()
-    awful.spawn('flameshot gui')
-  end,
-  inkscape = function()
-    awful.spawn('inkscape')
-  end,
-  discord = function()
-    awful.spawn('discord')
-  end,
-  simplescreenrecorder = function()
-    awful.spawn('simplescreenrecorder')
-  end,
-  firefox = function()
-    awful.spawn('firefox-developer-edition')
-  end,
-  aseprite = function()
-    awful.spawn('aseprite')
-  end,
-  godot = function()
-    awful.spawn('godot')
-  end,
-}
-
-local DMENU_COMMANDS = {}
-for key, _ in pairs(DMENU_CONFIG) do
-  DMENU_COMMANDS[#DMENU_COMMANDS + 1] = key
-end
 
 -- -----------------------------------------------------------------------------
 -- Components
@@ -123,9 +81,9 @@ local prompt = awful.widget.prompt({
     if newPromptValue ~= promptValue then
       filteredCommands = {}
 
-      for i, command in ipairs(DMENU_COMMANDS) do
+      for i, command in ipairs(dmenuCommands) do
         if command:find(newPromptValue) then
-          filteredCommands[#filteredCommands + 1] = command
+          table.insert(filteredCommands, command)
         end
       end
 
@@ -137,8 +95,12 @@ local prompt = awful.widget.prompt({
   end,
   exe_callback = function(command)
     local command = filteredCommands[selectedItemIndex]
-    if type(DMENU_CONFIG[command]) == 'function' then
-      DMENU_CONFIG[command]()
+    if dmenuConfig[command] and dmenuConfig[command].exec then
+      if dmenuConfig[command].with_shell then
+        awful.spawn.with_shell(dmenuConfig[command].exec)
+      else
+        awful.spawn(dmenuConfig[command].exec)
+      end
     end
   end,
   hooks = {
@@ -218,7 +180,22 @@ return function()
   if popup.visible == true then
     popup.visible = false
   else
-    filteredCommands = DMENU_COMMANDS
+    dmenuConfig = {}
+    dmenuCommands = {}
+
+    local dmenuConfigFile = io.open(os.getenv('DOTS') .. '/awesome/dmenu.json')
+    if dmenuConfigFile then
+      dmenuConfig = cjson.decode(dmenuConfigFile:read('*a'))
+      dmenuCommands = {}
+
+      for key, _ in pairs(dmenuConfig) do
+        table.insert(dmenuCommands, key)
+      end
+
+      dmenuConfigFile:close()
+    end
+
+    filteredCommands = dmenuCommands
     itemIndexOffset = math.max(1, #filteredCommands - DMENU_PAGE_SIZE + 1)
     selectedItemIndex = #filteredCommands
     promptValue = ''
