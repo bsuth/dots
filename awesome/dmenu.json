@@ -13,7 +13,7 @@
     "with_shell": true
   },
   "flameshot": {
-    "exec": "flameshot"
+    "exec": "flameshot gui"
   },
   "inkscape": {
     "exec": "inkscape"
