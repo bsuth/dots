@@ -175,6 +175,8 @@ vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 vim.keymap.set('n', '<c-f>', 'l%')
 vim.keymap.set('v', '<c-f>', 'l%')
 
+vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable<cr>')
+
 --
 -- Quick Links
 --
