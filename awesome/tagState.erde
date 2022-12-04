@@ -8,97 +8,97 @@ local tagState = {}
 local TAGSTATE_BACKUP_FILENAME = '/tmp/awesomewm_tag_state_backup'
 local tagStateBackup = {}
 
-do
+do {
   local tagStateBackupFile = io.open(TAGSTATE_BACKUP_FILENAME, 'rb')
-  if tagStateBackupFile then
+  if tagStateBackupFile {
     tagStateBackup = cjson.decode(tagStateBackupFile:read('*a'))
     tagStateBackupFile:close()
-  end
-end
+  }
+}
 
 -- -----------------------------------------------------------------------------
 -- Restore Tags
 -- -----------------------------------------------------------------------------
 
-function tagState.clear()
+function tagState.clear() {
   local tagStateBackupFile = io.open(TAGSTATE_BACKUP_FILENAME, 'w')
-  if tagStateBackupFile then
+  if tagStateBackupFile {
     tagStateBackupFile:write('{}')
     tagStateBackupFile:close()
-  end
-end
+  }
+}
 
-function tagState.backup()
+function tagState.backup() {
   tagStateBackup = {}
 
-  for s in screen do
+  for s in screen {
     local screenBackup = {}
 
-    for _, tag in ipairs(s.tags) do
-      if not tag.name:match('^_') then
+    for _, tag in ipairs(s.tags) {
+      if !tag.name:match('^_') {
         local tagBackup = { name = tag.name, selected = tag.selected }
 
-        for _, c in ipairs(tag:clients()) do
+        for _, c in ipairs(tag:clients()) {
           -- check if PID is actually available
-          if type(c.pid) == 'number' then
+          if type(c.pid) == 'number' {
             table.insert(tagBackup, c.pid)
-          end
-        end
+          }
+        }
 
         table.insert(screenBackup, tagBackup)
-      end
-    end
+      }
+    }
     
     tagStateBackup[s.index] = screenBackup
-  end
+  }
 
   local tagStateBackupFile = io.open(TAGSTATE_BACKUP_FILENAME, 'w')
 
-  if tagStateBackupFile then
+  if tagStateBackupFile {
     tagStateBackupFile:write(cjson.encode(tagStateBackup))
     tagStateBackupFile:close()
-  end
-end
+  }
+}
 
-function tagState.restoreScreen(s)
+function tagState.restoreScreen(s) {
   local screenBackup = tagStateBackup[s.index]
 
-  if not screenBackup then
+  if !screenBackup {
     return false
-  end
+  }
 
   local clientPidLookup = {}
-  for c in awful.client.iterate() do
+  for c in awful.client.iterate() {
     -- check if PID is actually available
-    if type(c.pid) == 'number' then
+    if type(c.pid) == 'number' {
       clientPidLookup[c.pid] = c
-    end
-  end
+    }
+  }
 
   local tagNames = {}
-  for _, tagBackup in ipairs(screenBackup) do
+  for _, tagBackup in ipairs(screenBackup) {
     table.insert(tagNames, tagBackup.name)
-  end
+  }
 
   -- Need to use awful.tag here, since awful.tag.add fails to set the screen's
   -- selected_tag appropriately
-  local tags = awful.tag(tagNames, s, s.geometry.width > s.geometry.height and layouts[1] or layouts[2])
+  local tags = awful.tag(tagNames, s, s.geometry.width > s.geometry.height && layouts[1] || layouts[2])
 
-  for i, tagBackup in ipairs(screenBackup) do
-    for _, clientPid in ipairs(tagBackup) do
+  for i, tagBackup in ipairs(screenBackup) {
+    for _, clientPid in ipairs(tagBackup) {
       local c = clientPidLookup[clientPid]
-      if c ~= nil then c:move_to_tag(tags[i]) end
-    end
-  end
+      if c != nil { c:move_to_tag(tags[i]) }
+    }
+  }
 
-  for i, tagBackup in ipairs(screenBackup) do
-    if tagBackup.selected then
+  for i, tagBackup in ipairs(screenBackup) {
+    if tagBackup.selected {
       tags[i]:view_only()
-    end
-  end
+    }
+  }
 
   return true
-end
+}
 
 -- -----------------------------------------------------------------------------
 -- Return

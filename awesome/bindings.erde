@@ -14,27 +14,27 @@ local bindings = {}
 -- Helpers
 -- -----------------------------------------------------------------------------
 
-local function grab_mouse_until_released()
-  mousegrabber.run(function(mouse)
-    for _, v in pairs(mouse.buttons) do
-      if v then
+function grab_mouse_until_released() {
+  mousegrabber.run(mouse -> {
+    for _, value in pairs(mouse.buttons) {
+      if value {
         return true
-      end
-    end
+      }
+    }
     return false
-  end, 'mouse')
-end
+  }, 'mouse')
+}
 
-local function global_move_client(dir)
+function global_move_client(dir) {
   local oldId = awful.client.idx(client.focus)
   awful.client.swap.bydirection(dir)
   local newId = awful.client.idx(client.focus)
 
-  if oldId.col == newId.col and oldId.idx == newId.idx then
+  if oldId.col == newId.col && oldId.idx == newId.idx {
     local newScreen = awful.screen.focused():get_next_in_direction(dir)
     client.focus:move_to_screen(newScreen)
-  end
-end
+  }
+}
 
 -- -----------------------------------------------------------------------------
 -- Global Keys
@@ -46,167 +46,167 @@ bindings.globalkeys = gears.table.join(
   -- System
   --
 
-  awful.key({ 'Mod4', 'Shift' }, 'Escape', function()
+  awful.key({ 'Mod4', 'Shift' }, 'Escape', () -> {
     tagState.clear()
     awesome.quit()
-  end),
+  }),
 
-  awful.key({ 'Mod4', 'Shift' }, 'r', function()
+  awful.key({ 'Mod4', 'Shift' }, 'r', () -> {
     tagState.backup()
     awesome.restart()
-  end),
+  }),
 
-  awful.key({}, 'XF86AudioLowerVolume', function()
+  awful.key({}, 'XF86AudioLowerVolume', () -> {
     models.volume:set(models.volume.percent - 5)
-  end),
-  awful.key({}, 'XF86AudioRaiseVolume', function()
+  }),
+  awful.key({}, 'XF86AudioRaiseVolume', () -> {
     models.volume:set(models.volume.percent + 5)
-  end),
-  awful.key({}, 'XF86AudioMute', function()
+  }),
+  awful.key({}, 'XF86AudioMute', () -> {
     models.volume:toggle()
-  end),
+  }),
 
-  awful.key({}, 'XF86MonBrightnessDown', function()
+  awful.key({}, 'XF86MonBrightnessDown', () -> {
     models.brightness:set(models.brightness.percent - 8)
-  end),
-  awful.key({}, 'XF86MonBrightnessUp', function()
+  }),
+  awful.key({}, 'XF86MonBrightnessUp', () -> {
     models.brightness:set(models.brightness.percent + 8)
-  end),
+  }),
 
   --
   -- Movement
   --
 
-  awful.key({ 'Mod4' }, 'h', function()
+  awful.key({ 'Mod4' }, 'h', () -> {
     awful.client.focus.global_bydirection('left')
-  end),
-  awful.key({ 'Mod4' }, 'j', function()
+  }),
+  awful.key({ 'Mod4' }, 'j', () -> {
     awful.client.focus.global_bydirection('down')
-  end),
-  awful.key({ 'Mod4' }, 'k', function()
+  }),
+  awful.key({ 'Mod4' }, 'k', () -> {
     awful.client.focus.global_bydirection('up')
-  end),
-  awful.key({ 'Mod4' }, 'l', function()
+  }),
+  awful.key({ 'Mod4' }, 'l', () -> {
     awful.client.focus.global_bydirection('right')
-  end),
+  }),
 
-  awful.key({ 'Mod4', 'Shift' }, 'h', function()
+  awful.key({ 'Mod4', 'Shift' }, 'h', () -> {
     global_move_client('left')
-  end),
-  awful.key({ 'Mod4', 'Shift' }, 'j', function()
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'j', () -> {
     global_move_client('down')
-  end),
-  awful.key({ 'Mod4', 'Shift' }, 'k', function()
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'k', () -> {
     global_move_client('up')
-  end),
-  awful.key({ 'Mod4', 'Shift' }, 'l', function()
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'l', () -> {
     global_move_client('right')
-  end),
+  }),
 
-  awful.key({ 'Mod4', 'Control' }, 'h', function()
+  awful.key({ 'Mod4', 'Control' }, 'h', () -> {
     awful.screen.focus_bydirection('left')
-  end),
-  awful.key({ 'Mod4', 'Control' }, 'j', function()
+  }),
+  awful.key({ 'Mod4', 'Control' }, 'j', () -> {
     awful.screen.focus_bydirection('down')
-  end),
-  awful.key({ 'Mod4', 'Control' }, 'k', function()
+  }),
+  awful.key({ 'Mod4', 'Control' }, 'k', () -> {
     awful.screen.focus_bydirection('up')
-  end),
-  awful.key({ 'Mod4', 'Control' }, 'l', function()
+  }),
+  awful.key({ 'Mod4', 'Control' }, 'l', () -> {
     awful.screen.focus_bydirection('right')
-  end),
+  }),
 
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'h', function()
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'h', () -> {
     awful.client.swap.global_bydirection('left')
-  end),
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'j', function()
+  }),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'j', () -> {
     awful.client.swap.global_bydirection('down')
-  end),
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'k', function()
+  }),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'k', () -> {
     awful.client.swap.global_bydirection('up')
-  end),
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'l', function()
+  }),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'l', () -> {
     awful.client.swap.global_bydirection('right')
-  end),
+  }),
 
   --
   -- Tagbar
   --
 
-  awful.key({ 'Mod4' }, 'space', function()
+  awful.key({ 'Mod4' }, 'space', () -> {
     require('dmenu')()
-  end),
-  awful.key({ 'Mod4' }, ';', function()
+  }),
+  awful.key({ 'Mod4' }, ';', () -> {
     require('statusMenu')()
-  end),
-  awful.key({ 'Mod4' }, 't', function()
+  }),
+  awful.key({ 'Mod4' }, 't', () -> {
     awful.screen.focused().tagbar:newTab()
-  end),
-  awful.key({ 'Mod4' }, 'w', function()
+  }),
+  awful.key({ 'Mod4' }, 'w', () -> {
     awful.screen.focused().tagbar:closeTab()
-  end),
-  awful.key({ 'Mod4', 'Shift' }, ',', function()
+  }),
+  awful.key({ 'Mod4', 'Shift' }, ',', () -> {
     awful.screen.focused().tagbar:shiftTab(-1)
-  end),
-  awful.key({ 'Mod4', 'Shift' }, '.', function()
+  }),
+  awful.key({ 'Mod4', 'Shift' }, '.', () -> {
     awful.screen.focused().tagbar:shiftTab(1)
-  end),
-  awful.key({ 'Mod4' }, 'Tab', function()
+  }),
+  awful.key({ 'Mod4' }, 'Tab', () -> {
     awful.screen.focused().tagbar:focusTab(1)
-  end),
-  awful.key({ 'Mod4', 'Shift' }, 'Tab', function()
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'Tab', () -> {
     awful.screen.focused().tagbar:focusTab(-1)
-  end),
-  awful.key({ 'Mod4', 'Mod1' }, 'Tab', function()
+  }),
+  awful.key({ 'Mod4', 'Mod1' }, 'Tab', () -> {
     awful.screen.focused().tagbar:focusTab(1, true)
-  end),
-  awful.key({ 'Mod4', 'Mod1', 'Shift' }, 'Tab', function()
+  }),
+  awful.key({ 'Mod4', 'Mod1', 'Shift' }, 'Tab', () -> {
     awful.screen.focused().tagbar:focusTab(-1, true)
-  end),
-  awful.key({ 'Mod4' }, 'r', function()
+  }),
+  awful.key({ 'Mod4' }, 'r', () -> {
     awful.screen.focused().tagbar:renameTab()
-  end),
-  awful.key({ 'Mod4' }, 'p', function()
+  }),
+  awful.key({ 'Mod4' }, 'p', () -> {
     awful.screen.focused().tagbar:toggleBackgroundTab()
-  end),
-  awful.key({ 'Mod4', 'Mod1' }, 'p', function()
+  }),
+  awful.key({ 'Mod4', 'Mod1' }, 'p', () -> {
     awful.screen.focused().tagbar:toggleBackgroundTab()
-  end),
+  }),
 
   --
   -- Client Buffer
   --
 
-  awful.key({ 'Mod4' }, 'm', function()
+  awful.key({ 'Mod4' }, 'm', () -> {
     client.focus:move_to_tag(awful.clientbuffer)
     client.focus.minimized = true
-  end),
+  }),
 
-  awful.key({ 'Mod4', 'Shift' }, 'm', function()
+  awful.key({ 'Mod4', 'Shift' }, 'm', () -> {
     local clients = awful.clientbuffer:clients()
-    if #clients > 0 then
+    if #clients > 0 {
       local c = clients[#clients]
       c:move_to_tag(awful.screen.focused().selected_tag)
       c.minimized = false
       client.focus = c
-    end
-  end),
+    }
+  }),
 
   --
   -- Spawners
   --
 
-  awful.key({ 'Mod4' }, 'Return', function()
+  awful.key({ 'Mod4' }, 'Return', () -> {
     awful.spawn('st -e nvim -c ":Dirvish"')
-  end),
+  }),
 
-  awful.key({ 'Mod4', 'Shift' }, 'Return', function()
+  awful.key({ 'Mod4', 'Shift' }, 'Return', () -> {
     awful.spawn('st')
-  end),
+  }),
 
-  awful.key({ 'Mod4' }, "'", function()
+  awful.key({ 'Mod4' }, "'", () -> {
     awful.spawn('firefox-developer-edition')
-  end)
+  })
 )
 
 -- -----------------------------------------------------------------------------
@@ -214,16 +214,16 @@ bindings.globalkeys = gears.table.join(
 -- -----------------------------------------------------------------------------
 
 bindings.clientkeys = gears.table.join(
-  awful.key({ 'Mod4', 'Shift' }, 'q', function(c)
+  awful.key({ 'Mod4', 'Shift' }, 'q', c -> {
     c:kill()
-  end),
+  }),
 
-  awful.key({ 'Mod4' }, 'f', function(c)
-    c.fullscreen = not c.fullscreen
+  awful.key({ 'Mod4' }, 'f', c -> {
+    c.fullscreen = !c.fullscreen
     c:raise()
-  end),
+  }),
 
-  awful.key({ 'Mod4', 'Shift' }, 'i', function(c)
+  awful.key({ 'Mod4', 'Shift' }, 'i', c -> {
     local msg = 'name: ' .. c.name
 
     local attrs = {
@@ -235,27 +235,27 @@ bindings.clientkeys = gears.table.join(
       'maximized',
     }
 
-    for i, attr in ipairs(attrs) do
+    for i, attr in ipairs(attrs) {
       msg = ('%s\n%s: %s'):format(msg, attr, c[attr])
-    end
+    }
 
     naughty.notify({ text = msg, force = true })
-  end),
+  }),
 
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'i', function(c)
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'i', c -> {
     c.floating = false
     c.maximized = false
     c.fullscreen = false
-  end)
+  })
 )
 
 -- -----------------------------------------------------------------------------
 -- Client Buttons
 -- -----------------------------------------------------------------------------
 
-bindings.clientbuttons = gears.table.join(awful.button({}, 1, function(c)
+bindings.clientbuttons = gears.table.join(awful.button({}, 1, c -> {
   c:emit_signal('request::activate', 'mouse_click', { raise = true })
-end))
+}))
 
 -- -----------------------------------------------------------------------------
 -- Return

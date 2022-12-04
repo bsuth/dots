@@ -53,9 +53,9 @@ beautiful.init({
 
 -- Copy palette into `beautiful` for convenience. This must be done after
 -- `beautiful.init({ ... })`.
-for color, hex in pairs(palette) do
+for color, hex in pairs(palette) {
   beautiful[color] = hex
-end
+}
 
 -- Some notification theme properties don't get overridden by the beautiful
 -- variables, so we have to directly set them here. See defaults here:
@@ -70,25 +70,25 @@ naughty.config.defaults.position = 'top_right'
 -- Functions
 -- -----------------------------------------------------------------------------
 
-function beautiful.assets(path)
+function beautiful.assets(path) {
   return os.getenv('DOTS') .. '/awesome/assets/' .. path
-end
+}
 
-function beautiful.hex2rgb(hex)
+function beautiful.hex2rgb(hex) {
   hex = hex:gsub('#', '')
   return {
     tonumber('0x' .. hex:sub(1, 2)) / 255,
     tonumber('0x' .. hex:sub(3, 4)) / 255,
     tonumber('0x' .. hex:sub(5, 6)) / 255,
   }
-end
+}
 
-function beautiful.setWallpaper(screen)
+function beautiful.setWallpaper(screen) {
   local wallpaper = screen.geometry.width > screen.geometry.height
-    and beautiful.assets('horizontal-wallpaper.svg')
-    or beautiful.assets('vertical-wallpaper.svg')
+    && beautiful.assets('horizontal-wallpaper.svg')
+    || beautiful.assets('vertical-wallpaper.svg')
   gears.wallpaper.maximized(wallpaper, screen)
-end
+}
 
 -- -----------------------------------------------------------------------------
 -- Signals
@@ -97,20 +97,11 @@ end
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
 screen.connect_signal('property::geometry', beautiful.setWallpaper)
 
-awful.screen.connect_for_each_screen(function(s)
-  beautiful.setWallpaper(s)
-end)
-
-client.connect_signal('focus', function(c)
+awful.screen.connect_for_each_screen(s -> beautiful.setWallpaper(s))
+client.connect_signal('focus', c -> {
   c.border_color = beautiful.border_focus
-end)
+})
 
-client.connect_signal('unfocus', function(c)
+client.connect_signal('unfocus', c -> {
   c.border_color = beautiful.border_normal
-end)
-
--- -----------------------------------------------------------------------------
--- Return
--- -----------------------------------------------------------------------------
-
-return beautiful
+})

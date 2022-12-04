@@ -9,132 +9,115 @@ local naughty = require('naughty')
 local upower = require('lgi').require('UPowerGlib')
 local device = upower.Client():get_display_device()
 
-local battery = gears.table.crush(gears.object(), {
+module battery = gears.table.crush(gears.object(), {
   percent = 0,
   discharging = true,
   sentLowWarning = false,
 
-  update = function(self)
+  update = () => {
     self.percent = device.percentage
     self.discharging = gears.table.hasitem({
       upower.DeviceState.PENDING_DISCHARGE,
       upower.DeviceState.DISCHARGING,
-    }, device.state) ~= nil
+    }, device.state) != nil
 
-    if self.percent < 15 then
-      if not self.sentLowWarning then
+    if self.percent < 15 {
+      if !self.sentLowWarning {
         naughty.notify({ text = 'Low Battery', force = true })
         self.sentLowWarning = true
-      end
-    elseif self.sentLowWarning then
+      }
+    } elseif self.sentLowWarning {
       self.sentLowWarning = false
-    end
+    }
 
     self:emit_signal('update')
-  end,
+  },
 })
 
 battery:update()
-device.on_notify = function()
-  battery:update()
-end
+device.on_notify = () -> battery:update()
 
 -- -----------------------------------------------------------------------------
 -- Brightness
 -- -----------------------------------------------------------------------------
 
-local brightness = gears.table.crush(gears.object(), {
+module brightness = gears.table.crush(gears.object(), {
   percent = 0,
 
-  set = function(self, percent)
+  set = percent => {
     self.percent = math.min(math.max(0, percent), 100)
     awful.spawn.easy_async_with_shell(
       ('brightnessctl set %s%%'):format(self.percent),
-      function()
-        self:emit_signal('update')
-      end
+      () -> self:emit_signal('update'),
     )
-  end,
+  },
 })
 
 awful.spawn.easy_async_with_shell(
   [[ echo $(( 100 * $(brightnessctl get) / $(brightnessctl max) )) ]],
-  function(stdout, _, _, _)
+  stdout -> {
     brightness.percent = tonumber(stdout)
     brightness:emit_signal('update')
-  end
+  },
 )
 
 -- -----------------------------------------------------------------------------
 -- Notifications
 -- -----------------------------------------------------------------------------
 
-local notifications = gears.table.crush(gears.object(), {
+module notifications = gears.table.crush(gears.object(), {
   -- Use custom active property instead of naughty's suspended state, since
   -- suspended state will save and queue all notifications during suspension,
   -- which we don't want
   active = false,
 
-  toggle = function(self)
-    self.active = not self.active
+  toggle = () => {
+    self.active = !self.active
     self:emit_signal('update')
-  end,
+  },
 })
 
-naughty.config.notify_callback = function(notification)
-  -- notification.force is a custom property to bypass notifications.active
-  return (notifications.active or notification.force) and notification or nil
-end
+-- notification.force is a custom property to bypass notifications.active
+naughty.config.notify_callback = notification ->
+  (notifications.active || notification.force) && notification || nil
 
 -- -----------------------------------------------------------------------------
 -- Volume
 -- -----------------------------------------------------------------------------
 
-local volume = gears.table.crush(gears.object(), {
+module volume = gears.table.crush(gears.object(), {
   percent = 0,
   active = false,
 
-  set = function(self, percent)
+  set = percent => {
     self.percent = math.min(math.max(0, percent), 100)
     awful.spawn.easy_async_with_shell(
       ('amixer sset Master %d%%'):format(self.percent),
-      function()
-        self:emit_signal('update')
-      end
+      () -> self:emit_signal('update'),
     )
-  end,
+  },
 
-  toggle = function(self)
-    awful.spawn.easy_async_with_shell('amixer sset Master toggle', function()
-      self.active = not self.active
+  toggle = () => awful.spawn.easy_async_with_shell(
+    'amixer sset Master toggle',
+    () -> {
+      self.active = !self.active
       self:emit_signal('update')
-    end)
-  end,
+    },
+  ),
 })
 
 awful.spawn.easy_async_with_shell(
-  [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[([0-9]+)%\].*/\1/' ]],
-  function(stdout, _, _, _)
+  [[ amixer sget Master | tail -n 1 | sed -E 's/.*\\[([0-9]+)%\\].*/\1/' ]],
+  stdout -> {
     volume.percent = tonumber(stdout)
     volume:emit_signal('update')
-  end
+  },
 )
 
 awful.spawn.easy_async_with_shell(
-  [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[(off|on)\].*/\1/' ]],
-  function(stdout, _, _, _)
+  [[ amixer sget Master | tail -n 1 | sed -E 's/.*\\[(off|on)\\].*/\1/' ]],
+  stdout -> {
     volume.active = string.find(stdout, 'on')
     volume:emit_signal('update')
-  end
+  },
 )
-
--- -----------------------------------------------------------------------------
--- Return
--- -----------------------------------------------------------------------------
-
-return {
-  battery = battery,
-  brightness = brightness,
-  notifications = notifications,
-  volume = volume,
-}

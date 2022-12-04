@@ -21,7 +21,7 @@ local promptValue = ''
 -- Components
 -- -----------------------------------------------------------------------------
 
-local function DmenuItemWidget(widget, selected)
+function DmenuItemWidget(widget, selected) {
   return wibox.widget({
     {
       widget,
@@ -29,11 +29,11 @@ local function DmenuItemWidget(widget, selected)
       widget = wibox.container.margin,
     },
     fg = beautiful.white,
-    bg = selected and beautiful.lightGray or beautiful.darkGray,
+    bg = selected && beautiful.lightGray || beautiful.darkGray,
     forced_width = DMENU_WIDTH,
     widget = wibox.container.background,
   })
-end
+}
 
 -- -----------------------------------------------------------------------------
 -- Widgets
@@ -43,7 +43,7 @@ local dmenuItemList = wibox.widget({
   layout = wibox.layout.fixed.vertical,
 })
 
-dmenuItemList:connect_signal('request::rerender', function()
+dmenuItemList:connect_signal('request::rerender', () -> {
   dmenuItemList.children = {}
 
   local itemIndexLimit = math.min(
@@ -51,70 +51,67 @@ dmenuItemList:connect_signal('request::rerender', function()
     itemIndexOffset + DMENU_PAGE_SIZE - 1
   )
 
-  for i = itemIndexOffset, itemIndexLimit do
+  for i = itemIndexOffset, itemIndexLimit {
     local command = filteredCommands[i]
     local markup = command
 
-    if #promptValue > 0 then
+    if #promptValue > 0 {
       local matchStart, matchEnd = command:find(promptValue)
       markup = table.concat({
         command:sub(1, matchStart - 1),
         ('<span color="%s">%s</span>'):format(beautiful.cyan, promptValue),
         command:sub(matchEnd + 1),
       })
-    end
+    }
 
     dmenuItemList.children[#dmenuItemList.children + 1] = DmenuItemWidget({
       markup = markup,
       widget = wibox.widget.textbox,
     }, i == selectedItemIndex)
-  end
-end)
+  }
+})
 
 local prompt = awful.widget.prompt({
   prompt = '',
   fg = beautiful.white,
-  changed_callback = function(newPromptValue)
+  changed_callback = newPromptValue -> {
     -- Need to explicitly check if the prompt _actually_ changed, since
     -- changed_callback also fires on just modifier keypresses.
-    if newPromptValue ~= promptValue then
+    if newPromptValue != promptValue {
       filteredCommands = {}
 
-      for i, command in ipairs(dmenuCommands) do
-        if command:find(newPromptValue) then
+      for i, command in ipairs(dmenuCommands) {
+        if command:find(newPromptValue) {
           table.insert(filteredCommands, command)
-        end
-      end
+        }
+      }
 
       itemIndexOffset = math.max(1, #filteredCommands - DMENU_PAGE_SIZE + 1)
       selectedItemIndex = #filteredCommands
       promptValue = newPromptValue
       dmenuItemList:emit_signal('request::rerender')
-    end
-  end,
-  exe_callback = function(command)
+    }
+  },
+  exe_callback = command -> {
     local command = filteredCommands[selectedItemIndex]
-    if dmenuConfig[command] and dmenuConfig[command].exec then
-      if dmenuConfig[command].with_shell then
+    if dmenuConfig[command] && dmenuConfig[command].exec {
+      if dmenuConfig[command].with_shell {
         awful.spawn.with_shell(dmenuConfig[command].exec)
-      else
+      } else {
         awful.spawn(dmenuConfig[command].exec)
-      end
-    end
-  end,
+      }
+    }
+  },
   hooks = {
     {
       {},
       'Tab',
-      function()
-        -- Disable tab completion
-        return true, false
-      end,
+      () -> (true, false), -- Disable tab completion
     },
     {
       { 'Control' },
       'n',
-      function(command)
+      command -> {
         selectedItemIndex = math.min(#filteredCommands, selectedItemIndex + 1)
         itemIndexOffset = math.max(
           itemIndexOffset,
@@ -122,17 +119,17 @@ local prompt = awful.widget.prompt({
         )
         dmenuItemList:emit_signal('request::rerender')
         return true, false
-      end,
+      },
     },
     {
       { 'Control' },
       'p',
-      function(command)
+      command -> {
         selectedItemIndex = math.max(1, selectedItemIndex - 1)
         itemIndexOffset = math.min(itemIndexOffset, selectedItemIndex)
         dmenuItemList:emit_signal('request::rerender')
         return true, false
-      end,
+      },
     },
   },
 })
@@ -171,28 +168,28 @@ local popup = awful.popup({
 -- Return
 -- -----------------------------------------------------------------------------
 
-prompt.done_callback = function()
+prompt.done_callback = () -> {
   popup.visible = false
-end
+}
 
-return function()
-  if popup.visible == true then
+return () -> {
+  if popup.visible == true {
     popup.visible = false
-  else
+  } else {
     dmenuConfig = {}
     dmenuCommands = {}
 
     local dmenuConfigFile = io.open(os.getenv('DOTS') .. '/awesome/dmenu.json')
-    if dmenuConfigFile then
+    if dmenuConfigFile {
       dmenuConfig = cjson.decode(dmenuConfigFile:read('*a'))
       dmenuCommands = {}
 
-      for key, _ in pairs(dmenuConfig) do
+      for key, _ in pairs(dmenuConfig) {
         table.insert(dmenuCommands, key)
-      end
+      }
 
       dmenuConfigFile:close()
-    end
+    }
 
     filteredCommands = dmenuCommands
     itemIndexOffset = math.max(1, #filteredCommands - DMENU_PAGE_SIZE + 1)
@@ -203,5 +200,5 @@ return function()
     popup.screen = awful.screen.focused()
     prompt:run()
     popup.visible = true
-  end
-end
+  }
+}
