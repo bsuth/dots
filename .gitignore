@@ -1,7 +1,3 @@
-# workstation-specific files
-**/__*
-!**/__config/__*
-
 # nvim
 autoload/
 bundle/
