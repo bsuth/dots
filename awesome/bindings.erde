@@ -14,17 +14,6 @@ local bindings = {}
 -- Helpers
 -- -----------------------------------------------------------------------------
 
-function grab_mouse_until_released() {
-  mousegrabber.run(mouse -> {
-    for _, value in pairs(mouse.buttons) {
-      if value {
-        return true
-      }
-    }
-    return false
-  }, 'mouse')
-}
-
 function global_move_client(dir) {
   local oldId = awful.client.idx(client.focus)
   awful.client.swap.bydirection(dir)

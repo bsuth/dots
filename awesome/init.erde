@@ -10,12 +10,29 @@ local tagState = require('tagState')
 local Tagbar = require('tagbar')
 local bindings = require('bindings')
 
-awful.layout.layouts = require('layouts')
+-- -----------------------------------------------------------------------------
+-- Layouts
+-- -----------------------------------------------------------------------------
 
--- Private tag used to move clients around tags
-awful.clientbuffer = awful.tag.add('_clientbuffer', {
-  screen = awful.screen.focused(),
-  layout = awful.layout.layouts[1],
+awful.layout.append_default_layout({
+  name = 'layout',
+  arrange = p -> {
+    if p.workarea.height > p.workarea.width {
+      local clientHeight = p.workarea.height / math.max(1, #p.clients)
+      for i, client in ipairs(p.clients) {
+        p.geometries[client] = {
+          x = p.workarea.x,
+          y = p.workarea.y + (i - 1) * clientHeight,
+          width = p.workarea.width,
+          height = clientHeight,
+        }
+      }
+    } elseif #p.clients < 4 {
+      awful.layout.suit.spiral.dwindle.arrange(p)
+    } else {
+      awful.layout.suit.fair.horizontal.arrange(p)
+    }
+  },
 })
 
 -- -----------------------------------------------------------------------------
@@ -61,36 +78,13 @@ awful.rules.rules = {
 }
 
 -- -----------------------------------------------------------------------------
--- Startup
+-- Misc
 -- -----------------------------------------------------------------------------
 
 awful.screen.connect_for_each_screen(s -> {
   s.tagbar = Tagbar(s)
-
   if !tagState.restoreScreen(s) {
     awful.tag({ '1' }, s, awful.layout.layouts[1])
-  }
-
-  s:connect_signal('tag::history::update', () -> {
-    -- restore focus to above client
-    for _, c in ipairs(s.selected_tag:clients()) {
-      if c.above {
-        c:emit_signal('request::activate')
-        return
-      }
-    }
-  })
-})
-
-awesome.connect_signal('startup', () -> {
-  for s in screen {
-    for _, tag in ipairs(s.tags) {
-      for _, c in ipairs(tag:clients()) {
-        if c.minimized {
-          c:move_to_tag(awful.clientbuffer)
-        }
-      }
-    }
   }
 })
 
@@ -104,13 +98,34 @@ client.connect_signal('manage', c -> {
   } else {
     -- Set the windows at the slave,
     -- i.e. put it at the end of others instead of setting it as master.
-    client.focus.above = false
     awful.client.setslave(c)
-    c.above = true
   }
 })
 
 -- Enable sloppy focus, so that focus follows mouse.
 client.connect_signal('mouse::enter', c -> {
-  c:emit_signal('request::activate', 'mouse_enter', { raise = false })
+  c:emit_signal('request::activate', 'mouse_enter')
+})
+
+-- -----------------------------------------------------------------------------
+-- Client Buffer
+--
+-- A private tag used as a stack for temporarily storing clients
+-- -----------------------------------------------------------------------------
+
+awful.clientbuffer = awful.tag.add('_clientbuffer', {
+  screen = awful.screen.focused(),
+  layout = awful.layout.layouts[1],
+})
+
+awesome.connect_signal('startup', () -> {
+  for s in screen {
+    for _, tag in ipairs(s.tags) {
+      for _, c in ipairs(tag:clients()) {
+        if c.minimized {
+          c:move_to_tag(awful.clientbuffer)
+        }
+      }
+    }
+  }
 })
