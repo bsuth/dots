@@ -1,7 +1,7 @@
 local awful = require('awful')
-local beautiful = require('beautiful')
 local wibox = require('wibox')
 local cjson = require('cjson')
+local { palette } = require('core.theme')
 
 -- -----------------------------------------------------------------------------
 -- State / Config
@@ -28,8 +28,8 @@ function DmenuItemWidget(widget, selected) {
       margins = 16,
       widget = wibox.container.margin,
     },
-    fg = beautiful.white,
-    bg = selected && beautiful.lightGray || beautiful.darkGray,
+    fg = palette.white,
+    bg = selected && palette.lightGray || palette.darkGray,
     forced_width = DMENU_WIDTH,
     widget = wibox.container.background,
   })
@@ -59,7 +59,7 @@ dmenuItemList:connect_signal('request::rerender', () -> {
       local matchStart, matchEnd = command:find(promptValue)
       markup = table.concat({
         command:sub(1, matchStart - 1),
-        ('<span color="%s">%s</span>'):format(beautiful.cyan, promptValue),
+        ('<span color="%s">%s</span>'):format(palette.cyan, promptValue),
         command:sub(matchEnd + 1),
       })
     }
@@ -73,7 +73,7 @@ dmenuItemList:connect_signal('request::rerender', () -> {
 
 local prompt = awful.widget.prompt({
   prompt = '',
-  fg = beautiful.white,
+  fg = palette.white,
   changed_callback = newPromptValue -> {
     -- Need to explicitly check if the prompt _actually_ changed, since
     -- changed_callback also fires on just modifier keypresses.
@@ -150,15 +150,15 @@ local popup = awful.popup({
         layout = wibox.layout.fixed.vertical,
       },
       shape_border_width = 1,
-      shape_border_color = beautiful.cyan,
-      bg = beautiful.darkGray,
+      shape_border_color = palette.cyan,
+      bg = palette.darkGray,
       widget = wibox.container.background,
     },
     margins = 16,
     widget = wibox.container.margin,
   },
   placement = awful.placement.bottom_right,
-  bg = beautiful.transparent,
+  bg = palette.transparent,
   visible = false,
   ontop = true,
   type = 'dock',

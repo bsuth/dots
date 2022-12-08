@@ -1,8 +1,9 @@
 local awful = require('awful')
-local beautiful = require('beautiful')
 local gears = require('gears')
-local models = require('models')
+local models = require('core.models')
 local wibox = require('wibox')
+local { palette } = require('core.theme')
+local { getFullAssetPath, hex2rgb } = require('core.utils')
 
 -- =============================================================================
 -- State / Config
@@ -30,13 +31,13 @@ function DialWidget(opts) {
     bgimage = (_, cr, width, height) -> {
       local m = math.min(width, height)
 
-      local bg = beautiful.hex2rgb(beautiful.lightGray)
+      local bg = hex2rgb(palette.lightGray)
       cr:set_source_rgb(bg[1], bg[2], bg[3])
       gears.shape.arc(cr, m, m, DIAL_BORDER_WIDTH, 0, 2 * math.pi)
       cr:fill()
 
       if opts.model.percent && opts.model.percent > 0 {
-        local fg = beautiful.hex2rgb(opts.color)
+        local fg = hex2rgb(opts.color)
         cr:set_source_rgb(fg[1], fg[2], fg[3])
 
         -- 98 is close enough so round (plus, battery percent never reaches
@@ -107,7 +108,7 @@ function StatusItemWidget(opts) {
       widget = wibox.container.margin,
     },
     fg = opts.color,
-    bg = beautiful.darkGray,
+    bg = palette.darkGray,
     widget = wibox.container.background,
   })
 
@@ -116,11 +117,11 @@ function StatusItemWidget(opts) {
   })
 
   statusItemWidget:connect_signal('request::select', () -> {
-    statusItemWidget.bg = beautiful.lightGray
+    statusItemWidget.bg = palette.lightGray
   })
 
   statusItemWidget:connect_signal('request::unselect', () -> {
-    statusItemWidget.bg = beautiful.darkGray
+    statusItemWidget.bg = palette.darkGray
   })
 
   statusItemWidget.keypressed_callback = opts.keypressed_callback
@@ -136,8 +137,8 @@ function StatusItemWidget(opts) {
 -- -----------------------------------------------------------------------------
 
 function getBatteryIcon() {
-  return models.battery.discharging && beautiful.assets('battery-discharging.svg')
-    || beautiful.assets('battery-charging.svg')
+  return models.battery.discharging && getFullAssetPath('battery-discharging.svg')
+    || getFullAssetPath('battery-charging.svg')
 }
 
 local batteryIconWidget = wibox.widget({
@@ -153,7 +154,7 @@ models.battery:connect_signal('update', () -> {
 
 local batteryWidget = StatusItemWidget({
   model = models.battery,
-  color = beautiful.red,
+  color = palette.red,
   widget = batteryIconWidget,
 })
 
@@ -162,8 +163,8 @@ local batteryWidget = StatusItemWidget({
 -- -----------------------------------------------------------------------------
 
 function getVolumeIcon() {
-  return models.volume.active && beautiful.assets('volume.svg')
-    || beautiful.assets('volume-muted.svg')
+  return models.volume.active && getFullAssetPath('volume.svg')
+    || getFullAssetPath('volume-muted.svg')
 }
 
 local volumeIconWidget = wibox.widget({
@@ -179,7 +180,7 @@ models.volume:connect_signal('update', () -> {
 
 local volumeWidget = StatusItemWidget({
   model = models.volume,
-  color = beautiful.green,
+  color = palette.green,
   widget = volumeIconWidget,
   keypressed_callback = (mod, key) -> {
     if #mod == 0 {
@@ -204,9 +205,9 @@ local volumeWidget = StatusItemWidget({
 
 local brightnessWidget = StatusItemWidget({
   model = models.brightness,
-  color = beautiful.yellow,
+  color = palette.yellow,
   widget = {
-    image = beautiful.assets('brightness.svg'),
+    image = getFullAssetPath('brightness.svg'),
     forced_width = STATUS_ITEM_SIZE,
     forced_height = STATUS_ITEM_SIZE,
     widget = wibox.widget.imagebox,
@@ -232,9 +233,9 @@ local brightnessWidget = StatusItemWidget({
 
 function getNotificationIcon() {
   if models.notifications.active {
-    return beautiful.assets('notifications-active.svg')
+    return getFullAssetPath('notifications-active.svg')
   } else {
-    return beautiful.assets('notifications-inactive.svg')
+    return getFullAssetPath('notifications-inactive.svg')
   }
 }
 
@@ -270,7 +271,7 @@ local popup = awful.popup({
             {
               {
                 format = ('<span color="%s">%s</span>'):format(
-                  beautiful.magenta,
+                  palette.magenta,
                   '%H:%M'
                 ),
                 font = 'Quicksand Regular 50',
@@ -279,7 +280,7 @@ local popup = awful.popup({
               },
               {
                 format = ('<span color="%s">%s</span>'):format(
-                  beautiful.blue,
+                  palette.blue,
                   '%a %b %d'
                 ),
                 font = 'Quicksand Regular 20',
@@ -306,15 +307,15 @@ local popup = awful.popup({
         widget = wibox.container.margin,
       },
       shape_border_width = 1,
-      shape_border_color = beautiful.cyan,
-      bg = beautiful.darkGray,
+      shape_border_color = palette.cyan,
+      bg = palette.darkGray,
       widget = wibox.container.background,
     },
     margins = 16,
     widget = wibox.container.margin,
   },
   placement = awful.placement.bottom_right,
-  bg = beautiful.transparent,
+  bg = palette.transparent,
   visible = false,
   ontop = true,
   type = 'dock',

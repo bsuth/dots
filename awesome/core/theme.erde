@@ -2,12 +2,13 @@ local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
 local naughty = require('naughty')
+local { getFullAssetPath } = require('core.utils')
 
 -- -----------------------------------------------------------------------------
 -- Palette
 -- -----------------------------------------------------------------------------
 
-local palette = {
+module palette = {
   -- onedark warmer
   -- https://github.com/navarasu/onedark.nvim/blob/master/lua/onedark/palette.lua
   red = '#de5d68',
@@ -49,12 +50,6 @@ beautiful.init({
   notification_border_color = palette.cyan,
 })
 
--- Copy palette into `beautiful` for convenience. This must be done after
--- `beautiful.init({ ... })`.
-for color, hex in pairs(palette) {
-  beautiful[color] = hex
-}
-
 -- Some notification theme properties don't get overridden by the beautiful
 -- variables, so we have to directly set them here. See defaults here:
 -- https://awesomewm.org/doc/api/libraries/naughty.html#config.defaults
@@ -65,26 +60,13 @@ naughty.config.defaults.border_width = 1
 naughty.config.defaults.position = 'top_right'
 
 -- -----------------------------------------------------------------------------
--- Functions
+-- Helpers
 -- -----------------------------------------------------------------------------
 
-function beautiful.assets(path) {
-  return os.getenv('DOTS') .. '/awesome/assets/' .. path
-}
-
-function beautiful.hex2rgb(hex) {
-  hex = hex:gsub('#', '')
-  return {
-    tonumber('0x' .. hex:sub(1, 2)) / 255,
-    tonumber('0x' .. hex:sub(3, 4)) / 255,
-    tonumber('0x' .. hex:sub(5, 6)) / 255,
-  }
-}
-
-function beautiful.setWallpaper(screen) {
+function setWallpaper(screen) {
   local wallpaper = screen.geometry.width > screen.geometry.height
-    && beautiful.assets('horizontal-wallpaper.svg')
-    || beautiful.assets('vertical-wallpaper.svg')
+    && getFullAssetPath('horizontal-wallpaper.svg')
+    || getFullAssetPath('vertical-wallpaper.svg')
   gears.wallpaper.maximized(wallpaper, screen)
 }
 
@@ -92,10 +74,11 @@ function beautiful.setWallpaper(screen) {
 -- Signals
 -- -----------------------------------------------------------------------------
 
-awful.screen.connect_for_each_screen(beautiful.setWallpaper)
+awful.screen.connect_for_each_screen(setWallpaper)
 
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
-screen.connect_signal('property::geometry', beautiful.setWallpaper)
+screen.connect_signal('property::geometry', setWallpaper)
 
+-- TODO: use rules here?
 client.connect_signal('focus', c -> { c.border_color = beautiful.border_focus })
 client.connect_signal('unfocus', c -> { c.border_color = beautiful.border_normal })

@@ -1,6 +1,6 @@
 local awful = require('awful')
-local beautiful = require('beautiful')
 local wibox = require('wibox')
+local { palette } = require('core.theme')
 
 local TAGBAR_HEIGHT = 48
 local TAGBAR_FONT = 'Quicksand Regular 14'
@@ -21,8 +21,8 @@ function Tab(opts) {
       },
       widget = wibox.container.place,
     },
-    fg = opts.isBackgroundTab && '#888888' || beautiful.white,
-    bg = opts.active && beautiful.lightGray || beautiful.darkGray,
+    fg = opts.isBackgroundTab && '#888888' || palette.white,
+    bg = opts.active && palette.lightGray || palette.darkGray,
     widget = wibox.container.background,
   })
 }
@@ -134,7 +134,7 @@ return screen -> {
     renamePrompt = awful.widget.prompt({
       prompt = '',
       font = TAGBAR_FONT,
-      fg = beautiful.white,
+      fg = palette.white,
       exe_callback = name -> {
         screen.selected_tag.name = name
       },
@@ -142,7 +142,7 @@ return screen -> {
     wibar = awful.wibar({
       screen = screen,
       position = 'top',
-      bg = beautiful.darkGray,
+      bg = palette.darkGray,
       height = TAGBAR_HEIGHT,
       type = 'dock', -- remove box shadows
     }),

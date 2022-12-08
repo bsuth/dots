@@ -1,0 +1,24 @@
+local awful = require('awful')
+
+-- -----------------------------------------------------------------------------
+-- Client Buffer
+--
+-- A private tag used as a stack for temporarily storing clients
+-- -----------------------------------------------------------------------------
+
+awful.clientbuffer = awful.tag.add('_clientbuffer', {
+  screen = awful.screen.focused(),
+  layout = awful.layout.layouts[1],
+})
+
+awesome.connect_signal('startup', () -> {
+  for s in screen {
+    for _, tag in ipairs(s.tags) {
+      for _, c in ipairs(tag:clients()) {
+        if c.minimized {
+          c:move_to_tag(awful.clientbuffer)
+        }
+      }
+    }
+  }
+})

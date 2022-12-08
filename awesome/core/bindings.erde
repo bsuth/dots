@@ -1,14 +1,7 @@
 local awful = require('awful')
 local gears = require('gears')
-local models = require('models')
+local models = require('core.models')
 local naughty = require('naughty')
-local tagState = require('tagState')
-
--- -----------------------------------------------------------------------------
--- Keybindings
--- -----------------------------------------------------------------------------
-
-local bindings = {}
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -29,19 +22,11 @@ function global_move_client(dir) {
 -- Global Keys
 -- -----------------------------------------------------------------------------
 
-bindings.globalkeys = gears.table.join(
-
-  --
-  -- System
-  --
-
+module globalKeys = {
   awful.key({ 'Mod4', 'Shift' }, 'Escape', () -> {
-    tagState.clear()
     awesome.quit()
   }),
-
   awful.key({ 'Mod4', 'Shift' }, 'r', () -> {
-    tagState.backup()
     awesome.restart()
   }),
 
@@ -61,10 +46,6 @@ bindings.globalkeys = gears.table.join(
   awful.key({}, 'XF86MonBrightnessUp', () -> {
     models.brightness:set(models.brightness.percent + 8)
   }),
-
-  --
-  -- Movement
-  --
 
   awful.key({ 'Mod4' }, 'h', () -> {
     awful.client.focus.global_bydirection('left')
@@ -118,9 +99,17 @@ bindings.globalkeys = gears.table.join(
     awful.client.swap.global_bydirection('right')
   }),
 
-  --
-  -- Tagbar
-  --
+  awful.key({ 'Mod4' }, 'Return', () -> {
+    awful.spawn('st -e nvim -c ":Dirvish"')
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'Return', () -> {
+    awful.spawn('st')
+  }),
+  awful.key({ 'Mod4' }, "'", () -> {
+    awful.spawn('firefox-developer-edition')
+  }),
+
+  -- TODO: remove
 
   awful.key({ 'Mod4' }, 'space', () -> {
     require('dmenu')()
@@ -180,29 +169,17 @@ bindings.globalkeys = gears.table.join(
       client.focus = c
     }
   }),
+}
 
-  --
-  -- Spawners
-  --
-
-  awful.key({ 'Mod4' }, 'Return', () -> {
-    awful.spawn('st -e nvim -c ":Dirvish"')
-  }),
-
-  awful.key({ 'Mod4', 'Shift' }, 'Return', () -> {
-    awful.spawn('st')
-  }),
-
-  awful.key({ 'Mod4' }, "'", () -> {
-    awful.spawn('firefox-developer-edition')
-  })
-)
+awesome.connect_signal('startup', () -> {
+  root.keys(gears.table.join(globalKeys))
+})
 
 -- -----------------------------------------------------------------------------
 -- Client Keys
 -- -----------------------------------------------------------------------------
 
-bindings.clientkeys = gears.table.join(
+module clientKeys = {
   awful.key({ 'Mod4', 'Shift' }, 'q', c -> {
     c:kill()
   }),
@@ -235,20 +212,15 @@ bindings.clientkeys = gears.table.join(
     c.floating = false
     c.maximized = false
     c.fullscreen = false
-  })
-)
+  }),
+}
 
 -- -----------------------------------------------------------------------------
 -- Client Buttons
 -- -----------------------------------------------------------------------------
 
-bindings.clientbuttons = gears.table.join(awful.button({}, 1, c -> {
-  c:emit_signal('request::activate', 'mouse_click', { raise = true })
-}))
-
--- -----------------------------------------------------------------------------
--- Return
--- -----------------------------------------------------------------------------
-
-root.keys(bindings.globalkeys)
-return bindings
+module clientButtons = {
+  awful.button({}, 1, c -> {
+    c:emit_signal('request::activate', 'mouse_click', { raise = true })
+  }),
+}
