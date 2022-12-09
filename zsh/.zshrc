@@ -113,7 +113,7 @@ alias lj='luajit'
 
 function gls() {
   git fetch --prune --quiet
-  git ls-remote origin | rg refs/head | sed -E "s/.*refs\/heads\/(.*)/\1/"
+  git branch --remotes --sort=committerdate | tac
 }
 
 function ansi() {
