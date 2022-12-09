@@ -1,7 +1,7 @@
 local awful = require('awful')
 local gears = require('gears')
-local models = require('core.models')
 local naughty = require('naughty')
+local models = require('core.models')
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -107,67 +107,6 @@ module globalKeys = {
   }),
   awful.key({ 'Mod4' }, "'", () -> {
     awful.spawn('firefox-developer-edition')
-  }),
-
-  -- TODO: remove
-
-  awful.key({ 'Mod4' }, 'space', () -> {
-    require('dmenu')()
-  }),
-  awful.key({ 'Mod4' }, ';', () -> {
-    require('statusMenu')()
-  }),
-  awful.key({ 'Mod4' }, 't', () -> {
-    awful.screen.focused().tagbar:newTab()
-  }),
-  awful.key({ 'Mod4' }, 'w', () -> {
-    awful.screen.focused().tagbar:closeTab()
-  }),
-  awful.key({ 'Mod4', 'Shift' }, ',', () -> {
-    awful.screen.focused().tagbar:shiftTab(-1)
-  }),
-  awful.key({ 'Mod4', 'Shift' }, '.', () -> {
-    awful.screen.focused().tagbar:shiftTab(1)
-  }),
-  awful.key({ 'Mod4' }, 'Tab', () -> {
-    awful.screen.focused().tagbar:focusTab(1)
-  }),
-  awful.key({ 'Mod4', 'Shift' }, 'Tab', () -> {
-    awful.screen.focused().tagbar:focusTab(-1)
-  }),
-  awful.key({ 'Mod4', 'Mod1' }, 'Tab', () -> {
-    awful.screen.focused().tagbar:focusTab(1, true)
-  }),
-  awful.key({ 'Mod4', 'Mod1', 'Shift' }, 'Tab', () -> {
-    awful.screen.focused().tagbar:focusTab(-1, true)
-  }),
-  awful.key({ 'Mod4' }, 'r', () -> {
-    awful.screen.focused().tagbar:renameTab()
-  }),
-  awful.key({ 'Mod4' }, 'p', () -> {
-    awful.screen.focused().tagbar:toggleBackgroundTab()
-  }),
-  awful.key({ 'Mod4', 'Mod1' }, 'p', () -> {
-    awful.screen.focused().tagbar:toggleBackgroundTab()
-  }),
-
-  --
-  -- Client Buffer
-  --
-
-  awful.key({ 'Mod4' }, 'm', () -> {
-    client.focus:move_to_tag(awful.clientbuffer)
-    client.focus.minimized = true
-  }),
-
-  awful.key({ 'Mod4', 'Shift' }, 'm', () -> {
-    local clients = awful.clientbuffer:clients()
-    if #clients > 0 {
-      local c = clients[#clients]
-      c:move_to_tag(awful.screen.focused().selected_tag)
-      c.minimized = false
-      client.focus = c
-    }
   }),
 }
 

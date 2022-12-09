@@ -1,6 +1,7 @@
 local awful = require('awful')
 local wibox = require('wibox')
 local cjson = require('cjson')
+local { globalKeys } = require('core.bindings')
 local { palette } = require('core.theme')
 
 -- -----------------------------------------------------------------------------
@@ -172,7 +173,7 @@ prompt.done_callback = () -> {
   popup.visible = false
 }
 
-return () -> {
+table.insert(globalKeys, awful.key({ 'Mod4' }, 'space', () -> {
   if popup.visible == true {
     popup.visible = false
   } else {
@@ -201,4 +202,4 @@ return () -> {
     prompt:run()
     popup.visible = true
   }
-}
+}))

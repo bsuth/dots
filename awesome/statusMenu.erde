@@ -2,8 +2,9 @@ local awful = require('awful')
 local gears = require('gears')
 local models = require('core.models')
 local wibox = require('wibox')
+local { globalKeys } = require('core.bindings')
 local { palette } = require('core.theme')
-local { getFullAssetPath, hex2rgb } = require('core.utils')
+local { getFullAssetPath, hex2rgb } = require('utils')
 
 -- =============================================================================
 -- State / Config
@@ -365,7 +366,7 @@ local keygrabber = awful.keygrabber({
 
 focusStatus(0)
 
-return () -> {
+table.insert(globalKeys, awful.key({ 'Mod4' }, ';', () -> {
   if popup.visible == true {
     popup.visible = false
   } else {
@@ -373,4 +374,4 @@ return () -> {
     popup.visible = true
     keygrabber:start()
   }
-}
+}))
