@@ -2,6 +2,7 @@ local awful = require('awful')
 local gears = require('gears')
 local naughty = require('naughty')
 local models = require('core.models')
+local rules = require('core.rules')
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -110,10 +111,6 @@ module globalKeys = {
   }),
 }
 
-awesome.connect_signal('startup', () -> {
-  root.keys(gears.table.join(globalKeys))
-})
-
 -- -----------------------------------------------------------------------------
 -- Client Keys
 -- -----------------------------------------------------------------------------
@@ -163,3 +160,18 @@ module clientButtons = {
     c:emit_signal('request::activate', 'mouse_click', { raise = true })
   }),
 }
+
+-- -----------------------------------------------------------------------------
+-- Startup
+-- -----------------------------------------------------------------------------
+
+awesome.connect_signal('startup', () -> {
+  root.keys(gears.table.join(globalKeys))
+  table.insert(rules, {
+    rule = {},
+    properties = {
+      keys = gears.table.join(clientKeys),
+      buttons = gears.table.join(clientButtons),
+    },
+  })
+})
