@@ -74,11 +74,3 @@ awful.screen.connect_for_each_screen(setWallpaper)
 
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
 screen.connect_signal('property::geometry', setWallpaper)
-
--- -----------------------------------------------------------------------------
--- Signals
--- -----------------------------------------------------------------------------
-
--- TODO: use rules here?
-client.connect_signal('focus', c -> { c.border_color = beautiful.border_focus })
-client.connect_signal('unfocus', c -> { c.border_color = beautiful.border_normal })

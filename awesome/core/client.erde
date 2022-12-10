@@ -1,0 +1,44 @@
+local awful = require('awful')
+local ruled = require('ruled')
+
+-- Enable sloppy focus, so that focus follows mouse.
+client.connect_signal('mouse::enter', c -> {
+  c:emit_signal('request::activate', 'mouse_enter')
+})
+
+client.connect_signal('manage', c -> {
+  if awesome.startup {
+    -- Prevent clients from being unreachable after screen count changes.
+    if !c.size_hints.user_position && !c.size_hints.program_position {
+      awful.placement.no_offscreen(c)
+    }
+  } else {
+    -- Set the windows at the slave,
+    -- i.e. put it at the end of others instead of setting it as master.
+    awful.client.setslave(c)
+  }
+})
+
+ruled.client.append_rules({
+  {
+    rule = {},
+    properties = {
+      floating = false,
+      maximized = false,
+      focus = awful.client.focus.filter,
+      screen = awful.screen.preferred,
+      placement = awful.placement.no_overlap + awful.placement.no_offscreen,
+    },
+  },
+  {
+    rule_any = {
+      type = { 'dialog' },
+      name = { 'Event Tester' }, -- xev
+      role = { 'pop-up' },
+    },
+    properties = {
+      above = true,
+      floating = true,
+    },
+  },
+})

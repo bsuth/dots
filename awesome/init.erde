@@ -1,0 +1,36 @@
+local awful = require('awful')
+local gears = require('gears')
+local ruled = require('ruled')
+
+-- Autofocus another client when the current one is closed
+require('awful/autofocus')
+
+-- Load modules
+local bindings = require('core.bindings')
+local layout = require('core.layout')
+
+require('core.client')
+require('core.models')
+require('core.theme')
+require('clientBuffer')
+require('dmenu')
+require('statusMenu')
+require('tagbar')
+
+-- Init tags
+awful.screen.connect_for_each_screen(s -> {
+  awful.tag({ '1' }, s, layout)
+})
+
+-- Init keybindings
+--
+-- Do this at the end, since we cannot update bindings dynamically and need to
+-- ensure other modules have registered their keybindings
+root.keys(gears.table.join(bindings.globalKeys))
+ruled.client.append_rule({
+  rule = {},
+  properties = {
+    keys = gears.table.join(bindings.clientKeys),
+    buttons = gears.table.join(bindings.clientButtons),
+  },
+})

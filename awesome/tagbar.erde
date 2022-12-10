@@ -162,7 +162,7 @@ gears.table.merge(globalKeys, {
   }),
 })
 
-return screen -> {
+awful.screen.connect_for_each_screen(screen -> {
   local tagbar = {
     screen = screen,
     tabListWidget = wibox.widget({
@@ -190,5 +190,6 @@ return screen -> {
   tagbar.renamePrompt.done_callback = name -> tagbar:refresh()
   screen:connect_signal('tag::history::update', () -> tagbar:refresh())
 
+  screen.tagbar = tagbar
   return setmetatable(tagbar, { __index = Tagbar })
-}
+})
