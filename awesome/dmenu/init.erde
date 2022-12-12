@@ -180,7 +180,7 @@ table.insert(globalKeys, awful.key({ 'Mod4' }, 'space', () -> {
     dmenuConfig = {}
     dmenuCommands = {}
 
-    local dmenuConfigFile = io.open(os.getenv('DOTS') .. '/awesome/dmenu.json')
+    local dmenuConfigFile = io.open(os.getenv('DOTS') .. '/awesome/dmenu/defaults.json')
     if dmenuConfigFile {
       dmenuConfig = cjson.decode(dmenuConfigFile:read('*a'))
       dmenuCommands = {}
