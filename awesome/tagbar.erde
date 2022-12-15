@@ -8,50 +8,115 @@ local TAGBAR_HEIGHT = 48
 local TAGBAR_FONT = 'Quicksand Regular 14'
 
 -- -----------------------------------------------------------------------------
--- Helpers
+-- Tab
 -- -----------------------------------------------------------------------------
 
-function getCurrentTagbar() {
-  return awful.screen.focused().tagbar
+local TabMT = {}
+local Tab = setmetatable({}, TabMT)
+
+function TabMT:__call(tag) {
+  local tab = { tag = tag, disabled = false }
+
+  tab.nameWidget = wibox.widget({
+    text = tag.name,
+    halign = 'center',
+    valign = 'center',
+    font = TAGBAR_FONT,
+    widget = wibox.widget.textbox,
+  })
+
+  tab.contentWidget = wibox.widget({
+    tab.nameWidget,
+    widget = wibox.container.place,
+  })
+
+  tab.rootWidget = wibox.widget({
+    tab.contentWidget,
+    fg = tag.tagbarDisabled && '#888888' || palette.white,
+    bg = tag.selected && palette.lightGray || palette.darkGray,
+    widget = wibox.container.background,
+  })
+
+  tag:connect_signal('property::name', () -> {
+    tab.nameWidget.text = tag.name
+  })
+
+  tag:connect_signal('property::selected', () -> {
+    tab.rootWidget.bg = tag.selected && palette.lightGray || palette.darkGray
+  })
+
+  return setmetatable(tab, { __index = Tab })
 }
 
--- -----------------------------------------------------------------------------
--- Components
--- -----------------------------------------------------------------------------
-
-local TAG_RENAME_PROMPT = awful.widget.prompt({
-  prompt = '',
-  font = TAGBAR_FONT,
-  fg = palette.white,
-  done_callback = () -> getCurrentTagbar():refresh(),
-  exe_callback = newTagName -> {
-    if #newTagName > 0 {
-      awful.screen.focused().selected_tag.name = newTagName
-    }
-  },
-})
-
-local Tab = props -> wibox.widget({
-  {
-    props.useRenamePrompt && TAG_RENAME_PROMPT || {
-      text = props.tag.name,
-      halign = 'center',
-      valign = 'center',
-      font = TAGBAR_FONT,
-      widget = wibox.widget.textbox,
+function Tab:rename() {
+  local prompt = awful.widget.prompt({
+    prompt = '',
+    font = TAGBAR_FONT,
+    fg = palette.white,
+    done_callback = () -> {
+      self.contentWidget.children = { self.nameWidget }
     },
-    widget = wibox.container.place,
-  },
-  fg = props.tag.tagbarDisabled && '#888888' || palette.white,
-  bg = props.tag.selected && palette.lightGray || palette.darkGray,
-  widget = wibox.container.background,
-})
+    exe_callback = newTagName -> {
+      if #newTagName > 0 {
+        self.tag.name = newTagName
+      }
+    },
+  })
+
+  prompt:run()
+  self.contentWidget.children = { prompt }
+}
+
+function Tab:toggle() {
+  self.disabled = !self.disabled
+  self.rootWidget.fg = self.disabled && '#888888' || palette.white
+}
 
 -- -----------------------------------------------------------------------------
 -- Tagbar
 -- -----------------------------------------------------------------------------
 
-local Tagbar = {}
+local TagbarMT = {}
+local Tagbar = setmetatable({}, TagbarMT)
+
+function TagbarMT:__call(s) {
+  local tagbar = { screen = s, tabs = {} }
+  setmetatable(tagbar, { __index = Tagbar })
+
+  tagbar.tabsWidget = wibox.widget({
+    forced_width = s.geometry.width,
+    layout  = wibox.layout.flex.horizontal,
+  })
+
+  tagbar.wibar = awful.wibar({
+    screen = s,
+    position = 'top',
+    bg = palette.darkGray,
+    height = TAGBAR_HEIGHT,
+    type = 'dock', -- remove box shadows
+    widget = tagbar.tabsWidget,
+  })
+
+  tagbar:refresh()
+  s:connect_signal('tag::history::update', () -> tagbar:refresh())
+
+  return tagbar
+}
+
+function Tagbar:getActiveTab() {
+  for i, tab in ipairs(self.tabs) {
+    if tab.tag == self.screen.selected_tag {
+      return tab, i
+    }
+  }
+}
+
+function Tagbar:getNextTab(tabIndex, reverse = false) {
+  local nextTabIndex = reverse 
+    && (tabIndex == 1 && #self.tabs || tabIndex - 1)
+    || (tabIndex == #self.tabs && 1 || tabIndex + 1)
+  return self.tabs[nextTabIndex], nextTabIndex
+}
 
 function Tagbar:open() {
   awful.tag.add(tostring(#self.screen.tags), {
@@ -74,101 +139,85 @@ function Tagbar:close() {
   }
 }
 
-function Tagbar:rename() {
-  TAG_RENAME_PROMPT:run()
-  self:refresh(true)
-}
+function Tagbar:move(reverse = false) {
+  local numTabs = #self.tabs
+  local activeTab, activeTabIndex = self:getActiveTab()
 
-function Tagbar:toggle() {
-  local tag = self.screen.selected_tag
-  tag.tagbarDisabled = !tag.tagbarDisabled
-  self:refresh()
-}
+  local canMove = numTabs > 1
+    && (reverse || activeTabIndex < numTabs)
+    && (!reverse || activeTabIndex > 1)
 
-function Tagbar:move(forwards = true) {
-  local selectedTag = self.screen.selected_tag
-  local increment = forwards && 1 || -1
-  local limit = forwards && #self.screen.tags || 1
-
-  for i = selectedTag.index + increment, limit, increment {
-    local swapTag = self.screen.tags[i]
-    if !swapTag.name:match('^_.*') {
-      selectedTag:swap(swapTag)
-      self:refresh()
-      break
-    }
+  if canMove {
+    local nextTab, nextTabIndex = self:getNextTab(activeTabIndex, reverse)
+    self.tabs[activeTabIndex] = nextTab
+    self.tabs[nextTabIndex] = activeTab
+    self.tabsWidget:swap(activeTabIndex, nextTabIndex)
+    activeTab.tag:swap(nextTab.tag)
   }
 }
 
-function Tagbar:focus(forwards = true, skipDisabled = true) {
-  local increment = forwards && 1 || -1
-  local newTagIndex = self.screen.selected_tag.index
-  local numTags = #self.screen.tags
+function Tagbar:focus(reverse = false, skipDisabled = true) {
+  if #self.tabs < 2 { return }
 
-  repeat {
-    newTagIndex = forwards
-      && newTagIndex % numTags + 1
-      || (newTagIndex - 2) % numTags + 1
+  local activeTab, activeTabIndex = self:getActiveTab()
+  local nextTab, nextTabIndex = self:getNextTab(activeTabIndex, reverse)
 
-    local newTag = self.screen.tags[newTagIndex]
-    if !(skipDisabledTags && newTag.tagbarDisabled) && !newTag.name:match('^_.*') {
-      newTag:view_only()
-      return
-    }
-  } until newTagIndex == self.screen.selected_tag.index
+  while skipDisabled && nextTab.disabled {
+    if nextTab == activeTab { break }
+    nextTab, nextTabIndex = self:getNextTab(nextTabIndex, reverse)
+  }
+
+  if nextTab != activeTab {
+    nextTab.tag:view_only()
+  }
 }
 
-function Tagbar:refresh(useRenamePrompt = false) {
+function Tagbar:refresh() {
+  local newTabs = {}
   local children = {}
 
-  for _, tag in pairs(self.screen.tags) {
+  for _, tag in ipairs(self.screen.tags) {
     if !tag.name:match('^_') {
-      children[#children + 1] = Tab({
-        tag = tag,
-        useRenamePrompt = useRenamePrompt && tag == self.screen.selected_tag,
-      })
+      local tagTab = nil
+
+      for _, tab in ipairs(self.tabs) {
+        if tab.tag == tag {
+          tagTab = tab
+          break
+        }
+      }
+
+      tagTab ||= Tab(tag)
+      table.insert(newTabs, tagTab)
+      table.insert(children, tagTab.rootWidget)
     }
   }
 
-  self.tabListWidget.children = children
+  self.tabs = newTabs
+  self.tabsWidget.children = children
 }
 
 -- -----------------------------------------------------------------------------
 -- Setup
 -- -----------------------------------------------------------------------------
 
+function getCurrentTagbar() {
+  return awful.screen.focused().tagbar
+}
+
 gears.table.merge(globalKeys, {
   awful.key({ 'Mod4' }, 't', () -> getCurrentTagbar():open()),
   awful.key({ 'Mod4' }, 'w', () -> getCurrentTagbar():close()),
-  awful.key({ 'Mod4', 'Shift' }, ',', () -> getCurrentTagbar():move(false)),
+  awful.key({ 'Mod4', 'Shift' }, ',', () -> getCurrentTagbar():move(true)),
   awful.key({ 'Mod4', 'Shift' }, '.', () -> getCurrentTagbar():move()),
   awful.key({ 'Mod4' }, 'Tab', () -> getCurrentTagbar():focus()),
-  awful.key({ 'Mod4', 'Shift' }, 'Tab', () -> getCurrentTagbar():focus(false)),
-  awful.key({ 'Mod4', 'Control' }, 'Tab', () -> getCurrentTagbar():focus(true, false)),
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'Tab', () -> getCurrentTagbar():focus(false, false)),
-  awful.key({ 'Mod4', 'Shift' }, 't', () -> getCurrentTagbar():rename()),
-  awful.key({ 'Mod4', 'Control' }, 't', () -> getCurrentTagbar():toggle()),
+  awful.key({ 'Mod4', 'Shift' }, 'Tab', () -> getCurrentTagbar():focus(true)),
+  awful.key({ 'Mod4', 'Control' }, 'Tab', () -> getCurrentTagbar():focus(false, false)),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'Tab', () -> getCurrentTagbar():focus(true, false)),
+  awful.key({ 'Mod4', 'Shift' }, 't', () -> getCurrentTagbar():getActiveTab():rename()),
+  awful.key({ 'Mod4', 'Control' }, 't', () -> getCurrentTagbar():getActiveTab():toggle()),
 })
 
 awful.screen.connect_for_each_screen(s -> {
-  local tagbar = {
-    screen = s,
-    tabListWidget = wibox.widget({
-      forced_width = s.geometry.width,
-      layout  = wibox.layout.flex.horizontal,
-    }),
-  }
-
-  local wibar = awful.wibar({
-    screen = s,
-    position = 'top',
-    bg = palette.darkGray,
-    height = TAGBAR_HEIGHT,
-    type = 'dock', -- remove box shadows
-    widget = tagbar.tabListWidget,
-  })
-
-  s.tagbar = tagbar
-  s:connect_signal('tag::history::update', () -> tagbar:refresh())
-  setmetatable(tagbar, { __index = Tagbar })
+  s.tagbar = Tagbar(s)
 })
