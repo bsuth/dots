@@ -32,7 +32,7 @@ function TabMT:__call(tag) {
 
   tab.rootWidget = wibox.widget({
     tab.contentWidget,
-    fg = tag.tagbarDisabled && '#888888' || palette.white,
+    fg = palette.white,
     bg = tag.selected && palette.lightGray || palette.darkGray,
     widget = wibox.container.background,
   })
@@ -201,8 +201,15 @@ function Tagbar:refresh() {
 -- Setup
 -- -----------------------------------------------------------------------------
 
+local tagbars = {}
+
 function getCurrentTagbar() {
-  return awful.screen.focused().tagbar
+  local currentScreen = awful.screen.focused()
+  for _, tagbar in ipairs(tagbars) {
+    if tagbar.screen == currentScreen {
+      return tagbar
+    }
+  }
 }
 
 gears.table.merge(globalKeys, {
@@ -218,6 +225,4 @@ gears.table.merge(globalKeys, {
   awful.key({ 'Mod4', 'Control' }, 't', () -> getCurrentTagbar():getActiveTab():toggle()),
 })
 
-awful.screen.connect_for_each_screen(s -> {
-  s.tagbar = Tagbar(s)
-})
+awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Tagbar(s)))
