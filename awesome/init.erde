@@ -18,9 +18,7 @@ require('statusMenu')
 require('tagbar')
 
 -- Init tags
-awful.screen.connect_for_each_screen(s -> {
-  awful.tag({ '1' }, s, layout)
-})
+awful.screen.connect_for_each_screen(s -> awful.tag({ '1' }, s, layout))
 
 -- Init keybindings
 --
