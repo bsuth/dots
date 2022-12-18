@@ -19,7 +19,7 @@ telescope.setup({
     layout_strategy = 'flex',
     layout_config = {
       flex = {
-        flip_columns = 120,
+        flip_columns = 150,
       },
     },
     mappings = {

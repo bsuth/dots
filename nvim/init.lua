@@ -189,10 +189,6 @@ vim.keymap.set(
   ':Dirvish ~/.local/share/nvim/site/pack/packer/start<cr>'
 )
 
-vim.keymap.set('n', '<leader>home', ':Dirvish ~<cr>')
-vim.keymap.set('n', '<leader>root', ':Dirvish /<cr>')
-vim.keymap.set('n', '<leader>dots', ':Dirvish ~/dots<cr>')
-
 --
 -- Window Management
 --
@@ -328,34 +324,48 @@ end)
 
 local cwdCache = {}
 
+local CWD_TRACK_BLACKLIST = {
+  '^term://',
+  '^fugitive://',
+}
+
+function getTrackDir(bufName)
+  return vim.fn.fnamemodify(bufName, ':p:h'):gsub('^sudo://', '')
+end
+
+function isTrackBlacklisted(bufName)
+  for _, pattern in ipairs(CWD_TRACK_BLACKLIST) do
+    if bufName:match(pattern) then
+      return true
+    end
+  end
+end
+
 -- Do not make this local! zsh needs this for cd hook in nested terminal.
 function saveTermCwd()
-  local bufname = nvim_buf_get_name(0)
-  cwdCache[bufname] = vim.fn.getcwd()
+  local bufName = nvim_buf_get_name(0)
+  if not isTrackBlacklisted(bufName) then
+    cwdCache[bufName] = vim.fn.getcwd()
+  end
 end
 
 local function clearTermCwd()
-  local bufname = nvim_buf_get_name(0)
-  if cwdCache[bufname] ~= nil then
-    cwdCache[bufname] = nil
+  local bufName = nvim_buf_get_name(0)
+  if not isTrackBlacklisted(bufName) and cwdCache[bufName] ~= nil then
+    cwdCache[bufName] = nil
   end
 end
 
 local function trackCwd()
-  local bufname = nvim_buf_get_name(0)
-
-  if bufname:match('^term://') then
-    if cwdCache[bufname] ~= nil then
-      vim.cmd('cd ' .. cwdCache[bufname])
+  local bufName = nvim_buf_get_name(0)
+  if bufName:match('^term://') then
+    if cwdCache[bufName] ~= nil then
+      vim.cmd('cd ' .. cwdCache[bufName])
     end
-  else
-    -- Change to current buffer's parent directory
-    local parentDir = vim.fn.fnamemodify(bufname, ':p:h'):gsub('^suda://', '')
-    vim.cmd('cd ' .. parentDir)
-
-    -- refresh dirvish after cd
+  elseif not isTrackBlacklisted(bufName) then
+    vim.cmd('cd ' .. getTrackDir(bufName))
     if nvim_buf_get_option(0, 'filetype') == 'dirvish' then
-      vim.cmd('Dirvish')
+      vim.cmd('Dirvish') -- refresh dirvish after cd
     end
   end
 end
