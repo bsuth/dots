@@ -2,6 +2,7 @@ local awful = require('awful')
 local gears = require('gears')
 local wibox = require('wibox')
 local { globalKeys } = require('core.bindings')
+local Object = require('core.object')
 local { palette } = require('core.theme')
 
 local TAGBAR_HEIGHT = 48
@@ -11,13 +12,13 @@ local TAGBAR_FONT = 'Quicksand Regular 14'
 -- Tab
 -- -----------------------------------------------------------------------------
 
-local TabMT = {}
-local Tab = setmetatable({}, TabMT)
+local Tab = {}
 
-function TabMT:__call(tag) {
-  local tab = { tag = tag, disabled = false }
+function Tab:__init(tag) {
+  self.tag = tag
+  self.disabled = false
 
-  tab.nameWidget = wibox.widget({
+  self.nameWidget = wibox.widget({
     text = tag.name,
     halign = 'center',
     valign = 'center',
@@ -25,27 +26,33 @@ function TabMT:__call(tag) {
     widget = wibox.widget.textbox,
   })
 
-  tab.contentWidget = wibox.widget({
-    tab.nameWidget,
+  self.contentWidget = wibox.widget({
+    self.nameWidget,
     widget = wibox.container.place,
   })
 
-  tab.rootWidget = wibox.widget({
-    tab.contentWidget,
+  self.rootWidget = wibox.widget({
+    self.contentWidget,
     fg = palette.white,
     bg = tag.selected && palette.lightGray || palette.darkGray,
     widget = wibox.container.background,
   })
 
   tag:connect_signal('property::name', () -> {
-    tab.nameWidget.text = tag.name
+    self.nameWidget.text = tag.name
   })
 
   tag:connect_signal('property::selected', () -> {
-    tab.rootWidget.bg = tag.selected && palette.lightGray || palette.darkGray
+    self.rootWidget.bg = tag.selected && palette.lightGray || palette.darkGray
   })
+}
 
-  return setmetatable(tab, { __index = Tab })
+function Tab:_on_change_disabled(disabled) {
+  self.rootWidget.fg = disabled && '#888888' || palette.white
+}
+
+function Tab:toggle() {
+  self.disabled = !self.disabled
 }
 
 function Tab:rename() {
@@ -67,40 +74,32 @@ function Tab:rename() {
   self.contentWidget.children = { prompt }
 }
 
-function Tab:toggle() {
-  self.disabled = !self.disabled
-  self.rootWidget.fg = self.disabled && '#888888' || palette.white
-}
-
 -- -----------------------------------------------------------------------------
 -- Tagbar
 -- -----------------------------------------------------------------------------
 
-local TagbarMT = {}
-local Tagbar = setmetatable({}, TagbarMT)
+local Tagbar = {}
 
-function TagbarMT:__call(s) {
-  local tagbar = { screen = s, tabs = {} }
-  setmetatable(tagbar, { __index = Tagbar })
+function Tagbar:__init(s) {
+  self.screen = s
+  self.tabs = {}
 
-  tagbar.tabsWidget = wibox.widget({
+  self.tabsWidget = wibox.widget({
     forced_width = s.geometry.width,
     layout  = wibox.layout.flex.horizontal,
   })
 
-  tagbar.wibar = awful.wibar({
+  self.wibar = awful.wibar({
     screen = s,
     position = 'top',
     bg = palette.darkGray,
     height = TAGBAR_HEIGHT,
     type = 'dock', -- remove box shadows
-    widget = tagbar.tabsWidget,
+    widget = self.tabsWidget,
   })
 
-  tagbar:refresh()
-  s:connect_signal('tag::history::update', () -> tagbar:refresh())
-
-  return tagbar
+  self:refresh()
+  s:connect_signal('tag::history::update', () -> self:refresh())
 }
 
 function Tagbar:getActiveTab() {
@@ -187,7 +186,7 @@ function Tagbar:refresh() {
         }
       }
 
-      tagTab ||= Tab(tag)
+      tagTab ||= Object(Tab, tag)
       table.insert(newTabs, tagTab)
       table.insert(children, tagTab.rootWidget)
     }
@@ -225,4 +224,4 @@ gears.table.merge(globalKeys, {
   awful.key({ 'Mod4', 'Control' }, 't', () -> getCurrentTagbar():getActiveTab():toggle()),
 })
 
-awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Tagbar(s)))
+awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Object(Tagbar, s)))
