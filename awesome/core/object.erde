@@ -1,80 +1,99 @@
--- -----------------------------------------------------------------------------
--- Object
--- -----------------------------------------------------------------------------
-
+local ObjectMT = {}
 local Object = setmetatable({}, ObjectMT)
 
-function Object:publish(event, ...) {
-  local native_handler = self["_on_{event}"]
-  local subscriptions = rawget(self, '_subscriptions')
+function ObjectMT:__call(class, ...) {
+  local instance = {
+    _class = class,
+    _proxy = {},
+    _subscriptions = {},
+  }
 
+  if type(class.__init) == 'function' {
+    -- Do not invoke getters, setters, or  change events until after initializtion
+    setmetatable(instance, { __index = Object.rawget, __newindex = instance._proxy })
+    class.__init(instance, ...)
+  }
+
+  setmetatable(instance, { __index = Object.get, __newindex = Object.set })
+  return instance
+}
+
+function Object:rawget(key) {
+  local proxyValue = self._proxy[key]
+  if proxyValue != nil {
+    return proxyValue
+  }
+
+  local classValue = self._class[key]
+  if classValue != nil {
+    return classValue
+  }
+
+  return Object[key]
+}
+
+function Object:get(key) {
+  local getter = self._class["_get_{key}"]
+  if type(getter) == 'function' {
+    return getter(self, key)
+  } else {
+    return Object.rawget(self, key)
+  }
+}
+
+function Object:rawset(key, value) {
+  local changed = Object.rawget(self, key) != value
+  self._proxy[key] = value
+  if changed {
+    Object.publish(self, "change_{key}", value)
+  }
+}
+
+function Object:set(key, value) {
+  local setter = self._class["_set_{key}"]
+  if type(setter) == 'function' {
+    setter(self, key, value)
+  } else {
+    Object.rawset(self, key, value)
+  }
+}
+
+function Object:publish(event, ...) {
+  local native_handler = self._class["_on_{event}"]
   if type(native_handler) == 'function' {
     native_handler(self, ...)
   }
 
-  if subscriptions[event] {
-    for _, subscription in ipairs(subscriptions[event]) {
+  if self._subscriptions[event] {
+    for _, subscription in ipairs(self._subscriptions[event]) {
       subscription(...)
     }
   }
 }
 
 function Object:subscribe(event, callback) {
-  local subscriptions = rawget(self, '_subscriptions')
-  subscriptions[event] ||= {}
+  self._subscriptions[event] ||= {}
 
-  for _, subscription in ipairs(subscriptions[event]) {
+  for _, subscription in ipairs(self._subscriptions[event]) {
     if subscription == callback {
       -- Prevent duplicate subscriptions
       return callback
     }
   }
 
-  table.insert(subscriptions[event], callback)
+  table.insert(self._subscriptions[event], callback)
   return callback
 }
 
 function Object:unsubscribe(event, callback) {
-  local subscriptions = rawget(self, '_subscriptions')
-  if subscriptions[event] {
-    for i, subscription in ipairs(subscriptions[event]) {
+  if self._subscriptions[event] {
+    for i, subscription in ipairs(self._subscriptions[event]) {
       if subscription == callback {
-        table.remove(subscriptions[event], i)
+        table.remove(self._subscriptions[event], i)
         break
       }
     }
   }
 }
 
--- -----------------------------------------------------------------------------
--- Return
--- -----------------------------------------------------------------------------
-
-return (class, ...) -> {
-  local proxy = setmetatable({}, {
-    __index = key => {
-      if class[key] != nil {
-        return class[key]
-      } else {
-        return Object[key]
-      }
-    }
-  })
-
-  local instanceMT = { __index = proxy, __newindex = proxy }
-  local instance = setmetatable({ _proxy = proxy, _subscriptions = {} }, instanceMT)
-
-  if type(class.__init) == 'function' {
-    class.__init(instance, ...)
-  }
-
-  -- Only start emitting events after initialization
-  instanceMT.__newindex = (key, value) => {
-    if proxy[key] != value {
-      proxy[key] = value
-      self:publish("change_{key}", value)
-    }
-  }
-
-  return instance
-}
+return Object
