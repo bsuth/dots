@@ -422,6 +422,7 @@ require('lualine').setup({
     section_separators = { left = '', right = '' },
   },
   sections = {
+    lualine_c = { { 'filename', path = 3 } },
     lualine_x = {},
   },
 })
