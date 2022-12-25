@@ -70,7 +70,6 @@ declare -a PACMAN_PACKAGES=(
   flameshot
   gpick
   simplescreenrecorder
-  physlock
   neovim
   firefox-developer-edition
   arandr

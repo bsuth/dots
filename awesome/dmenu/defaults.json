@@ -1,6 +1,6 @@
 {
-  "physlock": {
-    "exec": "physlock"
+  "lock": {
+    "exec": "slock"
   },
   "sleep": {
     "exec": "systemctl suspend"

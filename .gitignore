@@ -3,8 +3,9 @@ autoload/
 bundle/
 .netrwhist
 
-# st terminal
+# st / slock
 st/st
+slock/slock
 *.o
 
 # zsh

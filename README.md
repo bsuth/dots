@@ -11,7 +11,7 @@
 
 - Window Manager: [awesomewm](https://awesomewm.org/index.html)
 - Compositor: [picom](https://github.com/yshui/picom)
-- Lock: [physlock](https://github.com/muennich/physlock)
+- Lock: [slock](http://tools.suckless.org/slock/)
 
 ### Terminal
 
