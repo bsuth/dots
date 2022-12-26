@@ -1,6 +1,6 @@
 /* user and group to drop privileges to */
-static const char *user  = "nobody";
-static const char *group = "nogroup";
+static const char *user  = "bsuth";
+static const char *group = "bsuth";
 
 static const char *colorname[NUMCOLS] = {
 	[BG] =   "#101012",     /* background */
@@ -11,3 +11,6 @@ static const char *colorname[NUMCOLS] = {
 
 /* treat a cleared input like a wrong password (color) */
 static const int failonclear = 0;
+
+/* cube size */
+static const int cubesize = 50;

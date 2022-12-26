@@ -201,16 +201,14 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
                                  locks[screen]->colors[BG]);
             XClearWindow(dpy, locks[screen]->win);
             XSetForeground(dpy, locks[screen]->gc, locks[screen]->colors[color]);
-
-            for (int crtc = 0; crtc < locks[screen]->xrrsr->ncrtc; ++crtc) {
+            for (int crtc = 0; crtc < locks[screen]->xrrsr->ncrtc; ++crtc)
               XFillRectangle(dpy,
                        locks[screen]->win,
                        locks[screen]->gc,
-                       locks[screen]->xrrci[crtc]->x + (locks[screen]->xrrci[crtc]->width - 25) / 2,
-                       locks[screen]->xrrci[crtc]->y + (locks[screen]->xrrci[crtc]->height - 25) / 2,
-                       50,
-                       50);
-            }
+                       locks[screen]->xrrci[crtc]->x + (locks[screen]->xrrci[crtc]->width - cubesize) / 2,
+                       locks[screen]->xrrci[crtc]->y + (locks[screen]->xrrci[crtc]->height - cubesize) / 2,
+                       cubesize,
+                       cubesize);
           }
         } else {
           for (screen = 0; screen < nscreens; screen++) {
@@ -278,7 +276,7 @@ lockscreen(Display *dpy, struct xrandr *rr, int screen)
 	                          DefaultVisual(dpy, lock->screen),
 	                          CWOverrideRedirect | CWBackPixel, &wa);
   lock->gc = XCreateGC(dpy, lock->win, 0, &gcvalues);
-  XSetLineAttributes(dpy, lock->gc, 10, LineSolid, CapButt, JoinMiter);
+  XSetForeground(dpy, lock->gc, lock->colors[INIT]);
 	lock->pmap = XCreateBitmapFromData(dpy, lock->win, curs, 8, 8);
 	invisible = XCreatePixmapCursor(dpy, lock->pmap, lock->pmap,
 	                                &color, &color, 0, 0);
@@ -288,8 +286,17 @@ lockscreen(Display *dpy, struct xrandr *rr, int screen)
   if (rr->active) {
     lock->xrrsr = XRRGetScreenResourcesCurrent(dpy, lock->root);
     // TODO: bound my max
-    for (int crtc = 0; crtc < lock->xrrsr->ncrtc; ++crtc)
+    for (int crtc = 0; crtc < lock->xrrsr->ncrtc; ++crtc) {
       lock->xrrci[crtc] = XRRGetCrtcInfo(dpy, lock->xrrsr, lock->xrrsr->crtcs[crtc]);
+      XFillRectangle(dpy,
+                     lock->win,
+                     lock->gc,
+                     lock->xrrci[crtc]->x + (lock->xrrci[crtc]->width - cubesize) / 2,
+                     lock->xrrci[crtc]->y + (lock->xrrci[crtc]->height - cubesize) / 2,
+                     cubesize,
+                     cubesize);
+    }
+	  XSync(dpy, 0);
   }
 
 	/* Try to grab mouse pointer *and* keyboard for 600ms, else fail the lock */
@@ -405,6 +412,16 @@ main(int argc, char **argv) {
 			break;
 	}
 	XSync(dpy, 0);
+
+  for (int screen = 0; screen < nscreens; screen++)
+    for (int crtc = 0; crtc < locks[screen]->xrrsr->ncrtc; ++crtc)
+      XFillRectangle(dpy,
+               locks[screen]->win,
+               locks[screen]->gc,
+               locks[screen]->xrrci[crtc]->x + (locks[screen]->xrrci[crtc]->width - cubesize) / 2,
+               locks[screen]->xrrci[crtc]->y + (locks[screen]->xrrci[crtc]->height - cubesize) / 2,
+               cubesize,
+               cubesize);
 
 	/* did we manage to lock everything? */
 	if (nlocks != nscreens)
