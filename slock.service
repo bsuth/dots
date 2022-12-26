@@ -1,6 +1,0 @@
-[Service]
-User=bsuth
-ExecStart=/usr/bin/slock
-
-[Install]
-WantedBy=sleep.target

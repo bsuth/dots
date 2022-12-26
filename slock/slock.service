@@ -1,0 +1,10 @@
+[Unit]
+Description=slock
+
+[Service]
+User=bsuth
+Environment=DISPLAY=:0
+ExecStart=/usr/local/bin/slock
+
+[Install]
+WantedBy=sleep.target
