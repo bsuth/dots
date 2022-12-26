@@ -23,6 +23,7 @@
 #include "util.h"
 
 char *argv0;
+#define MAXMONITORS 10
 
 enum {
   BG,
@@ -38,6 +39,8 @@ struct lock {
 	GC gc;
 	Pixmap pmap;
 	unsigned long colors[NUMCOLS];
+  XRRScreenResources *xrrsr;
+  XRRCrtcInfo* xrrci[MAXMONITORS];
 };
 
 struct xrandr {
@@ -197,18 +200,14 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
                                  locks[screen]->win,
                                  locks[screen]->colors[BG]);
             XClearWindow(dpy, locks[screen]->win);
+            XSetForeground(dpy, locks[screen]->gc, locks[screen]->colors[color]);
 
-            XRRScreenResources *resources = XRRGetScreenResourcesCurrent(dpy, locks[screen]->root);
-            XRRCrtcInfo *xrrci;
-
-            for (int i = 0; i < resources->ncrtc; ++i) {
-              xrrci = XRRGetCrtcInfo(dpy, resources, resources->crtcs[i]);
-              XSetForeground(dpy, locks[screen]->gc, locks[screen]->colors[color]);
+            for (int crtc = 0; crtc < locks[screen]->xrrsr->ncrtc; ++crtc) {
               XDrawArc(dpy,
                        locks[screen]->win,
                        locks[screen]->gc,
-                       xrrci->x + (xrrci->width - 25) / 2,
-                       xrrci->y + (xrrci->height - 25) / 2,
+                       locks[screen]->xrrci[crtc]->x + (locks[screen]->xrrci[crtc]->width - 25) / 2,
+                       locks[screen]->xrrci[crtc]->y + (locks[screen]->xrrci[crtc]->height - 25) / 2,
                        50,
                        50,
                        0,
@@ -216,16 +215,13 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
               XFillArc(dpy,
                        locks[screen]->win,
                        locks[screen]->gc,
-                       xrrci->x + (xrrci->width - 25) / 2,
-                       xrrci->y + (xrrci->height - 25) / 2,
+                       locks[screen]->xrrci[crtc]->x + (locks[screen]->xrrci[crtc]->width - 25) / 2,
+                       locks[screen]->xrrci[crtc]->y + (locks[screen]->xrrci[crtc]->height - 25) / 2,
                        50,
                        50,
                        0,
                        360*64);
-              XRRFreeCrtcInfo(xrrci);
             }
-
-            XRRFreeScreenResources(resources);
           }
         } else {
           for (screen = 0; screen < nscreens; screen++) {
@@ -297,6 +293,14 @@ lockscreen(Display *dpy, struct xrandr *rr, int screen)
 	invisible = XCreatePixmapCursor(dpy, lock->pmap, lock->pmap,
 	                                &color, &color, 0, 0);
 	XDefineCursor(dpy, lock->win, invisible);
+
+
+  if (rr->active) {
+    lock->xrrsr = XRRGetScreenResourcesCurrent(dpy, lock->root);
+    // TODO: bound my max
+    for (int crtc = 0; crtc < lock->xrrsr->ncrtc; ++crtc)
+      lock->xrrci[crtc] = XRRGetCrtcInfo(dpy, lock->xrrsr, lock->xrrsr->crtcs[crtc]);
+  }
 
 	/* Try to grab mouse pointer *and* keyboard for 600ms, else fail the lock */
 	for (i = 0, ptgrab = kbgrab = -1; i < 6; i++) {
