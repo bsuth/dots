@@ -203,24 +203,13 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
             XSetForeground(dpy, locks[screen]->gc, locks[screen]->colors[color]);
 
             for (int crtc = 0; crtc < locks[screen]->xrrsr->ncrtc; ++crtc) {
-              XDrawArc(dpy,
+              XFillRectangle(dpy,
                        locks[screen]->win,
                        locks[screen]->gc,
                        locks[screen]->xrrci[crtc]->x + (locks[screen]->xrrci[crtc]->width - 25) / 2,
                        locks[screen]->xrrci[crtc]->y + (locks[screen]->xrrci[crtc]->height - 25) / 2,
                        50,
-                       50,
-                       0,
-                       360*64);
-              XFillArc(dpy,
-                       locks[screen]->win,
-                       locks[screen]->gc,
-                       locks[screen]->xrrci[crtc]->x + (locks[screen]->xrrci[crtc]->width - 25) / 2,
-                       locks[screen]->xrrci[crtc]->y + (locks[screen]->xrrci[crtc]->height - 25) / 2,
-                       50,
-                       50,
-                       0,
-                       360*64);
+                       50);
             }
           }
         } else {
@@ -289,6 +278,7 @@ lockscreen(Display *dpy, struct xrandr *rr, int screen)
 	                          DefaultVisual(dpy, lock->screen),
 	                          CWOverrideRedirect | CWBackPixel, &wa);
   lock->gc = XCreateGC(dpy, lock->win, 0, &gcvalues);
+  XSetLineAttributes(dpy, lock->gc, 10, LineSolid, CapButt, JoinMiter);
 	lock->pmap = XCreateBitmapFromData(dpy, lock->win, curs, 8, 8);
 	invisible = XCreatePixmapCursor(dpy, lock->pmap, lock->pmap,
 	                                &color, &color, 0, 0);
