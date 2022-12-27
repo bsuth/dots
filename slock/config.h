@@ -4,13 +4,13 @@ static const char *group = "bsuth";
 
 static const char *colorname[NUMCOLS] = {
 	[BG] =     "#101012",   /* background */
-	[INIT] =   "#4f525c",   /* after initialization */
-	[INPUT] =  "#57a5e5",   /* during input */
+	[INIT] =   "#57a5e5",   /* after initialization */
+	[INPUT] =  "#8fb573",   /* during input */
 	[FAILED] = "#de5d68",   /* wrong password */
 };
 
 /* treat a cleared input like a wrong password (color) */
 static const int failonclear = 0;
 
-/* size in px of cube */
+/* size of square in px */
 static const int squaresize = 50;
