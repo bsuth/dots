@@ -151,14 +151,6 @@ local function applyPrettier()
   }
 end
 
-local function applyStylua()
-  return {
-    exe = 'stylua --search-parent-directories',
-    args = { nvim_buf_get_name(0) },
-    stdin = false,
-  }
-end
-
 nvim_create_autocmd('BufWritePre', {
   group = 'bsuth',
   pattern = C.JS_PATTERNS,
@@ -178,7 +170,6 @@ nvim_create_autocmd('BufWritePost', {
 
 formatter.setup({
   filetype = {
-    lua = { applyStylua },
     json = { applyPrettier },
     javascript = { applyPrettier },
     javascriptreact = { applyPrettier },
