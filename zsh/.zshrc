@@ -110,6 +110,7 @@ chpwd_functions=(${chpwd_functions[@]} "on_cd")
 
 alias ls='ls --color=auto'
 alias lj='luajit'
+alias sysupdate='sudo pacman -Sy archlinux-keyring && yay -Su'
 
 function gls() {
   git fetch --prune --quiet

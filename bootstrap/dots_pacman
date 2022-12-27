@@ -15,6 +15,7 @@ declare -a PACMAN_PACKAGES=(
   xf86-video-amdgpu # AMD
   # xf86-video-intel # Intel
   xorg-server
+  xorg-xrandr
   xorg-server-xephyr
   xorg-xinit
   xorg-xev
