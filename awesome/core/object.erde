@@ -1,22 +1,30 @@
+-- -----------------------------------------------------------------------------
+-- Object
+-- -----------------------------------------------------------------------------
+
 local ObjectMT = {}
 local Object = setmetatable({}, ObjectMT)
 
-function ObjectMT:__call(class, ...) {
+function ObjectMT:__call(class = {}, ...) {
   local instance = {
     _class = class,
     _proxy = {},
     _subscriptions = {},
   }
 
-  if type(class.__init) == 'function' {
+  if type(class._init) == 'function' {
     -- Do not invoke getters, setters, or  change events until after initializtion
     setmetatable(instance, { __index = Object.rawget, __newindex = instance._proxy })
-    class.__init(instance, ...)
+    class._init(instance, ...)
   }
 
   setmetatable(instance, { __index = Object.get, __newindex = Object.set })
   return instance
 }
+
+-- -----------------------------------------------------------------------------
+-- Getters / Setters
+-- -----------------------------------------------------------------------------
 
 function Object:rawget(key) {
   local proxyValue = self._proxy[key]
@@ -35,7 +43,7 @@ function Object:rawget(key) {
 function Object:get(key) {
   local getter = self._class["_get_{key}"]
   if type(getter) == 'function' {
-    return getter(self, key)
+    return getter(self)
   } else {
     return Object.rawget(self, key)
   }
@@ -52,11 +60,15 @@ function Object:rawset(key, value) {
 function Object:set(key, value) {
   local setter = self._class["_set_{key}"]
   if type(setter) == 'function' {
-    setter(self, key, value)
+    setter(self, value)
   } else {
     Object.rawset(self, key, value)
   }
 }
+
+-- -----------------------------------------------------------------------------
+-- Pubsub
+-- -----------------------------------------------------------------------------
 
 function Object:publish(event, ...) {
   local native_handler = self._class["_on_{event}"]
@@ -95,5 +107,9 @@ function Object:unsubscribe(event, callback) {
     }
   }
 }
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
 
 return Object

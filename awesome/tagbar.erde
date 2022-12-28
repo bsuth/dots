@@ -14,7 +14,7 @@ local TAGBAR_FONT = 'Quicksand Regular 14'
 
 local Tab = {}
 
-function Tab:__init(tag) {
+function Tab:_init(tag) {
   self.tag = tag
   self.disabled = false
 
@@ -47,8 +47,8 @@ function Tab:__init(tag) {
   })
 }
 
-function Tab:_on_change_disabled(disabled) {
-  self.rootWidget.fg = disabled && '#888888' || palette.white
+function Tab:_on_change_disabled() {
+  self.rootWidget.fg = self.disabled && '#888888' || palette.white
 }
 
 function Tab:toggle() {
@@ -80,7 +80,7 @@ function Tab:rename() {
 
 local Tagbar = {}
 
-function Tagbar:__init(s) {
+function Tagbar:_init(s) {
   self.screen = s
   self.tabs = {}
 
