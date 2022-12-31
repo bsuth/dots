@@ -10,3 +10,19 @@ module function hex2rgb(hex) {
     tonumber('0x' .. hex:sub(5, 6)) / 255,
   }
 }
+
+module function shallowCopy(t) {
+  local copy = {}
+
+  for key, value in pairs(t) {
+    copy[key] = value
+  }
+
+  return copy
+}
+
+-- Remove leading / trailing whitespace from a string.
+-- Taken from: https://www.lua.org/pil/20.3.html
+module function trim(s) {
+  return (s:gsub('^%s*(.*)%s*$', '%1'))
+}
