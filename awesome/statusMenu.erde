@@ -4,7 +4,7 @@ local models = require('core.models')
 local wibox = require('wibox')
 local { globalKeys } = require('core.bindings')
 local { palette } = require('core.theme')
-local { getFullAssetPath, hex2rgb } = require('utils')
+local { getFullAssetPath, hex2rgb } = require('core.utils')
 
 -- =============================================================================
 -- State / Config
