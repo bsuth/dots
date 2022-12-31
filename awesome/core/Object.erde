@@ -5,23 +5,6 @@
 local ObjectMT = {}
 local Object = setmetatable({}, ObjectMT)
 
-function ObjectMT:__call(class = {}, ...) {
-  local instance = {
-    _class = class,
-    _proxy = {},
-    _subscriptions = {},
-  }
-
-  if type(class._init) == 'function' {
-    -- Do not invoke getters, setters, or  change events until after initializtion
-    setmetatable(instance, { __index = Object.rawget, __newindex = instance._proxy })
-    class._init(instance, ...)
-  }
-
-  setmetatable(instance, { __index = Object.get, __newindex = Object.set })
-  return instance
-}
-
 -- -----------------------------------------------------------------------------
 -- Getters / Setters
 -- -----------------------------------------------------------------------------
@@ -49,11 +32,11 @@ function Object:get(key) {
   }
 }
 
-function Object:rawset(key, value) {
-  local changed = Object.rawget(self, key) != value
+function Object:rawset(key, value, noPublish) {
+  local oldValue = Object.rawget(self, key)
   self._proxy[key] = value
-  if changed {
-    Object.publish(self, "change_{key}", value)
+  if !noPublish && oldValue != value {
+    Object.publish(self, "change_{key}", value, oldValue)
   }
 }
 
@@ -106,6 +89,26 @@ function Object:unsubscribe(event, callback) {
       }
     }
   }
+}
+
+-- -----------------------------------------------------------------------------
+-- Constructor
+-- -----------------------------------------------------------------------------
+
+local InstanceMT = { __index = Object.get, __newindex = Object.set }
+
+function ObjectMT:__call(class = {}, ...) {
+  local instance = setmetatable({
+    _class = class,
+    _proxy = {},
+    _subscriptions = {},
+  }, InstanceMT)
+
+  if type(class._init) == 'function' {
+    class._init(instance, ...)
+  }
+
+  return instance
 }
 
 -- -----------------------------------------------------------------------------

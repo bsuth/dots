@@ -2,7 +2,7 @@ local awful = require('awful')
 local gears = require('gears')
 local wibox = require('wibox')
 local { globalKeys } = require('core.bindings')
-local Object = require('core.object')
+local Object = require('core.Object')
 local { palette } = require('core.theme')
 
 local TAGBAR_HEIGHT = 48
@@ -16,7 +16,6 @@ local Tab = {}
 
 function Tab:_init(tag) {
   self.tag = tag
-  self.disabled = false
 
   self.nameWidget = wibox.widget({
     text = tag.name,
