@@ -1,0 +1,28 @@
+local awful = require('awful')
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+
+-- -----------------------------------------------------------------------------
+-- Veil
+-- -----------------------------------------------------------------------------
+
+local VeilMT = {}
+local Veil = setmetatable({}, VeilMT)
+
+function VeilMT:__call(props) {
+  return awful.popup({
+    widget = {
+      props.widget,
+      container = wibox.container.place,
+    },
+    visible = props.visible,
+    placement = awful.placement.maximized,
+    bg = palette.dimmed,
+  })
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Veil

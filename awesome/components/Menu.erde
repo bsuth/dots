@@ -1,0 +1,272 @@
+local awful = require('awful')
+local gears = require('gears')
+local wibox = require('wibox')
+local Object = require('core.Object')
+local { palette } = require('core.theme')
+
+local MENU_WIDTH = 400
+local MENU_PAGE_SIZE = 5
+
+-- -----------------------------------------------------------------------------
+-- MenuPrompt
+--
+-- props = {
+--   onBack = () -> void,
+--   onPrev = () -> void,
+--   onNext = () -> void,
+--   onChange = (newFilter = string) -> void,
+--   onSubmit = () -> void,
+-- }
+-- -----------------------------------------------------------------------------
+
+local MenuPrompt = {}
+
+function MenuPrompt:_init(props) {
+  self.prompt = awful.widget.prompt({
+    prompt = '',
+    fg = palette.white,
+    changed_callback = props.onChange,
+    exe_callback = props.onSubmit,
+    hooks = {
+      { {}, '-', props.onBack },
+      { {}, 'Up', props.onPrev },
+      { {}, 'Down', props.onNext },
+      { { 'Control' }, 'p', props.onPrev },
+      { { 'Control' }, 'n', props.onNext },
+      { { 'Shift' }, 'Tab', props.onPrev },
+      { {}, 'Tab', props.onNext },
+    },
+  })
+
+  self.rootWidget = wibox.widget({
+    {
+      {
+        {
+          markup = '➜ ',
+          widget = wibox.widget.textbox,
+        },
+        self.prompt,
+        layout = wibox.layout.fixed.horizontal,
+      },
+      margins = 16,
+      widget = wibox.container.margin,
+    },
+    fg = palette.white,
+    bg = palette.darkGray,
+    forced_width = MENU_WIDTH,
+    widget = wibox.container.background,
+  })
+}
+
+-- -----------------------------------------------------------------------------
+-- MenuItem
+--
+-- props? = {
+--   markup = string,
+--   active? = boolean,
+-- }
+-- -----------------------------------------------------------------------------
+
+local MenuItem = {}
+
+function MenuItem:_init(props = {}) {
+  self.textWidget = wibox.widget({
+    markup = props.markup,
+    widget = wibox.widget.textbox,
+  })
+
+  self.rootWidget = wibox.widget({
+    {
+      self.textWidget,
+      margins = 16,
+      widget = wibox.container.margin,
+    },
+    fg = palette.white,
+    bg = props.active && palette.lightGray || palette.darkGray,
+    forced_width = MENU_WIDTH,
+    widget = wibox.container.background,
+  })
+}
+
+function MenuItem:_get_markup() {
+  return self.textWidget.markup
+}
+
+function MenuItem:_set_markup(newMarkup) {
+  self.textWidget.markup = newMarkup
+}
+
+function MenuItem:_get_active() {
+  return !!gears.color.to_rgba_string(self.rootWidget.bg):find(palette.lightGray)
+}
+
+function MenuItem:_set_active(newActive) {
+  self.rootWidget.bg = newActive && palette.lightGray || palette.darkGray
+}
+
+-- -----------------------------------------------------------------------------
+-- Menu
+--
+-- props = {
+--   allowArbitraryInput? = boolean,
+--   options<1> = (string | { label = string, options = <1> })[]
+--   onSubmit = (option: string) -> void,
+-- }
+-- -----------------------------------------------------------------------------
+
+local Menu = {}
+
+function Menu:_init(props) {
+  self.allowArbitraryInput = props.allowArbitraryInput
+  self.options = props.options
+  self.onSubmit = props.onSubmit
+
+  self.items = {}
+  self.itemsWidget = wibox.widget({ layout = wibox.layout.fixed.vertical })
+  for i = 1, MENU_PAGE_SIZE {
+    local dmenuItem = Object(MenuItem, { markup = '' })
+    table.insert(self.items, dmenuItem)
+    self.itemsWidget:add(dmenuItem.rootWidget)
+  }
+
+  self.prompt = Object(MenuPrompt, {
+    onChange = newInput -> {
+      -- TODO: trim
+      self.input = newInput
+    },
+    onPrev = () -> self:previous(),
+    onNext = () -> self:next(),
+    onSubmit = () -> self:submit(),
+  })
+
+  self.rootWidget = wibox.widget({
+    self.itemsWidget,
+    shape_border_width = 1,
+    shape_border_color = palette.cyan,
+    bg = palette.darkGray,
+    widget = wibox.container.background,
+  })
+
+  self:reset()
+}
+
+function Menu:_on_change_path() {
+  self.pathOptions = {}
+  for _, value in ipairs(self.path) {
+    self.pathOptions = self.pathOptions[value]
+  }
+
+  self.input = ''
+}
+
+function Menu:_on_change_input() {
+  self.filteredOptions = {}
+  for _, option in ipairs(self.filteredOptions) {
+    local optionLabel = type(option) == 'table' && option.label || option
+    if (optionLabel:find(self.input)) {
+      table.insert(self.filteredOptions, option)
+    }
+  }
+
+  self.activeItemIndex = self.allowArbitraryInput && 0 || 1
+  self.itemIndexOffset = 0
+}
+
+function Menu:_on_change_itemIndexOffset() {
+  self:refresh()
+}
+
+function Menu:_on_change_activeItemIndex(_, oldActiveItemIndex) {
+  self.items[oldActiveItemIndex].active = false
+  if self.activeItemIndex > 0 {
+    self.items[self.activeItemIndex].active = true
+  }
+}
+
+function Menu:reset() {
+  self.path = {}
+}
+
+function Menu:refresh() {
+  local newItemsWidgetChildren = {}
+
+  for i = 1, math.min(#self.filteredOptions - self.itemIndexOffset, MENU_PAGE_SIZE) {
+    local option = self.filteredOptions[self.itemIndexOffset + i]
+    local optionLabel = type(option) == 'table' && option.label || option
+    local newItemMarkup = option
+
+    if self.input != '' {
+      local matchStart, matchEnd = optionLabel:find(self.input)
+      newItemMarkup = table.concat({
+        optionLabel:sub(1, matchStart - 1),
+        ('<span color="%s">%s</span>'):format(palette.cyan, self.input),
+        optionLabel:sub(matchEnd + 1),
+      })
+    }
+
+    self.items[i].textWidget.markup = newItemMarkup
+    table.insert(newItemsWidgetChildren, self.items[i].rootWidget)
+  }
+
+  self.itemsWidget.children = newItemsWidgetChildren
+}
+
+function Menu:back() {
+  -- TODO: use shallow copy
+  local newPaths = {}
+
+  for _, value in ipairs(self.paths) {
+    table.insert(newPaths, self.paths)
+  }
+
+  table.remove(newPaths)
+  self.paths = newPaths
+}
+
+function Menu:previous() {
+  if self.activeItemIndex > 1 {
+    self.activeItemIndex -= 1
+  } else {
+    self.itemIndexOffset = math.max(
+      self.itemIndexOffset - 1,
+      self.allowArbitraryInput && 0 || 1,
+    )
+  }
+}
+
+function Menu:next() {
+  if self.activeItemIndex < MENU_PAGE_SIZE {
+    self.activeItemIndex += 1
+  } else {
+    self.itemIndexOffset = math.min(
+      self.itemIndexOffset + 1,
+      #self.filteredOptions - MENU_PAGE_SIZE,
+    )
+  }
+}
+
+function Menu:submit() {
+  local activeOption = self.filteredOptions[self.itemIndexOffset + self.activeItemIndex]
+
+  if self.activeItemIndex == 0 {
+    self.onSubmit(self.input)
+  } elseif type(activeOption) == 'string' {
+    self.onSubmit(activeOption)
+  } elseif type(activeOption) == 'table' {
+    -- TODO: use shallow copy
+    local newPaths = {}
+
+    for _, value in ipairs(self.paths) {
+      table.insert(newPaths, self.paths)
+    }
+
+    table.insert(newPaths, activeOption.label)
+    self.paths = newPaths
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return config -> Object(Menu, config)
