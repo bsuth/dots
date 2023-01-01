@@ -37,5 +37,6 @@ module function show(widget) {
 module function hide() {
   for _, popup in ipairs(popups) {
     popup.visible = false
+    popup.widget.children = {}
   }
 }
