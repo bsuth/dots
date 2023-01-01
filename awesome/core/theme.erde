@@ -63,11 +63,11 @@ naughty.config.defaults.position = 'top_right'
 -- Wallpaper
 -- -----------------------------------------------------------------------------
 
-function setWallpaper(screen) {
-  local wallpaper = screen.geometry.width > screen.geometry.height
+function setWallpaper(s) {
+  local wallpaper = s.geometry.width > s.geometry.height
     && getFullAssetPath('horizontal-wallpaper.svg')
     || getFullAssetPath('vertical-wallpaper.svg')
-  gears.wallpaper.maximized(wallpaper, screen)
+  gears.wallpaper.maximized(wallpaper, s)
 }
 
 awful.screen.connect_for_each_screen(setWallpaper)

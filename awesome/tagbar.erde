@@ -224,3 +224,11 @@ gears.table.merge(globalKeys, {
 })
 
 awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Object(Tagbar, s)))
+awful.screen.disconnect_for_each_screen(s -> {
+  for i, tagbar in ipairs(tagbars) {
+    if tagbar.screen == s {
+      table.remove(tagbars, i)
+      break
+    }
+  }
+})
