@@ -68,10 +68,7 @@ function MenuItem:_set_active(newActive) {
 local Menu = {}
 
 function Menu:_init(props) {
-  self.options = props.options
-  self.onSubmit = props.onSubmit
-  self.onClose = props.onClose
-  self.allowArbitraryInput = props.allowArbitraryInput
+  self.props = props
 
   self.items = {}
   self.itemsWidget = wibox.widget({ layout = wibox.layout.fixed.vertical })
@@ -82,22 +79,18 @@ function Menu:_init(props) {
   }
 
   self.promptContainer = wibox.widget({
-    margins = 0,
-    widget = wibox.container.margin,
+    {
+      markup = '➜ ',
+      widget = wibox.widget.textbox,
+    },
+    layout = wibox.layout.fixed.horizontal,
   })
 
   self.rootWidget = wibox.widget({
     {
       {
         {
-          {
-            {
-              markup = '➜ ',
-              widget = wibox.widget.textbox,
-            },
-            self.promptContainer,
-            layout = wibox.layout.fixed.horizontal,
-          },
+          self.promptContainer,
           margins = 16,
           widget = wibox.container.margin,
         },
@@ -122,7 +115,8 @@ function Menu:_init(props) {
     layout = wibox.layout.fixed.vertical,
   })
 
-  self:reset()
+  self.path = {}
+  self.options = props.options
 }
 
 function Menu:_on_change_itemIndexOffset() {
@@ -131,7 +125,11 @@ function Menu:_on_change_itemIndexOffset() {
 
 function Menu:_on_change_input() {
   self:filter()
-  self:refresh()
+}
+
+function Menu:_on_change_options() {
+  self:rawset('input', '', true)
+  self:filter() -- force filter + refresh, in case input isnt actually changing
 }
 
 function Menu:_on_change_activeItemIndex(_, oldActiveItemIndex) {
@@ -144,69 +142,24 @@ function Menu:_on_change_activeItemIndex(_, oldActiveItemIndex) {
   }
 }
 
-function Menu:_on_change_path() {
-  self.pathOptions = self.options
-
-  for _, pathPart in ipairs(self.path) {
-    local nestedOptions
-
-    for _, option in ipairs(self.pathOptions) {
-      local optionLabel = type(option) == 'table' && option.label || option
-      if pathPart == optionLabel {
-        nestedOptions = option.options
-        break
-      }
-    }
-
-    if !nestedOptions { return self:stop() }
-    self.pathOptions = nestedOptions
-  }
-
-  self:rawset('input', '', true) -- prevent double refresh
-  self:filter()
-  self:refresh()
-}
-
-function Menu:prompt() {
-  local prompt = awful.widget.prompt({
-    prompt = '',
-    fg = palette.white,
-    changed_callback = newInput -> { self.input = trim(newInput) },
-    hooks = {
-      { {}, '-', () -> self:back() },
-      { {}, 'Up', () -> self:prev() },
-      { {}, 'Down', () -> self:next() },
-      { { 'Control' }, 'p', () -> self:prev() },
-      { { 'Control' }, 'n', () -> self:next() },
-      { { 'Shift' }, 'Tab', () -> self:prev() },
-      { {}, 'Tab', () -> self:next() },
-      { {}, 'Return', () -> self:submit() },
-      { { 'Control' }, 'c', () -> self:stop() },
-      { {}, 'Escape', () -> self:stop() },
-    },
-  })
-
-  self.promptContainer.children = { prompt }
-  prompt:run()
-}
-
 function Menu:filter() {
-  local timmedInput = trim(self.input)
+  local trimmedInput = trim(self.input)
 
-  if timmedInput == '' {
-    self.filteredOptions = self.pathOptions
+  if trimmedInput == '' {
+    self.filteredOptions = self.options
   } else {
     self.filteredOptions = {}
-    for _, option in ipairs(self.pathOptions) {
+    for _, option in ipairs(self.options) {
       local optionLabel = type(option) == 'table' && option.label || option
-      if (optionLabel:find(timmedInput)) {
+      if (optionLabel:find(trimmedInput)) {
         table.insert(self.filteredOptions, option)
       }
     }
   }
 
-  self.activeItemIndex = self.allowArbitraryInput && 0 || 1
-  self:rawset('itemIndexOffset', 0, true) -- prevent double refresh
+  self.activeItemIndex = self.props.allowArbitraryInput && 0 || 1
+  self:rawset('itemIndexOffset', 0, true)
+  self:refresh() -- force refresh, in case input isnt actually changing
 }
 
 function Menu:refresh() {
@@ -233,11 +186,39 @@ function Menu:refresh() {
   self.itemsWidget.children = newItemsWidgetChildren
 }
 
+function Menu:prompt() {
+  -- Use `return true, false` to prevent prompt from exiting
+  -- https://awesomewm.org/doc/api/libraries/awful.prompt.html#hook
+  local onBack = () -> { self:back(); return true, false }
+  local onPrev = () -> { self:prev(); return true, false }
+  local onNext = () -> { self:next(); return true, false }
+
+  local prompt = awful.widget.prompt({
+    prompt = '',
+    fg = palette.white,
+    changed_callback = newInput -> { self.input = trim(newInput) },
+    hooks = {
+      { {}, '-', onBack },
+      { {}, 'Up', onPrev },
+      { {}, 'Down', onNext },
+      { { 'Control' }, 'p', onPrev },
+      { { 'Control' }, 'n', onNext },
+      { { 'Shift' }, 'Tab', onPrev },
+      { {}, 'Tab', onNext },
+      { {}, 'Return', () -> self:submit() },
+      { { 'Control' }, 'c', () -> self:stop() },
+      { {}, 'Escape', () -> self:stop() },
+    },
+  })
+
+  self.promptContainer.children = { self.promptContainer.children[1], prompt }
+  prompt:run()
+}
+
 function Menu:back() {
-  local newPath = shallowCopy(self.path)
-  table.remove(newPath)
-  self.path = newPath
-  return true, false -- prevent prompt exec
+  if #self.path > 0 {
+    self.options = table.remove(self.path)
+  }
 }
 
 function Menu:prev() {
@@ -246,16 +227,13 @@ function Menu:prev() {
   } else {
     self.itemIndexOffset = math.max(
       self.itemIndexOffset - 1,
-      self.allowArbitraryInput && -1 || 0,
+      self.props.allowArbitraryInput && -1 || 0,
     )
   }
-
-  return true, false -- prevent prompt exec
 }
 
 function Menu:next() {
   local limit = math.min(MENU_PAGE_SIZE, #self.filteredOptions)
-
   if self.activeItemIndex < limit {
     self.activeItemIndex += 1
   } else {
@@ -264,23 +242,19 @@ function Menu:next() {
       #self.filteredOptions - limit,
     )
   }
-
-  return true, false -- prevent prompt exec
-}
-
-function Menu:reset() {
-  self.path = {}
 }
 
 function Menu:run() {
-  self:reset()
+  self.activeItemIndex = self.props.allowArbitraryInput && 0 || 1
+  self.itemIndexOffset = 0
   self:prompt()
 }
 
 function Menu:stop(option) {
   awful.keygrabber.stop()
-  if option { self.onSubmit(option, self.path) }
-  if self.onClose { self.onClose() }
+  if option { self.props.onSubmit(option, self.path) }
+  if self.props.onClose { self.props.onClose() }
+  self.input = ''
 }
 
 function Menu:submit() {
@@ -288,9 +262,8 @@ function Menu:submit() {
   if self.activeItemIndex == 0 {
     self:stop(self.input)
   } elseif type(activeOption) == 'table' && activeOption.options {
-    local newPath = shallowCopy(self.path)
-    table.insert(newPath, activeOption.label)
-    self.path = newPath
+    table.insert(self.path, self.options)
+    self.options = activeOption.options
     awful.keygrabber.stop()
     self:prompt()
   } else {
