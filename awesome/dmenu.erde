@@ -1,6 +1,10 @@
 local awful = require('awful')
+local { globalKeys } = require('core.bindings')
+local Object = require('core.Object')
+local Menu = require('components.Menu')
+local veil = require('veil')
 
-return {
+local HOME_DMENU_OPTIONS = {
   {
     label = 'system',
     options = {
@@ -27,3 +31,20 @@ return {
     },
   },
 }
+
+local menu = Object(Menu, {
+  options = HOME_DMENU_OPTIONS, -- TODO: work options
+  onClose = veil.hide,
+  onSubmit = { action } -> {
+    if type(action) == 'string' {
+      awful.spawn(action)
+    } elseif type(action) == 'function' {
+      action()
+    }
+  },
+})
+
+table.insert(globalKeys, awful.key({ 'Mod4' }, 'space', () -> {
+  veil.show(menu.rootWidget)
+  menu:run()
+}))
