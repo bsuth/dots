@@ -5,7 +5,7 @@ local Object = require('core.Object')
 local { palette } = require('core.theme')
 local { shallowCopy, trim } = require('core.utils')
 
-local MENU_WIDTH = 400
+local MENU_WIDTH = 384
 local MENU_PAGE_SIZE = 5
 
 -- -----------------------------------------------------------------------------
@@ -25,9 +25,20 @@ function MenuItem:_init(props = {}) {
     widget = wibox.widget.textbox,
   })
 
+  self.suffixWidget = wibox.widget({
+    text = '',
+    widget = wibox.widget.textbox,
+  })
+
   self.rootWidget = wibox.widget({
     {
-      self.textWidget,
+      {
+        self.textWidget,
+        { widget = wibox.container.background },
+        self.suffixWidget,
+        spacing = 8,
+        layout = wibox.layout.align.horizontal,
+      },
       margins = 16,
       widget = wibox.container.margin,
     },
@@ -80,7 +91,8 @@ function Menu:_init(props) {
 
   self.promptContainer = wibox.widget({
     {
-      markup = '➜ ',
+      -- dummy textbox to prevent container from collapsing
+      markup = '',
       widget = wibox.widget.textbox,
     },
     layout = wibox.layout.fixed.horizontal,
@@ -180,6 +192,7 @@ function Menu:refresh() {
     }
 
     self.items[i].textWidget.markup = newItemMarkup
+    self.items[i].suffixWidget.text = (type(option) == 'table' && option.options) && '➜' || ''
     table.insert(newItemsWidgetChildren, self.items[i].rootWidget)
   }
 
@@ -224,23 +237,27 @@ function Menu:back() {
 function Menu:prev() {
   if self.activeItemIndex > 1 {
     self.activeItemIndex -= 1
+  } elseif self.itemIndexOffset > 0 {
+    self.itemIndexOffset -= 1
   } else {
-    self.itemIndexOffset = math.max(
-      self.itemIndexOffset - 1,
-      self.props.allowArbitraryInput && -1 || 0,
-    )
+    local numFilteredOptions = #self.filteredOptions
+    local limit = math.min(MENU_PAGE_SIZE, numFilteredOptions)
+    self.activeItemIndex = limit
+    self.itemIndexOffset = numFilteredOptions - limit
   }
 }
 
 function Menu:next() {
-  local limit = math.min(MENU_PAGE_SIZE, #self.filteredOptions)
+  local numFilteredOptions = #self.filteredOptions
+  local limit = math.min(MENU_PAGE_SIZE, numFilteredOptions)
+
   if self.activeItemIndex < limit {
     self.activeItemIndex += 1
+  } elseif self.itemIndexOffset < numFilteredOptions - limit {
+    self.itemIndexOffset += 1
   } else {
-    self.itemIndexOffset = math.min(
-      self.itemIndexOffset + 1,
-      #self.filteredOptions - limit,
-    )
+    self.activeItemIndex = self.props.allowArbitraryInput && 0 || 1
+    self.itemIndexOffset = 0
   }
 }
 
