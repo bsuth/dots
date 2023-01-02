@@ -20,6 +20,23 @@ require('tagbar')
 -- Init tags
 awful.screen.connect_for_each_screen(s -> awful.tag({ '1' }, s, layout))
 
+-- When a screen is disconnected, reassign tags
+awful.tag.attached_connect_signal(nil, 'request::screen', tag -> {
+  local backupScreen
+
+  for s in screen {
+    if s != tag.screen {
+      backupScreen = s;
+      break
+    }
+  }
+
+  if backupScreen {
+    tag.screen = backupScreen
+    tag:view_only()
+  }
+})
+
 -- Init keybindings
 --
 -- Do this at the end, since we cannot update bindings dynamically and need to
