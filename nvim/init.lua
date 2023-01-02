@@ -409,11 +409,6 @@ vim.keymap.set('n', '<leader>mm', pushMark)
 -- https://github.com/hoob3rt/lualine.nvim
 -- -----------------------------------------------------------------------------
 
--- Lualine dissapears on rc reload unless we unload it completely before
--- calling setup. Fixed but awaiting merge. Track here:
--- https://github.com/hoob3rt/lualine.nvim/issues/276
-require('plenary.reload').reload_module('lualine', true)
-
 require('lualine').setup({
   options = {
     icons_enabled = false,
