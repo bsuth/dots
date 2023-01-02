@@ -5,8 +5,34 @@ local Object = require('core.Object')
 local { palette } = require('core.theme')
 local { shallowCopy, trim } = require('core.utils')
 
-local MENU_WIDTH = 384
+local MENU_ITEM_WIDTH = 384
+local MENU_ITEM_HEIGHT = 60
 local MENU_PAGE_SIZE = 5
+local SCROLLBAR_WIDTH = 4
+
+-- -----------------------------------------------------------------------------
+-- MenuItemWidget
+-- -----------------------------------------------------------------------------
+
+function createMenuItemWidget(contentWidget) {
+  return wibox.widget({
+    {
+      {
+        contentWidget,
+        left = 16,
+        right = 16,
+        widget = wibox.container.margin,
+      },
+      content_fill_horizontal = true,
+      widget = wibox.container.place,
+    },
+    fg = palette.white,
+    bg = palette.darkGray,
+    forced_width = MENU_ITEM_WIDTH,
+    forced_height = MENU_ITEM_HEIGHT,
+    widget = wibox.container.background,
+  })
+}
 
 -- -----------------------------------------------------------------------------
 -- MenuItem
@@ -30,23 +56,17 @@ function MenuItem:_init(props = {}) {
     widget = wibox.widget.textbox,
   })
 
-  self.rootWidget = wibox.widget({
-    {
-      {
-        self.textWidget,
-        { widget = wibox.container.background },
-        self.suffixWidget,
-        spacing = 8,
-        layout = wibox.layout.align.horizontal,
-      },
-      margins = 16,
-      widget = wibox.container.margin,
-    },
-    fg = palette.white,
-    bg = props.active && palette.lightGray || palette.darkGray,
-    forced_width = MENU_WIDTH,
-    widget = wibox.container.background,
+  self.rootWidget = createMenuItemWidget({
+    self.textWidget,
+    { widget = wibox.container.background },
+    self.suffixWidget,
+    spacing = 8,
+    layout = wibox.layout.align.horizontal,
   })
+
+  if props.active {
+    self.rootWidget.bg = palette.lightGray
+  }
 }
 
 function MenuItem:_get_markup() {
@@ -98,33 +118,43 @@ function Menu:_init(props) {
     layout = wibox.layout.fixed.horizontal,
   })
 
+  self.scrollThumbWidget = wibox.widget({
+    forced_width = SCROLLBAR_WIDTH,
+    bg = palette.cyan,
+    widget = wibox.container.background,
+  })
+
+  self.scrollbarWidget = wibox.widget({ layout = wibox.layout.manual })
+  self.scrollbarWidget:add_at(self.scrollThumbWidget, { x = 0, y = 0 })
+
   self.rootWidget = wibox.widget({
     {
       {
-        {
-          self.promptContainer,
-          margins = 16,
-          widget = wibox.container.margin,
-        },
-        fg = palette.white,
+        createMenuItemWidget(self.promptContainer),
+        shape_border_width = 1,
+        shape_border_color = palette.cyan,
         bg = palette.darkGray,
-        forced_width = MENU_WIDTH,
         widget = wibox.container.background,
       },
-      shape_border_width = 1,
-      shape_border_color = palette.cyan,
-      bg = palette.darkGray,
-      widget = wibox.container.background,
+      {
+        self.itemsWidget,
+        shape_border_width = 1,
+        shape_border_color = palette.cyan,
+        bg = palette.darkGray,
+        widget = wibox.container.background,
+      },
+      spacing = 8,
+      layout = wibox.layout.fixed.vertical,
     },
     {
-      self.itemsWidget,
-      shape_border_width = 1,
-      shape_border_color = palette.cyan,
-      bg = palette.darkGray,
-      widget = wibox.container.background,
+      self.scrollbarWidget,
+      top = MENU_ITEM_HEIGHT + 8,
+      forced_width = SCROLLBAR_WIDTH,
+      forced_height = MENU_ITEM_HEIGHT * MENU_PAGE_SIZE,
+      widget = wibox.container.margin,
     },
-    spacing = 16,
-    layout = wibox.layout.fixed.vertical,
+    spacing = 4,
+    layout = wibox.layout.fixed.horizontal,
   })
 
   self.path = {}
@@ -176,8 +206,19 @@ function Menu:filter() {
 
 function Menu:refresh() {
   local newItemsWidgetChildren = {}
+  local numFilteredOptions = #self.filteredOptions
 
-  for i = 1, math.min(#self.filteredOptions - self.itemIndexOffset, MENU_PAGE_SIZE) {
+  if numFilteredOptions <= MENU_PAGE_SIZE {
+    self.scrollbarWidget.visible = false
+  } else {
+    local numScroll = numFilteredOptions - MENU_PAGE_SIZE + 1
+    local scrollIncrement = (MENU_ITEM_HEIGHT * MENU_PAGE_SIZE) / numScroll
+    self.scrollThumbWidget.forced_height = scrollIncrement
+    self.scrollbarWidget:move_widget(self.scrollThumbWidget, { x = 0, y = self.itemIndexOffset * scrollIncrement })
+    self.scrollbarWidget.visible = true
+  }
+
+  for i = 1, math.min(numFilteredOptions - self.itemIndexOffset, MENU_PAGE_SIZE) {
     local option = self.filteredOptions[self.itemIndexOffset + i]
     local optionLabel = type(option) == 'table' && option.label || option
     local newItemMarkup = optionLabel
@@ -262,9 +303,13 @@ function Menu:next() {
 }
 
 function Menu:run() {
-  self.activeItemIndex = self.props.allowArbitraryInput && 0 || 1
-  self.itemIndexOffset = 0
   self:prompt()
+  if self.options != self.props.options {
+    self.options = self.props.options
+  } else {
+    self.activeItemIndex = self.props.allowArbitraryInput && 0 || 1
+    self.itemIndexOffset = 0
+  }
 }
 
 function Menu:stop(option) {
