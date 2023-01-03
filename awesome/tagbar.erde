@@ -102,9 +102,6 @@ function Tab:toggle() {
 }
 
 function Tab:rename() {
-  -- TODO: default prompt to value to current tag name. not yet supported in
-  -- latest stable (awful.widget.prompt.text)
-
   tabRenameMenuProps.onSubmit = newTagName -> {
     if #newTagName > 0 {
       self.tag.name = newTagName
