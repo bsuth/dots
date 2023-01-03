@@ -106,9 +106,6 @@ module globalKeys = {
   awful.key({ 'Mod4', 'Shift' }, 'Return', () -> {
     awful.spawn('st')
   }),
-  awful.key({ 'Mod4' }, "'", () -> {
-    awful.spawn('firefox-developer-edition')
-  }),
 }
 
 -- -----------------------------------------------------------------------------

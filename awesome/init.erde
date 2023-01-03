@@ -19,7 +19,7 @@ require('tagbar')
 
 -- Init tags
 awful.screen.connect_for_each_screen(s -> {
-  local tag = awful.tag.add('1', { screen = s, layout = layuout })
+  local tag = awful.tag.add('1', { screen = s, layout = layout })
   tag:view_only() -- force 'tag::history::update' signal
 })
 
