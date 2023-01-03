@@ -114,6 +114,11 @@ _G.packer_plugins = {
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/formatter.nvim",
     url = "https://github.com/mhartington/formatter.nvim"
   },
+  ["hop.nvim"] = {
+    loaded = true,
+    path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/hop.nvim",
+    url = "https://github.com/phaazon/hop.nvim"
+  },
   ["lualine.nvim"] = {
     loaded = true,
     path = "/home/bsuth/.local/share/nvim/site/pack/packer/start/lualine.nvim",

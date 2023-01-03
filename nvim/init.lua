@@ -90,6 +90,7 @@ require('packer').startup(function()
   use('tpope/vim-fugitive')
   use('matze/vim-move')
   use('lambdalisue/suda.vim')
+  use({ 'phaazon/hop.nvim', branch = 'v2' })
 
   -- Local plugins can be included
   use('~/repos/vim-erde')
@@ -114,6 +115,13 @@ nvim_create_augroup('bsuth', {})
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
 vim.g.loaded_netrwPlugin = true
+
+-- dark, darker, cool, deep, warm, warmer
+require('onedark').setup({ style = 'warmer' })
+require('onedark').load()
+
+vim.g.suda_smart_edit = true
+vim.g.go_fmt_autosave = true
 
 --
 -- Options
@@ -148,23 +156,19 @@ vim.opt.updatetime = 300
 vim.opt.scrollback = 100000
 vim.opt.commentstring = '//%s'
 
---
--- General Mappings
---
+-- -----------------------------------------------------------------------------
+-- Mappings
+-- -----------------------------------------------------------------------------
 
--- Remove annoying default map of K to manual
-vim.keymap.set('n', 'K', function() end)
+--
+-- General
+--
 
 vim.keymap.set('n', '<leader>ev', ':Dirvish ~/dots/nvim<cr>')
 vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
 vim.keymap.set('n', '<c-w>', ':write<cr>')
 vim.keymap.set('n', '<c-q>', ':quit<cr>')
-
-vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
-
-vim.keymap.set('n', '<leader>?', ':help ')
-vim.keymap.set('n', '<leader>v?', ':vert :help ')
 
 vim.keymap.set('c', '<c-space>', '<c-f>')
 vim.keymap.set('n', ':', ':<c-f><c-c>')
@@ -175,7 +179,15 @@ vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 vim.keymap.set('n', '<c-f>', 'l%')
 vim.keymap.set('v', '<c-f>', 'l%')
 
+vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
+
+vim.keymap.set('n', '<leader>?', ':help ')
+vim.keymap.set('n', '<leader>v?', ':vert :help ')
+
 vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable<cr>')
+
+-- Remove annoying default map of K to manual
+vim.keymap.set('n', 'K', function() end)
 
 --
 -- Quick Links
@@ -216,15 +228,13 @@ vim.keymap.set('n', '<leader>gl', ':Git log<cr>')
 vim.keymap.set('n', '<leader>gb', ':Git blame<cr>')
 
 --
--- Plugins
+-- Hop
 --
 
-vim.g.suda_smart_edit = true
-vim.g.go_fmt_autosave = true
-
--- dark, darker, cool, deep, warm, warmer
-require('onedark').setup({ style = 'warmer' })
-require('onedark').load()
+require('hop').setup() -- init hop
+vim.keymap.set('', '<leader>hw', ':HopWord<cr>')
+vim.keymap.set('', '<leader>hl', ':HopLine<cr>')
+vim.keymap.set('', '<leader>hp', ':HopPattern<cr>')
 
 -- -----------------------------------------------------------------------------
 -- Terminal
