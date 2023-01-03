@@ -18,7 +18,10 @@ require('statusMenu')
 require('tagbar')
 
 -- Init tags
-awful.screen.connect_for_each_screen(s -> awful.tag({ '1' }, s, layout))
+awful.screen.connect_for_each_screen(s -> {
+  local tag = awful.tag.add('1', { screen = s, layout = layuout })
+  tag:view_only() -- force 'tag::history::update' signal
+})
 
 -- When a screen is disconnected, reassign tags
 awful.tag.attached_connect_signal(nil, 'request::screen', tag -> {
