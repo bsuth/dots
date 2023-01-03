@@ -4,9 +4,56 @@ local wibox = require('wibox')
 local { globalKeys } = require('core.bindings')
 local Object = require('core.Object')
 local { palette } = require('core.theme')
+local Menu = require('components.Menu')
+local veil = require('veil')
 
 local TAGBAR_HEIGHT = 48
 local TAGBAR_FONT = 'Quicksand Regular 14'
+
+-- -----------------------------------------------------------------------------
+-- TabRename
+-- -----------------------------------------------------------------------------
+
+local TAGBAR_NAME_HISTORY_FILENAME = "{os.getenv('HOME')}/.tagbar_name_history"
+local TAGBAR_NAME_HISTORY_SIZE = 20
+local recentlyUsedTabNames = {}
+
+do {
+  local tagbarNameHistoryFile = io.open(TAGBAR_NAME_HISTORY_FILENAME, 'r+')
+  if tagbarNameHistoryFile {
+    for recentlyUsedTabName in tagbarNameHistoryFile:lines() {
+      table.insert(recentlyUsedTabNames, recentlyUsedTabName)
+    }
+    tagbarNameHistoryFile:close()
+  }
+}
+
+function saveRecentlyUsedTabName(tabName) {
+  for i, recentlyUsedTabName in ipairs(recentlyUsedTabNames) {
+    if recentlyUsedTabName == tabName {
+      table.remove(recentlyUsedTabNames, i)
+      break
+    }
+  }
+
+  table.insert(recentlyUsedTabNames, 1, tabName)
+  for i = #recentlyUsedTabNames, TAGBAR_NAME_HISTORY_SIZE, -1 {
+    -- Constrain number of saved recently used tab names
+    table.remove(recentlyUsedTabNames, i)
+  }
+
+  local tagbarNameHistoryFile = io.open(TAGBAR_NAME_HISTORY_FILENAME, 'w')
+  tagbarNameHistoryFile:write(table.concat(recentlyUsedTabNames, '\n'))
+  tagbarNameHistoryFile:close()
+}
+
+local tabRenameMenuProps = {
+  options = recentlyUsedTabNames,
+  onClose = veil.hide,
+  allowArbitraryInput = true,
+}
+
+local tabRenameMenu = Object(Menu, tabRenameMenuProps)
 
 -- -----------------------------------------------------------------------------
 -- Tab
@@ -55,22 +102,19 @@ function Tab:toggle() {
 }
 
 function Tab:rename() {
-  local prompt = awful.widget.prompt({
-    prompt = '',
-    font = TAGBAR_FONT,
-    fg = palette.white,
-    done_callback = () -> {
-      self.contentWidget.children = { self.nameWidget }
-    },
-    exe_callback = newTagName -> {
-      if #newTagName > 0 {
-        self.tag.name = newTagName
-      }
-    },
-  })
+  -- TODO: default prompt to value to current tag name. not yet supported in
+  -- latest stable (awful.widget.prompt.text)
 
-  prompt:run()
-  self.contentWidget.children = { prompt }
+  tabRenameMenuProps.onSubmit = newTagName -> {
+    if #newTagName > 0 {
+      self.tag.name = newTagName
+      saveRecentlyUsedTabName(newTagName)
+      tabRenameMenu:refresh()
+    }
+  }
+
+  tabRenameMenu:run()
+  veil.show(tabRenameMenu.rootWidget)
 }
 
 -- -----------------------------------------------------------------------------

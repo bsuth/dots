@@ -93,6 +93,7 @@ function MenuItem:_set_active(newActive) {
 --   onSubmit = (option: string) -> void,
 --   onClose? = () -> void,
 --   allowArbitraryInput? = boolean,
+--   defaultPromptText? = string,
 -- }
 -- -----------------------------------------------------------------------------
 
@@ -276,7 +277,7 @@ function Menu:back() {
 }
 
 function Menu:prev() {
-  if self.activeItemIndex > 1 {
+  if self.activeItemIndex > (self.props.allowArbitraryInput && 0 || 1) {
     self.activeItemIndex -= 1
   } elseif self.itemIndexOffset > 0 {
     self.itemIndexOffset -= 1
