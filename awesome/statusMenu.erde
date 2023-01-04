@@ -5,6 +5,7 @@ local wibox = require('wibox')
 local { globalKeys } = require('core.bindings')
 local { palette } = require('core.theme')
 local { getFullAssetPath, hex2rgb } = require('core.utils')
+local veil = require('veil')
 
 -- -----------------------------------------------------------------------------
 -- State / Config
@@ -16,75 +17,8 @@ local DIAL_BORDER_WIDTH = 6
 local selectedItemIndex = 1
 
 -- -----------------------------------------------------------------------------
--- Components
+-- StatusItemWidget
 -- -----------------------------------------------------------------------------
-
-function DialWidget(opts) {
-  local dialWidget = wibox.widget({
-    {
-      {
-        opts.widget,
-        widget = wibox.container.place,
-      },
-      margins = 16,
-      widget = wibox.container.margin,
-    },
-    bgimage = (_, cr, width, height) -> {
-      local m = math.min(width, height)
-
-      local bg = hex2rgb(palette.lightGray)
-      cr:set_source_rgb(bg[1], bg[2], bg[3])
-      gears.shape.arc(cr, m, m, DIAL_BORDER_WIDTH, 0, 2 * math.pi)
-      cr:fill()
-
-      if opts.model.percent && opts.model.percent > 0 {
-        local fg = hex2rgb(opts.color)
-        cr:set_source_rgb(fg[1], fg[2], fg[3])
-
-        -- 98 is close enough so round (plus, battery percent never reaches
-        -- 100% on some computers)
-        if opts.model.percent < 98 {
-          -- If (thetaEnd - thetaStart) is too small, then cairo will shift
-          -- theta_end slightly in an attempt to draw something over nothing.
-          -- This causes a sort of "jump" when the percent gets to low, so to
-          -- avoid this, we always draw a small circle centered at theta_end
-          -- to mimic the rounded end, and just draw a rounded start for the
-          -- actual arc.
-          cr:arc(
-            m / 2,
-            DIAL_BORDER_WIDTH / 2,
-            DIAL_BORDER_WIDTH / 2,
-            0,
-            2 * math.pi
-          )
-
-          local thetaEnd = 3 * math.pi / 2
-          local thetaStart = thetaEnd
-            - (opts.model.percent / 100) * (2 * math.pi)
-
-          gears.shape.arc(
-            cr,
-            m,
-            m,
-            DIAL_BORDER_WIDTH,
-            thetaStart,
-            thetaEnd,
-            true,
-            false
-          )
-        } else {
-          gears.shape.arc(cr, m, m, DIAL_BORDER_WIDTH, 0, 2 * math.pi)
-        }
-      }
-
-      cr:fill()
-    },
-    widget = wibox.container.background,
-  })
-
-  opts.model:connect_signal('update', () -> dialWidget:emit_signal('widget::redraw_needed'))
-  return dialWidget
-}
 
 function StatusItemWidget(opts) {
   local textWidget = wibox.widget({
@@ -248,7 +182,7 @@ models.notifications:connect_signal('update', () -> {
 })
 
 -- -----------------------------------------------------------------------------
--- Popup
+-- StatusMenuWidget
 -- -----------------------------------------------------------------------------
 
 local statusRowWidget = wibox.widget({
@@ -259,63 +193,56 @@ local statusRowWidget = wibox.widget({
   layout = wibox.layout.flex.horizontal,
 })
 
-local popup = awful.popup({
-  widget = {
+local statusMenuWidget = wibox.widget({
+  {
     {
       {
         {
           {
             {
-              {
-                format = ('<span color="%s">%s</span>'):format(
-                  palette.magenta,
-                  '%H:%M'
-                ),
-                font = 'Quicksand Regular 50',
-                forced_height = 50, -- match line height to font size
-                widget = wibox.widget.textclock,
-              },
-              {
-                format = ('<span color="%s">%s</span>'):format(
-                  palette.blue,
-                  '%a %b %d'
-                ),
-                font = 'Quicksand Regular 20',
-                forced_height = 20, -- match line height to font size
-                widget = wibox.widget.textclock,
-              },
-              spacing = 16,
-              -- Force width to prevent resizing on time change
-              forced_width = 200,
-              layout = wibox.layout.fixed.vertical,
+              format = ('<span color="%s">%s</span>'):format(
+                palette.magenta,
+                '%H:%M'
+              ),
+              font = 'Quicksand Regular 50',
+              forced_height = 50, -- match line height to font size
+              widget = wibox.widget.textclock,
             },
             {
-              notificationWidget,
-              widget = wibox.container.place,
+              format = ('<span color="%s">%s</span>'):format(
+                palette.blue,
+                '%a %b %d'
+              ),
+              font = 'Quicksand Regular 20',
+              forced_height = 20, -- match line height to font size
+              widget = wibox.widget.textclock,
             },
-            spacing = 32,
-            layout = wibox.layout.fixed.horizontal,
+            spacing = 16,
+            -- Force width to prevent resizing on time change
+            forced_width = 200,
+            layout = wibox.layout.fixed.vertical,
           },
-          statusRowWidget,
+          {
+            notificationWidget,
+            widget = wibox.container.place,
+          },
           spacing = 32,
-          layout = wibox.layout.fixed.vertical,
+          layout = wibox.layout.fixed.horizontal,
         },
-        margins = 32,
-        widget = wibox.container.margin,
+        statusRowWidget,
+        spacing = 32,
+        layout = wibox.layout.fixed.vertical,
       },
-      shape_border_width = 1,
-      shape_border_color = palette.cyan,
-      bg = palette.darkGray,
-      widget = wibox.container.background,
+      margins = 32,
+      widget = wibox.container.margin,
     },
-    margins = 16,
-    widget = wibox.container.margin,
+    shape_border_width = 1,
+    shape_border_color = palette.cyan,
+    bg = palette.darkGray,
+    widget = wibox.container.background,
   },
-  placement = awful.placement.bottom_right,
-  bg = palette.transparent,
-  visible = false,
-  ontop = true,
-  type = 'dock',
+  margins = 16,
+  widget = wibox.container.margin,
 })
 
 -- -----------------------------------------------------------------------------
@@ -334,6 +261,13 @@ function focusStatus(dir) {
 }
 
 local keygrabber = awful.keygrabber({
+  stop_callback = veil.hide,
+  keypressed_callback = (mod, key) => {
+    local selectedWidget = statusRowWidget.children[selectedItemIndex]
+    if type(selectedWidget.keypressed_callback) == 'function' {
+      selectedWidget.keypressed_callback(mod, key)
+    }
+  },
   keybindings = {
     { {}, 'h', () -> focusStatus(-1) },
     { {}, 'l', () -> focusStatus(1) },
@@ -345,29 +279,14 @@ local keygrabber = awful.keygrabber({
     { {}, 'XF86MonBrightnessUp', () -> models.brightness:set(models.brightness.percent + 8) },
     { { 'Mod4' }, ';', () => self:stop() },
   },
-  keypressed_callback = (mod, key) => {
-    local selectedWidget = statusRowWidget.children[selectedItemIndex]
-    if type(selectedWidget.keypressed_callback) == 'function' {
-      selectedWidget.keypressed_callback(mod, key)
-    }
-  },
-  stop_callback = () -> {
-    popup.visible = false
-  },
 })
 
 -- -----------------------------------------------------------------------------
 -- Return
 -- -----------------------------------------------------------------------------
 
-focusStatus(0)
-
 table.insert(globalKeys, awful.key({ 'Mod4' }, ';', () -> {
-  if popup.visible == true {
-    popup.visible = false
-  } else {
-    popup.screen = awful.screen.focused()
-    popup.visible = true
-    keygrabber:start()
-  }
+  focusStatus(0)
+  keygrabber:start()
+  veil.show(statusMenuWidget)
 }))
