@@ -76,7 +76,7 @@ require('packer').startup(function()
   -- languages
   use('peterhoeg/vim-qml')
   use('fatih/vim-go')
-  use('habamax/vim-godot')
+  use('tridactyl/vim-tridactyl')
 
   -- apps
   use('justinmk/vim-dirvish')
