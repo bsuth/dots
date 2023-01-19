@@ -1,0 +1,24 @@
+From fc3effd9c23c92e7da4e2f6f4b217129dd48b6bc Mon Sep 17 00:00:00 2001
+From: "brian.sutherland" <brian.sutherland@mujin.co.jp>
+Date: Fri, 20 Jan 2023 08:20:33 +0900
+Subject: [PATCH] Reset failure on backspace
+
+---
+ slock/slock.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/slock/slock.c b/slock/slock.c
+index 0750768..cb1f59e 100644
+--- a/slock/slock.c
++++ b/slock/slock.c
+@@ -217,6 +217,7 @@ readpw(Display *dpy, struct xrandr *rr, struct lock **locks, int nscreens,
+ 				len = 0;
+ 				break;
+ 			case XK_BackSpace:
++				failure = 0; // reset error
+ 				if (len)
+ 					passwd[--len] = '\0';
+ 				break;
+-- 
+2.37.2
+
