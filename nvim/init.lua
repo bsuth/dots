@@ -345,8 +345,22 @@ local CWD_TRACK_BLACKLIST = {
   '^fugitive://',
 }
 
+local CWD_TRACK_BUFNAME_FILTER = {
+  '^suda://',
+}
+
+function getTrackBufName()
+  local bufName = nvim_buf_get_name(0)
+
+  for _, pattern in ipairs(CWD_TRACK_BUFNAME_FILTER) do
+    bufName = bufName:gsub(pattern, '')
+  end
+
+  return bufName
+end
+
 function getTrackDir(bufName)
-  return vim.fn.fnamemodify(bufName, ':p:h'):gsub('^sudo://', '')
+  return vim.fn.fnamemodify(bufName, ':p:h')
 end
 
 function isTrackBlacklisted(bufName)
@@ -359,21 +373,21 @@ end
 
 -- Do not make this local! zsh needs this for cd hook in nested terminal.
 function saveTermCwd()
-  local bufName = nvim_buf_get_name(0)
+  local bufName = getTrackBufName()
   if not isTrackBlacklisted(bufName) then
     cwdCache[bufName] = vim.fn.getcwd()
   end
 end
 
 local function clearTermCwd()
-  local bufName = nvim_buf_get_name(0)
+  local bufName = getTrackBufName()
   if not isTrackBlacklisted(bufName) and cwdCache[bufName] ~= nil then
     cwdCache[bufName] = nil
   end
 end
 
 local function trackCwd()
-  local bufName = nvim_buf_get_name(0)
+  local bufName = getTrackBufName()
   if bufName:match('^term://') then
     if cwdCache[bufName] ~= nil then
       vim.cmd('cd ' .. cwdCache[bufName])
