@@ -176,8 +176,11 @@ vim.keymap.set('n', ':', ':<c-f><c-c>')
 vim.keymap.set('n', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 
-vim.keymap.set('n', '<c-f>', 'l%')
-vim.keymap.set('v', '<c-f>', 'l%')
+-- TODO: improve these
+vim.keymap.set('n', '<char-62>', 'l%')
+vim.keymap.set('v', '<char-62>', 'l%')
+vim.keymap.set('n', '<char-60>', 'h%')
+vim.keymap.set('v', '<char-60>', 'h%')
 
 vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
 
@@ -232,9 +235,12 @@ vim.keymap.set('n', '<leader>gb', ':Git blame<cr>')
 --
 
 require('hop').setup() -- init hop
-vim.keymap.set('', '<leader>hw', ':HopWord<cr>')
-vim.keymap.set('', '<leader>hl', ':HopLine<cr>')
-vim.keymap.set('', '<leader>hp', ':HopPattern<cr>')
+vim.keymap.set('n', '<c-f>', ':HopWord<cr>')
+-- use <cmd> to prevent "No range allowed" errors in visual mode.
+-- see https://github.com/phaazon/hop.nvim/issues/126#issuecomment-910761167
+vim.keymap.set('v', '<c-f>', '<cmd>HopWord<cr>')
+vim.keymap.set('n', '<leader>hl', ':HopLine<cr>')
+vim.keymap.set('n', '<leader>hp', ':HopPattern<cr>')
 
 -- -----------------------------------------------------------------------------
 -- Terminal
