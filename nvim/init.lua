@@ -235,12 +235,12 @@ vim.keymap.set('n', '<leader>gb', ':Git blame<cr>')
 --
 
 require('hop').setup() -- init hop
-vim.keymap.set('n', '<c-f>', ':HopWord<cr>')
 -- use <cmd> to prevent "No range allowed" errors in visual mode.
 -- see https://github.com/phaazon/hop.nvim/issues/126#issuecomment-910761167
+vim.keymap.set('n', '<c-f>', ':HopWord<cr>')
 vim.keymap.set('v', '<c-f>', '<cmd>HopWord<cr>')
-vim.keymap.set('n', '<leader>hl', ':HopLine<cr>')
-vim.keymap.set('n', '<leader>hp', ':HopPattern<cr>')
+vim.keymap.set('n', '<c-l>', ':HopLine<cr>')
+vim.keymap.set('v', '<c-l>', '<cmd>HopLine<cr>')
 
 -- -----------------------------------------------------------------------------
 -- Terminal
