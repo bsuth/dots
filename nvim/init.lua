@@ -176,16 +176,7 @@ vim.keymap.set('n', ':', ':<c-f><c-c>')
 vim.keymap.set('n', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 
--- TODO: improve these
-vim.keymap.set('n', '<char-62>', 'l%')
-vim.keymap.set('v', '<char-62>', 'l%')
-vim.keymap.set('n', '<char-60>', 'h%')
-vim.keymap.set('v', '<char-60>', 'h%')
-
 vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
-
-vim.keymap.set('n', '<leader>?', ':help ')
-vim.keymap.set('n', '<leader>v?', ':vert :help ')
 
 vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable<cr>')
 
@@ -198,11 +189,6 @@ vim.keymap.set('n', 'K', function() end)
 
 vim.keymap.set('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
 vim.keymap.set('n', '<leader>pack', ':Dirvish ~/.local/share/nvim/site/pack/packer/start<cr>')
-vim.keymap.set(
-  'n',
-  '<leader>pack',
-  ':Dirvish ~/.local/share/nvim/site/pack/packer/start<cr>'
-)
 
 --
 -- Window Management
@@ -237,10 +223,10 @@ vim.keymap.set('n', '<leader>gb', ':Git blame<cr>')
 require('hop').setup() -- init hop
 -- use <cmd> to prevent "No range allowed" errors in visual mode.
 -- see https://github.com/phaazon/hop.nvim/issues/126#issuecomment-910761167
-vim.keymap.set('n', '<c-f>', ':HopWord<cr>')
-vim.keymap.set('v', '<c-f>', '<cmd>HopWord<cr>')
-vim.keymap.set('n', '<c-l>', ':HopLine<cr>')
-vim.keymap.set('v', '<c-l>', '<cmd>HopLine<cr>')
+vim.keymap.set('n', 'H', ':HopWord<cr>')
+vim.keymap.set('v', 'H', '<cmd>HopWord<cr>')
+vim.keymap.set('n', '<c-h>', ':HopLine<cr>')
+vim.keymap.set('v', '<c-h>', '<cmd>HopLine<cr>')
 
 -- -----------------------------------------------------------------------------
 -- Terminal
@@ -335,6 +321,71 @@ vim.keymap.set('v', '<c-n>', function()
 end)
 
 -- -----------------------------------------------------------------------------
+-- Surround Jumping
+-- -----------------------------------------------------------------------------
+
+local SURROUND_CHARS = {
+  ['('] = true,
+  [')'] = true,
+  ['{'] = true,
+  ['}'] = true,
+  ['['] = true,
+  [']'] = true,
+}
+
+local FORWARD_SURROUND_CHARS = {
+  ['('] = true,
+  ['{'] = true,
+  ['['] = true,
+}
+
+local BACK_SURROUND_CHARS = {
+  [')'] = true,
+  ['}'] = true,
+  [']'] = true,
+}
+
+local function findFirstCharBehind(searchChars, charline, charcol)
+  local _, curcharline, curcharcol = unpack(vim.fn.getcurpos())
+  charline = charline or curcharline
+  charcol = charcol or curcharcol
+
+  local line = getline(charline)
+  local char = line[charcol]
+
+  while not searchChars[char] do
+    if charcol > 1 then
+      charcol = charcol - 1
+      char = line[charcol]
+    elseif charline == 1 then
+      return nil -- no surrounds
+    else
+      charline = charline - 1
+      line = getline(charline)
+      charcol = #line
+      char = line[charcol]
+    end
+  end
+
+  return char, charline, charcol
+end
+
+local function jumpSurroundBack()
+  local char, charline, charcol = findFirstCharBehind(SURROUND_CHARS)
+
+  if BACK_SURROUND_CHARS[char] then
+    char, charline, charcol = findFirstCharBehind(FORWARD_SURROUND_CHARS, charline, charcol)
+  end
+
+  vim.fn.setcursorcharpos(charline, charcol)
+end
+
+vim.keymap.set('n', ')', 'l%')
+vim.keymap.set('v', ')', 'l%')
+vim.keymap.set('n', '(', 'h%')
+vim.keymap.set('v', '(', 'h%')
+
+-- -----------------------------------------------------------------------------
 -- CWD Tracking
 -- -----------------------------------------------------------------------------
 
@@ -417,22 +468,6 @@ nvim_create_autocmd('TermClose', {
   pattern = C.TERM_PATTERNS,
   callback = clearTermCwd,
 })
-
--- -----------------------------------------------------------------------------
--- Marks
--- -----------------------------------------------------------------------------
-
--- Clear all marks on startup
-vim.cmd('delm!')
-vim.cmd('delm A-Z0-9')
-local markCounter = 0
-
-local function pushMark()
-  vim.cmd('normal m' .. tostring(markCounter))
-  markCounter = (markCounter + 1) % 10
-end
-
-vim.keymap.set('n', '<leader>mm', pushMark)
 
 -- -----------------------------------------------------------------------------
 -- Lualine
