@@ -1,0 +1,74 @@
+local { TERM_PATTERNS } = require('constants')
+
+local cwdCache = {}
+
+local CWD_TRACK_BLACKLIST = {
+  '^term://',
+  '^fugitive://',
+}
+
+local CWD_TRACK_BUFNAME_FILTER = {
+  -- TODO: have suda inject this
+  '^suda://',
+}
+
+function getTrackBufName() {
+  local bufName = vim.api.nvim_buf_get_name(0)
+
+  for _, pattern in ipairs(CWD_TRACK_BUFNAME_FILTER) {
+    bufName = bufName:gsub(pattern, '')
+  }
+
+  return bufName
+}
+
+function isTrackBlacklisted(bufName) {
+  for _, pattern in ipairs(CWD_TRACK_BLACKLIST) {
+    if bufName:match(pattern) {
+      return true
+    }
+  }
+}
+
+-- Do not make this local! zsh needs this for cd hook in nested terminal.
+global function saveTermCwd() {
+  local bufName = getTrackBufName()
+  if !isTrackBlacklisted(bufName) {
+    cwdCache[bufName] = vim.fn.getcwd()
+  }
+}
+
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = 'bsuth',
+  pattern = '*',
+  callback = () -> {
+    local bufName = getTrackBufName()
+    if bufName:match('^term://') {
+      if cwdCache[bufName] != nil {
+        vim.cmd('cd ' .. cwdCache[bufName])
+      }
+    } elseif !isTrackBlacklisted(bufName) {
+      vim.cmd('cd ' .. vim.fn.fnamemodify(bufName, ':p:h'))
+      if vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' {
+        vim.cmd('Dirvish') -- refresh dirvish after cd
+      }
+    }
+  },
+})
+
+vim.api.nvim_create_autocmd('TermOpen', {
+  group = 'bsuth',
+  pattern = TERM_PATTERNS,
+  callback = saveTermCwd,
+})
+
+vim.api.nvim_create_autocmd('TermClose', {
+  group = 'bsuth',
+  pattern = TERM_PATTERNS,
+  callback = () -> {
+    local bufName = getTrackBufName()
+    if !isTrackBlacklisted(bufName) && cwdCache[bufName] != nil {
+      cwdCache[bufName] = nil
+    }
+  },
+})

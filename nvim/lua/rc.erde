@@ -4,12 +4,11 @@
 -- package.loaded['telescope-config'] = nil
 -- package.loaded['work'] = nil
 
-local C = require('constants')
-
 -- -----------------------------------------------------------------------------
 -- Settings
 -- -----------------------------------------------------------------------------
 
+-- core
 vim.g.mapleader = ' '
 vim.api.nvim_create_augroup('bsuth', {})
 
@@ -43,71 +42,35 @@ vim.opt.scrollback = 100000
 vim.opt.commentstring = '//%s'
 
 -- -----------------------------------------------------------------------------
--- Plugins
--- -----------------------------------------------------------------------------
-
-require('plugins.packer')
-require('plugins.treesitter')
-require('plugins.onedark')
-require('plugins.suda')
-require('plugins.fugitive')
-require('plugins.sneak')
-require('plugins.dirvish')
-require('plugins.telescope')
-require('plugins.lualine')
-require('plugins.bookmarks')
-require('plugins.go')
-require('plugins.formatter')
-require('plugins.lsp')
-
--- plug-n-play
-require('packer').use('nvim-lua/plenary.nvim')
-require('packer').use('tpope/vim-surround')
-require('packer').use('tpope/vim-commentary')
-require('packer').use('matze/vim-move')
-require('packer').use('peterhoeg/vim-qml')
-require('packer').use('tridactyl/vim-tridactyl')
-require('packer').use('~/repos/vim-erde')
-require('packer').use('~/repos/emacs-bindings.nvim')
-
--- -----------------------------------------------------------------------------
 -- Mappings
 -- -----------------------------------------------------------------------------
 
---
--- General
---
-
-vim.keymap.set('n', '<leader>ev', ':Dirvish ~/dots/nvim<cr>')
+-- vimrc
+vim.keymap.set('n', '<leader>ev', ':Dirvish ~/dots/nvim/lua<cr>')
 vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
+-- write, quit
 vim.keymap.set('n', '<c-w>', ':write<cr>')
 vim.keymap.set('n', '<c-q>', ':quit<cr>')
 
+-- command mode
 vim.keymap.set('c', '<c-space>', '<c-f>')
 vim.keymap.set('n', ':', ':<c-f><c-c>')
 
-vim.keymap.set('n', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
-vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
-
+-- clear search highlighting
 vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
 
+-- refresh syntax highlighting
 vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable<cr>')
 
--- Remove annoying default map of K to manual
+-- remove annoying default map of K to manual
 vim.keymap.set('n', 'K', () -> nil)
 
---
--- Quick Links
---
-
+-- quick links
 vim.keymap.set('n', '<leader>swp', ':Dirvish ~/.local/share/nvim/swap<cr>')
 vim.keymap.set('n', '<leader>pack', ':Dirvish ~/.local/share/nvim/site/pack/packer/start<cr>')
 
---
--- Window Management
---
-
+-- window management
 vim.keymap.set('n', '<leader>w', '<c-w>')
 vim.keymap.set('n', '<c-h>', '<c-w>h')
 vim.keymap.set('n', '<c-j>', '<c-w>j')
@@ -119,239 +82,49 @@ vim.keymap.set('n', '<leader><c-j>', ':rightbelow :sp | :Dirvish<cr>')
 vim.keymap.set('n', '<leader><c-h>', ':aboveleft :vsp | :Dirvish<cr>')
 
 -- -----------------------------------------------------------------------------
--- Terminal
+-- Plugins
 -- -----------------------------------------------------------------------------
 
-vim.keymap.set('n', '<c-space>', ':term<cr>')
-vim.keymap.set('t', '<c-[>', '<c-\\><c-n>')
-vim.keymap.set('t', '<esc>', '<c-\\><c-n>')
+-- core
+require('plugins.packer')
+require('packer').use('nvim-lua/plenary.nvim')
 
-function onTermClose() {
-  local termBuffer = vim.api.nvim_win_get_buf(0)
-  -- Dirvish throws an error when using :Dirvish from a term buffer, but it
-  -- still works so just silence it.
-  vim.cmd('silent Dirvish ' .. vim.fn.getcwd())
-  vim.api.nvim_buf_delete(termBuffer, {})
-}
+-- ide
+require('plugins.onedark')
+require('plugins.treesitter')
+require('plugins.lsp')
+require('plugins.formatter')
 
-vim.api.nvim_create_autocmd('TermOpen', {
-  group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
-  command = 'setlocal nonumber wrap',
-})
+-- utils
+require('packer').use('matze/vim-move')
+require('plugins.sneak')
+require('packer').use('tpope/vim-surround')
+require('plugins.commentary')
+require('plugins.suda')
 
-vim.api.nvim_create_autocmd('TermOpen', {
-  group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
-  command = 'startinsert',
-})
+-- ui
+require('plugins.dirvish')
+require('plugins.fugitive')
+require('plugins.telescope')
+require('plugins.lualine')
+require('plugins.bookmarks')
 
-vim.api.nvim_create_autocmd('TermClose', {
-  group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
-  callback = onTermClose,
-})
+-- languages
+require('plugins.go')
+require('packer').use('peterhoeg/vim-qml')
+require('packer').use('tridactyl/vim-tridactyl')
 
--- -----------------------------------------------------------------------------
--- Tidy
--- Modified version of https://github.com/mcauley-penney/tidy.nvim
--- -----------------------------------------------------------------------------
-
-vim.api.nvim_create_autocmd('BufWritePre', {
-  group = 'bsuth',
-  callback = () -> {
-    local cursor = vim.api.nvim_win_get_cursor(0)
-
-    vim.cmd([[keepjumps keeppatterns %s/\s\+$//e]]) -- trailing whitespace
-    vim.cmd([[keepjumps keeppatterns silent! 0;/^\%(\n*.\)\@!/,$d_]]) -- trailing newlines
-
-    cursor[1] = math.min(cursor[1], vim.api.nvim_buf_line_count(0))
-    vim.api.nvim_win_set_cursor(0, cursor)
-  },
-})
+-- local plugins
+require('packer').use('~/repos/vim-erde')
+require('packer').use('~/repos/emacs-bindings.nvim')
 
 -- -----------------------------------------------------------------------------
--- Visual Selection
+-- Modules
 -- -----------------------------------------------------------------------------
 
-function getVisualSelection() {
-  -- Do not use '> and '< registers in getpos! These registers are only updated
-  -- _after_ leaving visual mode.
-  -- @see https://github.com/neovim/neovim/pull/13896#issuecomment-774680224
-  local _, line_start, column_start = unpack(vim.fn.getpos('v'))
-  local _, line_end, column_end = unpack(vim.fn.getcurpos())
-
-  local lines = vim.fn.getline(line_start, line_end)
-  vim.fn.setpos('.', { { 0, line_start, column_start, 0 } })
-
-  if #lines == 1 {
-    lines[1] = lines[1]:sub(column_start, column_end)
-  } elseif #lines > 1 {
-    lines[1] = lines[1]:sub(column_start)
-    lines[#lines] = lines[#lines]:sub(1, column_end)
-  }
-
-  return table.concat(lines, '\n')
-}
-
-vim.keymap.set('v', '<c-n>', () -> {
-  vim.fn.setreg('/', getVisualSelection())
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<esc>', true, false, true), 'n', false)
-  vim.cmd('normal n')
-})
-
--- -----------------------------------------------------------------------------
--- Surround Jumping
--- -----------------------------------------------------------------------------
-
-local SURROUND_CHARS = {
-  ['('] = true,
-  [')'] = true,
-  ['{'] = true,
-  ['}'] = true,
-  ['['] = true,
-  [']'] = true,
-}
-
-local FORWARD_SURROUND_CHARS = {
-  ['('] = true,
-  ['{'] = true,
-  ['['] = true,
-}
-
-local BACK_SURROUND_CHARS = {
-  [')'] = true,
-  ['}'] = true,
-  [']'] = true,
-}
-
-function findFirstCharBehind(searchChars, charline, charcol) {
-  local _, curcharline, curcharcol = unpack(vim.fn.getcurpos())
-  charline ||= curcharline
-  charcol ||= curcharcol
-
-  local line = vim.fn.getline(charline)
-  local char = line[charcol]
-
-  while !searchChars[char] {
-    if charcol > 1 {
-      charcol = charcol - 1
-      char = line[charcol]
-    } elseif charline == 1 {
-      return nil -- no surrounds
-    } else {
-      charline = charline - 1
-      line = vim.fn.getline(charline)
-      charcol = #line
-      char = line[charcol]
-    }
-  }
-
-  return char, charline, charcol
-}
-
-function jumpSurroundBack() {
-  local char, charline, charcol = findFirstCharBehind(SURROUND_CHARS)
-
-  if BACK_SURROUND_CHARS[char] {
-    char, charline, charcol = findFirstCharBehind(FORWARD_SURROUND_CHARS, charline, charcol)
-  }
-
-  vim.fn.setcursorcharpos(charline, charcol)
-}
-
-vim.keymap.set('n', ')', 'l%')
-vim.keymap.set('v', ')', 'l%')
-vim.keymap.set('n', '(', 'h%')
-vim.keymap.set('v', '(', 'h%')
-
--- -----------------------------------------------------------------------------
--- CWD Tracking
--- -----------------------------------------------------------------------------
-
-local cwdCache = {}
-
-local CWD_TRACK_BLACKLIST = {
-  '^term://',
-  '^fugitive://',
-}
-
-local CWD_TRACK_BUFNAME_FILTER = {
-  -- TODO: have suda inject this
-  '^suda://',
-}
-
-function getTrackBufName() {
-  local bufName = vim.api.nvim_buf_get_name(0)
-
-  for _, pattern in ipairs(CWD_TRACK_BUFNAME_FILTER) {
-    bufName = bufName:gsub(pattern, '')
-  }
-
-  return bufName
-}
-
-function getTrackDir(bufName) {
-  return vim.fn.fnamemodify(bufName, ':p:h')
-}
-
-function isTrackBlacklisted(bufName) {
-  for _, pattern in ipairs(CWD_TRACK_BLACKLIST) {
-    if bufName:match(pattern) {
-      return true
-    }
-  }
-}
-
--- Do not make this local! zsh needs this for cd hook in nested terminal.
-global function saveTermCwd() {
-  local bufName = getTrackBufName()
-  if !isTrackBlacklisted(bufName) {
-    cwdCache[bufName] = vim.fn.getcwd()
-  }
-}
-
-function clearTermCwd() {
-  local bufName = getTrackBufName()
-  if !isTrackBlacklisted(bufName) && cwdCache[bufName] != nil {
-    cwdCache[bufName] = nil
-  }
-}
-
-function trackCwd() {
-  local bufName = getTrackBufName()
-  if bufName:match('^term://') {
-    if cwdCache[bufName] != nil {
-      vim.cmd('cd ' .. cwdCache[bufName])
-    }
-  } elseif !isTrackBlacklisted(bufName) {
-    vim.cmd('cd ' .. getTrackDir(bufName))
-    if vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' {
-      vim.cmd('Dirvish') -- refresh dirvish after cd
-    }
-  }
-}
-
-vim.api.nvim_create_autocmd('BufEnter', {
-  group = 'bsuth',
-  pattern = '*',
-  callback = trackCwd,
-})
-
-vim.api.nvim_create_autocmd('TermOpen', {
-  group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
-  callback = saveTermCwd,
-})
-
-vim.api.nvim_create_autocmd('TermClose', {
-  group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
-  callback = clearTermCwd,
-})
-
--- -----------------------------------------------------------------------------
--- Home vs Work
--- -----------------------------------------------------------------------------
-
+require('terminal')
+require('tidy')
+require('search-visual')
+require('track-cwd')
+require('surround-jump')
 pcall(() -> require('work'))

@@ -1,0 +1,26 @@
+local { TERM_PATTERNS } = require('constants')
+
+vim.keymap.set('n', '<c-space>', ':term<cr>')
+vim.keymap.set('t', '<c-[>', '<c-\\><c-n>')
+vim.keymap.set('t', '<esc>', '<c-\\><c-n>')
+
+vim.api.nvim_create_autocmd('TermOpen', {
+  group = 'bsuth',
+  pattern = TERM_PATTERNS,
+  callback = () -> {
+    vim.cmd('setlocal nonumber wrap')
+    vim.cmd('startinsert')
+  },
+})
+
+vim.api.nvim_create_autocmd('TermClose', {
+  group = 'bsuth',
+  pattern = TERM_PATTERNS,
+  callback = () -> {
+    local termBuffer = vim.api.nvim_win_get_buf(0)
+    -- Dirvish throws an error when using :Dirvish from a term buffer, but it
+    -- still works so just silence it.
+    vim.cmd('silent Dirvish ' .. vim.fn.getcwd())
+    vim.api.nvim_buf_delete(termBuffer, {})
+  },
+})

@@ -1,0 +1,60 @@
+local SURROUND_CHARS = {
+  ['('] = true,
+  [')'] = true,
+  ['{'] = true,
+  ['}'] = true,
+  ['['] = true,
+  [']'] = true,
+}
+
+local FORWARD_SURROUND_CHARS = {
+  ['('] = true,
+  ['{'] = true,
+  ['['] = true,
+}
+
+local BACK_SURROUND_CHARS = {
+  [')'] = true,
+  ['}'] = true,
+  [']'] = true,
+}
+
+function findFirstCharBehind(searchChars, charline, charcol) {
+  local _, curcharline, curcharcol = unpack(vim.fn.getcurpos())
+  charline ||= curcharline
+  charcol ||= curcharcol
+
+  local line = vim.fn.getline(charline)
+  local char = line[charcol]
+
+  while !searchChars[char] {
+    if charcol > 1 {
+      charcol = charcol - 1
+      char = line[charcol]
+    } elseif charline == 1 {
+      return nil -- no surrounds
+    } else {
+      charline = charline - 1
+      line = vim.fn.getline(charline)
+      charcol = #line
+      char = line[charcol]
+    }
+  }
+
+  return char, charline, charcol
+}
+
+function jumpSurroundBack() {
+  local char, charline, charcol = findFirstCharBehind(SURROUND_CHARS)
+
+  if BACK_SURROUND_CHARS[char] {
+    char, charline, charcol = findFirstCharBehind(FORWARD_SURROUND_CHARS, charline, charcol)
+  }
+
+  vim.fn.setcursorcharpos(charline, charcol)
+}
+
+vim.keymap.set('n', ')', 'l%')
+vim.keymap.set('v', ')', 'l%')
+vim.keymap.set('n', '(', 'h%')
+vim.keymap.set('v', '(', 'h%')
