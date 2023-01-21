@@ -1,0 +1,8 @@
+module DOTS = os.getenv('DOTS')
+
+module TERM_PATTERNS = { 'term://*zsh*', 'term://*bash*' }
+module JS_PATTERNS = { '*.js', '*.jsx', '*.ts', '*.tsx' }
+module CSS_PATTERNS = { '*.css', '*.scss', '*.less' }
+module JSON_PATTERNS = { '*.json', '*.cjson' }
+
+module FD_FAVORITES_PATH = DOTS .. '/nvim/telescope_favorites_home'

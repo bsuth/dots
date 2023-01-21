@@ -1,0 +1,81 @@
+require('packer').use('neovim/nvim-lspconfig')
+require('packer').use('hrsh7th/nvim-cmp')
+require('packer').use('hrsh7th/cmp-nvim-lsp') -- lsp
+require('packer').use('hrsh7th/vim-vsnip') -- lsp snippets
+require('packer').use('hrsh7th/cmp-vsnip') -- lsp snippets
+require('packer').use('hrsh7th/cmp-buffer') -- words in current buffer
+require('packer').use('hrsh7th/cmp-path') -- file paths
+require('packer').use('hrsh7th/cmp-nvim-lua') -- neovim lua api
+require('packer').use('hrsh7th/cmp-nvim-lsp-signature-help') -- fancy function signature highlighting
+
+vim.keymap.set('n', '<leader>lsp', ':silent :LspRestart<cr>')
+vim.keymap.set('n', "'e", vim.diagnostic.open_float)
+vim.keymap.set('n', "'h", vim.lsp.buf.hover)
+vim.keymap.set('n', "'d", vim.lsp.buf.definition)
+vim.keymap.set('n', "'D", vim.lsp.buf.declaration)
+vim.keymap.set('n', "'p", vim.diagnostic.goto_prev)
+vim.keymap.set('n', "'n", vim.diagnostic.goto_next)
+vim.keymap.set('n', "'r", vim.lsp.buf.references)
+vim.keymap.set('n', "'q", vim.diagnostic.setloclist)
+vim.keymap.set('n', "'s", vim.lsp.buf.rename)
+vim.keymap.set('n', "'c", vim.lsp.buf.code_action)
+
+require('cmp').setup({
+  mapping = {
+    ['<c-Space>'] = require('cmp').mapping.complete(),
+    ['<c-p>'] = require('cmp').mapping.select_prev_item(),
+    ['<c-n>'] = require('cmp').mapping.select_next_item(),
+    ['<cr>'] = require('cmp').mapping.confirm(),
+    ['<c-d>'] = require('cmp').mapping.scroll_docs(-4),
+    ['<c-u>'] = require('cmp').mapping.scroll_docs(4),
+    ['<c-c>'] = require('cmp').mapping.close(),
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'vsnip' },
+    { name = 'nvim_lua' },
+    { name = 'nvim_lsp_signature_help' },
+    { name = 'buffer' },
+    { name = 'path' },
+  },
+  snippet = {
+    expand = args -> vim.fn['vsnip#anonymous'](args.body),
+  },
+})
+
+local lspServers = {
+  clangd = {},
+  cssls = {},
+  graphql = {},
+  gopls = {},
+  eslint = {},
+  tsserver = {},
+  tsserver = {},
+  gdscript = {},
+  jsonls = {
+    filetypes = { 'json', 'jsonc' },
+    settings = {
+      json = {
+        -- https://www.schemastore.org
+        schemas = {
+          {
+            fileMatch = { 'package.json' },
+            url = 'https://json.schemastore.org/package.json',
+          },
+          {
+            fileMatch = { 'tsconfig*.json' },
+            url = 'https://json.schemastore.org/tsconfig.json',
+          },
+        },
+      },
+    },
+  },
+}
+
+for server, config in pairs(lspServers) {
+  require('lspconfig')[server].setup(vim.tbl_deep_extend('force', {
+    capabilities = require('cmp_nvim_lsp').default_capabilities(
+      vim.lsp.protocol.make_client_capabilities()
+    ),
+  }, config))
+}

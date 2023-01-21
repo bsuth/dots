@@ -1,0 +1,30 @@
+require('packer').use('justinmk/vim-dirvish')
+
+-- TODO: use this
+require('constants').DIRCMD = 'Dirvish'
+
+-- prevent netrw from taking over:
+-- https://github.com/justinmk/vim-dirvish/issues/137
+vim.g.loaded_netrwPlugin = true
+
+function dirvishXdgOpen() {
+  local file = vim.fn.expand('<cWORD>')
+  local dir = vim.fn.fnamemodify(file, ':p:h')
+  local ext = vim.fn.fnamemodify(file, ':e')
+
+  if ext == 'png' {
+    os.execute('xdg-open ' .. file .. ' &>/dev/null')
+  } else {
+    vim.fn['dirvish#open']('edit', 0)
+    vim.cmd('cd ' .. dir)
+  }
+}
+
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'bsuth',
+  pattern = 'dirvish',
+  callback = () -> vim.keymap.set('n', '<cr>', dirvishXdgOpen, {
+    buffer = true,
+    silent = true,
+  }),
+})

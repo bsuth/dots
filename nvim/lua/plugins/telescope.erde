@@ -1,9 +1,7 @@
 local C = require('constants')
 
--- -----------------------------------------------------------------------------
--- Telescope
--- https://github.com/nvim-telescope/telescope.nvim
--- -----------------------------------------------------------------------------
+require('packer').use('nvim-telescope/telescope.nvim')
+require('packer').use({ 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
 
 local telescope = require('telescope')
 local pickers = require('telescope.pickers')
@@ -53,7 +51,7 @@ telescope.load_extension('fzf')
 -- Helpers
 -- -----------------------------------------------------------------------------
 
-local function newTelescopeFdJob(fdFlags)
+function newTelescopeFdJob(fdFlags) {
   return vim.list_extend({
     'fd',
     '--follow',
@@ -62,46 +60,46 @@ local function newTelescopeFdJob(fdFlags)
     '--exclude',
     'bin',
   }, fdFlags)
-end
+}
 
-local function telescopeRun(cwd, job, opts)
+function telescopeRun(cwd, job, opts) {
   return pickers.new(opts, {
     finder = finders.new_oneshot_job(job, { cwd = cwd }),
     previewer = previewers.vim_buffer_cat.new({ cwd = cwd }),
     sorter = config.generic_sorter(),
-    attach_mappings = function(prompt_bufnr, map)
+    attach_mappings = (prompt_bufnr, map) -> {
       local currentPicker = actionState.get_current_picker(prompt_bufnr)
 
       -- Default select does not consider cwd from finder
-      actionSet.select:replace(function()
+      actionSet.select:replace(() -> {
         local selection = actionState.get_selected_entry().value
         actions.close(prompt_bufnr)
         vim.cmd('edit ' .. cwd .. '/' .. selection)
-      end)
+      })
 
       return true
-    end,
+    },
   }):find()
-end
+}
 
 -- -----------------------------------------------------------------------------
 -- Pickers
 -- -----------------------------------------------------------------------------
 
-local function telescopeFavorites()
+function telescopeFavorites() {
   local home = os.getenv('HOME')
   telescopeRun(home, { C.FD_FAVORITES_PATH }, { prompt_title = 'Favorites' })
-end
+}
 
-local function telescopeFd()
+function telescopeFd() {
   local job = newTelescopeFdJob({ '--type', 'f' })
   telescopeRun('.', job, { prompt_title = 'fd' })
-end
+}
 
-local function telescopeCd()
+function telescopeCd() {
   local job = newTelescopeFdJob({ '--type', 'd' })
   telescopeRun('.', job, { prompt_title = 'cd' })
-end
+}
 
 -- -----------------------------------------------------------------------------
 -- Mappings
@@ -112,4 +110,3 @@ vim.keymap.set('n', '<leader>fd', telescopeFd)
 vim.keymap.set('n', '<leader>cd', telescopeCd)
 vim.keymap.set('n', '<leader>rg', ':Telescope grep_string only_sort_text=true search=<cr>')
 vim.keymap.set('n', '<leader>buf', ':Telescope buffers<cr>')
-vim.keymap.set('n', '<leader>ma', ':Telescope marks<cr>')

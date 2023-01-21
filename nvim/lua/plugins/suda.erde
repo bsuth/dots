@@ -1,0 +1,3 @@
+require('packer').use('lambdalisue/suda.vim')
+vim.g.suda_smart_edit = true
+-- table.insert(C.CWD_TRACK_BUFNAME_FILTER, '^suda://')
