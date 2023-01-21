@@ -57,6 +57,10 @@ require('packer').startup(function()
   use('wbthomason/packer.nvim')
   use('nvim-lua/plenary.nvim')
 
+  -- syntax
+  use('nvim-treesitter/nvim-treesitter')
+  use('navarasu/onedark.nvim')
+
   -- lsp, completion, formatter
   use('neovim/nvim-lspconfig')
   use('mhartington/formatter.nvim')
@@ -69,28 +73,25 @@ require('packer').startup(function()
   use('hrsh7th/cmp-nvim-lua') -- neovim lua api
   use('hrsh7th/cmp-nvim-lsp-signature-help') -- fancy function signature highlighting
 
-  -- syntax
-  use('nvim-treesitter/nvim-treesitter')
-  use('navarasu/onedark.nvim')
- 
-  -- languages
-  use('peterhoeg/vim-qml')
-  use('fatih/vim-go')
-  use('tridactyl/vim-tridactyl')
-
-  -- apps
-  use('justinmk/vim-dirvish')
-  use('hoob3rt/lualine.nvim')
-  use('nvim-telescope/telescope.nvim')
-  use({ 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
-
   -- util
   use('tpope/vim-surround')
   use('tpope/vim-commentary')
   use('tpope/vim-fugitive')
+  use('justinmk/vim-sneak')
   use('matze/vim-move')
   use('lambdalisue/suda.vim')
-  use({ 'phaazon/hop.nvim', branch = 'v2' })
+
+  -- apps
+  use('justinmk/vim-dirvish')
+  use('nvim-telescope/telescope.nvim')
+  use({ 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
+  use('hoob3rt/lualine.nvim')
+  use('MattesGroeger/vim-bookmarks')
+
+  -- languages
+  use('peterhoeg/vim-qml')
+  use('fatih/vim-go')
+  use('tridactyl/vim-tridactyl')
 
   -- Local plugins can be included
   use('~/repos/vim-erde')
@@ -122,6 +123,7 @@ require('onedark').load()
 
 vim.g.suda_smart_edit = true
 vim.g.go_fmt_autosave = true
+vim.g.bookmark_auto_close = 1
 
 --
 -- Options
@@ -217,16 +219,18 @@ vim.keymap.set('n', '<leader>gl', ':Git log<cr>')
 vim.keymap.set('n', '<leader>gb', ':Git blame<cr>')
 
 --
--- Hop
+-- Sneak
 --
 
-require('hop').setup() -- init hop
--- use <cmd> to prevent "No range allowed" errors in visual mode.
--- see https://github.com/phaazon/hop.nvim/issues/126#issuecomment-910761167
-vim.keymap.set('n', 'H', ':HopWord<cr>')
-vim.keymap.set('v', 'H', '<cmd>HopWord<cr>')
-vim.keymap.set('n', '<c-h>', ':HopLine<cr>')
-vim.keymap.set('v', '<c-h>', '<cmd>HopLine<cr>')
+vim.cmd('highlight link Sneak None')
+vim.keymap.set('n', 'f', '<Plug>Sneak_f')
+vim.keymap.set('v', 'f', '<Plug>Sneak_f')
+vim.keymap.set('n', 'F', '<Plug>Sneak_F')
+vim.keymap.set('v', 'F', '<Plug>Sneak_F')
+vim.keymap.set('n', 't', '<Plug>Sneak_s')
+vim.keymap.set('v', 't', '<Plug>Sneak_s')
+vim.keymap.set('n', 'T', '<Plug>Sneak_S')
+vim.keymap.set('v', 'T', '<Plug>Sneak_S')
 
 -- -----------------------------------------------------------------------------
 -- Terminal
@@ -263,6 +267,24 @@ nvim_create_autocmd('TermClose', {
 })
 
 -- -----------------------------------------------------------------------------
+-- Tidy
+-- Modified version of https://github.com/mcauley-penney/tidy.nvim
+-- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = 'bsuth',
+  callback = function()
+    local cursor = vim.api.nvim_win_get_cursor(0)
+
+    vim.cmd([[keepjumps keeppatterns %s/\s\+$//e]]) -- trailing whitespace
+    vim.cmd([[keepjumps keeppatterns silent! 0;/^\%(\n*.\)\@!/,$d_]]) -- trailing newlines
+
+    cursor[1] = math.min(cursor[1], vim.api.nvim_buf_line_count(0))
+    vim.api.nvim_win_set_cursor(0, cursor)
+  end,
+})
+
+-- -----------------------------------------------------------------------------
 -- Dirvish
 -- -----------------------------------------------------------------------------
 
@@ -295,7 +317,7 @@ nvim_create_autocmd('FileType', {
 -- -----------------------------------------------------------------------------
 
 local function getVisualSelection()
-  -- Do not use '> and '< registers in getpos! These registers are only updated 
+  -- Do not use '> and '< registers in getpos! These registers are only updated
   -- _after_ leaving visual mode.
   -- @see https://github.com/neovim/neovim/pull/13896#issuecomment-774680224
   local _, line_start, column_start = unpack(vim.fn.getpos('v'))
