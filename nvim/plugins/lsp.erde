@@ -1,12 +1,18 @@
-require('packer').use('neovim/nvim-lspconfig')
-require('packer').use('hrsh7th/nvim-cmp')
-require('packer').use('hrsh7th/cmp-nvim-lsp') -- lsp
-require('packer').use('hrsh7th/vim-vsnip') -- lsp snippets
-require('packer').use('hrsh7th/cmp-vsnip') -- lsp snippets
-require('packer').use('hrsh7th/cmp-buffer') -- words in current buffer
-require('packer').use('hrsh7th/cmp-path') -- file paths
-require('packer').use('hrsh7th/cmp-nvim-lua') -- neovim lua api
-require('packer').use('hrsh7th/cmp-nvim-lsp-signature-help') -- fancy function signature highlighting
+local packer = require('packer')
+
+packer.use('neovim/nvim-lspconfig')
+packer.use('hrsh7th/nvim-cmp')
+packer.use('hrsh7th/cmp-nvim-lsp') -- lsp
+packer.use('hrsh7th/vim-vsnip') -- lsp snippets
+packer.use('hrsh7th/cmp-vsnip') -- lsp snippets
+packer.use('hrsh7th/cmp-buffer') -- words in current buffer
+packer.use('hrsh7th/cmp-path') -- file paths
+packer.use('hrsh7th/cmp-nvim-lua') -- neovim lua api
+packer.use('hrsh7th/cmp-nvim-lsp-signature-help') -- fancy function signature highlighting
+
+local cmp = require('cmp')
+local lspconfig = require('lspconfig')
+local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
 vim.keymap.set('n', '<leader>lsp', ':silent :LspRestart<cr>')
 vim.keymap.set('n', "'e", vim.diagnostic.open_float)
@@ -20,15 +26,15 @@ vim.keymap.set('n', "'q", vim.diagnostic.setloclist)
 vim.keymap.set('n', "'s", vim.lsp.buf.rename)
 vim.keymap.set('n', "'c", vim.lsp.buf.code_action)
 
-require('cmp').setup({
+cmp.setup({
   mapping = {
-    ['<c-Space>'] = require('cmp').mapping.complete(),
-    ['<c-p>'] = require('cmp').mapping.select_prev_item(),
-    ['<c-n>'] = require('cmp').mapping.select_next_item(),
-    ['<cr>'] = require('cmp').mapping.confirm(),
-    ['<c-d>'] = require('cmp').mapping.scroll_docs(-4),
-    ['<c-u>'] = require('cmp').mapping.scroll_docs(4),
-    ['<c-c>'] = require('cmp').mapping.close(),
+    ['<c-Space>'] = cmp.mapping.complete(),
+    ['<c-p>'] = cmp.mapping.select_prev_item(),
+    ['<c-n>'] = cmp.mapping.select_next_item(),
+    ['<cr>'] = cmp.mapping.confirm(),
+    ['<c-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<c-u>'] = cmp.mapping.scroll_docs(4),
+    ['<c-c>'] = cmp.mapping.close(),
   },
   sources = {
     { name = 'nvim_lsp' },
@@ -43,7 +49,7 @@ require('cmp').setup({
   },
 })
 
-local lspServers = {
+local LSP_SERVERS = {
   clangd = {},
   cssls = {},
   graphql = {},
@@ -72,9 +78,9 @@ local lspServers = {
   },
 }
 
-for server, config in pairs(lspServers) {
-  require('lspconfig')[server].setup(vim.tbl_deep_extend('force', {
-    capabilities = require('cmp_nvim_lsp').default_capabilities(
+for server, config in pairs(LSP_SERVERS) {
+  lspconfig[server].setup(vim.tbl_deep_extend('force', {
+    capabilities = cmp_nvim_lsp.default_capabilities(
       vim.lsp.protocol.make_client_capabilities()
     ),
   }, config))

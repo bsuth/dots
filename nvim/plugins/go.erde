@@ -1,0 +1,5 @@
+local packer = require('packer')
+
+packer.use('fatih/vim-go')
+
+vim.g.go_fmt_autosave = true

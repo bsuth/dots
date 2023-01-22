@@ -1,6 +1,6 @@
 local { TERM_PATTERNS } = require('constants')
 
-local cwdCache = {}
+local CWD_CACHE = {}
 
 local CWD_TRACK_BLACKLIST = {
   '^term://',
@@ -12,29 +12,29 @@ local CWD_TRACK_BUFNAME_FILTER = {
   '^suda://',
 }
 
-function getTrackBufName() {
-  local bufName = vim.api.nvim_buf_get_name(0)
+function get_bufname() {
+  local bufname = vim.api.nvim_buf_get_name(0)
 
   for _, pattern in ipairs(CWD_TRACK_BUFNAME_FILTER) {
-    bufName = bufName:gsub(pattern, '')
+    bufname = bufname:gsub(pattern, '')
   }
 
-  return bufName
+  return bufname
 }
 
-function isTrackBlacklisted(bufName) {
+function is_blacklist_bufname(bufname) {
   for _, pattern in ipairs(CWD_TRACK_BLACKLIST) {
-    if bufName:match(pattern) {
+    if bufname:match(pattern) {
       return true
     }
   }
 }
 
 -- Do not make this local! zsh needs this for cd hook in nested terminal.
-global function saveTermCwd() {
-  local bufName = getTrackBufName()
-  if !isTrackBlacklisted(bufName) {
-    cwdCache[bufName] = vim.fn.getcwd()
+global function save_term_cwd() {
+  local bufname = get_bufname()
+  if !is_blacklist_bufname(bufname) {
+    CWD_CACHE[bufname] = vim.fn.getcwd()
   }
 }
 
@@ -42,13 +42,13 @@ vim.api.nvim_create_autocmd('BufEnter', {
   group = 'bsuth',
   pattern = '*',
   callback = () -> {
-    local bufName = getTrackBufName()
-    if bufName:match('^term://') {
-      if cwdCache[bufName] != nil {
-        vim.cmd('cd ' .. cwdCache[bufName])
+    local bufname = get_bufname()
+    if bufname:match('^term://') {
+      if CWD_CACHE[bufname] != nil {
+        vim.cmd('cd ' .. CWD_CACHE[bufname])
       }
-    } elseif !isTrackBlacklisted(bufName) {
-      vim.cmd('cd ' .. vim.fn.fnamemodify(bufName, ':p:h'))
+    } elseif !is_blacklist_bufname(bufname) {
+      vim.cmd('cd ' .. vim.fn.fnamemodify(bufname, ':p:h'))
       if vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' {
         vim.cmd('Dirvish') -- refresh dirvish after cd
       }
@@ -59,16 +59,16 @@ vim.api.nvim_create_autocmd('BufEnter', {
 vim.api.nvim_create_autocmd('TermOpen', {
   group = 'bsuth',
   pattern = TERM_PATTERNS,
-  callback = saveTermCwd,
+  callback = save_term_cwd,
 })
 
 vim.api.nvim_create_autocmd('TermClose', {
   group = 'bsuth',
   pattern = TERM_PATTERNS,
   callback = () -> {
-    local bufName = getTrackBufName()
-    if !isTrackBlacklisted(bufName) && cwdCache[bufName] != nil {
-      cwdCache[bufName] = nil
+    local bufname = get_bufname()
+    if !is_blacklist_bufname(bufname) && CWD_CACHE[bufname] != nil {
+      CWD_CACHE[bufname] = nil
     }
   },
 })

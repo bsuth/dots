@@ -3,9 +3,9 @@
 -- https://github.com/wbthomason/packer.nvim
 -- -----------------------------------------------------------------------------
 
-local packerPath = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+local packer_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 
-if vim.fn.empty(vim.fn.glob(packerPath)) > 0 {
+if vim.fn.empty(vim.fn.glob(packer_path)) > 0 {
   vim.api.nvim_create_autocmd('VimEnter', {
     group = 'bsuth',
     command = () -> {
@@ -16,7 +16,7 @@ if vim.fn.empty(vim.fn.glob(packerPath)) > 0 {
       --   '--depth',
       --   '1',
       --   'https://github.com/wbthomason/packer.nvim',
-      --   packerPath,
+      --   packer_path,
       -- })
       -- if packerBootstrap then
       --   require('packer').sync()
@@ -25,9 +25,11 @@ if vim.fn.empty(vim.fn.glob(packerPath)) > 0 {
   })
 }
 
-require('packer').init()
-require('packer').reset()
-require('packer').use('wbthomason/packer.nvim')
+local packer = require('packer')
+
+packer.init({ compile_path = "{vim.fn.stdpath('config')}/packer_compiled.lua" })
+packer.reset()
+packer.use('wbthomason/packer.nvim')
 
 -- TODO: do not hardcode dirvish
 vim.keymap.set('n', '<leader>pack', ':Dirvish ~/.local/share/nvim/site/pack/packer/start<cr>')

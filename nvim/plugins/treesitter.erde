@@ -1,5 +1,10 @@
-require('packer').use('nvim-treesitter/nvim-treesitter')
-require('nvim-treesitter.configs').setup({
+local packer = require('packer')
+
+packer.use('nvim-treesitter/nvim-treesitter')
+
+local treesitter_configs = require('nvim-treesitter.configs')
+
+treesitter_configs.setup({
   ensure_installed = 'all',
   indent = {
     enable = true,

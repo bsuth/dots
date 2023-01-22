@@ -1,4 +1,4 @@
-function getVisualSelection() {
+function get_visual_selection() {
   -- Do not use '> and '< registers in getpos! These registers are only updated
   -- _after_ leaving visual mode.
   -- @see https://github.com/neovim/neovim/pull/13896#issuecomment-774680224
@@ -19,13 +19,13 @@ function getVisualSelection() {
 }
 
 vim.keymap.set('v', '<c-n>', () -> {
-  vim.fn.setreg('/', getVisualSelection())
+  vim.fn.setreg('/', get_visual_selection())
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<esc>', true, false, true), 'n', false) -- go back to normal mode
   vim.cmd('normal n')
 })
 
 vim.keymap.set('v', '<c-N>', () -> {
-  vim.fn.setreg('/', getVisualSelection())
+  vim.fn.setreg('/', get_visual_selection())
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<esc>', true, false, true), 'n', false) -- go back to normal mode
   vim.cmd('normal N')
 })

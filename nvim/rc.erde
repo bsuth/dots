@@ -88,6 +88,7 @@ vim.keymap.set('n', '<leader><c-h>', ':aboveleft :vsp | :Dirvish<cr>')
 -- core
 require('plugins.packer')
 require('packer').use('nvim-lua/plenary.nvim')
+local packer = require('packer')
 
 -- ide
 require('plugins.onedark')
@@ -96,9 +97,9 @@ require('plugins.lsp')
 require('plugins.formatter')
 
 -- utils
-require('packer').use('matze/vim-move')
+packer.use('matze/vim-move')
 require('plugins.sneak')
-require('packer').use('tpope/vim-surround')
+packer.use('tpope/vim-surround')
 require('plugins.commentary')
 require('plugins.suda')
 
@@ -111,20 +112,20 @@ require('plugins.bookmarks')
 
 -- languages
 require('plugins.go')
-require('packer').use('peterhoeg/vim-qml')
-require('packer').use('tridactyl/vim-tridactyl')
+packer.use('peterhoeg/vim-qml')
+packer.use('tridactyl/vim-tridactyl')
 
 -- local plugins
-require('packer').use('~/repos/vim-erde')
-require('packer').use('~/repos/emacs-bindings.nvim')
+packer.use('~/repos/vim-erde')
+packer.use('~/repos/emacs-bindings.nvim')
 
 -- -----------------------------------------------------------------------------
 -- Modules
 -- -----------------------------------------------------------------------------
 
-require('terminal')
-require('tidy')
-require('search-visual')
-require('track-cwd')
-require('surround-jump')
+require('modules.terminal')
+require('modules.tidy')
+require('modules.search_visual')
+require('modules.track_cwd')
+require('modules.surround_jump')
 pcall(() -> require('work'))

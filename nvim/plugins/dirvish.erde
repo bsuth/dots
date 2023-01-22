@@ -1,13 +1,16 @@
-require('packer').use('justinmk/vim-dirvish')
+local C = require('constants')
+local packer = require('packer')
+
+packer.use('justinmk/vim-dirvish')
 
 -- TODO: use this
-require('constants').DIRCMD = 'Dirvish'
+C.DIRCMD = 'Dirvish'
 
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
 vim.g.loaded_netrwPlugin = true
 
-function dirvishXdgOpen() {
+function xdg_open() {
   local file = vim.fn.expand('<cWORD>')
   local dir = vim.fn.fnamemodify(file, ':p:h')
   local ext = vim.fn.fnamemodify(file, ':e')
@@ -23,7 +26,7 @@ function dirvishXdgOpen() {
 vim.api.nvim_create_autocmd('FileType', {
   group = 'bsuth',
   pattern = 'dirvish',
-  callback = () -> vim.keymap.set('n', '<cr>', dirvishXdgOpen, {
+  callback = () -> vim.keymap.set('n', '<cr>', xdg_open, {
     buffer = true,
     silent = true,
   }),

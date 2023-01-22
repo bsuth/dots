@@ -1,4 +1,7 @@
-require('packer').use('tpope/vim-fugitive')
+local packer = require('packer')
+
+packer.use('tpope/vim-fugitive')
+
 vim.keymap.set('n', '<leader>gg', ':Git ')
 vim.keymap.set('n', '<leader>git', ':Git<cr>')
 vim.keymap.set('n', '<leader>ga', ':Git add .<cr>')

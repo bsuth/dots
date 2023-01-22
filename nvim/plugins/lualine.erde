@@ -1,5 +1,10 @@
-require('packer').use('hoob3rt/lualine.nvim')
-require('lualine').setup({
+local packer = require('packer')
+
+packer.use('hoob3rt/lualine.nvim')
+
+local lualine = require('lualine')
+
+lualine.setup({
   options = {
     icons_enabled = false,
     theme = 'onedark',

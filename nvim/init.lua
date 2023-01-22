@@ -8,7 +8,7 @@
 -- modules), so we adjust package.path for our neovim modules manually.
 --
 -- @see https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_init_packages.lua
-local nvimPackagePath = os.getenv('DOTS') .. '/nvim/lua'
-package.path = ('%s/?.lua;%s/?/init.lua;%s'):format(nvimPackagePath, nvimPackagePath, package.path)
+local nvim_package_path = os.getenv('DOTS') .. '/nvim'
+package.path = ('%s/?.lua;%s/?/init.lua;%s'):format(nvim_package_path, nvim_package_path, package.path)
 require('erde').load('jit')
 require('rc')

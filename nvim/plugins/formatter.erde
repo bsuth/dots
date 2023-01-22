@@ -1,7 +1,9 @@
 local C = require('constants')
-require('packer').use('mhartington/formatter.nvim')
+local packer = require('packer')
 
-function applyPrettier() {
+packer.use('mhartington/formatter.nvim')
+
+function prettier() {
   return {
     exe = 'prettierd',
     args = { vim.api.nvim_buf_get_name(0) },
@@ -28,14 +30,14 @@ vim.api.nvim_create_autocmd('BufWritePost', {
 
 require('formatter').setup({
   filetype = {
-    json = { applyPrettier },
-    javascript = { applyPrettier },
-    javascriptreact = { applyPrettier },
-    typescript = { applyPrettier },
-    typescriptreact = { applyPrettier },
-    graphql = { applyPrettier },
-    css = { applyPrettier },
-    scss = { applyPrettier },
-    less = { applyPrettier },
+    json = { prettier },
+    javascript = { prettier },
+    javascriptreact = { prettier },
+    typescript = { prettier },
+    typescriptreact = { prettier },
+    graphql = { prettier },
+    css = { prettier },
+    scss = { prettier },
+    less = { prettier },
   },
 })

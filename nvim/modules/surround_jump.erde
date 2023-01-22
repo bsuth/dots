@@ -19,7 +19,7 @@ local BACK_SURROUND_CHARS = {
   [']'] = true,
 }
 
-function findFirstCharBehind(searchChars, charline, charcol) {
+function find_first_char_behind(searchChars, charline, charcol) {
   local _, curcharline, curcharcol = unpack(vim.fn.getcurpos())
   charline ||= curcharline
   charcol ||= curcharcol
@@ -44,11 +44,11 @@ function findFirstCharBehind(searchChars, charline, charcol) {
   return char, charline, charcol
 }
 
-function jumpSurroundBack() {
-  local char, charline, charcol = findFirstCharBehind(SURROUND_CHARS)
+function jump_surround_back() {
+  local char, charline, charcol = find_first_char_behind(SURROUND_CHARS)
 
   if BACK_SURROUND_CHARS[char] {
-    char, charline, charcol = findFirstCharBehind(FORWARD_SURROUND_CHARS, charline, charcol)
+    char, charline, charcol = find_first_char_behind(FORWARD_SURROUND_CHARS, charline, charcol)
   }
 
   vim.fn.setcursorcharpos(charline, charcol)
