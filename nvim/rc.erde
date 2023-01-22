@@ -1,9 +1,3 @@
--- TODO: Unload to allow re-sourcing
--- package.loaded['constants'] = nil
--- package.loaded['language-support'] = nil
--- package.loaded['telescope-config'] = nil
--- package.loaded['work'] = nil
-
 -- -----------------------------------------------------------------------------
 -- Settings
 -- -----------------------------------------------------------------------------
@@ -46,7 +40,7 @@ vim.opt.commentstring = '//%s'
 -- -----------------------------------------------------------------------------
 
 -- vimrc
-vim.keymap.set('n', '<leader>ev', ':Explore ~/dots/nvim/lua<cr>')
+vim.keymap.set('n', '<leader>ev', ':Explore ~/dots/nvim<cr>')
 vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
 -- write, quit
@@ -81,36 +75,41 @@ vim.keymap.set('n', '<leader><c-j>', ':rightbelow :sp | :Explore<cr>')
 vim.keymap.set('n', '<leader><c-h>', ':aboveleft :vsp | :Explore<cr>')
 
 -- -----------------------------------------------------------------------------
--- Plugins
+-- Plugins / Modules
 -- -----------------------------------------------------------------------------
 
+function load(name) {
+  package.loaded[name] = nil -- unset to force reloading
+  require(name)
+}
+
 -- core
-require('plugins.packer')
+load('plugins.packer')
 require('packer').use('nvim-lua/plenary.nvim')
 local packer = require('packer')
 
 -- ide
-require('plugins.onedark')
-require('plugins.treesitter')
-require('plugins.lsp')
-require('plugins.formatter')
+load('plugins.onedark')
+load('plugins.treesitter')
+load('plugins.lsp')
+load('plugins.formatter')
 
 -- utils
 packer.use('matze/vim-move')
-require('plugins.sneak')
+load('plugins.sneak')
 packer.use('tpope/vim-surround')
-require('plugins.commentary')
-require('plugins.suda')
+load('plugins.commentary')
+load('plugins.suda')
 
 -- ui
-require('plugins.dirvish')
-require('plugins.fugitive')
-require('plugins.telescope')
-require('plugins.lualine')
-require('plugins.bookmarks')
+load('plugins.dirvish')
+load('plugins.fugitive')
+load('plugins.telescope')
+load('plugins.lualine')
+load('plugins.bookmarks')
 
 -- languages
-require('plugins.go')
+load('plugins.go')
 packer.use('peterhoeg/vim-qml')
 packer.use('tridactyl/vim-tridactyl')
 
@@ -118,13 +117,10 @@ packer.use('tridactyl/vim-tridactyl')
 packer.use('~/repos/vim-erde')
 packer.use('~/repos/emacs-bindings.nvim')
 
--- -----------------------------------------------------------------------------
--- Modules
--- -----------------------------------------------------------------------------
-
-require('modules.terminal')
-require('modules.tidy')
-require('modules.search_visual')
-require('modules.track_cwd')
-require('modules.surround_jump')
-pcall(() -> require('work'))
+-- modules
+load('modules.terminal')
+load('modules.tidy')
+load('modules.search_visual')
+load('modules.track_cwd')
+load('modules.surround_jump')
+pcall(() -> load('work'))

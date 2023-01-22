@@ -1,22 +1,11 @@
-local packer_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
+local PACKER_PATH = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 
-if vim.fn.empty(vim.fn.glob(packer_path)) > 0 {
+if vim.fn.empty(vim.fn.glob(PACKER_PATH)) > 0 {
+  vim.fn.system({ 'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', PACKER_PATH })
+  vim.cmd('packadd packer.nvim')
   vim.api.nvim_create_autocmd('VimEnter', {
     group = 'bsuth',
-    command = () -> {
-      -- TODO
-      -- local packerBootstrap = vim.fn.system({
-      --   'git',
-      --   'clone',
-      --   '--depth',
-      --   '1',
-      --   'https://github.com/wbthomason/packer.nvim',
-      --   packer_path,
-      -- })
-      -- if packerBootstrap then
-      --   require('packer').sync()
-      -- end
-    },
+    callback = () -> require('packer').sync(),
   })
 }
 
