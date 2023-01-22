@@ -1,8 +1,3 @@
--- -----------------------------------------------------------------------------
--- Packer
--- https://github.com/wbthomason/packer.nvim
--- -----------------------------------------------------------------------------
-
 local packer_path = vim.fn.stdpath('data') .. '/site/pack/packer/start/packer.nvim'
 
 if vim.fn.empty(vim.fn.glob(packer_path)) > 0 {
@@ -31,5 +26,4 @@ packer.init({ compile_path = "{vim.fn.stdpath('config')}/packer_compiled.lua" })
 packer.reset()
 packer.use('wbthomason/packer.nvim')
 
--- TODO: do not hardcode dirvish
-vim.keymap.set('n', '<leader>pack', ':Dirvish ~/.local/share/nvim/site/pack/packer/start<cr>')
+vim.keymap.set('n', '<leader>pack', ':Explore ~/.local/share/nvim/site/pack/packer/start<cr>')

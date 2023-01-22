@@ -96,6 +96,8 @@ SPACESHIP_PROMPT_ORDER=(
 # Hooks
 # ------------------------------------------------------------------------------
 
+# TODO: move this inside vimrc? (i.e. rebind <c-space> to feed in hooks?
+# TODO: need to call save_term_cd...
 function on_cd() {
   if [[ ! -z $NVIM ]]; then
     nvim --server $NVIM --remote-send "<c-[>:cd $(pwd)<cr>i"

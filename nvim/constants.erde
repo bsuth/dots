@@ -1,10 +1,11 @@
-module DOTS = os.getenv('DOTS')
+module FILE_BROWSER_FILETYPE = 'netrw'
 
-module FBROWSER = { command = 'Explore', filetype = 'netrw' }
+module FD_FAVORITES_PATH = os.getenv('DOTS') .. '/nvim/telescope_favorites_home'
+
+module TRACK_CWD_BLACKLIST = { '^term://' }
+module TRACK_CWD_BUFNAME_FILTER = {}
 
 module TERM_PATTERNS = { 'term://*zsh*', 'term://*bash*' }
 module JS_PATTERNS = { '*.js', '*.jsx', '*.ts', '*.tsx' }
 module CSS_PATTERNS = { '*.css', '*.scss', '*.less' }
 module JSON_PATTERNS = { '*.json', '*.cjson' }
-
-module FD_FAVORITES_PATH = DOTS .. '/nvim/telescope_favorites_home'

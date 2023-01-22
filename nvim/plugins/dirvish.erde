@@ -3,12 +3,15 @@ local packer = require('packer')
 
 packer.use('justinmk/vim-dirvish')
 
--- TODO: use this
-C.DIRCMD = 'Dirvish'
-
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
 vim.g.loaded_netrwPlugin = true
+
+C.FILE_BROWSER_FILETYPE = 'dirvish'
+vim.api.nvim_create_user_command('Explore', 'Dirvish <args>', {
+  nargs = '?',
+  force = true,
+})
 
 function xdg_open() {
   local file = vim.fn.expand('<cWORD>')

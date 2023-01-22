@@ -1,21 +1,11 @@
-local { TERM_PATTERNS } = require('constants')
+local C = require('constants')
 
 local CWD_CACHE = {}
-
-local CWD_TRACK_BLACKLIST = {
-  '^term://',
-  '^fugitive://',
-}
-
-local CWD_TRACK_BUFNAME_FILTER = {
-  -- TODO: have suda inject this
-  '^suda://',
-}
 
 function get_bufname() {
   local bufname = vim.api.nvim_buf_get_name(0)
 
-  for _, pattern in ipairs(CWD_TRACK_BUFNAME_FILTER) {
+  for _, pattern in ipairs(C.TRACK_CWD_BUFNAME_FILTER) {
     bufname = bufname:gsub(pattern, '')
   }
 
@@ -23,7 +13,7 @@ function get_bufname() {
 }
 
 function is_blacklist_bufname(bufname) {
-  for _, pattern in ipairs(CWD_TRACK_BLACKLIST) {
+  for _, pattern in ipairs(C.TRACK_CWD_BLACKLIST) {
     if bufname:match(pattern) {
       return true
     }
@@ -49,8 +39,8 @@ vim.api.nvim_create_autocmd('BufEnter', {
       }
     } elseif !is_blacklist_bufname(bufname) {
       vim.cmd('cd ' .. vim.fn.fnamemodify(bufname, ':p:h'))
-      if vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' {
-        vim.cmd('Dirvish') -- refresh dirvish after cd
+      if vim.api.nvim_buf_get_option(0, 'filetype') == C.FILE_BROWSER_FILETYPE {
+        vim.cmd('Explore') -- refresh file browser
       }
     }
   },
@@ -58,13 +48,13 @@ vim.api.nvim_create_autocmd('BufEnter', {
 
 vim.api.nvim_create_autocmd('TermOpen', {
   group = 'bsuth',
-  pattern = TERM_PATTERNS,
+  pattern = C.TERM_PATTERNS,
   callback = save_term_cwd,
 })
 
 vim.api.nvim_create_autocmd('TermClose', {
   group = 'bsuth',
-  pattern = TERM_PATTERNS,
+  pattern = C.TERM_PATTERNS,
   callback = () -> {
     local bufname = get_bufname()
     if !is_blacklist_bufname(bufname) && CWD_CACHE[bufname] != nil {
