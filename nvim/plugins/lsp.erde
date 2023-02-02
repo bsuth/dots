@@ -16,7 +16,7 @@ local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
 vim.keymap.set('n', '<leader>lsp', ':silent :LspRestart<cr>')
 vim.keymap.set('n', "''", vim.lsp.buf.hover)
-vim.keymap.set('n', "'", vim.diagnostic.open_float) -- o(pen)
+vim.keymap.set('n', "'o", vim.diagnostic.open_float) -- o(pen)
 vim.keymap.set('n', "'r", vim.lsp.buf.rename) -- r(ename)
 vim.keymap.set('n', "'d", vim.lsp.buf.definition) -- d(efinition)
 vim.keymap.set('n', "'p", vim.diagnostic.goto_prev) -- p(rev)
