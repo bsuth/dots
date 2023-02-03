@@ -1,0 +1,144 @@
+local awful = require('awful')
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+
+local WORDCHARS = os.getenv('WORDCHARS')
+local Prompt = {}
+
+function Prompt:_init(props = {}) {
+  self.text = props.text || ''
+  self.cursor = props.cursor || 0
+
+  self.on_submit = props.on_submit
+  self.on_stop = props.on_stop
+  self.on_cancel = props.on_cancel
+
+  self.rootWidget = wibox.widget({
+    markup = '',
+    halign = props.halign,
+    valign = props.valign,
+    font = props.font,
+    widget = wibox.widget.textbox
+  })
+
+  local keybindings = {
+    { {}, 'Escape', () -> {
+      self.keygrabber:stop()
+      if self.on_stop { self.on_stop() }
+      if self.on_cancel { self.on_cancel() }
+    } },
+    { {}, 'Return', () -> {
+      self.keygrabber:stop()
+      if self.on_stop { self.on_stop() }
+      if self.on_submit { self.on_submit() }
+    } },
+    { {}, 'Right', () -> self:_move_char_forward() },
+    { {}, 'Left', () -> self:_move_char_back() },
+    { { 'Control' }, 'f', () -> self:_move_char_forward() },
+    { { 'Control' }, 'b', () -> self:_move_char_back() },
+    { { 'Mod1' }, 'f', () -> self:_move_word_forward() },
+    { { 'Mod1' }, 'b', () -> self:_move_word_back() },
+    { { 'Control' }, 'a', () -> self:_move_line_start() },
+    { { 'Control' }, 'e', () -> self:_move_line_end() },
+    { { 'Control' }, 'd', () -> self:_delete_char_forward() },
+    { {}, 'BackSpace', () -> self:_delete_char_back() },
+    { { 'Mod1' }, 'd', () -> self:_delete_word_forward() },
+    { { 'Mod1' }, 'BackSpace', () -> self:_delete_word_back() },
+    { { 'Control' }, 'u', () -> self:_delete_line_start() },
+    { { 'Control' }, 'k', () -> self:_delete_line_end() },
+  }
+
+  if props.keybindings {
+    for _, keybinding in ipairs(props.keybindings) {
+      table.insert(keybindings, keybinding)
+    }
+  }
+
+  self.keygrabber = awful.keygrabber({
+    keybindings = keybindings,
+    keyreleased_callback = (_, mod, key) -> {
+      if #mod == 0 && #key == 1 {
+        self:refresh(table.concat({
+          self.text:sub(1, self.cursor),
+          key,
+          self.text:sub(self.cursor + 1),
+        }), self.cursor + 1)
+      }
+    },
+  })
+}
+
+function Prompt:_move_char_forward() {
+  if self.cursor < #self.text {
+    self:refresh(nil, self.cursor + 1)
+  }
+}
+
+function Prompt:_move_char_back() {
+  if self.cursor > 0 {
+    self:refresh(nil, self.cursor - 1)
+  }
+}
+
+function Prompt:_move_word_forward() {
+}
+
+function Prompt:_move_word_back() {
+}
+
+function Prompt:_move_line_start() {
+  self:refresh(nil, 0)
+}
+
+function Prompt:_move_line_end() {
+  self:refresh(nil, #self.text)
+}
+
+function Prompt:_delete_char_forward() {
+  if self.cursor < #self.text {
+    self:refresh(self.text:sub(1, self.cursor) .. self.text:sub(self.cursor + 2))
+  }
+}
+
+function Prompt:_delete_char_back() {
+  if self.cursor > 0 {
+    self:refresh(
+      self.text:sub(1, self.cursor - 1) .. self.text:sub(self.cursor + 1),
+      self.cursor - 1,
+    )
+  }
+}
+
+function Prompt:_delete_word_forward() {
+}
+
+function Prompt:_delete_word_back() {
+}
+
+function Prompt:_delete_line_start() {
+  if self.cursor > 0 {
+    self:refresh(self.text:sub(self.cursor + 1), 0)
+  }
+}
+
+function Prompt:_delete_line_end() {
+  if self.cursor < #self.text {
+    self:refresh(self.text:sub(1, self.cursor))
+  }
+}
+
+function Prompt:refresh(new_text, new_cursor) {
+  if new_text { self.text = new_text }
+  if new_cursor { self.cursor = new_cursor }
+  local new_widget_markup = self.text:sub(1, self.cursor)
+  new_widget_markup ..= [[<span foreground="{palette.darkGray}">|</span>]]
+  new_widget_markup ..= self.text:sub(self.cursor + 1)
+  self.rootWidget.markup = new_widget_markup
+}
+
+function Prompt:start(new_text) {
+  if new_text { self:refresh(new_text, #new_text) }
+  self.keygrabber:start()
+}
+
+return Prompt

@@ -5,6 +5,7 @@ local { globalKeys } = require('core.bindings')
 local Object = require('core.Object')
 local { palette } = require('core.theme')
 local Menu = require('components.Menu')
+local Prompt = require('components.Prompt')
 local veil = require('veil')
 
 local TAGBAR_HEIGHT = 48
@@ -47,14 +48,6 @@ function saveRecentlyUsedTabName(tabName) {
   tagbarNameHistoryFile:close()
 }
 
-local tabRenameMenuProps = {
-  options = recentlyUsedTabNames,
-  onClose = veil.hide,
-  allowArbitraryInput = true,
-}
-
-local tabRenameMenu = Object(Menu, tabRenameMenuProps)
-
 -- -----------------------------------------------------------------------------
 -- Tab
 -- -----------------------------------------------------------------------------
@@ -63,6 +56,21 @@ local Tab = {}
 
 function Tab:_init(tag) {
   self.tag = tag
+
+  self.prompt = Object(Prompt, {
+    halign = 'center',
+    valign = 'center',
+    font = TAGBAR_FONT,
+    on_stop = () -> {
+      self.contentWidget.children = { self.nameWidget }
+    },
+    on_submit = () -> {
+      if #self.prompt.text > 0 {
+        self.tag.name = self.prompt.text
+        saveRecentlyUsedTabName(self.prompt.text)
+      }
+    },
+  })
 
   self.nameWidget = wibox.widget({
     text = tag.name,
@@ -102,16 +110,8 @@ function Tab:toggle() {
 }
 
 function Tab:rename() {
-  tabRenameMenuProps.onSubmit = newTagName -> {
-    if #newTagName > 0 {
-      self.tag.name = newTagName
-      saveRecentlyUsedTabName(newTagName)
-      tabRenameMenu:refresh()
-    }
-  }
-
-  tabRenameMenu:run()
-  veil.show(tabRenameMenu.rootWidget)
+  self.contentWidget.children = { self.prompt.rootWidget }
+  self.prompt:start(self.tag.name)
 }
 
 -- -----------------------------------------------------------------------------
@@ -151,7 +151,7 @@ function Tagbar:getActiveTab() {
 }
 
 function Tagbar:getNextTab(tabIndex, reverse = false) {
-  local nextTabIndex = reverse 
+  local nextTabIndex = reverse
     && (tabIndex == 1 && #self.tabs || tabIndex - 1)
     || (tabIndex == #self.tabs && 1 || tabIndex + 1)
   return self.tabs[nextTabIndex], nextTabIndex
