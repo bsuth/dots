@@ -1,12 +1,3 @@
-local SURROUND_CHARS = {
-  ['('] = true,
-  [')'] = true,
-  ['{'] = true,
-  ['}'] = true,
-  ['['] = true,
-  [']'] = true,
-}
-
 local FORWARD_SURROUND_CHARS = {
   ['('] = true,
   ['{'] = true,
@@ -19,9 +10,13 @@ local BACK_SURROUND_CHARS = {
   [']'] = true,
 }
 
--- TODO: improve compatability with jump list
+local SURROUND_CHARS = {}
+for char in pairs(FORWARD_SURROUND_CHARS) { SURROUND_CHARS[char] = true }
+for char in pairs(BACK_SURROUND_CHARS) { SURROUND_CHARS[char] = true }
+
 function surround_jump_back() {
-  local _, charline, charcol = unpack(vim.fn.getcurpos())
+  local _, startline, startcol = unpack(vim.fn.getcurpos())
+  local charline, charcol = startline, startcol
   local line = vim.fn.getline(charline)
   local char = line:sub(charcol, charcol)
 
@@ -39,16 +34,20 @@ function surround_jump_back() {
     }
   } until SURROUND_CHARS[char]
 
-  vim.fn.setcursorcharpos(charline, charcol)
-
   if BACK_SURROUND_CHARS[char] {
-    vim.cmd('normal %')
+    vim.fn.setcursorcharpos(charline, charcol)
+    vim.cmd('keepjumps normal %')
+    _, charline, charcol = unpack(vim.fn.getcurpos())
+    vim.fn.setcursorcharpos(startline, startcol)
   }
+
+  -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
+  vim.cmd("normal {charline}G{charcol}|")
 }
 
--- TODO: improve compatability with jump list
 function surround_jump_forward() {
-  local _, charline, charcol = unpack(vim.fn.getcurpos())
+  local _, startline, startcol = unpack(vim.fn.getcurpos())
+  local charline, charcol = startline, startcol
   local line = vim.fn.getline(charline)
   local char = line:sub(charcol, charcol)
 
@@ -70,11 +69,15 @@ function surround_jump_forward() {
     }
   } until SURROUND_CHARS[char]
 
-  vim.fn.setcursorcharpos(charline, charcol)
-
   if FORWARD_SURROUND_CHARS[char] {
-    vim.cmd('normal %')
+    vim.fn.setcursorcharpos(charline, charcol)
+    vim.cmd('keepjumps normal %')
+    _, charline, charcol = unpack(vim.fn.getcurpos())
+    vim.fn.setcursorcharpos(startline, startcol)
   }
+
+  -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
+  vim.cmd("normal {charline}G{charcol}|")
 }
 
 vim.keymap.set('n', ')', surround_jump_forward)
