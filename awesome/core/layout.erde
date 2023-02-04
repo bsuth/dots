@@ -4,13 +4,13 @@ local layout = { name = 'layout' }
 
 function layout.arrange(p) {
   if p.workarea.height > p.workarea.width {
-    local clientHeight = p.workarea.height / math.max(1, #p.clients)
+    local client_height = p.workarea.height / math.max(1, #p.clients)
     for i, client in ipairs(p.clients) {
       p.geometries[client] = {
         x = p.workarea.x,
-        y = p.workarea.y + (i - 1) * clientHeight,
+        y = p.workarea.y + (i - 1) * client_height,
         width = p.workarea.width,
-        height = clientHeight,
+        height = client_height,
       }
     }
   } elseif #p.clients < 4 {

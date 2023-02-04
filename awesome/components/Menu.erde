@@ -3,22 +3,18 @@ local gears = require('gears')
 local wibox = require('wibox')
 local Object = require('core.Object')
 local { palette } = require('core.theme')
-local { shallowCopy, trim } = require('core.utils')
+local { trim } = require('core.utils')
 
 local MENU_ITEM_WIDTH = 384
 local MENU_ITEM_HEIGHT = 60
 local MENU_PAGE_SIZE = 5
 local SCROLLBAR_WIDTH = 4
 
--- -----------------------------------------------------------------------------
--- MenuItemWidget
--- -----------------------------------------------------------------------------
-
-function createMenuItemWidget(contentWidget) {
+function create_menu_item_widget(content_widget) {
   return wibox.widget({
     {
       {
-        contentWidget,
+        content_widget,
         left = 16,
         right = 16,
         widget = wibox.container.margin,
@@ -27,7 +23,7 @@ function createMenuItemWidget(contentWidget) {
       widget = wibox.container.place,
     },
     fg = palette.white,
-    bg = palette.darkGray,
+    bg = palette.dark_gray,
     forced_width = MENU_ITEM_WIDTH,
     forced_height = MENU_ITEM_HEIGHT,
     widget = wibox.container.background,
@@ -36,65 +32,52 @@ function createMenuItemWidget(contentWidget) {
 
 -- -----------------------------------------------------------------------------
 -- MenuItem
---
--- props? = {
---   markup = string,
---   active? = boolean,
--- }
 -- -----------------------------------------------------------------------------
 
 local MenuItem = {}
 
 function MenuItem:_init(props = {}) {
-  self.textWidget = wibox.widget({
+  self.text_widget = wibox.widget({
     markup = props.markup,
     widget = wibox.widget.textbox,
   })
 
-  self.suffixWidget = wibox.widget({
+  self.suffix_widget = wibox.widget({
     text = '',
     widget = wibox.widget.textbox,
   })
 
-  self.rootWidget = createMenuItemWidget({
-    self.textWidget,
+  self.root_widget = create_menu_item_widget({
+    self.text_widget,
     { widget = wibox.container.background },
-    self.suffixWidget,
+    self.suffix_widget,
     spacing = 8,
     layout = wibox.layout.align.horizontal,
   })
 
   if props.active {
-    self.rootWidget.bg = palette.lightGray
+    self.root_widget.bg = palette.light_gray
   }
 }
 
 function MenuItem:_get_markup() {
-  return self.textWidget.markup
+  return self.text_widget.markup
 }
 
-function MenuItem:_set_markup(newMarkup) {
-  self.textWidget.markup = newMarkup
+function MenuItem:_set_markup(new_markup) {
+  self.text_widget.markup = new_markup
 }
 
 function MenuItem:_get_active() {
-  return !!gears.color.to_rgba_string(self.rootWidget.bg):find(palette.lightGray)
+  return !!gears.color.to_rgba_string(self.root_widget.bg):find(palette.light_gray)
 }
 
-function MenuItem:_set_active(newActive) {
-  self.rootWidget.bg = newActive && palette.lightGray || palette.darkGray
+function MenuItem:_set_active(new_active) {
+  self.root_widget.bg = new_active && palette.light_gray || palette.dark_gray
 }
 
 -- -----------------------------------------------------------------------------
 -- Menu
---
--- props = {
---   options<1> = (string | { label = string, options = <1> })[]
---   onSubmit = (option: string) -> void,
---   onClose? = () -> void,
---   allowArbitraryInput? = boolean,
---   defaultPromptText? = string,
--- }
 -- -----------------------------------------------------------------------------
 
 local Menu = {}
@@ -103,14 +86,14 @@ function Menu:_init(props) {
   self.props = props
 
   self.items = {}
-  self.itemsWidget = wibox.widget({ layout = wibox.layout.fixed.vertical })
+  self.items_widget = wibox.widget({ layout = wibox.layout.fixed.vertical })
   for i = 1, MENU_PAGE_SIZE {
-    local dmenuItem = Object(MenuItem, { markup = '' })
-    table.insert(self.items, dmenuItem)
-    self.itemsWidget:add(dmenuItem.rootWidget)
+    local dmenu_item = Object(MenuItem, { markup = '' })
+    table.insert(self.items, dmenu_item)
+    self.items_widget:add(dmenu_item.root_widget)
   }
 
-  self.promptContainer = wibox.widget({
+  self.prompt_container = wibox.widget({
     {
       -- dummy textbox to prevent container from collapsing
       markup = '',
@@ -119,36 +102,36 @@ function Menu:_init(props) {
     layout = wibox.layout.fixed.horizontal,
   })
 
-  self.scrollThumbWidget = wibox.widget({
+  self.scroll_thumb_widget = wibox.widget({
     forced_width = SCROLLBAR_WIDTH,
     bg = palette.cyan,
     widget = wibox.container.background,
   })
 
-  self.scrollbarWidget = wibox.widget({ layout = wibox.layout.manual })
-  self.scrollbarWidget:add_at(self.scrollThumbWidget, { x = 0, y = 0 })
+  self.scrollbar_widget = wibox.widget({ layout = wibox.layout.manual })
+  self.scrollbar_widget:add_at(self.scroll_thumb_widget, { x = 0, y = 0 })
 
-  self.rootWidget = wibox.widget({
+  self.root_widget = wibox.widget({
     {
       {
-        createMenuItemWidget(self.promptContainer),
+        create_menu_item_widget(self.prompt_container),
         shape_border_width = 1,
         shape_border_color = palette.cyan,
-        bg = palette.darkGray,
+        bg = palette.dark_gray,
         widget = wibox.container.background,
       },
       {
-        self.itemsWidget,
+        self.items_widget,
         shape_border_width = 1,
         shape_border_color = palette.cyan,
-        bg = palette.darkGray,
+        bg = palette.dark_gray,
         widget = wibox.container.background,
       },
       spacing = 8,
       layout = wibox.layout.fixed.vertical,
     },
     {
-      self.scrollbarWidget,
+      self.scrollbar_widget,
       top = MENU_ITEM_HEIGHT + 8,
       forced_width = SCROLLBAR_WIDTH,
       forced_height = MENU_ITEM_HEIGHT * MENU_PAGE_SIZE,
@@ -162,7 +145,7 @@ function Menu:_init(props) {
   self.options = props.options
 }
 
-function Menu:_on_change_itemIndexOffset() {
+function Menu:_on_change_item_index_offset() {
   self:refresh()
 }
 
@@ -175,98 +158,98 @@ function Menu:_on_change_options() {
   self:filter() -- force filter + refresh, in case input isnt actually changing
 }
 
-function Menu:_on_change_activeItemIndex(_, oldActiveItemIndex) {
-  if oldActiveItemIndex && oldActiveItemIndex > 0 {
-    self.items[oldActiveItemIndex].active = false
+function Menu:_on_change_active_item_index(_, old_active_item_index) {
+  if old_active_item_index && old_active_item_index > 0 {
+    self.items[old_active_item_index].active = false
   }
 
-  if self.activeItemIndex > 0 {
-    self.items[self.activeItemIndex].active = true
+  if self.active_item_index > 0 {
+    self.items[self.active_item_index].active = true
   }
 }
 
 function Menu:filter() {
-  local trimmedInput = trim(self.input)
+  local trimmed_input = trim(self.input)
 
-  if trimmedInput == '' {
-    self.filteredOptions = self.options
+  if trimmed_input == '' {
+    self.filtered_options = self.options
   } else {
-    self.filteredOptions = {}
+    self.filtered_options = {}
     for _, option in ipairs(self.options) {
-      local optionLabel = type(option) == 'table' && option.label || option
-      if (optionLabel:find(trimmedInput)) {
-        table.insert(self.filteredOptions, option)
+      local option_label = type(option) == 'table' && option.label || option
+      if (option_label:find(trimmed_input)) {
+        table.insert(self.filtered_options, option)
       }
     }
   }
 
-  self.activeItemIndex = self.props.allowArbitraryInput && 0 || 1
-  self:rawset('itemIndexOffset', 0, true)
+  self.active_item_index = self.props.allow_arbitrary_input && 0 || 1
+  self:rawset('item_index_offset', 0, true)
   self:refresh() -- force refresh, in case input isnt actually changing
 }
 
 function Menu:refresh() {
-  local newItemsWidgetChildren = {}
-  local numFilteredOptions = #self.filteredOptions
+  local new_items_widget_children = {}
+  local num_filtered_options = #self.filtered_options
 
-  if numFilteredOptions <= MENU_PAGE_SIZE {
-    self.scrollbarWidget.visible = false
+  if num_filtered_options <= MENU_PAGE_SIZE {
+    self.scrollbar_widget.visible = false
   } else {
-    local numScroll = numFilteredOptions - MENU_PAGE_SIZE + 1
-    local scrollIncrement = (MENU_ITEM_HEIGHT * MENU_PAGE_SIZE) / numScroll
-    self.scrollThumbWidget.forced_height = scrollIncrement
-    self.scrollbarWidget:move_widget(self.scrollThumbWidget, { x = 0, y = self.itemIndexOffset * scrollIncrement })
-    self.scrollbarWidget.visible = true
+    local num_scroll = num_filtered_options - MENU_PAGE_SIZE + 1
+    local scroll_increment = (MENU_ITEM_HEIGHT * MENU_PAGE_SIZE) / num_scroll
+    self.scroll_thumb_widget.forced_height = scroll_increment
+    self.scrollbar_widget:move_widget(self.scroll_thumb_widget, { x = 0, y = self.item_index_offset * scroll_increment })
+    self.scrollbar_widget.visible = true
   }
 
-  for i = 1, math.min(numFilteredOptions - self.itemIndexOffset, MENU_PAGE_SIZE) {
-    local option = self.filteredOptions[self.itemIndexOffset + i]
-    local optionLabel = type(option) == 'table' && option.label || option
-    local newItemMarkup = optionLabel
+  for i = 1, math.min(num_filtered_options - self.item_index_offset, MENU_PAGE_SIZE) {
+    local option = self.filtered_options[self.item_index_offset + i]
+    local option_label = type(option) == 'table' && option.label || option
+    local new_item_markup = option_label
 
     if self.input != '' {
-      local matchStart, matchEnd = optionLabel:find(self.input)
-      newItemMarkup = table.concat({
-        optionLabel:sub(1, matchStart - 1),
+      local match_start, match_end = option_label:find(self.input)
+      new_item_markup = table.concat({
+        option_label:sub(1, match_start - 1),
         ('<span color="%s">%s</span>'):format(palette.cyan, self.input),
-        optionLabel:sub(matchEnd + 1),
+        option_label:sub(match_end + 1),
       })
     }
 
-    self.items[i].textWidget.markup = newItemMarkup
-    self.items[i].suffixWidget.text = (type(option) == 'table' && option.options) && '➜' || ''
-    table.insert(newItemsWidgetChildren, self.items[i].rootWidget)
+    self.items[i].text_widget.markup = new_item_markup
+    self.items[i].suffix_widget.text = (type(option) == 'table' && option.options) && '➜' || ''
+    table.insert(new_items_widget_children, self.items[i].root_widget)
   }
 
-  self.itemsWidget.children = newItemsWidgetChildren
+  self.items_widget.children = new_items_widget_children
 }
 
 function Menu:prompt() {
   -- Use `return true, false` to prevent prompt from exiting
   -- https://awesomewm.org/doc/api/libraries/awful.prompt.html#hook
-  local onBack = () -> { self:back(); return true, false }
-  local onPrev = () -> { self:prev(); return true, false }
-  local onNext = () -> { self:next(); return true, false }
+  local on_back = () -> { self:back(); return true, false }
+  local on_prev = () -> { self:prev(); return true, false }
+  local on_next = () -> { self:next(); return true, false }
 
   local prompt = awful.widget.prompt({
     prompt = '',
     fg = palette.white,
-    changed_callback = newInput -> { self.input = trim(newInput) },
+    changed_callback = new_input -> { self.input = trim(new_input) },
     hooks = {
-      { {}, '-', onBack },
-      { {}, 'Up', onPrev },
-      { {}, 'Down', onNext },
-      { { 'Control' }, 'p', onPrev },
-      { { 'Control' }, 'n', onNext },
-      { { 'Shift' }, 'Tab', onPrev },
-      { {}, 'Tab', onNext },
+      { {}, '-', on_back },
+      { {}, 'Up', on_prev },
+      { {}, 'Down', on_next },
+      { { 'Control' }, 'p', on_prev },
+      { { 'Control' }, 'n', on_next },
+      { { 'Shift' }, 'Tab', on_prev },
+      { {}, 'Tab', on_next },
       { {}, 'Return', () -> self:submit() },
       { { 'Control' }, 'c', () -> self:stop() },
       { {}, 'Escape', () -> self:stop() },
     },
   })
 
-  self.promptContainer.children = { self.promptContainer.children[1], prompt }
+  self.prompt_container.children = { self.prompt_container.children[1], prompt }
   prompt:run()
 }
 
@@ -277,29 +260,29 @@ function Menu:back() {
 }
 
 function Menu:prev() {
-  if self.activeItemIndex > (self.props.allowArbitraryInput && 0 || 1) {
-    self.activeItemIndex -= 1
-  } elseif self.itemIndexOffset > 0 {
-    self.itemIndexOffset -= 1
+  if self.active_item_index > (self.props.allow_arbitrary_input && 0 || 1) {
+    self.active_item_index -= 1
+  } elseif self.item_index_offset > 0 {
+    self.item_index_offset -= 1
   } else {
-    local numFilteredOptions = #self.filteredOptions
-    local limit = math.min(MENU_PAGE_SIZE, numFilteredOptions)
-    self.activeItemIndex = limit
-    self.itemIndexOffset = numFilteredOptions - limit
+    local num_filtered_options = #self.filtered_options
+    local limit = math.min(MENU_PAGE_SIZE, num_filtered_options)
+    self.active_item_index = limit
+    self.item_index_offset = num_filtered_options - limit
   }
 }
 
 function Menu:next() {
-  local numFilteredOptions = #self.filteredOptions
-  local limit = math.min(MENU_PAGE_SIZE, numFilteredOptions)
+  local num_filtered_options = #self.filtered_options
+  local limit = math.min(MENU_PAGE_SIZE, num_filtered_options)
 
-  if self.activeItemIndex < limit {
-    self.activeItemIndex += 1
-  } elseif self.itemIndexOffset < numFilteredOptions - limit {
-    self.itemIndexOffset += 1
+  if self.active_item_index < limit {
+    self.active_item_index += 1
+  } elseif self.item_index_offset < num_filtered_options - limit {
+    self.item_index_offset += 1
   } else {
-    self.activeItemIndex = self.props.allowArbitraryInput && 0 || 1
-    self.itemIndexOffset = 0
+    self.active_item_index = self.props.allow_arbitrary_input && 0 || 1
+    self.item_index_offset = 0
   }
 }
 
@@ -308,29 +291,29 @@ function Menu:run() {
   if self.options != self.props.options {
     self.options = self.props.options
   } else {
-    self.activeItemIndex = self.props.allowArbitraryInput && 0 || 1
-    self.itemIndexOffset = 0
+    self.active_item_index = self.props.allow_arbitrary_input && 0 || 1
+    self.item_index_offset = 0
   }
 }
 
 function Menu:stop(option) {
   awful.keygrabber.stop()
-  if option { self.props.onSubmit(option, self.path) }
-  if self.props.onClose { self.props.onClose() }
+  if option { self.props.on_submit(option, self.path) }
+  if self.props.on_close { self.props.on_close() }
   self.input = ''
 }
 
 function Menu:submit() {
-  local activeOption = self.filteredOptions[self.itemIndexOffset + self.activeItemIndex]
-  if self.activeItemIndex == 0 {
+  local active_option = self.filtered_options[self.item_index_offset + self.active_item_index]
+  if self.active_item_index == 0 {
     self:stop(self.input)
-  } elseif type(activeOption) == 'table' && activeOption.options {
+  } elseif type(active_option) == 'table' && active_option.options {
     table.insert(self.path, self.options)
-    self.options = activeOption.options
+    self.options = active_option.options
     awful.keygrabber.stop()
     self:prompt()
   } else {
-    self:stop(activeOption)
+    self:stop(active_option)
   }
 }
 

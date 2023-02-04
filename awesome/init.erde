@@ -12,9 +12,9 @@ local layout = require('core.layout')
 require('core.client')
 require('core.models')
 require('core.theme')
-require('clientBuffer')
+require('client_buffer')
 require('dmenu')
-require('statusMenu')
+require('status_menu')
 require('tagbar')
 
 -- Init tags
@@ -46,11 +46,11 @@ awful.tag.attached_connect_signal(nil, 'request::screen', tag -> {
 --
 -- Do this at the end, since we cannot update bindings dynamically and need to
 -- ensure other modules have registered their keybindings
-root.keys(gears.table.join(bindings.globalKeys))
+root.keys(gears.table.join(bindings.global_keys))
 ruled.client.append_rule({
   rule = {},
   properties = {
-    keys = gears.table.join(bindings.clientKeys),
-    buttons = gears.table.join(bindings.clientButtons),
+    keys = gears.table.join(bindings.client_keys),
+    buttons = gears.table.join(bindings.client_buttons),
   },
 })

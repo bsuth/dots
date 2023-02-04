@@ -2,7 +2,7 @@ local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
 local naughty = require('naughty')
-local { getFullAssetPath } = require('core.utils')
+local { get_full_asset_path } = require('core.utils')
 
 -- -----------------------------------------------------------------------------
 -- Palette
@@ -19,8 +19,8 @@ module palette = {
   cyan = '#51a8b3',
 
   black = '#101012',
-  darkGray = '#232326',
-  lightGray = '#35353b',
+  dark_gray = '#232326',
+  light_gray = '#35353b',
 
   -- Custom
   white = '#e8e8e8',
@@ -44,7 +44,7 @@ beautiful.init({
   border_focus = palette.white,
 
   notification_font = 'Quicksand Regular 14',
-  notification_bg = palette.darkGray,
+  notification_bg = palette.dark_gray,
   notification_fg = palette.white,
   notification_border_color = palette.cyan,
 })
@@ -62,14 +62,14 @@ naughty.config.defaults.position = 'top_right'
 -- Wallpaper
 -- -----------------------------------------------------------------------------
 
-function setWallpaper(s) {
+function set_wallpaper(s) {
   local wallpaper = s.geometry.width > s.geometry.height
-    && getFullAssetPath('horizontal-wallpaper.svg')
-    || getFullAssetPath('vertical-wallpaper.svg')
+    && get_full_asset_path('horizontal-wallpaper.svg')
+    || get_full_asset_path('vertical-wallpaper.svg')
   gears.wallpaper.maximized(wallpaper, s)
 }
 
-awful.screen.connect_for_each_screen(setWallpaper)
+awful.screen.connect_for_each_screen(set_wallpaper)
 
 -- Re-set wallpaper when screen geometry changes (e.g. resolution change)
-screen.connect_signal('property::geometry', setWallpaper)
+screen.connect_signal('property::geometry', set_wallpaper)

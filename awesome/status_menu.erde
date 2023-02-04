@@ -2,9 +2,9 @@ local awful = require('awful')
 local gears = require('gears')
 local models = require('core.models')
 local wibox = require('wibox')
-local { globalKeys } = require('core.bindings')
+local { global_keys } = require('core.bindings')
 local { palette } = require('core.theme')
-local { getFullAssetPath, hex2rgb } = require('core.utils')
+local { get_full_asset_path, hex2rgb } = require('core.utils')
 local veil = require('veil')
 
 -- -----------------------------------------------------------------------------
@@ -14,28 +14,28 @@ local veil = require('veil')
 local STATUS_ITEM_SIZE = 36
 local DIAL_BORDER_WIDTH = 6
 
-local selectedItemIndex = 1
+local selected_item_index = 1
 
 -- -----------------------------------------------------------------------------
 -- StatusItemWidget
 -- -----------------------------------------------------------------------------
 
 function StatusItemWidget(opts) {
-  local textWidget = wibox.widget({
+  local text_widget = wibox.widget({
     text = tostring(opts.model.percent) .. '%',
     align = 'center',
     valign = 'center',
     widget = wibox.widget.textbox,
   })
 
-  local statusItemWidget = wibox.widget({
+  local status_item_widget = wibox.widget({
     {
       {
         {
           opts.widget,
           widget = wibox.container.place,
         },
-        textWidget,
+        text_widget,
         spacing = 16,
         layout = wibox.layout.fixed.vertical,
       },
@@ -43,76 +43,78 @@ function StatusItemWidget(opts) {
       widget = wibox.container.margin,
     },
     fg = opts.color,
-    bg = palette.darkGray,
+    bg = palette.dark_gray,
     widget = wibox.container.background,
   })
 
   opts.model:connect_signal('update', () -> {
-    textWidget.text = tostring(opts.model.percent) .. '%'
+    text_widget.text = tostring(opts.model.percent) .. '%'
   })
 
-  statusItemWidget:connect_signal('request::select', () -> {
-    statusItemWidget.bg = palette.lightGray
+  status_item_widget:connect_signal('request::select', () -> {
+    status_item_widget.bg = palette.light_gray
   })
 
-  statusItemWidget:connect_signal('request::unselect', () -> {
-    statusItemWidget.bg = palette.darkGray
+  status_item_widget:connect_signal('request::unselect', () -> {
+    status_item_widget.bg = palette.dark_gray
   })
 
-  statusItemWidget.keypressed_callback = opts.keypressed_callback
-  return statusItemWidget
+  status_item_widget.keypressed_callback = opts.keypressed_callback
+  return status_item_widget
 }
 
 -- -----------------------------------------------------------------------------
--- BatteryWidget
+-- BATTERY_WIDGET
 -- -----------------------------------------------------------------------------
 
-function getBatteryIcon() {
-  return models.battery.discharging && getFullAssetPath('battery-discharging.svg')
-    || getFullAssetPath('battery-charging.svg')
+function get_battery_icon() {
+  return models.battery.discharging
+    && get_full_asset_path('battery-discharging.svg')
+    || get_full_asset_path('battery-charging.svg')
 }
 
-local batteryIconWidget = wibox.widget({
-  image = getBatteryIcon(),
+local BATTERY_ICON_WIDGET = wibox.widget({
+  image = get_battery_icon(),
   forced_width = STATUS_ITEM_SIZE,
   forced_height = STATUS_ITEM_SIZE,
   widget = wibox.widget.imagebox,
 })
 
 models.battery:connect_signal('update', () -> {
-  batteryIconWidget.image = getBatteryIcon()
+  BATTERY_ICON_WIDGET.image = get_battery_icon()
 })
 
-local batteryWidget = StatusItemWidget({
+local BATTERY_WIDGET = StatusItemWidget({
   model = models.battery,
   color = palette.red,
-  widget = batteryIconWidget,
+  widget = BATTERY_ICON_WIDGET,
 })
 
 -- -----------------------------------------------------------------------------
--- VolumeWidget
+-- VOLUME_WIDGET
 -- -----------------------------------------------------------------------------
 
-function getVolumeIcon() {
-  return models.volume.active && getFullAssetPath('volume.svg')
-    || getFullAssetPath('volume-muted.svg')
+function get_volume_icon() {
+  return models.volume.active
+    && get_full_asset_path('volume.svg')
+    || get_full_asset_path('volume-muted.svg')
 }
 
-local volumeIconWidget = wibox.widget({
-  image = getVolumeIcon(),
+local VOLUME_ICON_WIDGET = wibox.widget({
+  image = get_volume_icon(),
   forced_width = STATUS_ITEM_SIZE,
   forced_height = STATUS_ITEM_SIZE,
   widget = wibox.widget.imagebox,
 })
 
 models.volume:connect_signal('update', () -> {
-  volumeIconWidget.image = getVolumeIcon()
+  VOLUME_ICON_WIDGET.image = get_volume_icon()
 })
 
-local volumeWidget = StatusItemWidget({
+local VOLUME_WIDGET = StatusItemWidget({
   model = models.volume,
   color = palette.green,
-  widget = volumeIconWidget,
+  widget = VOLUME_ICON_WIDGET,
   keypressed_callback = (mod, key) -> {
     if #mod == 0 {
       if key == 'j' {
@@ -131,14 +133,14 @@ local volumeWidget = StatusItemWidget({
 })
 
 -- -----------------------------------------------------------------------------
--- BrightnessWidget
+-- BRIGHTNESS_WIDGET
 -- -----------------------------------------------------------------------------
 
-local brightnessWidget = StatusItemWidget({
+local BRIGHTNESS_WIDGET = StatusItemWidget({
   model = models.brightness,
   color = palette.yellow,
   widget = {
-    image = getFullAssetPath('brightness.svg'),
+    image = get_full_asset_path('brightness.svg'),
     forced_width = STATUS_ITEM_SIZE,
     forced_height = STATUS_ITEM_SIZE,
     widget = wibox.widget.imagebox,
@@ -159,41 +161,41 @@ local brightnessWidget = StatusItemWidget({
 })
 
 -- -----------------------------------------------------------------------------
--- NotificationWidget
+-- NOTIFICATION_WIDGET
 -- -----------------------------------------------------------------------------
 
-function getNotificationIcon() {
+function get_notification_icon() {
   if models.notifications.active {
-    return getFullAssetPath('notifications-active.svg')
+    return get_full_asset_path('notifications-active.svg')
   } else {
-    return getFullAssetPath('notifications-inactive.svg')
+    return get_full_asset_path('notifications-inactive.svg')
   }
 }
 
-local notificationWidget = wibox.widget({
-  image = getNotificationIcon(),
+local NOTIFICATION_WIDGET = wibox.widget({
+  image = get_notification_icon(),
   forced_width = 64,
   forced_height = 64,
   widget = wibox.widget.imagebox,
 })
 
 models.notifications:connect_signal('update', () -> {
-  notificationWidget.image = getNotificationIcon()
+  NOTIFICATION_WIDGET.image = get_notification_icon()
 })
 
 -- -----------------------------------------------------------------------------
--- StatusMenuWidget
+-- STATUS_MENU_WIDGET
 -- -----------------------------------------------------------------------------
 
-local statusRowWidget = wibox.widget({
-  brightnessWidget,
-  volumeWidget,
-  batteryWidget,
+local STATUS_ROW_WIDGET = wibox.widget({
+  BRIGHTNESS_WIDGET,
+  VOLUME_WIDGET,
+  BATTERY_WIDGET,
   spacing = 16,
   layout = wibox.layout.flex.horizontal,
 })
 
-local statusMenuWidget = wibox.widget({
+local STATUS_MENU_WIDGET = wibox.widget({
   {
     {
       {
@@ -223,13 +225,13 @@ local statusMenuWidget = wibox.widget({
             layout = wibox.layout.fixed.vertical,
           },
           {
-            notificationWidget,
+            NOTIFICATION_WIDGET,
             widget = wibox.container.place,
           },
           spacing = 32,
           layout = wibox.layout.fixed.horizontal,
         },
-        statusRowWidget,
+        STATUS_ROW_WIDGET,
         spacing = 32,
         layout = wibox.layout.fixed.vertical,
       },
@@ -238,7 +240,7 @@ local statusMenuWidget = wibox.widget({
     },
     shape_border_width = 1,
     shape_border_color = palette.cyan,
-    bg = palette.darkGray,
+    bg = palette.dark_gray,
     widget = wibox.container.background,
   },
   margins = 16,
@@ -249,28 +251,28 @@ local statusMenuWidget = wibox.widget({
 -- Keygrabber
 -- -----------------------------------------------------------------------------
 
-function focusStatus(dir) {
-  local newSelectedItemIndex = math.min(
-    #statusRowWidget.children,
-    math.max(1, selectedItemIndex + dir)
+function focus_status(dir) {
+  local new_selected_item_index = math.min(
+    #STATUS_ROW_WIDGET.children,
+    math.max(1, selected_item_index + dir)
   )
 
-  statusRowWidget.children[selectedItemIndex]:emit_signal('request::unselect')
-  statusRowWidget.children[newSelectedItemIndex]:emit_signal('request::select')
-  selectedItemIndex = newSelectedItemIndex
+  STATUS_ROW_WIDGET.children[selected_item_index]:emit_signal('request::unselect')
+  STATUS_ROW_WIDGET.children[new_selected_item_index]:emit_signal('request::select')
+  selected_item_index = new_selected_item_index
 }
 
 local keygrabber = awful.keygrabber({
   stop_callback = veil.hide,
   keypressed_callback = (mod, key) => {
-    local selectedWidget = statusRowWidget.children[selectedItemIndex]
-    if type(selectedWidget.keypressed_callback) == 'function' {
-      selectedWidget.keypressed_callback(mod, key)
+    local selected_widget = STATUS_ROW_WIDGET.children[selected_item_index]
+    if type(selected_widget.keypressed_callback) == 'function' {
+      selected_widget.keypressed_callback(mod, key)
     }
   },
   keybindings = {
-    { {}, 'h', () -> focusStatus(-1) },
-    { {}, 'l', () -> focusStatus(1) },
+    { {}, 'h', () -> focus_status(-1) },
+    { {}, 'l', () -> focus_status(1) },
     { {}, 'm', () -> models.notifications:toggle() },
     { {}, 'XF86AudioLowerVolume', () -> models.volume:set(models.volume.percent - 5) },
     { {}, 'XF86AudioRaiseVolume', () -> models.volume:set(models.volume.percent + 5) },
@@ -285,8 +287,8 @@ local keygrabber = awful.keygrabber({
 -- Return
 -- -----------------------------------------------------------------------------
 
-table.insert(globalKeys, awful.key({ 'Mod4' }, ';', () -> {
-  focusStatus(0)
+table.insert(global_keys, awful.key({ 'Mod4' }, ';', () -> {
+  focus_status(0)
   keygrabber:start()
-  veil.show(statusMenuWidget)
+  veil.show(STATUS_MENU_WIDGET)
 }))

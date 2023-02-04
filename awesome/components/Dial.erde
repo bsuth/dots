@@ -13,7 +13,7 @@ function DialWidget(opts) {
     bgimage = (_, cr, width, height) -> {
       local m = math.min(width, height)
 
-      local bg = hex2rgb(palette.lightGray)
+      local bg = hex2rgb(palette.light_gray)
       cr:set_source_rgb(bg[1], bg[2], bg[3])
       gears.shape.arc(cr, m, m, DIAL_BORDER_WIDTH, 0, 2 * math.pi)
       cr:fill()

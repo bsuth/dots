@@ -12,7 +12,7 @@ local device = upower.Client():get_display_device()
 module battery = gears.table.crush(gears.object(), {
   percent = 0,
   discharging = true,
-  sentLowWarning = false,
+  sent_low_warning = false,
 
   update = () => {
     self.percent = device.percentage
@@ -22,12 +22,12 @@ module battery = gears.table.crush(gears.object(), {
     }, device.state) != nil
 
     if self.percent < 15 {
-      if !self.sentLowWarning {
+      if !self.sent_low_warning {
         naughty.notify({ text = 'Low Battery', force = true })
-        self.sentLowWarning = true
+        self.sent_low_warning = true
       }
-    } elseif self.sentLowWarning {
-      self.sentLowWarning = false
+    } elseif self.sent_low_warning {
+      self.sent_low_warning = false
     }
 
     self:emit_signal('update')

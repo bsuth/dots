@@ -1,7 +1,5 @@
 local awful = require('awful')
-local gears = require('gears')
 local naughty = require('naughty')
-local ruled = require('ruled')
 local models = require('core.models')
 
 -- -----------------------------------------------------------------------------
@@ -9,13 +7,13 @@ local models = require('core.models')
 -- -----------------------------------------------------------------------------
 
 function global_move_client(dir) {
-  local oldId = awful.client.idx(client.focus)
+  local old_id = awful.client.idx(client.focus)
   awful.client.swap.bydirection(dir)
-  local newId = awful.client.idx(client.focus)
+  local new_id = awful.client.idx(client.focus)
 
-  if oldId.col == newId.col && oldId.idx == newId.idx {
-    local newScreen = awful.screen.focused():get_next_in_direction(dir)
-    client.focus:move_to_screen(newScreen)
+  if old_id.col == new_id.col && old_id.idx == new_id.idx {
+    local new_screen = awful.screen.focused():get_next_in_direction(dir)
+    client.focus:move_to_screen(new_screen)
   }
 }
 
@@ -23,7 +21,7 @@ function global_move_client(dir) {
 -- Global Keys
 -- -----------------------------------------------------------------------------
 
-module globalKeys = {
+module global_keys = {
   awful.key({ 'Mod4', 'Shift' }, 'Escape', () -> {
     awesome.quit()
   }),
@@ -112,7 +110,7 @@ module globalKeys = {
 -- Client Keys
 -- -----------------------------------------------------------------------------
 
-module clientKeys = {
+module client_keys = {
   awful.key({ 'Mod4', 'Shift' }, 'q', c -> {
     c:kill()
   }),
@@ -152,7 +150,7 @@ module clientKeys = {
 -- Client Buttons
 -- -----------------------------------------------------------------------------
 
-module clientButtons = {
+module client_buttons = {
   awful.button({}, 1, c -> {
     c:emit_signal('request::activate', 'mouse_click', { raise = true })
   }),

@@ -1,7 +1,7 @@
 local awful = require('awful')
 local gears = require('gears')
 local layout = require('core.layout')
-local { globalKeys } = require('core.bindings')
+local { global_keys } = require('core.bindings')
 
 -- -----------------------------------------------------------------------------
 -- Client Buffer
@@ -9,18 +9,18 @@ local { globalKeys } = require('core.bindings')
 -- A private tag used as a stack for temporarily storing clients
 -- -----------------------------------------------------------------------------
 
-local clientBuffer = awful.tag.add('_clientBuffer', {
+local CLIENT_BUFFER = awful.tag.add('_clientBuffer', {
   screen = awful.screen.focused(),
   layout = layout,
 })
 
-gears.table.merge(globalKeys, {
+gears.table.merge(global_keys, {
   awful.key({ 'Mod4' }, 'm', () -> {
-    client.focus:move_to_tag(clientBuffer)
+    client.focus:move_to_tag(CLIENT_BUFFER)
     client.focus.minimized = true
   }),
   awful.key({ 'Mod4', 'Shift' }, 'm', () -> {
-    local clients = clientBuffer:clients()
+    local clients = CLIENT_BUFFER:clients()
     if #clients > 0 {
       local c = clients[#clients]
       local s = awful.screen.focused()
@@ -38,7 +38,7 @@ awesome.connect_signal('startup', () -> {
     for _, tag in ipairs(s.tags) {
       for _, c in ipairs(tag:clients()) {
         if c.minimized {
-          c:move_to_tag(clientBuffer)
+          c:move_to_tag(CLIENT_BUFFER)
         }
       }
     }

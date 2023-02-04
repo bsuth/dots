@@ -10,14 +10,14 @@ local Object = setmetatable({}, ObjectMT)
 -- -----------------------------------------------------------------------------
 
 function Object:rawget(key) {
-  local proxyValue = self._proxy[key]
-  if proxyValue != nil {
-    return proxyValue
+  local proxy_value = self._proxy[key]
+  if proxy_value != nil {
+    return proxy_value
   }
 
-  local classValue = self._class[key]
-  if classValue != nil {
-    return classValue
+  local class_value = self._class[key]
+  if class_value != nil {
+    return class_value
   }
 
   return Object[key]
@@ -32,11 +32,11 @@ function Object:get(key) {
   }
 }
 
-function Object:rawset(key, value, noPublish) {
-  local oldValue = Object.rawget(self, key)
+function Object:rawset(key, value, no_publish) {
+  local old_value = Object.rawget(self, key)
   self._proxy[key] = value
-  if !noPublish && oldValue != value {
-    Object.publish(self, "change_{key}", value, oldValue)
+  if !no_publish && old_value != value {
+    Object.publish(self, "change_{key}", value, old_value)
   }
 }
 

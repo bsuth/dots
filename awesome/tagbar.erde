@@ -1,7 +1,7 @@
 local awful = require('awful')
 local gears = require('gears')
 local wibox = require('wibox')
-local { globalKeys } = require('core.bindings')
+local { global_keys } = require('core.bindings')
 local Object = require('core.Object')
 local { palette } = require('core.theme')
 local { trim } = require('core.utils')
@@ -93,7 +93,7 @@ function TabSuggestions:_init(props) {
     minimum_width = self.screen.geometry.width,
     minimum_height = TAGBAR_HEIGHT,
     fg = palette.white,
-    bg = palette.darkGray,
+    bg = palette.dark_gray,
   })
 }
 
@@ -195,7 +195,7 @@ function Tab:_init(props) {
   self.root_widget = wibox.widget({
     self.content_widget,
     fg = palette.white,
-    bg = self.tag.selected && palette.lightGray || palette.darkGray,
+    bg = self.tag.selected && palette.light_gray || palette.dark_gray,
     widget = wibox.container.background,
   })
 
@@ -204,7 +204,7 @@ function Tab:_init(props) {
   })
 
   self.tag:connect_signal('property::selected', () -> {
-    self.root_widget.bg = self.tag.selected && palette.lightGray || palette.darkGray
+    self.root_widget.bg = self.tag.selected && palette.light_gray || palette.dark_gray
   })
 }
 
@@ -235,7 +235,7 @@ function Tagbar:_init(props) {
   self.wibar = awful.wibar({
     screen = self.screen,
     position = 'top',
-    bg = palette.darkGray,
+    bg = palette.dark_gray,
     height = TAGBAR_HEIGHT,
     type = 'dock', -- remove box shadows
     widget = self.tabs_widget,
@@ -441,7 +441,7 @@ function get_current_tagbar() {
   }
 }
 
-gears.table.merge(globalKeys, {
+gears.table.merge(global_keys, {
   awful.key({ 'Mod4' }, 't', () -> get_current_tagbar():open()),
   awful.key({ 'Mod4' }, 'w', () -> get_current_tagbar():close()),
   awful.key({ 'Mod4', 'Shift' }, ',', () -> get_current_tagbar():move_prev()),
