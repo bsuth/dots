@@ -13,14 +13,15 @@ for i = 1, #ENV_WORDCHARS { WORDCHARS[ENV_WORDCHARS:sub(i, i)] = true }
 local Prompt = {}
 
 function Prompt:_init(props = {}) {
-  self.text = props.text || ''
-  self.cursor = props.cursor || 0
+  self.text = ''
+  self.cursor = 0
 
-  self.on_submit = props.on_submit
   self.on_stop = props.on_stop
   self.on_cancel = props.on_cancel
+  self.on_submit = props.on_submit
+  self.on_user_change = props.on_user_change
 
-  self.rootWidget = wibox.widget({
+  self.root_widget = wibox.widget({
     markup = '',
     halign = props.halign,
     valign = props.valign,
@@ -29,16 +30,8 @@ function Prompt:_init(props = {}) {
   })
 
   local keybindings = {
-    { {}, 'Escape', () -> {
-      self.keygrabber:stop()
-      if self.on_stop { self.on_stop() }
-      if self.on_cancel { self.on_cancel() }
-    } },
-    { {}, 'Return', () -> {
-      self.keygrabber:stop()
-      if self.on_stop { self.on_stop() }
-      if self.on_submit { self.on_submit() }
-    } },
+    { {}, 'Escape', () -> self:cancel() },
+    { {}, 'Return', () -> self:submit() },
     { {}, 'Right', () -> self:_move_char_forward() },
     { {}, 'Left', () -> self:_move_char_back() },
     { { 'Control' }, 'f', () -> self:_move_char_forward() },
@@ -65,11 +58,8 @@ function Prompt:_init(props = {}) {
     keybindings = keybindings,
     keyreleased_callback = (_, mod, key) -> {
       if #mod == 0 && #key == 1 {
-        self:refresh(table.concat({
-          self.text:sub(1, self.cursor),
-          key,
-          self.text:sub(self.cursor + 1),
-        }), self.cursor + 1)
+        self:update(table.concat({ self.text:sub(1, self.cursor), key, self.text:sub(self.cursor + 1), }), self.cursor + 1)
+        if self.on_user_change { self.on_user_change() }
       }
     },
   })
@@ -77,13 +67,13 @@ function Prompt:_init(props = {}) {
 
 function Prompt:_move_char_back() {
   if self.cursor > 0 {
-    self:refresh(nil, self.cursor - 1)
+    self:update(nil, self.cursor - 1)
   }
 }
 
 function Prompt:_move_char_forward() {
   if self.cursor < #self.text {
-    self:refresh(nil, self.cursor + 1)
+    self:update(nil, self.cursor + 1)
   }
 }
 
@@ -102,7 +92,7 @@ function Prompt:_move_word_back() {
       char = self.text:sub(new_cursor, new_cursor)
     }
 
-    self:refresh(nil, new_cursor)
+    self:update(nil, new_cursor)
   }
 }
 
@@ -121,30 +111,29 @@ function Prompt:_move_word_forward() {
       next_char = self.text:sub(new_cursor + 1, new_cursor + 1)
     }
 
-    self:refresh(nil, new_cursor)
+    self:update(nil, new_cursor)
   }
 }
 
 function Prompt:_move_line_start() {
-  self:refresh(nil, 0)
+  self:update(nil, 0)
 }
 
 function Prompt:_move_line_end() {
-  self:refresh(nil, #self.text)
+  self:update(nil, #self.text)
 }
 
 function Prompt:_delete_char_back() {
   if self.cursor > 0 {
-    self:refresh(
-      self.text:sub(1, self.cursor - 1) .. self.text:sub(self.cursor + 1),
-      self.cursor - 1,
-    )
+    self:update(self.text:sub(1, self.cursor - 1) .. self.text:sub(self.cursor + 1), self.cursor - 1)
+    if self.on_user_change { self.on_user_change() }
   }
 }
 
 function Prompt:_delete_char_forward() {
   if self.cursor < #self.text {
-    self:refresh(self.text:sub(1, self.cursor) .. self.text:sub(self.cursor + 2))
+    self:update(self.text:sub(1, self.cursor) .. self.text:sub(self.cursor + 2))
+    if self.on_user_change { self.on_user_change() }
   }
 }
 
@@ -163,7 +152,8 @@ function Prompt:_delete_word_back() {
       char = self.text:sub(new_cursor, new_cursor)
     }
 
-    self:refresh(self.text:sub(1, new_cursor) .. self.text:sub(self.cursor + 1), new_cursor)
+    self:update(self.text:sub(1, new_cursor) .. self.text:sub(self.cursor + 1), new_cursor)
+    if self.on_user_change { self.on_user_change() }
   }
 }
 
@@ -182,34 +172,50 @@ function Prompt:_delete_word_forward() {
       char = self.text:sub(new_cursor, new_cursor)
     }
 
-    self:refresh(self.text:sub(1, self.cursor) .. self.text:sub(new_cursor), nil)
+    self:update(self.text:sub(1, self.cursor) .. self.text:sub(new_cursor), nil)
+    if self.on_user_change { self.on_user_change() }
   }
 }
 
 function Prompt:_delete_line_start() {
   if self.cursor > 0 {
-    self:refresh(self.text:sub(self.cursor + 1), 0)
+    self:update(self.text:sub(self.cursor + 1), 0)
+    if self.on_user_change { self.on_user_change() }
   }
 }
 
 function Prompt:_delete_line_end() {
   if self.cursor < #self.text {
-    self:refresh(self.text:sub(1, self.cursor))
+    self:update(self.text:sub(1, self.cursor))
+    if self.on_user_change { self.on_user_change() }
   }
 }
 
-function Prompt:refresh(new_text, new_cursor) {
+function Prompt:update(new_text, new_cursor) {
   if new_text { self.text = new_text }
   if new_cursor { self.cursor = new_cursor }
+
   local new_widget_markup = self.text:sub(1, self.cursor)
   new_widget_markup ..= [[<span foreground="{palette.white}">|</span>]]
   new_widget_markup ..= self.text:sub(self.cursor + 1)
-  self.rootWidget.markup = new_widget_markup
+  self.root_widget.markup = new_widget_markup
 }
 
-function Prompt:start(new_text) {
-  if new_text { self:refresh(new_text, #new_text) }
+function Prompt:start(initial_text = '') {
+  self:update(initial_text, #initial_text)
   self.keygrabber:start()
+}
+
+function Prompt:cancel() {
+  self.keygrabber:stop()
+  if self.on_stop { self.on_stop() }
+  if self.on_cancel { self.on_cancel() }
+}
+
+function Prompt:submit() {
+  self.keygrabber:stop()
+  if self.on_stop { self.on_stop() }
+  if self.on_submit { self.on_submit() }
 }
 
 return Prompt

@@ -4,6 +4,7 @@ local wibox = require('wibox')
 local { globalKeys } = require('core.bindings')
 local Object = require('core.Object')
 local { palette } = require('core.theme')
+local { trim } = require('core.utils')
 local Menu = require('components.Menu')
 local Prompt = require('components.Prompt')
 local veil = require('veil')
@@ -12,40 +13,173 @@ local TAGBAR_HEIGHT = 48
 local TAGBAR_FONT = 'Quicksand Regular 14'
 
 -- -----------------------------------------------------------------------------
--- TabRename
+-- RECENTLY_USED_TAG_NAMES
 -- -----------------------------------------------------------------------------
 
 local TAGBAR_NAME_HISTORY_FILENAME = "{os.getenv('HOME')}/.tagbar_name_history"
 local TAGBAR_NAME_HISTORY_SIZE = 20
-local recentlyUsedTabNames = {}
+local RECENTLY_USED_TAG_NAMES = {}
 
 do {
-  local tagbarNameHistoryFile = io.open(TAGBAR_NAME_HISTORY_FILENAME, 'r+')
-  if tagbarNameHistoryFile {
-    for recentlyUsedTabName in tagbarNameHistoryFile:lines() {
-      table.insert(recentlyUsedTabNames, recentlyUsedTabName)
+  local tagbar_name_history_file = io.open(TAGBAR_NAME_HISTORY_FILENAME, 'r+')
+  if tagbar_name_history_file {
+    for recently_used_tab_name in tagbar_name_history_file:lines() {
+      table.insert(RECENTLY_USED_TAG_NAMES, recently_used_tab_name)
     }
-    tagbarNameHistoryFile:close()
+    tagbar_name_history_file:close()
   }
 }
 
-function saveRecentlyUsedTabName(tabName) {
-  for i, recentlyUsedTabName in ipairs(recentlyUsedTabNames) {
-    if recentlyUsedTabName == tabName {
-      table.remove(recentlyUsedTabNames, i)
+function save_recently_used_tab_name(tab_name) {
+  for i, recently_used_tab_name in ipairs(RECENTLY_USED_TAG_NAMES) {
+    if recently_used_tab_name == tab_name {
+      table.remove(RECENTLY_USED_TAG_NAMES, i)
       break
     }
   }
 
-  table.insert(recentlyUsedTabNames, 1, tabName)
-  for i = #recentlyUsedTabNames, TAGBAR_NAME_HISTORY_SIZE, -1 {
+  table.insert(RECENTLY_USED_TAG_NAMES, 1, tab_name)
+  for i = #RECENTLY_USED_TAG_NAMES, TAGBAR_NAME_HISTORY_SIZE, -1 {
     -- Constrain number of saved recently used tab names
-    table.remove(recentlyUsedTabNames, i)
+    table.remove(RECENTLY_USED_TAG_NAMES, i)
   }
 
-  local tagbarNameHistoryFile = io.open(TAGBAR_NAME_HISTORY_FILENAME, 'w')
-  tagbarNameHistoryFile:write(table.concat(recentlyUsedTabNames, '\n'))
-  tagbarNameHistoryFile:close()
+  local tagbar_name_history_file = io.open(TAGBAR_NAME_HISTORY_FILENAME, 'w')
+  tagbar_name_history_file:write(table.concat(RECENTLY_USED_TAG_NAMES, '\n'))
+  tagbar_name_history_file:close()
+}
+
+-- -----------------------------------------------------------------------------
+-- TabSuggestions
+-- -----------------------------------------------------------------------------
+
+local TabSuggestions = {}
+
+function TabSuggestions:_init(props) {
+  self.screen = props.screen
+  self.default_suggestion = props.default_suggestion
+
+  self.suggestion_widgets = {}
+  for i = 1, TAGBAR_NAME_HISTORY_SIZE {
+    table.insert(self.suggestion_widgets, wibox.widget({
+      text = '',
+      halign = 'center',
+      valign = 'center',
+      font = TAGBAR_FONT,
+      widget = wibox.widget.textbox,
+    }))
+  }
+
+  self.root_widget = wibox.widget({
+    spacing = 16,
+    layout  = wibox.layout.fixed.horizontal,
+  })
+
+  self.popup = awful.popup({
+    widget = {
+      self.root_widget,
+      left = 16,
+      right = 16,
+      widget = wibox.container.margin,
+    },
+    screen = self.screen,
+    visible = false,
+    ontop = true,
+    x = self.screen.geometry.x,
+    y = self.screen.geometry.y + TAGBAR_HEIGHT,
+    minimum_width = self.screen.geometry.width,
+    minimum_height = TAGBAR_HEIGHT,
+    fg = palette.white,
+    bg = palette.darkGray,
+  })
+
+  self.suggestions = props.suggestions
+  self:rawset('filtered_suggestions', props.suggestions, true)
+  self:rawset('selected', 0, true)
+}
+
+function TabSuggestions:_on_change_filter() {
+  local new_filtered_suggestions = {}
+  local trimmed_filter = trim(self.filter)
+
+  for i, suggestion in ipairs(self.suggestions) {
+    if suggestion:find(trimmed_filter) {
+      table.insert(new_filtered_suggestions, suggestion)
+    }
+  }
+
+  self.filtered_suggestions = new_filtered_suggestions
+  self.selected = 0
+}
+
+function TabSuggestions:_on_change_filtered_suggestions() {
+  local new_children = {}
+
+  for i = 1, #self.filtered_suggestions {
+    local widget = self.suggestion_widgets[i]
+    local suggestion = self.filtered_suggestions[i]
+
+    if i == self.selected {
+      widget.markup = [[<span foreground="{palette.cyan}">{suggestion}</span>]]
+    } else {
+      widget.text = suggestion
+    }
+
+    table.insert(new_children, widget)
+  }
+
+  self.root_widget.children = new_children
+}
+
+function TabSuggestions:_on_change_selected() {
+  for i = 1, #self.root_widget.children {
+    local widget = self.root_widget.children[i]
+    local suggestion = self.filtered_suggestions[i]
+
+    if i == self.selected {
+      widget.markup = [[<span foreground="{palette.cyan}">{suggestion}</span>]]
+    } else {
+      widget.text = suggestion
+    }
+  }
+}
+
+function TabSuggestions:show() {
+  self.filter = ''
+  self.popup.visible = true
+}
+
+function TabSuggestions:hide() {
+  self.popup.visible = false
+  self.selected = 0
+}
+
+function TabSuggestions:prev() {
+  if self.selected == 0 {
+    self.selected = #self.filtered_suggestions
+  } else {
+    self.selected -= 1
+  }
+
+  if self.selected == 0 {
+    return self.default_suggestion
+  } else {
+    return self.filtered_suggestions[self.selected]
+  }
+}
+
+function TabSuggestions:next() {
+  if self.selected == #self.filtered_suggestions {
+    self.selected = 0
+  } else {
+    self.selected += 1
+  }
+
+  if self.selected == 0 {
+    return self.default_suggestion
+  } else {
+    return self.filtered_suggestions[self.selected]
+  }
 }
 
 -- -----------------------------------------------------------------------------
@@ -54,64 +188,44 @@ function saveRecentlyUsedTabName(tabName) {
 
 local Tab = {}
 
-function Tab:_init(tag) {
-  self.tag = tag
+function Tab:_init(props) {
+  self.tag = props.tag
 
-  self.prompt = Object(Prompt, {
-    halign = 'center',
-    valign = 'center',
-    font = TAGBAR_FONT,
-    on_stop = () -> {
-      self.contentWidget.children = { self.nameWidget }
-    },
-    on_submit = () -> {
-      if #self.prompt.text > 0 {
-        self.tag.name = self.prompt.text
-        saveRecentlyUsedTabName(self.prompt.text)
-      }
-    },
-  })
-
-  self.nameWidget = wibox.widget({
-    text = tag.name,
+  self.name_widget = wibox.widget({
+    text = self.tag.name,
     halign = 'center',
     valign = 'center',
     font = TAGBAR_FONT,
     widget = wibox.widget.textbox,
   })
 
-  self.contentWidget = wibox.widget({
-    self.nameWidget,
+  self.content_widget = wibox.widget({
+    self.name_widget,
     widget = wibox.container.place,
   })
 
-  self.rootWidget = wibox.widget({
-    self.contentWidget,
+  self.root_widget = wibox.widget({
+    self.content_widget,
     fg = palette.white,
-    bg = tag.selected && palette.lightGray || palette.darkGray,
+    bg = self.tag.selected && palette.lightGray || palette.darkGray,
     widget = wibox.container.background,
   })
 
-  tag:connect_signal('property::name', () -> {
-    self.nameWidget.text = tag.name
+  self.tag:connect_signal('property::name', () -> {
+    self.name_widget.text = self.tag.name
   })
 
-  tag:connect_signal('property::selected', () -> {
-    self.rootWidget.bg = tag.selected && palette.lightGray || palette.darkGray
+  self.tag:connect_signal('property::selected', () -> {
+    self.root_widget.bg = self.tag.selected && palette.lightGray || palette.darkGray
   })
 }
 
 function Tab:_on_change_disabled() {
-  self.rootWidget.fg = self.disabled && '#888888' || palette.white
+  self.root_widget.fg = self.disabled && '#888888' || palette.white
 }
 
 function Tab:toggle() {
   self.disabled = !self.disabled
-}
-
-function Tab:rename() {
-  self.contentWidget.children = { self.prompt.rootWidget }
-  self.prompt:start(self.tag.name)
 }
 
 -- -----------------------------------------------------------------------------
@@ -120,29 +234,54 @@ function Tab:rename() {
 
 local Tagbar = {}
 
-function Tagbar:_init(s) {
-  self.screen = s
+function Tagbar:_init(props) {
+  self.screen = props.screen
   self.tabs = {}
 
-  self.tabsWidget = wibox.widget({
-    forced_width = s.geometry.width,
+  self.tab_suggestions = Object(TabSuggestions, {
+    screen = self.screen,
+    suggestions = RECENTLY_USED_TAG_NAMES,
+  })
+
+  self.tabs_widget = wibox.widget({
+    forced_width = self.screen.geometry.width,
     layout  = wibox.layout.flex.horizontal,
   })
 
   self.wibar = awful.wibar({
-    screen = s,
+    screen = self.screen,
     position = 'top',
     bg = palette.darkGray,
     height = TAGBAR_HEIGHT,
     type = 'dock', -- remove box shadows
-    widget = self.tabsWidget,
+    widget = self.tabs_widget,
+  })
+
+  self.prompt = Object(Prompt, {
+    halign = 'center',
+    valign = 'center',
+    font = TAGBAR_FONT,
+    on_user_change = () -> {
+      self.tab_suggestions.default_suggestion = self.prompt.text
+      self.tab_suggestions.filter = self.prompt.text
+    },
+    keybindings = {
+      { {}, 'Tab', () -> {
+        local suggestion = self.tab_suggestions:next()
+        self.prompt:update(suggestion, #suggestion)
+      } },
+      { { 'Shift' }, 'Tab', () -> {
+        local suggestion = self.tab_suggestions:prev()
+        self.prompt:update(suggestion, #suggestion)
+      } },
+    },
   })
 
   self:refresh()
-  s:connect_signal('tag::history::update', () -> self:refresh())
+  self.screen:connect_signal('tag::history::update', () -> self:refresh())
 }
 
-function Tagbar:getActiveTab() {
+function Tagbar:get_active_tab() {
   for i, tab in ipairs(self.tabs) {
     if tab.tag == self.screen.selected_tag {
       return tab, i
@@ -150,11 +289,16 @@ function Tagbar:getActiveTab() {
   }
 }
 
-function Tagbar:getNextTab(tabIndex, reverse = false) {
-  local nextTabIndex = reverse
-    && (tabIndex == 1 && #self.tabs || tabIndex - 1)
-    || (tabIndex == #self.tabs && 1 || tabIndex + 1)
-  return self.tabs[nextTabIndex], nextTabIndex
+function Tagbar:get_prev_tab(tab_index) {
+  if !tab_index { local _; _, tab_index = self:get_active_tab() }
+  local prev_index = tab_index == 1 && #self.tabs || tab_index - 1
+  return self.tabs[prev_index], prev_index
+}
+
+function Tagbar:get_next_tab(tab_index) {
+  if !tab_index { local _; _, tab_index = self:get_active_tab() }
+  local next_index = tab_index == #self.tabs && 1 || tab_index + 1
+  return self.tabs[next_index], next_index
 }
 
 function Tagbar:open() {
@@ -165,75 +309,126 @@ function Tagbar:open() {
 }
 
 function Tagbar:close() {
-  local numVisibleTags = 0
+  local num_visible_tags = 0
 
   for _, tag in ipairs(self.screen.tags) {
     if !tag.name:match('^_') {
-      numVisibleTags += 1
+      num_visible_tags += 1
     }
   }
 
-  if numVisibleTags > 1 {
+  if num_visible_tags > 1 {
     self.screen.selected_tag:delete()
   }
 }
 
-function Tagbar:move(reverse = false) {
-  local numTabs = #self.tabs
-  local activeTab, activeTabIndex = self:getActiveTab()
+function Tagbar:swap(index1, index2) {
+  local tmp = self.tabs[index1]
+  self.tabs[index1] = self.tabs[index2]
+  self.tabs[index2] = tmp
+  self.tabs_widget:swap(index1, index2)
+  self.tabs[index1].tag:swap(self.tabs[index2].tag)
+}
 
-  local canMove = numTabs > 1
-    && (reverse || activeTabIndex < numTabs)
-    && (!reverse || activeTabIndex > 1)
-
-  if canMove {
-    local nextTab, nextTabIndex = self:getNextTab(activeTabIndex, reverse)
-    self.tabs[activeTabIndex] = nextTab
-    self.tabs[nextTabIndex] = activeTab
-    self.tabsWidget:swap(activeTabIndex, nextTabIndex)
-    activeTab.tag:swap(nextTab.tag)
+function Tagbar:move_prev() {
+  local num_tabs = #self.tabs
+  local _, active_tab_index = self:get_active_tab()
+  if num_tabs > 1 && active_tab_index > 1 {
+    local _, prev_tab_index = self:get_prev_tab()
+    self:swap(active_tab_index, prev_tab_index)
   }
 }
 
-function Tagbar:focus(reverse = false, skipDisabled = true) {
+function Tagbar:move_next() {
+  local num_tabs = #self.tabs
+  local _, active_tab_index = self:get_active_tab()
+  if num_tabs > 1 && active_tab_index < num_tabs {
+    local _, next_tab_index = self:get_next_tab()
+    self:swap(active_tab_index, next_tab_index)
+  }
+}
+
+function Tagbar:focus_prev(skip_disabled) {
   if #self.tabs < 2 { return }
 
-  local activeTab, activeTabIndex = self:getActiveTab()
-  local nextTab, nextTabIndex = self:getNextTab(activeTabIndex, reverse)
+  local active_tab, active_tab_index = self:get_active_tab()
+  local prev_tab, prev_tab_index = self:get_prev_tab()
 
-  while skipDisabled && nextTab.disabled {
-    if nextTab == activeTab { break }
-    nextTab, nextTabIndex = self:getNextTab(nextTabIndex, reverse)
+  if skip_disabled {
+    while prev_tab.disabled {
+      if prev_tab == active_tab { break }
+      prev_tab, prev_tab_index = self:get_prev_tab(prev_tab_index)
+    }
   }
 
-  if nextTab != activeTab {
-    nextTab.tag:view_only()
+  if prev_tab != active_tab {
+    prev_tab.tag:view_only()
+  }
+}
+
+function Tagbar:focus_next(skip_disabled) {
+  if #self.tabs < 2 { return }
+
+  local active_tab, active_tab_index = self:get_active_tab()
+  local next_tab, next_tab_index = self:get_next_tab()
+
+  if skip_disabled {
+    while next_tab.disabled {
+      if next_tab == active_tab { break }
+      next_tab, next_tab_index = self:get_next_tab(next_tab_index)
+    }
+  }
+
+  if next_tab != active_tab {
+    next_tab.tag:view_only()
   }
 }
 
 function Tagbar:refresh() {
-  local newTabs = {}
+  local new_tabs = {}
   local children = {}
 
   for _, tag in ipairs(self.screen.tags) {
     if !tag.name:match('^_') {
-      local tagTab = nil
+      local new_tab = nil
 
       for _, tab in ipairs(self.tabs) {
         if tab.tag == tag {
-          tagTab = tab
+          new_tab = tab
           break
         }
       }
 
-      tagTab ||= Object(Tab, tag)
-      table.insert(newTabs, tagTab)
-      table.insert(children, tagTab.rootWidget)
+      new_tab ||= Object(Tab, { tag = tag })
+      table.insert(new_tabs, new_tab)
+      table.insert(children, new_tab.root_widget)
     }
   }
 
-  self.tabs = newTabs
-  self.tabsWidget.children = children
+  self.tabs = new_tabs
+  self.tabs_widget.children = children
+}
+
+function Tagbar:rename() {
+  local active_tab = self:get_active_tab()
+
+  self.prompt.on_stop = () -> {
+    active_tab.content_widget.children = { active_tab.name_widget }
+    self.tab_suggestions:hide()
+  }
+
+  self.prompt.on_submit = () -> {
+    if #self.prompt.text > 0 {
+      active_tab.tag.name = self.prompt.text
+      save_recently_used_tab_name(self.prompt.text)
+    }
+  }
+
+  self.tab_suggestions.default_suggestion = active_tab.tag.name
+  self.tab_suggestions:show()
+
+  active_tab.content_widget.children = { self.prompt.root_widget }
+  self.prompt:start()
 }
 
 -- -----------------------------------------------------------------------------
@@ -242,29 +437,29 @@ function Tagbar:refresh() {
 
 local tagbars = {}
 
-function getCurrentTagbar() {
-  local currentScreen = awful.screen.focused()
+function get_current_tagbar() {
+  local current_screen = awful.screen.focused()
   for _, tagbar in ipairs(tagbars) {
-    if tagbar.screen == currentScreen {
+    if tagbar.screen == current_screen {
       return tagbar
     }
   }
 }
 
 gears.table.merge(globalKeys, {
-  awful.key({ 'Mod4' }, 't', () -> getCurrentTagbar():open()),
-  awful.key({ 'Mod4' }, 'w', () -> getCurrentTagbar():close()),
-  awful.key({ 'Mod4', 'Shift' }, ',', () -> getCurrentTagbar():move(true)),
-  awful.key({ 'Mod4', 'Shift' }, '.', () -> getCurrentTagbar():move()),
-  awful.key({ 'Mod4' }, 'Tab', () -> getCurrentTagbar():focus()),
-  awful.key({ 'Mod4', 'Shift' }, 'Tab', () -> getCurrentTagbar():focus(true)),
-  awful.key({ 'Mod4', 'Control' }, 'Tab', () -> getCurrentTagbar():focus(false, false)),
-  awful.key({ 'Mod4', 'Control', 'Shift' }, 'Tab', () -> getCurrentTagbar():focus(true, false)),
-  awful.key({ 'Mod4', 'Shift' }, 't', () -> getCurrentTagbar():getActiveTab():rename()),
-  awful.key({ 'Mod4', 'Control' }, 't', () -> getCurrentTagbar():getActiveTab():toggle()),
+  awful.key({ 'Mod4' }, 't', () -> get_current_tagbar():open()),
+  awful.key({ 'Mod4' }, 'w', () -> get_current_tagbar():close()),
+  awful.key({ 'Mod4', 'Shift' }, ',', () -> get_current_tagbar():move_prev()),
+  awful.key({ 'Mod4', 'Shift' }, '.', () -> get_current_tagbar():move_next()),
+  awful.key({ 'Mod4' }, 'Tab', () -> get_current_tagbar():focus_next(true)),
+  awful.key({ 'Mod4', 'Shift' }, 'Tab', () -> get_current_tagbar():focus_prev(true)),
+  awful.key({ 'Mod4', 'Control' }, 'Tab', () -> get_current_tagbar():focus_next()),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'Tab', () -> get_current_tagbar():focus_prev()),
+  awful.key({ 'Mod4', 'Shift' }, 't', () -> get_current_tagbar():rename()),
+  awful.key({ 'Mod4', 'Control' }, 't', () -> get_current_tagbar():get_active_tab():toggle()),
 })
 
-awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Object(Tagbar, s)))
+awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Object(Tagbar, { screen = s })))
 awful.screen.disconnect_for_each_screen(s -> {
   for i, tagbar in ipairs(tagbars) {
     if tagbar.screen == s {
