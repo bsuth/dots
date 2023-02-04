@@ -7,7 +7,7 @@ local { palette } = require('core.theme')
 local { trim } = require('core.utils')
 local Menu = require('components.Menu')
 local Prompt = require('components.Prompt')
-local veil = require('veil')
+local Veil = require('components.Veil')
 
 local TAGBAR_HEIGHT = 48
 local TAGBAR_FONT = 'Quicksand Regular 14'
@@ -57,7 +57,10 @@ local TabSuggestions = {}
 
 function TabSuggestions:_init(props) {
   self.screen = props.screen
+  self.suggestions = props.suggestions
+  self.filtered_suggestions = props.suggestions
   self.default_suggestion = props.default_suggestion
+  self:rawset('selected', 0, true)
 
   self.suggestion_widgets = {}
   for i = 1, TAGBAR_NAME_HISTORY_SIZE {
@@ -92,43 +95,28 @@ function TabSuggestions:_init(props) {
     fg = palette.white,
     bg = palette.darkGray,
   })
-
-  self.suggestions = props.suggestions
-  self:rawset('filtered_suggestions', props.suggestions, true)
-  self:rawset('selected', 0, true)
 }
 
 function TabSuggestions:_on_change_filter() {
-  local new_filtered_suggestions = {}
   local trimmed_filter = trim(self.filter)
 
+  local new_filtered_suggestions = {}
   for i, suggestion in ipairs(self.suggestions) {
     if suggestion:find(trimmed_filter) {
       table.insert(new_filtered_suggestions, suggestion)
     }
   }
 
-  self.filtered_suggestions = new_filtered_suggestions
-  self.selected = 0
-}
-
-function TabSuggestions:_on_change_filtered_suggestions() {
-  local new_children = {}
-
-  for i = 1, #self.filtered_suggestions {
+  local new_root_children = {}
+  for i = 1, #new_filtered_suggestions {
     local widget = self.suggestion_widgets[i]
-    local suggestion = self.filtered_suggestions[i]
-
-    if i == self.selected {
-      widget.markup = [[<span foreground="{palette.cyan}">{suggestion}</span>]]
-    } else {
-      widget.text = suggestion
-    }
-
-    table.insert(new_children, widget)
+    widget.text = new_filtered_suggestions[i]
+    table.insert(new_root_children, widget)
   }
 
-  self.root_widget.children = new_children
+  self.filtered_suggestions = new_filtered_suggestions
+  self.root_widget.children = new_root_children
+  self:rawset('selected', 0, true)
 }
 
 function TabSuggestions:_on_change_selected() {
@@ -137,7 +125,7 @@ function TabSuggestions:_on_change_selected() {
     local suggestion = self.filtered_suggestions[i]
 
     if i == self.selected {
-      widget.markup = [[<span foreground="{palette.cyan}">{suggestion}</span>]]
+      widget.markup = [[<span foreground="{palette.blue}">{suggestion}</span>]]
     } else {
       widget.text = suggestion
     }
@@ -146,12 +134,12 @@ function TabSuggestions:_on_change_selected() {
 
 function TabSuggestions:show() {
   self.filter = ''
+  self.selected = 0
   self.popup.visible = true
 }
 
 function TabSuggestions:hide() {
   self.popup.visible = false
-  self.selected = 0
 }
 
 function TabSuggestions:prev() {
@@ -237,11 +225,7 @@ local Tagbar = {}
 function Tagbar:_init(props) {
   self.screen = props.screen
   self.tabs = {}
-
-  self.tab_suggestions = Object(TabSuggestions, {
-    screen = self.screen,
-    suggestions = RECENTLY_USED_TAG_NAMES,
-  })
+  self.veil = Object(Veil)
 
   self.tabs_widget = wibox.widget({
     forced_width = self.screen.geometry.width,
@@ -255,6 +239,11 @@ function Tagbar:_init(props) {
     height = TAGBAR_HEIGHT,
     type = 'dock', -- remove box shadows
     widget = self.tabs_widget,
+  })
+
+  self.tab_suggestions = Object(TabSuggestions, {
+    screen = self.screen,
+    suggestions = RECENTLY_USED_TAG_NAMES,
   })
 
   self.prompt = Object(Prompt, {
@@ -410,24 +399,30 @@ function Tagbar:refresh() {
 }
 
 function Tagbar:rename() {
-  local active_tab = self:get_active_tab()
+  local rename_tab = self:get_active_tab()
+  local focused_screen = awful.screen.focused()
+  local focused_veil = self.veil:get_focused_veil()
 
   self.prompt.on_stop = () -> {
-    active_tab.content_widget.children = { active_tab.name_widget }
+    rename_tab.content_widget.children = { rename_tab.name_widget }
+    focused_veil.shape = nil
     self.tab_suggestions:hide()
+    self.veil:hide()
   }
 
   self.prompt.on_submit = () -> {
     if #self.prompt.text > 0 {
-      active_tab.tag.name = self.prompt.text
+      rename_tab.tag.name = self.prompt.text
       save_recently_used_tab_name(self.prompt.text)
     }
   }
 
-  self.tab_suggestions.default_suggestion = active_tab.tag.name
-  self.tab_suggestions:show()
+  self.tab_suggestions.default_suggestion = rename_tab.tag.name
+  rename_tab.content_widget.children = { self.prompt.root_widget }
+  focused_veil.shape = (cr, width, height) -> cr:rectangle(0, 2 * TAGBAR_HEIGHT, width, height - (2 * TAGBAR_HEIGHT))
 
-  active_tab.content_widget.children = { self.prompt.root_widget }
+  self.veil:show()
+  self.tab_suggestions:show()
   self.prompt:start()
 }
 
@@ -438,9 +433,9 @@ function Tagbar:rename() {
 local tagbars = {}
 
 function get_current_tagbar() {
-  local current_screen = awful.screen.focused()
+  local focused_screen = awful.screen.focused()
   for _, tagbar in ipairs(tagbars) {
-    if tagbar.screen == current_screen {
+    if tagbar.screen == focused_screen {
       return tagbar
     }
   }

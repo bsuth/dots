@@ -26,17 +26,17 @@ awful.screen.connect_for_each_screen(s -> {
 -- When a screen is disconnected, reassign tags
 awful.tag.attached_connect_signal(nil, 'request::screen', tag -> {
   if #tag:clients() > 0 {
-    local backupScreen
+    local backup_screen
 
     for s in screen {
       if s != tag.screen {
-        backupScreen = s;
+        backup_screen = s;
         break
       }
     }
 
-    if backupScreen {
-      tag.screen = backupScreen
+    if backup_screen {
+      tag.screen = backup_screen
       tag:view_only()
     }
   }

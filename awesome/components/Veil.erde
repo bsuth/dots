@@ -1,0 +1,52 @@
+local awful = require('awful')
+local wibox = require('wibox')
+
+local Veil = {}
+
+function Veil:_init() {
+  self.popups = {}
+
+  awful.screen.connect_for_each_screen(s -> {
+    table.insert(self.popups, awful.popup({
+      widget = wibox.widget({ widget = wibox.container.place }),
+      screen = s,
+      visible = false,
+      bg = '#000000aa',
+      placement = awful.placement.maximize,
+      ontop = true,
+      type = dock,
+    }))
+  })
+
+  awful.screen.disconnect_for_each_screen(s -> {
+    for i, popup in ipairs(self.popups) {
+      if popup.screen == s {
+        table.remove(self.popups, i)
+        break
+      }
+    }
+  })
+}
+
+function Veil:get_focused_veil() {
+  local focused_screen = awful.screen.focused()
+  for _, popup in ipairs(self.popups) {
+    if popup.screen == focused_screen {
+      return popup
+    }
+  }
+}
+
+function Veil:show() {
+  for _, popup in ipairs(self.popups) {
+    popup.visible = true
+  }
+}
+
+function Veil:hide() {
+  for _, popup in ipairs(self.popups) {
+    popup.visible = false
+  }
+}
+
+return Veil
