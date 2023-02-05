@@ -53,6 +53,8 @@ function save_recently_used_tab_name(tab_name) {
 -- TabSuggestions
 -- -----------------------------------------------------------------------------
 
+local MAX_TAB_SUGGESTIONS = 10
+
 local TabSuggestions = {}
 
 function TabSuggestions:_init(props) {
@@ -63,7 +65,7 @@ function TabSuggestions:_init(props) {
   self:rawset('selected', 0, true)
 
   self.suggestion_widgets = {}
-  for i = 1, TAGBAR_NAME_HISTORY_SIZE {
+  for i = 1, MAX_TAB_SUGGESTIONS {
     table.insert(self.suggestion_widgets, wibox.widget({
       text = '',
       halign = 'center',
@@ -80,7 +82,10 @@ function TabSuggestions:_init(props) {
 
   self.popup = awful.popup({
     widget = {
-      self.root_widget,
+      {
+        self.root_widget,
+        widget = wibox.container.place,
+      },
       left = 16,
       right = 16,
       widget = wibox.container.margin,
@@ -99,11 +104,14 @@ function TabSuggestions:_init(props) {
 
 function TabSuggestions:_on_change_filter() {
   local trimmed_filter = trim(self.filter)
-
   local new_filtered_suggestions = {}
+
   for i, suggestion in ipairs(self.suggestions) {
-    if suggestion:find(trimmed_filter) {
+    if suggestion:match(trimmed_filter) {
       table.insert(new_filtered_suggestions, suggestion)
+      if #new_filtered_suggestions == MAX_TAB_SUGGESTIONS {
+        break
+      }
     }
   }
 
