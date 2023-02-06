@@ -81,7 +81,7 @@ void setup() {
   QUKEYS(
     kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 0), Key_LeftAlt),
     kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 1), Key_LeftGui),
-    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 2), Key_LeftControl),
+    kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 2), Key_RightControl),
     kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 3), Key_LeftShift),
     kaleidoscope::plugin::Qukey(QWERTY, KeyAddr(1, 4), ShiftToLayer(ARROWS)),
 
