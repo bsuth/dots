@@ -17,7 +17,7 @@ local TAGBAR_FONT = 'Quicksand Regular 14'
 -- -----------------------------------------------------------------------------
 
 local TAGBAR_NAME_HISTORY_FILENAME = "{os.getenv('HOME')}/.tagbar_name_history"
-local TAGBAR_NAME_HISTORY_SIZE = 20
+local TAGBAR_NAME_HISTORY_SIZE = 50
 local RECENTLY_USED_TAG_NAMES = {}
 
 do {
@@ -39,7 +39,7 @@ function save_recently_used_tab_name(tab_name) {
   }
 
   table.insert(RECENTLY_USED_TAG_NAMES, 1, tab_name)
-  for i = #RECENTLY_USED_TAG_NAMES, TAGBAR_NAME_HISTORY_SIZE, -1 {
+  for i = #RECENTLY_USED_TAG_NAMES, TAGBAR_NAME_HISTORY_SIZE + 1, -1 {
     -- Constrain number of saved recently used tab names
     table.remove(RECENTLY_USED_TAG_NAMES, i)
   }
