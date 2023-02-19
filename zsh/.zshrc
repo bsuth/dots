@@ -7,7 +7,7 @@ bindkey -e
 bindkey \^U backward-kill-line
 
 # Options
-setopt appendhistory autocd extendedglob nomatch notify
+setopt appendhistory autocd extendedglob nomatch notify histignoredups
 unsetopt beep
 
 # Completion
