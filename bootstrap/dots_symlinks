@@ -8,6 +8,7 @@ declare -A SYMLINKS=(
   ["$DOTS/awesome"]="$HOME/.config/awesome"
   ["$DOTS/nvim"]="$HOME/.config/nvim"
   ["$DOTS/flameshot"]="$HOME/.config/flameshot"
+  ["$DOTS/warpd"]="$HOME/.config/warpd"
 )
 
 for SYMLINK in ${!SYMLINKS[@]}; do
