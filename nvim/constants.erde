@@ -6,6 +6,6 @@ module TRACK_CWD_BLACKLIST = { '^term://' }
 module TRACK_CWD_BUFNAME_FILTER = {}
 
 module TERM_PATTERNS = { 'term://*zsh*', 'term://*bash*' }
-module JS_PATTERNS = { '*.js', '*.jsx', '*.ts', '*.tsx' }
+module JS_PATTERNS = { '*.js', '*.mjs', '*.jsx', '*.ts', '*.tsx' }
 module CSS_PATTERNS = { '*.css', '*.scss', '*.less' }
 module JSON_PATTERNS = { '*.json', '*.cjson' }
