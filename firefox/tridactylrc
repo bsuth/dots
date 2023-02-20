@@ -12,6 +12,8 @@ bind d scrollpage 0.5
 bind u scrollpage -0.5
 bind <space>sv source ~/dots/firefox/tridactylrc
 bind <space>ev js tri.native.run('st -e nvim ~/dots/firefox/tridactylrc')
+bind <c-o> back
+bind <c-i> forward
 bind <space>bo fillcmdline bmarks
 
 " " Git{Hub,Lab} git clone via SSH yank

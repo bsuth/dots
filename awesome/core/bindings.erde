@@ -115,10 +115,10 @@ module client_keys = {
     c:kill()
   }),
 
-  awful.key({ 'Mod4' }, 'f', c -> {
-    c.fullscreen = !c.fullscreen
-    c:raise()
-  }),
+  -- awful.key({ 'Mod4' }, 'f', c -> {
+  --   c.fullscreen = !c.fullscreen
+  --   c:raise()
+  -- }),
 
   awful.key({ 'Mod4', 'Shift' }, 'i', c -> {
     local msg = 'name: ' .. c.name
