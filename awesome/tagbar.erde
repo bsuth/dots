@@ -16,7 +16,7 @@ local TAGBAR_FONT = 'Quicksand Regular 14'
 -- RECENTLY_USED_TAG_NAMES
 -- -----------------------------------------------------------------------------
 
-local TAGBAR_NAME_HISTORY_FILENAME = "{os.getenv('HOME')}/.tagbar_name_history"
+local TAGBAR_NAME_HISTORY_FILENAME = "{os.getenv('HOME')}/.cache/awesome/tagbar_name_history"
 local TAGBAR_NAME_HISTORY_SIZE = 50
 local RECENTLY_USED_TAG_NAMES = {}
 
