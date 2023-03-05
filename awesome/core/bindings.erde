@@ -58,6 +58,18 @@ module global_keys = {
   awful.key({ 'Mod4' }, 'l', () -> {
     awful.client.focus.global_bydirection('right')
   }),
+  awful.key({ 'Mod4' }, 'Left', () -> {
+    awful.client.focus.global_bydirection('left')
+  }),
+  awful.key({ 'Mod4' }, 'Down', () -> {
+    awful.client.focus.global_bydirection('down')
+  }),
+  awful.key({ 'Mod4' }, 'Up', () -> {
+    awful.client.focus.global_bydirection('up')
+  }),
+  awful.key({ 'Mod4' }, 'Right', () -> {
+    awful.client.focus.global_bydirection('right')
+  }),
 
   awful.key({ 'Mod4', 'Shift' }, 'h', () -> {
     global_move_client('left')
@@ -69,6 +81,18 @@ module global_keys = {
     global_move_client('up')
   }),
   awful.key({ 'Mod4', 'Shift' }, 'l', () -> {
+    global_move_client('right')
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'Left', () -> {
+    global_move_client('left')
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'Down', () -> {
+    global_move_client('down')
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'Up', () -> {
+    global_move_client('up')
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'Right', () -> {
     global_move_client('right')
   }),
 
@@ -84,6 +108,18 @@ module global_keys = {
   awful.key({ 'Mod4', 'Control' }, 'l', () -> {
     awful.screen.focus_bydirection('right')
   }),
+  awful.key({ 'Mod4', 'Control' }, 'Left', () -> {
+    awful.screen.focus_bydirection('left')
+  }),
+  awful.key({ 'Mod4', 'Control' }, 'Down', () -> {
+    awful.screen.focus_bydirection('down')
+  }),
+  awful.key({ 'Mod4', 'Control' }, 'Up', () -> {
+    awful.screen.focus_bydirection('up')
+  }),
+  awful.key({ 'Mod4', 'Control' }, 'Right', () -> {
+    awful.screen.focus_bydirection('right')
+  }),
 
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'h', () -> {
     awful.client.swap.global_bydirection('left')
@@ -95,6 +131,18 @@ module global_keys = {
     awful.client.swap.global_bydirection('up')
   }),
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'l', () -> {
+    awful.client.swap.global_bydirection('right')
+  }),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'Left', () -> {
+    awful.client.swap.global_bydirection('left')
+  }),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'Down', () -> {
+    awful.client.swap.global_bydirection('down')
+  }),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'Up', () -> {
+    awful.client.swap.global_bydirection('up')
+  }),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'Right', () -> {
     awful.client.swap.global_bydirection('right')
   }),
 
