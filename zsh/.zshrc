@@ -114,6 +114,12 @@ alias ls='ls --color=auto'
 alias lj='luajit'
 alias sysupdate='sudo pacman -Sy archlinux-keyring && yay -Su'
 
+alias erdejit='luajit ~/.luarocks/share/lua/5.1/erde/cli.lua'
+alias erde5.1='lua5.1 ~/.luarocks/share/lua/5.1/erde/cli.lua'
+alias erde5.2='lua5.2 ~/.luarocks/share/lua/5.2/erde/cli.lua'
+alias erde5.3='lua5.3 ~/.luarocks/share/lua/5.3/erde/cli.lua'
+alias erde5.4='lua5.4 ~/.luarocks/share/lua/5.4/erde/cli.lua'
+
 function gls() {
   git fetch --prune --quiet
   git branch --remotes --sort=committerdate | tac

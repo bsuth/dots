@@ -11,8 +11,8 @@
 local nvim_package_path = os.getenv('DOTS') .. '/nvim'
 package.path = ('%s/?.lua;%s/?/init.lua;%s'):format(nvim_package_path, nvim_package_path, package.path)
 
--- nvim uses luajit
-require('erde').load('jit')
+-- load erde
+require('erde').load()
 
 -- force reload rc
 package.loaded.rc = nil
