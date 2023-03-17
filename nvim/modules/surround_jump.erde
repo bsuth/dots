@@ -1,20 +1,20 @@
-local FORWARD_SURROUND_CHARS = {
+local OPEN_SURROUND_CHARS = {
   ['('] = true,
   ['{'] = true,
   ['['] = true,
 }
 
-local BACK_SURROUND_CHARS = {
+local CLOSE_SURROUND_CHARS = {
   [')'] = true,
   ['}'] = true,
   [']'] = true,
 }
 
 local SURROUND_CHARS = {}
-for char in pairs(FORWARD_SURROUND_CHARS) { SURROUND_CHARS[char] = true }
-for char in pairs(BACK_SURROUND_CHARS) { SURROUND_CHARS[char] = true }
+for char in pairs(OPEN_SURROUND_CHARS) { SURROUND_CHARS[char] = true }
+for char in pairs(CLOSE_SURROUND_CHARS) { SURROUND_CHARS[char] = true }
 
-function surround_jump_back() {
+function surround_jump_previous_open() {
   local _, startline, startcol = unpack(vim.fn.getcurpos())
   local charline, charcol = startline, startcol
   local line = vim.fn.getline(charline)
@@ -34,7 +34,7 @@ function surround_jump_back() {
     }
   } until SURROUND_CHARS[char]
 
-  if BACK_SURROUND_CHARS[char] {
+  if CLOSE_SURROUND_CHARS[char] {
     vim.fn.setcursorcharpos(charline, charcol)
     vim.cmd('keepjumps normal %')
     _, charline, charcol = unpack(vim.fn.getcurpos())
@@ -45,7 +45,7 @@ function surround_jump_back() {
   vim.cmd("normal {charline}G{charcol}|")
 }
 
-function surround_jump_forward() {
+function surround_jump_next_close() {
   local _, startline, startcol = unpack(vim.fn.getcurpos())
   local charline, charcol = startline, startcol
   local line = vim.fn.getline(charline)
@@ -69,7 +69,7 @@ function surround_jump_forward() {
     }
   } until SURROUND_CHARS[char]
 
-  if FORWARD_SURROUND_CHARS[char] {
+  if OPEN_SURROUND_CHARS[char] {
     vim.fn.setcursorcharpos(charline, charcol)
     vim.cmd('keepjumps normal %')
     _, charline, charcol = unpack(vim.fn.getcurpos())
@@ -80,7 +80,79 @@ function surround_jump_forward() {
   vim.cmd("normal {charline}G{charcol}|")
 }
 
-vim.keymap.set('n', ')', surround_jump_forward)
-vim.keymap.set('v', ')', surround_jump_forward)
-vim.keymap.set('n', '(', surround_jump_back)
-vim.keymap.set('v', '(', surround_jump_back)
+function surround_jump_parent_open() {
+  local _, startline, startcol = unpack(vim.fn.getcurpos())
+  local charline, charcol = startline, startcol
+  local line = vim.fn.getline(charline)
+  local char = line:sub(charcol, charcol)
+
+  repeat {
+    if CLOSE_SURROUND_CHARS[char] {
+      vim.fn.setcursorcharpos(charline, charcol)
+      vim.cmd('keepjumps normal %')
+      _, charline, charcol = unpack(vim.fn.getcurpos())
+      line = vim.fn.getline(charline)
+      char = line:sub(charcol, charcol)
+      vim.fn.setcursorcharpos(startline, startcol)
+    }
+
+    if charcol > 1 {
+      charcol -= 1
+      char = line:sub(charcol, charcol)
+    } elseif charline > 1 {
+      charline -= 1
+      line = vim.fn.getline(charline)
+      charcol = #line
+      char = line:sub(charcol, charcol)
+    } else {
+      return -- no surrounds
+    }
+  } until OPEN_SURROUND_CHARS[char]
+
+  -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
+  vim.cmd("normal {charline}G{charcol}|")
+}
+
+function surround_jump_parent_close() {
+  local _, startline, startcol = unpack(vim.fn.getcurpos())
+  local charline, charcol = startline, startcol
+  local line = vim.fn.getline(charline)
+  local char = line:sub(charcol, charcol)
+
+  repeat {
+    if OPEN_SURROUND_CHARS[char] {
+      vim.fn.setcursorcharpos(charline, charcol)
+      vim.cmd('keepjumps normal %')
+      _, charline, charcol = unpack(vim.fn.getcurpos())
+      line = vim.fn.getline(charline)
+      char = line:sub(charcol, charcol)
+      vim.fn.setcursorcharpos(startline, startcol)
+    }
+
+    if charcol < lastcol {
+      charcol += 1
+      char = line:sub(charcol, charcol)
+    } elseif charline < lastline {
+      charline += 1
+      line = vim.fn.getline(charline)
+      charcol = 1
+      char = line:sub(charcol, charcol)
+      lastcol = #line
+    } else {
+      return -- no surrounds
+    }
+  } until CLOSE_SURROUND_CHARS[char]
+
+  -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
+  vim.cmd("normal {charline}G{charcol}|")
+}
+
+vim.keymap.set('n', '(', surround_jump_previous_open)
+vim.keymap.set('v', '(', surround_jump_previous_open)
+vim.keymap.set('n', ')', surround_jump_next_close)
+vim.keymap.set('v', ')', surround_jump_next_close)
+
+vim.keymap.set('n', '{', surround_jump_parent_open)
+vim.keymap.set('v', '{', surround_jump_parent_open)
+vim.keymap.set('n', '}', surround_jump_parent_close)
+vim.keymap.set('v', '}', surround_jump_parent_close)

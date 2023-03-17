@@ -3,11 +3,12 @@ local packer = require('packer')
 
 packer.use('justinmk/vim-dirvish')
 
+C.FILE_BROWSER_FILETYPE = 'dirvish'
+
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
 vim.g.loaded_netrwPlugin = true
 
-C.FILE_BROWSER_FILETYPE = 'dirvish'
 vim.api.nvim_create_user_command('Explore', 'Dirvish <args>', {
   nargs = '?',
   force = true,

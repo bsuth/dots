@@ -57,6 +57,13 @@ local LSP_SERVERS = {
   tsserver = {},
   tsserver = {},
   gdscript = {},
+  stylelint_lsp = {
+    settings = {
+      stylelintplus = {
+        autoFixOnFormat = true,
+      }
+    },
+  },
   jsonls = {
     filetypes = { 'json', 'jsonc' },
     settings = {

@@ -1,5 +1,0 @@
-local packer = require('packer')
-
-packer.use('MattesGroeger/vim-bookmarks')
-
-vim.g.bookmark_auto_close = 1

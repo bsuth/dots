@@ -1,5 +1,6 @@
 local C = require('constants')
 
+-- Cache to manually track cwd.
 local CWD_CACHE = {}
 
 function get_bufname() {
@@ -22,10 +23,7 @@ function is_blacklist_bufname(bufname) {
 
 -- Do not make this local! zsh needs this for cd hook in nested terminal.
 global function save_term_cwd() {
-  local bufname = get_bufname()
-  if !is_blacklist_bufname(bufname) {
-    CWD_CACHE[bufname] = vim.fn.getcwd()
-  }
+  CWD_CACHE[get_bufname()] = vim.fn.getcwd()
 }
 
 vim.api.nvim_create_autocmd('BufEnter', {
@@ -33,15 +31,15 @@ vim.api.nvim_create_autocmd('BufEnter', {
   pattern = '*',
   callback = () -> {
     local bufname = get_bufname()
-    if bufname:match('^term://') {
-      if CWD_CACHE[bufname] != nil {
-        vim.cmd('cd ' .. CWD_CACHE[bufname])
-      }
+
+    if CWD_CACHE[bufname] != nil {
+      vim.cmd('cd ' .. CWD_CACHE[bufname])
     } elseif !is_blacklist_bufname(bufname) {
       vim.cmd('cd ' .. vim.fn.fnamemodify(bufname, ':p:h'))
-      if vim.api.nvim_buf_get_option(0, 'filetype') == C.FILE_BROWSER_FILETYPE {
-        vim.cmd('Explore') -- refresh file browser
-      }
+    }
+
+    if vim.api.nvim_buf_get_option(0, 'filetype') == C.FILE_BROWSER_FILETYPE {
+      vim.cmd('Explore') -- refresh file browser
     }
   },
 })
@@ -55,10 +53,5 @@ vim.api.nvim_create_autocmd('TermOpen', {
 vim.api.nvim_create_autocmd('TermClose', {
   group = 'bsuth',
   pattern = C.TERM_PATTERNS,
-  callback = () -> {
-    local bufname = get_bufname()
-    if !is_blacklist_bufname(bufname) && CWD_CACHE[bufname] != nil {
-      CWD_CACHE[bufname] = nil
-    }
-  },
+  callback = () -> { CWD_CACHE[get_bufname()] = nil },
 })

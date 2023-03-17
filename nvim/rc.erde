@@ -25,6 +25,7 @@ vim.opt.termguicolors = true
 vim.opt.number = true
 vim.opt.signcolumn = 'yes'
 vim.opt.showmode = false
+vim.opt.synmaxcol = 300 -- limit for performance
 vim.opt.colorcolumn = '80'
 vim.cmd('highlight ColorColumn guibg=#585858')
 
@@ -108,7 +109,6 @@ load('plugins.dirvish')
 load('plugins.fugitive')
 load('plugins.telescope')
 load('plugins.lualine')
-load('plugins.bookmarks')
 
 -- languages
 load('plugins.go')

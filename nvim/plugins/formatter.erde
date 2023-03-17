@@ -17,6 +17,12 @@ vim.api.nvim_create_autocmd('BufWritePre', {
   command = 'if exists(":EslintFixAll") | EslintFixAll',
 })
 
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = 'bsuth',
+  pattern = C.CSS_PATTERNS,
+  command = 'lua vim.lsp.buf.format()',
+})
+
 vim.api.nvim_create_autocmd('BufWritePost', {
   group = 'bsuth',
   command = 'FormatWrite',
