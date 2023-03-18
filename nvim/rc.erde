@@ -26,6 +26,7 @@ vim.opt.number = true
 vim.opt.signcolumn = 'yes'
 vim.opt.showmode = false
 vim.opt.synmaxcol = 300 -- limit for performance
+vim.opt.laststatus = 3
 vim.opt.colorcolumn = '80'
 vim.cmd('highlight ColorColumn guibg=#585858')
 
@@ -125,4 +126,5 @@ load('modules.tidy')
 load('modules.search_visual')
 load('modules.track_cwd')
 load('modules.surround_jump')
+load('modules.buffer_history')
 pcall(() -> load('modules.work'))

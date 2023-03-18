@@ -10,149 +10,119 @@ local CLOSE_SURROUND_CHARS = {
   [']'] = true,
 }
 
-local SURROUND_CHARS = {}
-for char in pairs(OPEN_SURROUND_CHARS) { SURROUND_CHARS[char] = true }
-for char in pairs(CLOSE_SURROUND_CHARS) { SURROUND_CHARS[char] = true }
-
-function surround_jump_previous_open() {
-  local _, startline, startcol = unpack(vim.fn.getcurpos())
-  local charline, charcol = startline, startcol
-  local line = vim.fn.getline(charline)
-  local char = line:sub(charcol, charcol)
-
-  repeat {
-    if charcol > 1 {
-      charcol -= 1
-      char = line:sub(charcol, charcol)
-    } elseif charline > 1 {
-      charline -= 1
-      line = vim.fn.getline(charline)
-      charcol = #line
-      char = line:sub(charcol, charcol)
-    } else {
-      return -- no surrounds
-    }
-  } until SURROUND_CHARS[char]
-
-  if CLOSE_SURROUND_CHARS[char] {
-    vim.fn.setcursorcharpos(charline, charcol)
-    vim.cmd('keepjumps normal %')
-    _, charline, charcol = unpack(vim.fn.getcurpos())
-    vim.fn.setcursorcharpos(startline, startcol)
-  }
-
-  -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
-  vim.cmd("normal {charline}G{charcol}|")
+function get_cursor_char() {
+  local [ _, line, column ] = vim.fn.getpos('.')
+  return vim.fn.getline(line):sub(column, column)
 }
 
-function surround_jump_next_close() {
-  local _, startline, startcol = unpack(vim.fn.getcurpos())
-  local charline, charcol = startline, startcol
-  local line = vim.fn.getline(charline)
-  local char = line:sub(charcol, charcol)
+function prev_chars() {
+  local [ _, line, column ] = vim.fn.getpos('.')
+  local line_chars = vim.fn.getline(line)
 
-  local lastline = vim.fn.line('$')
-  local lastcol = #line
-
-  repeat {
-    if charcol < lastcol {
-      charcol += 1
-      char = line:sub(charcol, charcol)
-    } elseif charline < lastline {
-      charline += 1
-      line = vim.fn.getline(charline)
-      charcol = 1
-      char = line:sub(charcol, charcol)
-      lastcol = #line
-    } else {
-      return -- no surrounds
+  local iterator = () -> {
+    if column > 1 {
+      column -= 1
+      return line, column, line_chars:sub(column, column)
+    } elseif line > 1 {
+      line -= 1
+      line_chars = vim.fn.getline(line)
+      column = #line_chars
+      return line, column, line_chars:sub(column, column)
     }
-  } until SURROUND_CHARS[char]
-
-  if OPEN_SURROUND_CHARS[char] {
-    vim.fn.setcursorcharpos(charline, charcol)
-    vim.cmd('keepjumps normal %')
-    _, charline, charcol = unpack(vim.fn.getcurpos())
-    vim.fn.setcursorcharpos(startline, startcol)
   }
 
-  -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
-  vim.cmd("normal {charline}G{charcol}|")
+  return iterator, vimpos
 }
 
-function surround_jump_parent_open() {
-  local _, startline, startcol = unpack(vim.fn.getcurpos())
-  local charline, charcol = startline, startcol
-  local line = vim.fn.getline(charline)
-  local char = line:sub(charcol, charcol)
+function next_chars() {
+  local [ _, line, column ] = vim.fn.getpos('.')
+  local line_chars = vim.fn.getline(line)
+  local line_limit, column_limit = vim.fn.line('$'), #line_chars
 
-  repeat {
+  local iterator = () -> {
+    if column < column_limit {
+      column += 1
+      return line, column, line_chars:sub(column, column)
+    } elseif line < line_limit {
+      line += 1
+      line_chars = vim.fn.getline(line)
+      column, column_limit = 1, #line_chars
+      return line, column, line_chars:sub(column, column)
+    }
+  }
+
+  return iterator, vimpos
+}
+
+-- If on surround closing, jump to opening.
+-- Else if parent, jump to parent opening.
+-- Else if previous sibling, jump to previous sibling opening.
+function surround_jump_back() {
+  if CLOSE_SURROUND_CHARS[get_cursor_char()] {
+    vim.cmd('normal %')
+    return
+  }
+
+  -- NOTE: Technically, we should keep track of each surround depth in case of
+  -- unbalanced surrounds but this is much simpler and covers 99% of cases.
+  local jump_line, jump_column
+  local depth = 0
+
+  for line, column, char in prev_chars() {
     if CLOSE_SURROUND_CHARS[char] {
-      vim.fn.setcursorcharpos(charline, charcol)
-      vim.cmd('keepjumps normal %')
-      _, charline, charcol = unpack(vim.fn.getcurpos())
-      line = vim.fn.getline(charline)
-      char = line:sub(charcol, charcol)
-      vim.fn.setcursorcharpos(startline, startcol)
-    }
-
-    if charcol > 1 {
-      charcol -= 1
-      char = line:sub(charcol, charcol)
-    } elseif charline > 1 {
-      charline -= 1
-      line = vim.fn.getline(charline)
-      charcol = #line
-      char = line:sub(charcol, charcol)
+      depth += 1
+    } elseif !OPEN_SURROUND_CHARS[char] {
+      continue
+    } elseif depth == 0 {
+      jump_line, jump_column = line, column
+      break
+    } elseif depth == 1 && !jump_line && !jump_column {
+      depth -= 1
+      jump_line, jump_column = line, column
     } else {
-      return -- no surrounds
+      depth -= 1
     }
-  } until OPEN_SURROUND_CHARS[char]
+  }
 
-  -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
-  vim.cmd("normal {charline}G{charcol}|")
+  if jump_line && jump_column {
+    -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
+    vim.cmd("normal {jump_line}G{jump_column}|")
+  }
 }
 
-function surround_jump_parent_close() {
-  local _, startline, startcol = unpack(vim.fn.getcurpos())
-  local charline, charcol = startline, startcol
-  local line = vim.fn.getline(charline)
-  local char = line:sub(charcol, charcol)
+-- If on surround opening, jump to closing.
+-- Else if next sibling, jump to next sibling opening.
+function surround_jump_forward() {
+  if OPEN_SURROUND_CHARS[get_cursor_char()] {
+    vim.cmd('normal %')
+    return
+  }
 
-  repeat {
+  -- NOTE: Technically, we should keep track of each surround depth in case of
+  -- unbalanced surrounds but this is much simpler and covers 99% of cases.
+  local jump_line, jump_column
+  local depth = 0
+
+  for line, column, char in next_chars() {
     if OPEN_SURROUND_CHARS[char] {
-      vim.fn.setcursorcharpos(charline, charcol)
-      vim.cmd('keepjumps normal %')
-      _, charline, charcol = unpack(vim.fn.getcurpos())
-      line = vim.fn.getline(charline)
-      char = line:sub(charcol, charcol)
-      vim.fn.setcursorcharpos(startline, startcol)
-    }
-
-    if charcol < lastcol {
-      charcol += 1
-      char = line:sub(charcol, charcol)
-    } elseif charline < lastline {
-      charline += 1
-      line = vim.fn.getline(charline)
-      charcol = 1
-      char = line:sub(charcol, charcol)
-      lastcol = #line
+      depth += 1
+    } elseif !CLOSE_SURROUND_CHARS[char] {
+      continue
+    } elseif depth == 1 {
+      jump_line, jump_column = line, column
+      break
     } else {
-      return -- no surrounds
+      depth -= 1
     }
-  } until CLOSE_SURROUND_CHARS[char]
+  }
 
-  -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
-  vim.cmd("normal {charline}G{charcol}|")
+  if jump_line && jump_column {
+    -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
+    vim.cmd("normal {jump_line}G{jump_column}|")
+  }
 }
 
-vim.keymap.set('n', '(', surround_jump_previous_open)
-vim.keymap.set('v', '(', surround_jump_previous_open)
-vim.keymap.set('n', ')', surround_jump_next_close)
-vim.keymap.set('v', ')', surround_jump_next_close)
-
-vim.keymap.set('n', '{', surround_jump_parent_open)
-vim.keymap.set('v', '{', surround_jump_parent_open)
-vim.keymap.set('n', '}', surround_jump_parent_close)
-vim.keymap.set('v', '}', surround_jump_parent_close)
+vim.keymap.set('n', '(', surround_jump_back)
+vim.keymap.set('v', '(', surround_jump_back)
+vim.keymap.set('n', ')', surround_jump_forward)
+vim.keymap.set('v', ')', surround_jump_forward)
