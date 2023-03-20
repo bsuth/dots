@@ -2,7 +2,7 @@ module FILE_BROWSER_FILETYPE = 'netrw'
 
 module FD_FAVORITES_PATH = os.getenv('DOTS') .. '/nvim/telescope_favorites_home'
 
-module TRACK_CWD_BLACKLIST = { '^term://' }
+module TRACK_CWD_BLACKLIST = { '^term://', '^man://' }
 module TRACK_CWD_BUFNAME_FILTER = {}
 
 module TERM_PATTERNS = { 'term://*zsh*', 'term://*bash*' }

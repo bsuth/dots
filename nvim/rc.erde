@@ -22,7 +22,7 @@ vim.opt.expandtab = true
 
 -- interface
 vim.opt.termguicolors = true
-vim.opt.number = true
+vim.opt.number = false
 vim.opt.signcolumn = 'yes'
 vim.opt.showmode = false
 vim.opt.synmaxcol = 300 -- limit for performance
@@ -49,10 +49,6 @@ vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 vim.keymap.set('n', '<c-w>', ':write<cr>')
 vim.keymap.set('n', '<c-q>', ':quit<cr>')
 
--- command mode
-vim.keymap.set('c', '<c-space>', '<c-f>')
-vim.keymap.set('n', ':', ':<c-f><c-c>')
-
 -- clear search highlighting
 vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
 
@@ -77,6 +73,10 @@ vim.keymap.set('n', '<leader><c-l>', ':rightbelow :vsp | :Explore<cr>')
 vim.keymap.set('n', '<leader><c-k>', ':aboveleft :sp | :Explore<cr>')
 vim.keymap.set('n', '<leader><c-j>', ':rightbelow :sp | :Explore<cr>')
 vim.keymap.set('n', '<leader><c-h>', ':aboveleft :vsp | :Explore<cr>')
+vim.keymap.set('n', '<leader><m-l>', '<c-w>L')
+vim.keymap.set('n', '<leader><m-k>', '<c-w>K')
+vim.keymap.set('n', '<leader><m-j>', '<c-w>J')
+vim.keymap.set('n', '<leader><m-h>', '<c-w>H')
 
 -- -----------------------------------------------------------------------------
 -- Plugins / Modules

@@ -9,7 +9,10 @@
 --
 -- @see https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_init_packages.lua
 local nvim_package_path = os.getenv('DOTS') .. '/nvim'
-package.path = ('%s/?.lua;%s/?/init.lua;%s'):format(nvim_package_path, nvim_package_path, package.path)
+
+if not package.path:find(nvim_package_path) then
+  package.path = ('%s/?.lua;%s/?/init.lua;%s'):format(nvim_package_path, nvim_package_path, package.path)
+end
 
 -- load erde
 require('erde').load()

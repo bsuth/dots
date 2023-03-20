@@ -28,6 +28,7 @@ local HOME_DMENU_OPTIONS = {
       { label = 'discord', action = 'discord' },
       { label = 'aseprite', action = 'aseprite' },
       { label = 'godot', action = 'godot' },
+      { label = 'steam', action = 'steam' },
     },
   },
 }

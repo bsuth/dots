@@ -5,13 +5,8 @@ packer.use('nvim-telescope/telescope.nvim')
 packer.use({ 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
 
 local telescope = require('telescope')
-local telescope_config = require('telescope.config')
-local telescope_pickers = require('telescope.pickers')
-local telescope_finders = require('telescope.finders')
-local telescope_previewers = require('telescope.previewers')
 local telescope_actions = require('telescope.actions')
-local telescope_actions_set = require('telescope.actions.set')
-local telescope_actions_state = require('telescope.actions.state')
+local telescope_builtin = require('telescope.builtin')
 
 telescope.setup({
   defaults = {
@@ -48,45 +43,14 @@ telescope.setup({
 
 telescope.load_extension('fzf')
 
--- -----------------------------------------------------------------------------
--- Helpers
--- -----------------------------------------------------------------------------
+vim.keymap.set('n', '<m-space>b', ':Telescope buffers<cr>')
+vim.keymap.set('n', '<m-space>h', ':Telescope help_tags<cr>')
+vim.keymap.set('n', '<m-space>m', ':Telescope man_pages<cr>')
+vim.keymap.set('n', '<m-space>g', ':Telescope git_files<cr>')
+vim.keymap.set('n', '<m-space>f', ':Telescope find_files<cr>')
+vim.keymap.set('n', '<m-space>r', ':Telescope grep_string only_sort_text=true search=<cr>')
 
-function fd_job(flags) {
-  return vim.list_extend({
-    'fd',
-    '--follow',
-    '--exclude',
-    'go',
-    '--exclude',
-    'bin',
-  }, flags)
-}
-
-function run(cwd, job, opts) {
-  return telescope_pickers.new(opts, {
-    finder = telescope_finders.new_oneshot_job(job, { cwd = cwd }),
-    previewer = telescope_previewers.vim_buffer_cat.new({ cwd = cwd }),
-    sorter = telescope_config.values.generic_sorter(),
-    attach_mappings = (prompt_bufnr, map) -> {
-      -- Default select does not consider cwd from finder
-      telescope_actions_set.select:replace(() -> {
-        local selection = telescope_actions_state.get_selected_entry().value
-        telescope_actions.close(prompt_bufnr)
-        vim.cmd('edit ' .. cwd .. '/' .. selection)
-      })
-
-      return true
-    },
-  }):find()
-}
-
--- -----------------------------------------------------------------------------
--- Mappings
--- -----------------------------------------------------------------------------
-
-vim.keymap.set('n', '<leader><leader>', () -> run(os.getenv('HOME'), { C.FD_FAVORITES_PATH }, { prompt_title = 'Favorites' }))
-vim.keymap.set('n', '<leader>fd', () -> run('.', fd_job({ '--type', 'f' }), { prompt_title = 'fd' }))
-vim.keymap.set('n', '<leader>cd', () -> run('.', fd_job({ '--type', 'd' }), { prompt_title = 'cd' }))
-vim.keymap.set('n', '<leader>rg', ':Telescope grep_string only_sort_text=true search=<cr>')
-vim.keymap.set('n', '<leader>buf', ':Telescope buffers<cr>')
+vim.keymap.set('n', '<m-space><leader>', () -> telescope_builtin.find_files({
+  cwd = '~',
+  search_dirs = { 'dots', 'repos' },
+}))
