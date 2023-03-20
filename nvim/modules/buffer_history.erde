@@ -78,8 +78,13 @@ vim.api.nvim_create_autocmd('BufEnter', {
 
     if needs_update {
       window_history_clear(buffer, window)
+
+      for i = #window_history.buffer_history, window_history.history_pointer + 1, -1 {
+        table.remove(window_history.buffer_history)
+      }
+
       table.insert(window_history.buffer_history, buffer)
-      window_history.history_pointer = #window_history.buffer_history
+      window_history.history_pointer += 1
     }
   },
 })
