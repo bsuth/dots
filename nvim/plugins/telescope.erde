@@ -43,14 +43,15 @@ telescope.setup({
 
 telescope.load_extension('fzf')
 
-vim.keymap.set('n', '<m-space>b', ':Telescope buffers<cr>')
-vim.keymap.set('n', '<m-space>h', ':Telescope help_tags<cr>')
-vim.keymap.set('n', '<m-space>m', ':Telescope man_pages<cr>')
-vim.keymap.set('n', '<m-space>g', ':Telescope git_files<cr>')
-vim.keymap.set('n', '<m-space>f', ':Telescope find_files<cr>')
-vim.keymap.set('n', '<m-space>r', ':Telescope grep_string only_sort_text=true search=<cr>')
+vim.keymap.set('n', '`b', ':Telescope buffers<cr>')
+vim.keymap.set('n', '`h', ':Telescope help_tags<cr>')
+vim.keymap.set('n', '`m', ':Telescope man_pages<cr>')
+vim.keymap.set('n', '`g', ':Telescope git_files<cr>')
+vim.keymap.set('n', '`f', ':Telescope find_files<cr>')
+vim.keymap.set('n', '`r', ':Telescope grep_string only_sort_text=true search=<cr>')
 
-vim.keymap.set('n', '<m-space><leader>', () -> telescope_builtin.find_files({
+vim.keymap.set('n', '``', () -> telescope_builtin.find_files({
   cwd = '~',
   search_dirs = { 'dots', 'repos' },
+  find_command = { 'fd', '--type', 'f', '--type', 'd' },
 }))
