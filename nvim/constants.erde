@@ -5,6 +5,9 @@ module FD_FAVORITES_PATH = os.getenv('DOTS') .. '/nvim/telescope_favorites_home'
 module TRACK_CWD_BLACKLIST = { '^term://', '^man://' }
 module TRACK_CWD_BUFNAME_FILTER = {}
 
+module BUFFER_HISTORY_NAME_BLACKLIST = { '^term://', '^man://' }
+module BUFFER_HISTORY_FILETYPE_BLACKLIST = { FILE_BROWSER_FILETYPE }
+
 module TERM_PATTERNS = { 'term://*zsh*', 'term://*bash*' }
 module JS_PATTERNS = { '*.js', '*.mjs', '*.jsx', '*.ts', '*.tsx' }
 module CSS_PATTERNS = { '*.css', '*.scss', '*.less' }

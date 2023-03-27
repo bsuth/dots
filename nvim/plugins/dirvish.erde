@@ -4,6 +4,7 @@ local packer = require('packer')
 packer.use('justinmk/vim-dirvish')
 
 C.FILE_BROWSER_FILETYPE = 'dirvish'
+table.insert(C.BUFFER_HISTORY_FILETYPE_BLACKLIST, 'dirvish')
 
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
