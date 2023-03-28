@@ -1,112 +1,100 @@
 local C = require('constants')
 
-local window_histories = {}
+local buffer_history = {}
+local buffer_history_pointer = 0
+local ignore_buf_enter = false
 
-function is_blacklist_buffer(buffer = vim.api.nvim_get_current_buf()) {
+function has_blacklist_bufname(buffer) {
   local bufname = vim.api.nvim_buf_get_name(buffer)
-  local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
-
   for _, pattern in ipairs(C.BUFFER_HISTORY_NAME_BLACKLIST) {
     if bufname:match(pattern) {
       return true
     }
   }
+}
 
-  for _, blacklist in ipairs(C.BUFFER_HISTORY_FILETYPE_BLACKLIST) {
-    if filetype == blacklist {
+function has_blacklist_filetype(buffer) {
+  local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
+  for _, blacklisted in ipairs(C.BUFFER_HISTORY_FILETYPE_BLACKLIST) {
+    if filetype == blacklisted {
       return true
     }
   }
 }
 
-function window_history_back(window = vim.api.nvim_get_current_win()) {
-  local window_history = window_histories[window]
-  if window_history && window_history.history_pointer > 1 {
-    window_history.history_pointer -= 1
-    vim.api.nvim_win_set_buf(window, window_history.buffer_history[window_history.history_pointer])
-  }
+function is_blacklist_buffer(buffer) {
+  return has_blacklist_bufname(buffer) || has_blacklist_filetype(buffer)
 }
 
-function window_history_forward(window = vim.api.nvim_get_current_win()) {
-  local window_history = window_histories[window]
-  if window_history && window_history.history_pointer < #window_history.buffer_history {
-    window_history.history_pointer += 1
-    vim.api.nvim_win_set_buf(window, window_history.buffer_history[window_history.history_pointer])
-  }
-}
-
-function window_history_clear(buffer = vim.api.nvim_get_current_buf(), window) {
-  local clear_histories = window == nil
-    && window_histories
-    || window_histories[window]
-    && { window_histories[window] }
-    || {}
-
-  for window, window_history in pairs(clear_histories) {
-    for i, history_buffer in ipairs(window_history.buffer_history) {
-      if history_buffer == buffer {
-        table.remove(window_history.buffer_history, i)
-        break
-      }
+function history_back() {
+  for i = buffer_history_pointer - 1, 1, -1 {
+    if #vim.fn.win_findbuf(buffer_history[i]) == 0 {
+      ignore_buf_enter = true
+      buffer_history_pointer = i
+      vim.api.nvim_win_set_buf(0, buffer_history[i])
+      break
     }
   }
 }
 
-vim.api.nvim_create_autocmd('VimEnter', {
-  group = 'bsuth',
-  callback = () -> {
-    -- Initialize for first window, since WinNew event is not fired on startup.
-    local window = vim.api.nvim_get_current_win()
-    window_histories[window] = { buffer_history = {}, history_pointer = 0 }
-  },
-})
+function history_forward() {
+  for i = buffer_history_pointer + 1, #buffer_history {
+    if #vim.fn.win_findbuf(buffer_history[i]) == 0 {
+      ignore_buf_enter = true
+      buffer_history_pointer = i
+      vim.api.nvim_win_set_buf(0, buffer_history[i])
+      break
+    }
+  }
+}
 
-vim.api.nvim_create_autocmd('WinNew', {
-  group = 'bsuth',
-  callback = () -> {
-    local window = vim.api.nvim_get_current_win()
-    window_histories[window] = { buffer_history = {}, history_pointer = 0 }
-  },
-})
+function history_remove(buffer) {
+  for i, history_buffer in ipairs(buffer_history) {
+    if history_buffer == buffer {
+      table.remove(buffer_history, i)
+      buffer_history_pointer = math.min(buffer_history_pointer, #buffer_history)
+      break
+    }
+  }
+}
 
-vim.api.nvim_create_autocmd('WinClosed', {
-  group = 'bsuth',
-  callback = () -> {
-    local window = vim.api.nvim_get_current_win()
-    window_histories[window] = nil
-  },
-})
+function history_push(buffer) {
+  history_remove(buffer)
+
+  for i = #buffer_history, buffer_history_pointer + 1, -1 {
+    table.remove(buffer_history)
+  }
+
+  table.insert(buffer_history, buffer)
+  buffer_history_pointer += 1
+}
 
 vim.api.nvim_create_autocmd('BufEnter', {
   group = 'bsuth',
   callback = () -> {
-    local window = vim.api.nvim_get_current_win()
-    local window_history = window_histories[window]
     local buffer = vim.api.nvim_get_current_buf()
+    if ignore_buf_enter {
+      ignore_buf_enter = false
+    } elseif !is_blacklist_buffer(buffer) {
+      history_push(buffer)
+    }
+  },
+})
 
-    local needs_update = (
-      window_history &&
-      !is_blacklist_buffer(buffer) &&
-      window_history.buffer_history[window_history.history_pointer] != buffer
-    )
-
-    if needs_update {
-      window_history_clear(buffer, window)
-
-      for i = #window_history.buffer_history, window_history.history_pointer + 1, -1 {
-        table.remove(window_history.buffer_history)
-      }
-
-      table.insert(window_history.buffer_history, buffer)
-      window_history.history_pointer += 1
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'bsuth',
+  callback = () -> {
+    local buffer = vim.api.nvim_get_current_buf()
+    if has_blacklist_filetype(buffer) {
+      history_remove(buffer)
     }
   },
 })
 
 vim.api.nvim_create_autocmd('BufWipeout', {
   group = 'bsuth',
-  callback = window_history_clear,
+  callback = () -> history_remove(vim.api.nvim_get_current_buf()),
 })
 
-vim.keymap.set('n', '<m-o>', window_history_back)
-vim.keymap.set('n', '<m-i>', window_history_forward)
+vim.keymap.set('n', '<m-o>', history_back)
+vim.keymap.set('n', '<m-i>', history_forward)
