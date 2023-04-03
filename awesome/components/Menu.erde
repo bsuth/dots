@@ -8,7 +8,6 @@ local { trim } = require('core.utils')
 local MENU_ITEM_WIDTH = 384
 local MENU_ITEM_HEIGHT = 60
 local MENU_PAGE_SIZE = 5
-local SCROLLBAR_WIDTH = 4
 
 function create_menu_item_widget(content_widget) {
   return wibox.widget({
@@ -102,43 +101,23 @@ function Menu:_init(props) {
     layout = wibox.layout.fixed.horizontal,
   })
 
-  self.scroll_thumb_widget = wibox.widget({
-    forced_width = SCROLLBAR_WIDTH,
-    bg = palette.cyan,
-    widget = wibox.container.background,
-  })
-
-  self.scrollbar_widget = wibox.widget({ layout = wibox.layout.manual })
-  self.scrollbar_widget:add_at(self.scroll_thumb_widget, { x = 0, y = 0 })
-
   self.root_widget = wibox.widget({
     {
-      {
-        create_menu_item_widget(self.prompt_container),
-        shape_border_width = 1,
-        shape_border_color = palette.cyan,
-        bg = palette.dark_gray,
-        widget = wibox.container.background,
-      },
-      {
-        self.items_widget,
-        shape_border_width = 1,
-        shape_border_color = palette.cyan,
-        bg = palette.dark_gray,
-        widget = wibox.container.background,
-      },
-      spacing = 8,
-      layout = wibox.layout.fixed.vertical,
+      create_menu_item_widget(self.prompt_container),
+      shape_border_width = 1,
+      shape_border_color = palette.white,
+      shape = (cr, width, height) -> gears.shape.rounded_rect(cr, width, height, 4),
+      widget = wibox.container.background,
     },
     {
-      self.scrollbar_widget,
-      top = MENU_ITEM_HEIGHT + 8,
-      forced_width = SCROLLBAR_WIDTH,
-      forced_height = MENU_ITEM_HEIGHT * MENU_PAGE_SIZE,
-      widget = wibox.container.margin,
+      self.items_widget,
+      shape_border_width = 1,
+      shape_border_color = palette.white,
+      shape = (cr, width, height) -> gears.shape.rounded_rect(cr, width, height, 4),
+      widget = wibox.container.background,
     },
-    spacing = 4,
-    layout = wibox.layout.fixed.horizontal,
+    spacing = 8,
+    layout = wibox.layout.fixed.vertical,
   })
 
   self.path = {}
@@ -191,16 +170,6 @@ function Menu:filter() {
 function Menu:refresh() {
   local new_items_widget_children = {}
   local num_filtered_options = #self.filtered_options
-
-  if num_filtered_options <= MENU_PAGE_SIZE {
-    self.scrollbar_widget.visible = false
-  } else {
-    local num_scroll = num_filtered_options - MENU_PAGE_SIZE + 1
-    local scroll_increment = (MENU_ITEM_HEIGHT * MENU_PAGE_SIZE) / num_scroll
-    self.scroll_thumb_widget.forced_height = scroll_increment
-    self.scrollbar_widget:move_widget(self.scroll_thumb_widget, { x = 0, y = self.item_index_offset * scroll_increment })
-    self.scrollbar_widget.visible = true
-  }
 
   for i = 1, math.min(num_filtered_options - self.item_index_offset, MENU_PAGE_SIZE) {
     local option = self.filtered_options[self.item_index_offset + i]

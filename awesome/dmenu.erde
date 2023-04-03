@@ -5,6 +5,15 @@ local Menu = require('components.Menu')
 local veil = require('veil')
 
 local HOME_DMENU_OPTIONS = {
+  { label = 'firefox', action = 'firefox-developer-edition' },
+  { label = 'flameshot', action = 'flameshot gui' },
+  { label = 'discord', action = 'discord' },
+  { label = 'simplescreenrecorder', action = 'simplescreenrecorder' },
+  { label = 'steam', action = 'steam' },
+  {
+    label = 'gpick',
+    action = () -> awful.spawn.with_shell("gpick -s -o | tr -d '\\n' | xclip -sel c")
+  },
   {
     label = 'system',
     options = {
@@ -12,23 +21,6 @@ local HOME_DMENU_OPTIONS = {
       { label = 'sleep', action = 'systemctl suspend' },
       { label = 'reboot', action = '/sbin/reboot' },
       { label = 'poweroff', action = '/sbin/poweroff' },
-    },
-  },
-  {
-    label = 'gpick',
-    action = () -> awful.spawn.with_shell("gpick -s -o | tr -d '\\n' | xclip -sel c")
-  },
-  { label = 'flameshot', action = 'flameshot gui' },
-  { label = 'simplescreenrecorder', action = 'simplescreenrecorder' },
-  { label = 'firefox', action = 'firefox-developer-edition' },
-  {
-    label = 'apps',
-    options = {
-      { label = 'inkscape', action = 'inkscape' },
-      { label = 'discord', action = 'discord' },
-      { label = 'aseprite', action = 'aseprite' },
-      { label = 'godot', action = 'godot' },
-      { label = 'steam', action = 'steam' },
     },
   },
 }
