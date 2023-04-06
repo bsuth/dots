@@ -39,8 +39,15 @@ function Veil:get_focused_veil() {
 }
 
 function Veil:show(widget) {
-  local focused_veil = self:get_focused_veil()
-  focused_veil.widget.children = widget && { widget } || {}
+  local focused_screen = awful.screen.focused()
+
+  for _, popup in ipairs(self.popups) {
+    if popup.screen == focused_screen {
+      popup.widget.children = { widget }
+    } else {
+      popup.widget.children = {}
+    }
+  }
 
   for _, popup in ipairs(self.popups) {
     popup.visible = true
