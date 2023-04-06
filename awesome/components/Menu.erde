@@ -1,7 +1,7 @@
 local awful = require('awful')
 local gears = require('gears')
 local wibox = require('wibox')
-local Object = require('core.Object')
+local Class = require('core.Class')
 local { palette } = require('core.theme')
 local { trim } = require('core.utils')
 
@@ -33,7 +33,7 @@ function create_menu_item_widget(content_widget) {
 -- MenuItem
 -- -----------------------------------------------------------------------------
 
-local MenuItem = {}
+local MenuItem = Class()
 
 function MenuItem:_init(props = {}) {
   self.text_widget = wibox.widget({
@@ -79,7 +79,7 @@ function MenuItem:_set_active(new_active) {
 -- Menu
 -- -----------------------------------------------------------------------------
 
-local Menu = {}
+local Menu = Class()
 
 function Menu:_init(props) {
   self.props = props
@@ -87,7 +87,7 @@ function Menu:_init(props) {
   self.items = {}
   self.items_widget = wibox.widget({ layout = wibox.layout.fixed.vertical })
   for i = 1, MENU_PAGE_SIZE {
-    local dmenu_item = Object(MenuItem, { markup = '' })
+    local dmenu_item = MenuItem({ markup = '' })
     table.insert(self.items, dmenu_item)
     self.items_widget:add(dmenu_item.root_widget)
   }

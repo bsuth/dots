@@ -2,9 +2,9 @@ local awful = require('awful')
 local gears = require('gears')
 local wibox = require('wibox')
 local { global_keys } = require('core.bindings')
-local Object = require('core.Object')
 local { palette } = require('core.theme')
 local { trim } = require('core.utils')
+local Class = require('core.Class')
 local Menu = require('components.Menu')
 local Prompt = require('components.Prompt')
 local Veil = require('components.Veil')
@@ -55,7 +55,7 @@ function save_recently_used_tab_name(tab_name) {
 
 local MAX_TAB_SUGGESTIONS = 10
 
-local TabSuggestions = {}
+local TabSuggestions = Class()
 
 function TabSuggestions:_init(props) {
   self.screen = props.screen
@@ -182,7 +182,7 @@ function TabSuggestions:next() {
 -- Tab
 -- -----------------------------------------------------------------------------
 
-local Tab = {}
+local Tab = Class()
 
 function Tab:_init(props) {
   self.tag = props.tag
@@ -228,12 +228,12 @@ function Tab:toggle() {
 -- Tagbar
 -- -----------------------------------------------------------------------------
 
-local Tagbar = {}
+local Tagbar = Class()
 
 function Tagbar:_init(props) {
   self.screen = props.screen
   self.tabs = {}
-  self.veil = Object(Veil)
+  self.veil = Veil()
 
   self.tabs_widget = wibox.widget({
     forced_width = self.screen.geometry.width,
@@ -249,12 +249,12 @@ function Tagbar:_init(props) {
     widget = self.tabs_widget,
   })
 
-  self.tab_suggestions = Object(TabSuggestions, {
+  self.tab_suggestions = TabSuggestions({
     screen = self.screen,
     suggestions = RECENTLY_USED_TAG_NAMES,
   })
 
-  self.prompt = Object(Prompt, {
+  self.prompt = Prompt({
     halign = 'center',
     valign = 'center',
     font = TAGBAR_FONT,
@@ -396,7 +396,7 @@ function Tagbar:refresh() {
         }
       }
 
-      new_tab ||= Object(Tab, { tag = tag })
+      new_tab ||= Tab({ tag = tag })
       table.insert(new_tabs, new_tab)
       table.insert(children, new_tab.root_widget)
     }
@@ -462,7 +462,7 @@ gears.table.merge(global_keys, {
   awful.key({ 'Mod4', 'Control' }, 't', () -> get_current_tagbar():get_active_tab():toggle()),
 })
 
-awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Object(Tagbar, { screen = s })))
+awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Tagbar({ screen = s })))
 awful.screen.disconnect_for_each_screen(s -> {
   for i, tagbar in ipairs(tagbars) {
     if tagbar.screen == s {

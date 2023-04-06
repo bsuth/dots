@@ -1,7 +1,8 @@
 local awful = require('awful')
 local wibox = require('wibox')
+local Class = require('core.Class')
 
-local Veil = {}
+local Veil = Class()
 
 function Veil:_init() {
   self.popups = {}
@@ -37,7 +38,10 @@ function Veil:get_focused_veil() {
   }
 }
 
-function Veil:show() {
+function Veil:show(widget) {
+  local focused_veil = self:get_focused_veil()
+  focused_veil.widget.children = widget && { widget } || {}
+
   for _, popup in ipairs(self.popups) {
     popup.visible = true
   }

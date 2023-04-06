@@ -1,6 +1,5 @@
 local awful = require('awful')
 local { global_keys } = require('core.bindings')
-local Object = require('core.Object')
 local Menu = require('components.Menu')
 local veil = require('veil')
 
@@ -25,7 +24,7 @@ local HOME_DMENU_OPTIONS = {
   },
 }
 
-local menu = Object(Menu, {
+local menu = Menu({
   options = HOME_DMENU_OPTIONS, -- TODO: work options
   on_close = veil.hide,
   on_submit = { action } -> {
