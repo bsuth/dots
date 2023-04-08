@@ -30,13 +30,23 @@ do {
   }
 }
 
-function save_recently_used_tab_name(tab_name) {
+function write_recently_used_tab_names() {
+  local tagbar_name_history_file = io.open(TAGBAR_NAME_HISTORY_FILENAME, 'w')
+  tagbar_name_history_file:write(table.concat(RECENTLY_USED_TAG_NAMES, '\n'))
+  tagbar_name_history_file:close()
+}
+
+function remove_recently_used_tab_name(tab_name) {
   for i, recently_used_tab_name in ipairs(RECENTLY_USED_TAG_NAMES) {
     if recently_used_tab_name == tab_name {
       table.remove(RECENTLY_USED_TAG_NAMES, i)
       break
     }
   }
+}
+
+function save_recently_used_tab_name(tab_name) {
+  remove_recently_used_tab_name(tab_name)
 
   table.insert(RECENTLY_USED_TAG_NAMES, 1, tab_name)
   for i = #RECENTLY_USED_TAG_NAMES, TAGBAR_NAME_HISTORY_SIZE + 1, -1 {
@@ -44,9 +54,12 @@ function save_recently_used_tab_name(tab_name) {
     table.remove(RECENTLY_USED_TAG_NAMES, i)
   }
 
-  local tagbar_name_history_file = io.open(TAGBAR_NAME_HISTORY_FILENAME, 'w')
-  tagbar_name_history_file:write(table.concat(RECENTLY_USED_TAG_NAMES, '\n'))
-  tagbar_name_history_file:close()
+  write_recently_used_tab_names()
+}
+
+function delete_recently_used_tab_name(tab_name) {
+  remove_recently_used_tab_name(tab_name)
+  write_recently_used_tab_names()
 }
 
 -- -----------------------------------------------------------------------------
@@ -150,18 +163,21 @@ function TabSuggestions:hide() {
   self.popup.visible = false
 }
 
+function TabSuggestions:current() {
+  if self.selected == 0 {
+    return self.default_suggestion
+  } else {
+    return self.filtered_suggestions[self.selected]
+  }
+}
+
 function TabSuggestions:prev() {
   if self.selected == 0 {
     self.selected = #self.filtered_suggestions
   } else {
     self.selected -= 1
   }
-
-  if self.selected == 0 {
-    return self.default_suggestion
-  } else {
-    return self.filtered_suggestions[self.selected]
-  }
+  return self:current()
 }
 
 function TabSuggestions:next() {
@@ -170,12 +186,28 @@ function TabSuggestions:next() {
   } else {
     self.selected += 1
   }
+  return self:current()
+}
 
-  if self.selected == 0 {
-    return self.default_suggestion
-  } else {
-    return self.filtered_suggestions[self.selected]
+function TabSuggestions:delete() {
+  local current_suggestion = self:current()
+
+  local num_filtered_suggestions = #self.filtered_suggestions
+  local new_selected = self.selected < num_filtered_suggestions
+    && self.selected || num_filtered_suggestions - 1
+
+  for i, suggestion in ipairs(self.suggestions) {
+    if suggestion == current_suggestion {
+      table.remove(self.suggestions, i)
+      break
+    }
   }
+
+  delete_recently_used_tab_name(current_suggestion)
+  self:_on_change_filter()
+  self.selected = new_selected
+
+  return self:current()
 }
 
 -- -----------------------------------------------------------------------------
@@ -263,6 +295,10 @@ function Tagbar:_init(props) {
       self.tab_suggestions.filter = self.prompt.text
     },
     keybindings = {
+      { { 'Control' }, 'q', () -> {
+        local suggestion = self.tab_suggestions:delete()
+        self.prompt:update(suggestion, #suggestion)
+      } },
       { {}, 'Tab', () -> {
         local suggestion = self.tab_suggestions:next()
         self.prompt:update(suggestion, #suggestion)
