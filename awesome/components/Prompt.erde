@@ -31,8 +31,6 @@ function Prompt:_init(props = {}) {
   })
 
   local keybindings = {
-    { {}, 'Escape', () -> self:cancel() },
-    { {}, 'Return', () -> self:submit() },
     { {}, 'Right', () -> self:_move_char_forward() },
     { {}, 'Left', () -> self:_move_char_back() },
     { { 'Control' }, 'f', () -> self:_move_char_forward() },
@@ -47,6 +45,9 @@ function Prompt:_init(props = {}) {
     { { 'Mod1' }, 'BackSpace', () -> self:_delete_word_back() },
     { { 'Control' }, 'u', () -> self:_delete_line_start() },
     { { 'Control' }, 'k', () -> self:_delete_line_end() },
+    { {}, 'Escape', () -> self:cancel() },
+    { { 'Control' }, 'c', () -> self:cancel() },
+    { {}, 'Return', () -> self:submit() },
   }
 
   if props.keybindings {

@@ -4,6 +4,7 @@ local wibox = require('wibox')
 local Class = require('core.Class')
 local { palette } = require('core.theme')
 local { trim } = require('core.utils')
+local Prompt = require('components.Prompt')
 
 local MENU_ITEM_WIDTH = 384
 local MENU_ITEM_HEIGHT = 60
@@ -193,18 +194,18 @@ function Menu:refresh() {
   self.items_widget.children = new_items_widget_children
 }
 
-function Menu:prompt() {
+function Menu:run_prompt() {
   -- Use `return true, false` to prevent prompt from exiting
   -- https://awesomewm.org/doc/api/libraries/awful.prompt.html#hook
   local on_back = () -> { self:back(); return true, false }
   local on_prev = () -> { self:prev(); return true, false }
   local on_next = () -> { self:next(); return true, false }
 
-  local prompt = awful.widget.prompt({
-    prompt = '',
-    fg = palette.white,
-    changed_callback = new_input -> { self.input = trim(new_input) },
-    hooks = {
+  self.prompt = Prompt({
+    on_cancel = () -> self:stop(),
+    on_submit = () -> self:submit(),
+    on_user_change = () -> { self.input = trim(self.prompt.text) },
+    keybindings = {
       { {}, '-', on_back },
       { {}, 'Up', on_prev },
       { {}, 'Down', on_next },
@@ -212,14 +213,15 @@ function Menu:prompt() {
       { { 'Control' }, 'n', on_next },
       { { 'Shift' }, 'Tab', on_prev },
       { {}, 'Tab', on_next },
-      { {}, 'Return', () -> self:submit() },
-      { { 'Control' }, 'c', () -> self:stop() },
-      { {}, 'Escape', () -> self:stop() },
     },
   })
 
-  self.prompt_container.children = { self.prompt_container.children[1], prompt }
-  prompt:run()
+  self.prompt_container.children = {
+    self.prompt_container.children[1],
+    self.prompt.root_widget,
+  }
+
+  self.prompt:start()
 }
 
 function Menu:back() {
@@ -256,7 +258,7 @@ function Menu:next() {
 }
 
 function Menu:run() {
-  self:prompt()
+  self:run_prompt()
   if self.options != self.props.options {
     self.options = self.props.options
   } else {
@@ -266,10 +268,10 @@ function Menu:run() {
 }
 
 function Menu:stop(option) {
-  awful.keygrabber.stop()
   if option { self.props.on_submit(option, self.path) }
   if self.props.on_close { self.props.on_close() }
   self.input = ''
+  self.prompt_container.children = { self.prompt_container.children[1] }
 }
 
 function Menu:submit() {
@@ -279,8 +281,7 @@ function Menu:submit() {
   } elseif type(active_option) == 'table' && active_option.options {
     table.insert(self.path, self.options)
     self.options = active_option.options
-    awful.keygrabber.stop()
-    self:prompt()
+    self:run_prompt()
   } else {
     self:stop(active_option)
   }

@@ -4,12 +4,14 @@ local Class = require('core.Class')
 
 local Veil = Class()
 
+local dummy_widget = wibox.widget({ widget = wibox.container.place })
+
 function Veil:_init() {
   self.popups = {}
 
   awful.screen.connect_for_each_screen(s -> {
     table.insert(self.popups, awful.popup({
-      widget = wibox.widget({ widget = wibox.container.place }),
+      widget = dummy_widget,
       screen = s,
       visible = false,
       bg = '#000000aa',
@@ -42,11 +44,7 @@ function Veil:show(widget) {
   local focused_screen = awful.screen.focused()
 
   for _, popup in ipairs(self.popups) {
-    if popup.screen == focused_screen {
-      popup.widget.children = { widget }
-    } else {
-      popup.widget.children = {}
-    }
+    popup.widget = popup.screen == focused_screen && widget || dummy_widget
   }
 
   for _, popup in ipairs(self.popups) {
