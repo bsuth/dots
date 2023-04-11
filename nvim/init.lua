@@ -14,9 +14,9 @@ if not package.path:find(nvim_package_path) then
   package.path = ('%s/?.lua;%s/?/init.lua;%s'):format(nvim_package_path, nvim_package_path, package.path)
 end
 
--- load erde
-require('erde').load()
+local erde = require('erde')
+erde.load()
 
--- force reload rc
-package.loaded.rc = nil
-require('rc')
+package.loaded.rc = nil -- force reload rc
+local ok, result = xpcall(function() require('rc') end, erde.rewrite)
+if not ok then error(result) end
