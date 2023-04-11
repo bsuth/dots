@@ -257,7 +257,7 @@ keygrabber = awful.keygrabber({
     { {}, 'Return', () => activate(active_component) },
     { {}, 'Escape', close_dashboard },
     { { 'Control' }, 'c', close_dashboard },
-    { { 'Mod4' }, ' ', close_dashboard },
+    { { 'Mod4' }, ';', close_dashboard },
   },
 
   keyreleased_callback = (modifiers, key) => {
@@ -353,7 +353,7 @@ local root_widget = wibox.widget({
 -- Return
 -- -----------------------------------------------------------------------------
 
-table.insert(global_keys, awful.key({ 'Mod4' }, 'space', () -> {
+table.insert(global_keys, awful.key({ 'Mod4' }, ';', () -> {
   local { width: screen_width, height: screen_height } = awful.screen.focused().geometry
   dashboard_widget.spacing = screen_width < screen_height && 64 || 128
   veil:show(root_widget)

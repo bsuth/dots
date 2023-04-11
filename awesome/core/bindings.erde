@@ -146,11 +146,17 @@ module global_keys = {
     awful.client.swap.global_bydirection('right')
   }),
 
-  awful.key({ 'Mod4' }, 'Return', () -> {
+  awful.key({ 'Mod4' }, 'space', () -> {
     awful.spawn('st -e nvim -c ":Dirvish"')
   }),
-  awful.key({ 'Mod4', 'Shift' }, 'Return', () -> {
+  awful.key({ 'Mod4', 'Shift' }, 'space', () -> {
     awful.spawn('st')
+  }),
+  awful.key({ 'Mod4' }, 'Return', () -> {
+    awful.spawn('firefox-developer-edition')
+  }),
+  awful.key({ 'Mod4', 'Shift' }, 'Return', () -> {
+    awful.spawn('firefox-developer-edition --private-window')
   }),
 }
 
