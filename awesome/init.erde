@@ -13,9 +13,8 @@ require('core.client')
 require('core.models')
 require('core.theme')
 require('client_buffer')
-require('dmenu')
-require('status_menu')
 require('tagbar')
+require('dashboard')
 
 -- Init tags
 awful.screen.connect_for_each_screen(s -> {

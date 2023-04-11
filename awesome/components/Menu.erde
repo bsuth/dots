@@ -9,6 +9,8 @@ local Prompt = require('components.Prompt')
 local MENU_ITEM_WIDTH = 384
 local MENU_ITEM_HEIGHT = 60
 local MENU_PAGE_SIZE = 5
+local MENU_SELECTED_BG = palette.light_gray
+local MENU_UNSELECTED_BG = '#1A1A1A'
 
 function create_menu_item_widget(content_widget) {
   return wibox.widget({
@@ -23,7 +25,7 @@ function create_menu_item_widget(content_widget) {
       widget = wibox.container.place,
     },
     fg = palette.white,
-    bg = palette.dark_gray,
+    bg = MENU_UNSELECTED_BG,
     forced_width = MENU_ITEM_WIDTH,
     forced_height = MENU_ITEM_HEIGHT,
     widget = wibox.container.background,
@@ -73,7 +75,7 @@ function MenuItem:_get_active() {
 }
 
 function MenuItem:_set_active(new_active) {
-  self.root_widget.bg = new_active && palette.light_gray || palette.dark_gray
+  self.root_widget.bg = new_active && MENU_SELECTED_BG || MENU_UNSELECTED_BG
 }
 
 -- -----------------------------------------------------------------------------
@@ -107,14 +109,12 @@ function Menu:_init(props) {
       create_menu_item_widget(self.prompt_container),
       shape_border_width = 1,
       shape_border_color = palette.white,
-      shape = (cr, width, height) -> gears.shape.rounded_rect(cr, width, height, 4),
       widget = wibox.container.background,
     },
     {
       self.items_widget,
       shape_border_width = 1,
       shape_border_color = palette.white,
-      shape = (cr, width, height) -> gears.shape.rounded_rect(cr, width, height, 4),
       widget = wibox.container.background,
     },
     spacing = 8,
@@ -123,6 +123,9 @@ function Menu:_init(props) {
 
   self.path = {}
   self.options = props.options
+
+  -- Initialize active_item_index to 0 until we actually start running
+  self.active_item_index = 0
 }
 
 function Menu:_on_change_item_index_offset() {
@@ -268,9 +271,11 @@ function Menu:run() {
 }
 
 function Menu:stop(option) {
-  if option { self.props.on_submit(option, self.path) }
+  if option && self.props.on_submit { self.props.on_submit(option, self.path) }
+  if !option && self.props.on_cancel { self.props.on_cancel() }
   if self.props.on_close { self.props.on_close() }
   self.input = ''
+  self.active_item_index = 0
   self.prompt_container.children = { self.prompt_container.children[1] }
 }
 

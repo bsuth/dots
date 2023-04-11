@@ -1,0 +1,361 @@
+local awful = require('awful')
+local wibox = require('wibox')
+local { global_keys } = require('core.bindings')
+local models = require('core.models')
+local { palette } = require('core.theme')
+local Class = require('core.Class')
+local { get_full_asset_path } = require('core.utils')
+local Button = require('components.Button')
+local Menu = require('components.Menu')
+local Veil = require('components.Veil')
+
+-- -----------------------------------------------------------------------------
+-- State
+-- -----------------------------------------------------------------------------
+
+local veil = Veil()
+
+-- The currently active component. Allows the following standard fields / methods:
+--
+-- active_component.active = boolean
+-- active_component:toggle(keygrabber)
+-- active_component:keypress(keygrabber, modifiers, key)
+local active_component
+
+-- The master keygrabber (forward declared).
+local keygrabber
+
+-- Function to cleanup and close dashboard (forward declared).
+local close_dashboard
+
+-- -----------------------------------------------------------------------------
+-- System Action
+-- -----------------------------------------------------------------------------
+
+local SystemAction = Class()
+
+function SystemAction:_init(props) {
+  self.command = props.command
+  self.button = Button({ color = palette.magenta, icon = get_full_asset_path(props.icon) })
+  self.root_widget = self.button.root_widget
+}
+
+function SystemAction:_get_active() {
+  return self.button.active
+}
+
+function SystemAction:_set_active(new_active) {
+  self.button.active = new_active
+}
+
+function SystemAction:toggle() {
+  close_dashboard()
+  awful.spawn(self.command)
+}
+
+-- -----------------------------------------------------------------------------
+-- SystemActions
+-- -----------------------------------------------------------------------------
+
+local lock = SystemAction({ command = 'slock', icon = 'lock.svg' })
+local sleep = SystemAction({ command = 'systemctl suspend', icon = 'sleep.svg' })
+local reboot = SystemAction({ command = '/sbin/reboot', icon = 'reboot.svg' })
+local power = SystemAction({ command = '/sbin/poweroff', icon = 'power.svg' })
+
+-- -----------------------------------------------------------------------------
+-- Dmenu
+-- -----------------------------------------------------------------------------
+
+local HOME_DMENU_OPTIONS = {
+  { label = 'firefox', action = 'firefox-developer-edition' },
+  { label = 'flameshot', action = 'flameshot gui' },
+  { label = 'discord', action = 'discord' },
+  { label = 'simplescreenrecorder', action = 'simplescreenrecorder' },
+  { label = 'steam', action = 'steam' },
+  { label = 'gpick', action = () -> awful.spawn.with_shell("gpick -s -o | tr -d '\\n' | xclip -sel c") },
+}
+
+local dmenu = Menu({
+  options = HOME_DMENU_OPTIONS, -- TODO: work options
+  on_cancel = () -> keygrabber:start(),
+  on_submit = { action } -> {
+    close_dashboard()
+    if type(action) == 'string' {
+      awful.spawn(action)
+    } elseif type(action) == 'function' {
+      action()
+    }
+  },
+})
+
+-- -----------------------------------------------------------------------------
+-- SystemStatus
+-- -----------------------------------------------------------------------------
+
+local SystemStatus = Class()
+
+function SystemStatus:_init(props) {
+  self.button = Button({ color = props.color, icon = props.icon, value = props.value })
+  self.root_widget = self.button.root_widget
+}
+
+function SystemStatus:_get_active() {
+  return self.button.active
+}
+
+function SystemStatus:_set_active(new_active) {
+  self.button.active = new_active
+}
+
+-- -----------------------------------------------------------------------------
+-- Battery
+-- -----------------------------------------------------------------------------
+
+function get_battery_icon() {
+  return models.battery.discharging
+    && get_full_asset_path('battery-discharging.svg')
+    || get_full_asset_path('battery-charging.svg')
+}
+
+local battery = SystemStatus({
+  color = palette.red,
+  icon = get_battery_icon(),
+  value = models.battery.percent,
+})
+
+models.battery:connect_signal('update', () -> {
+  battery.button.value = models.battery.percent
+  battery.button.icon = get_battery_icon()
+})
+
+-- -----------------------------------------------------------------------------
+-- Brightness
+-- -----------------------------------------------------------------------------
+
+local brightness = SystemStatus({
+  color = palette.yellow,
+  icon = get_full_asset_path('brightness.svg'),
+  value = models.brightness.percent
+})
+
+models.brightness:connect_signal('update', () -> {
+  brightness.button.value = models.brightness.percent
+})
+
+function brightness:keypress(modifiers, key) {
+  if #modifiers == 0 {
+    if key == 'j' {
+      models.brightness:set(models.brightness.percent - 5)
+    } elseif key == 'k' {
+      models.brightness:set(models.brightness.percent + 5)
+    } elseif key == 'd' {
+      models.brightness:set(models.brightness.percent - 15)
+    } elseif key == 'u' {
+      models.brightness:set(models.brightness.percent + 15)
+    }
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Volume
+-- -----------------------------------------------------------------------------
+
+function get_volume_icon() {
+  return models.volume.active
+    && get_full_asset_path('volume-active.svg')
+    || get_full_asset_path('volume-inactive.svg')
+}
+
+local volume = SystemStatus({
+  color = palette.green,
+  icon = get_volume_icon(),
+  value = models.volume.percent,
+})
+
+models.volume:connect_signal('update', () -> {
+  volume.button.value = models.volume.percent
+  volume.button.icon = get_volume_icon()
+})
+
+function volume:toggle() {
+  models.volume:toggle()
+}
+
+function volume:keypress(modifiers, key) {
+  if #modifiers == 0 {
+    if key == 'j' {
+      models.volume:set(models.volume.percent - 5)
+    } elseif key == 'k' {
+      models.volume:set(models.volume.percent + 5)
+    } elseif key == 'd' {
+      models.volume:set(models.volume.percent - 15)
+    } elseif key == 'u' {
+      models.volume:set(models.volume.percent + 15)
+    }
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Notifications
+-- -----------------------------------------------------------------------------
+
+function get_notifications_icon() {
+  return models.notifications.active
+    && get_full_asset_path('notifications-active.svg')
+    || get_full_asset_path('notifications-inactive.svg')
+}
+
+local notifications = SystemStatus({
+  color = palette.blue,
+  icon = get_notifications_icon(),
+})
+
+models.notifications:connect_signal('update', () -> {
+  notifications.button.icon = get_notifications_icon()
+})
+
+function notifications:toggle() {
+  models.notifications:toggle()
+}
+
+-- -----------------------------------------------------------------------------
+-- Keygrabber
+-- -----------------------------------------------------------------------------
+
+function activate(new_active_component) {
+  if active_component && new_active_component == active_component {
+    active_component:toggle()
+  } else {
+    if active_component {
+      active_component.active = false
+    }
+
+    if new_active_component {
+      new_active_component.active = true
+    }
+
+    active_component = new_active_component
+  }
+}
+
+close_dashboard = () -> {
+  keygrabber:stop()
+  veil:hide()
+  activate(nil)
+}
+
+keygrabber = awful.keygrabber({
+  keybindings = {
+    { {}, 'l', () => activate(lock) },
+    { {}, 's', () => activate(sleep) },
+    { {}, 'r', () => activate(reboot) },
+    { {}, 'p', () => activate(power) },
+    { {}, 'b', () => activate(brightness) },
+    { {}, 'v', () => activate(volume) },
+    { {}, 'n', () => activate(notifications) },
+    { {}, 'BackSpace', () => activate(nil) },
+    { {}, 'Return', () => activate(active_component) },
+    { {}, 'Escape', close_dashboard },
+    { { 'Control' }, 'c', close_dashboard },
+    { { 'Mod4' }, ' ', close_dashboard },
+  },
+
+  keyreleased_callback = (modifiers, key) => {
+    if active_component && active_component.keypress {
+      active_component:keypress(modifiers, key, self)
+    } elseif #modifiers == 0 && (key == ' ' || key == 'i') {
+      -- Trigger this on keyreleased so the key does not get registered in the
+      -- dmenu input.
+
+      -- Need to stop the current keygrabber, otherwise dmenu keygrabber will
+      -- crash...
+      keygrabber:stop()
+      dmenu:run()
+    }
+  },
+})
+
+-- -----------------------------------------------------------------------------
+-- Widgets
+-- -----------------------------------------------------------------------------
+
+local dashboard_widget = wibox.widget({
+  {
+    {
+      lock.root_widget,
+      sleep.root_widget,
+      reboot.root_widget,
+      power.root_widget,
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.place,
+  },
+  {
+    dmenu.root_widget,
+    widget = wibox.container.place,
+  },
+  {
+    {
+      battery.root_widget,
+      brightness.root_widget,
+      volume.root_widget,
+      notifications.root_widget,
+      layout = wibox.layout.fixed.vertical,
+    },
+    widget = wibox.container.place,
+  },
+  spacing = 256,
+  layout = wibox.layout.fixed.horizontal,
+})
+
+local time_widget = wibox.widget({
+  {
+    {
+      {
+        format = '%H:%M',
+        font = 'Quicksand Semibold 50',
+        widget = wibox.widget.textclock,
+      },
+      widget = wibox.container.place,
+    },
+    {
+      {
+        format = '%a %b %d',
+        font = 'Quicksand Semibold 20',
+        widget = wibox.widget.textclock,
+      },
+      widget = wibox.container.place,
+    },
+    layout = wibox.layout.fixed.vertical,
+  },
+  fg = palette.white,
+  widget = wibox.container.background,
+})
+
+local root_widget = wibox.widget({
+  {
+    dashboard_widget,
+    widget = wibox.container.place,
+  },
+  {
+    {
+      time_widget,
+      bottom = 64,
+      widget = wibox.container.margin,
+    },
+    valign = 'bottom',
+    widget = wibox.container.place,
+  },
+  layout = wibox.layout.stack,
+})
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+table.insert(global_keys, awful.key({ 'Mod4' }, 'space', () -> {
+  local { width: screen_width, height: screen_height } = awful.screen.focused().geometry
+  dashboard_widget.spacing = screen_width < screen_height && 64 || 128
+  veil:show(root_widget)
+  keygrabber:start()
+}))

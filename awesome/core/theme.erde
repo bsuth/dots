@@ -46,7 +46,7 @@ beautiful.init({
   notification_font = 'Quicksand Regular 14',
   notification_bg = palette.dark_gray,
   notification_fg = palette.white,
-  notification_border_color = palette.cyan,
+  notification_border_color = palette.blue,
 })
 
 -- Some notification theme properties don't get overridden by the beautiful

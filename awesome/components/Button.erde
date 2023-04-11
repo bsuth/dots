@@ -1,0 +1,106 @@
+local gears = require('gears')
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local Class = require('core.Class')
+local { hex2rgb } = require('core.utils')
+
+local BUTTON_DEFAULT_ICON_SIZE = 56
+local BUTTON_DEFAULT_SIZE = 112 -- 64 + 32 + 16
+
+local Button = Class()
+
+function Button:_init(props = {}) {
+  self.color = props.color || palette.white
+
+  self.icon_widget = wibox.widget({
+    image = props.icon,
+    forced_width = props.icon_size || BUTTON_DEFAULT_ICON_SIZE,
+    forced_height = props.icon_size || BUTTON_DEFAULT_ICON_SIZE,
+    widget = wibox.widget.imagebox,
+  })
+
+  self.icon_container_widget = wibox.widget({
+    {
+      {
+        {
+          self.icon_widget,
+          widget = wibox.container.place,
+        },
+        forced_width = props.size || BUTTON_DEFAULT_SIZE,
+        forced_height = props.size || BUTTON_DEFAULT_SIZE,
+        bg = self.color,
+        shape = gears.shape.circle,
+        widget = wibox.container.background,
+      },
+      margins = 16,
+      widget = wibox.container.margin,
+    },
+    widget = wibox.container.background,
+  })
+
+  self.value_widget = wibox.widget({
+    text = tostring(props.value),
+    font = 'Quicksand Bold 14',
+    widget = wibox.widget.textbox,
+  })
+
+  self.value_container_widget = wibox.widget({
+    {
+      {
+        {
+          self.value_widget,
+          widget = wibox.container.place,
+        },
+        forced_width = 40,
+        forced_height = 40,
+        shape = gears.shape.circle,
+        shape_border_width = 4,
+        shape_border_color = palette.black,
+        bg = self.color,
+        widget = wibox.container.background,
+      },
+      bottom = 12,
+      right = 12,
+      widget = wibox.container.margin,
+    },
+    visible = props.value != nil,
+    valign = 'bottom',
+    halign = 'right',
+    widget = wibox.container.place,
+  })
+
+  self.root_widget = wibox.widget({
+    self.icon_container_widget,
+    self.value_container_widget,
+    layout = wibox.layout.stack,
+  })
+
+  self.active = props.active
+  self.value = props.value
+}
+
+function Button:_on_change_icon() {
+  self.icon_widget.image = self.icon
+}
+
+function Button:_on_change_value() {
+  self.value_widget.text = tostring(self.value)
+  self.value_container_widget.visible = self.value != nil
+}
+
+function Button:_on_change_active() {
+  if !self.active {
+    self.icon_container_widget.bgimage = nil
+  } else {
+    local bg = hex2rgb(self.color)
+    self.icon_container_widget.bgimage = (cr, width, height) => {
+      local m = math.min(width, height)
+      cr:set_source_rgb(bg[1], bg[2], bg[3])
+      gears.shape.arc(cr, m, m, 6, math.pi / 2, math.pi, true, true)
+      gears.shape.arc(cr, m, m, 6, (3 / 2) * math.pi, 2 * math.pi, true, true)
+      cr:fill()
+    }
+  }
+}
+
+return Button
