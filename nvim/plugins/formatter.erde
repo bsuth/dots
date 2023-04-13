@@ -3,47 +3,29 @@ local packer = require('packer')
 
 packer.use('mhartington/formatter.nvim')
 
-function prettier() {
-  return {
-    exe = 'prettierd',
-    args = { vim.api.nvim_buf_get_name(0) },
-    stdin = true,
-  }
-}
-
-vim.api.nvim_create_autocmd('BufWritePre', {
-  group = 'bsuth',
-  pattern = C.JS_PATTERNS,
-  command = 'if exists(":EslintFixAll") | EslintFixAll',
-})
+local formatters = require('formatter.defaults')
 
 vim.api.nvim_create_autocmd('BufWritePre', {
   group = 'bsuth',
   pattern = C.CSS_PATTERNS,
-  command = 'lua vim.lsp.buf.format()',
+  command = 'lua vim.lsp.buf.format()', -- stylelint
 })
 
 vim.api.nvim_create_autocmd('BufWritePost', {
   group = 'bsuth',
   command = 'FormatWrite',
-  pattern = vim.tbl_flatten({
-    C.JSON_PATTERNS,
-    C.CSS_PATTERNS,
-    C.JS_PATTERNS,
-    { '*.graphql' },
-  }),
 })
 
 require('formatter').setup({
   filetype = {
-    json = { prettier },
-    javascript = { prettier },
-    javascriptreact = { prettier },
-    typescript = { prettier },
-    typescriptreact = { prettier },
-    graphql = { prettier },
-    css = { prettier },
-    scss = { prettier },
-    less = { prettier },
+    json = { formatters.prettierd },
+    graphql = { formatters.prettierd },
+    css = { formatters.prettierd },
+    scss = { formatters.prettierd },
+    less = { formatters.prettierd },
+    javascript = { formatters.prettierd, formatters.eslintd },
+    javascriptreact = { formatters.prettierd, formatters.eslintd },
+    typescript = { formatters.prettierd, formatters.eslintd },
+    typescriptreact = { formatters.prettierd, formatters.eslintd },
   },
 })

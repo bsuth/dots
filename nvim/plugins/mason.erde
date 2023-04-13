@@ -1,0 +1,18 @@
+local packer = require('packer')
+
+packer.use('williamboman/mason.nvim')
+packer.use('williamboman/mason-lspconfig.nvim')
+
+require('mason').setup()
+require('mason-lspconfig').setup({
+  automatic_installation = true,
+  ensure_installed = {
+    'cssls',
+    'eslint',
+    'graphql',
+    'gopls',
+    'jsonls',
+    'stylelint_lsp',
+    'tsserver',
+  },
+})

@@ -1,16 +1,7 @@
 local packer = require('packer')
 
 packer.use('neovim/nvim-lspconfig')
-packer.use('hrsh7th/nvim-cmp')
-packer.use('hrsh7th/cmp-nvim-lsp') -- lsp
-packer.use('hrsh7th/vim-vsnip') -- lsp snippets
-packer.use('hrsh7th/cmp-vsnip') -- lsp snippets
-packer.use('hrsh7th/cmp-buffer') -- words in current buffer
-packer.use('hrsh7th/cmp-path') -- file paths
-packer.use('hrsh7th/cmp-nvim-lua') -- neovim lua api
-packer.use('hrsh7th/cmp-nvim-lsp-signature-help') -- fancy function signature highlighting
 
-local cmp = require('cmp')
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
@@ -25,35 +16,11 @@ vim.keymap.set('n', "'l", vim.diagnostic.setloclist) -- l(ist)
 vim.keymap.set('n', "'u", vim.lsp.buf.references) -- u(sage)
 vim.keymap.set('n', "'a", vim.lsp.buf.code_action) -- a(ction)
 
-cmp.setup({
-  mapping = {
-    ['<c-Space>'] = cmp.mapping.complete(),
-    ['<c-p>'] = cmp.mapping.select_prev_item(),
-    ['<c-n>'] = cmp.mapping.select_next_item(),
-    ['<cr>'] = cmp.mapping.confirm(),
-    ['<c-d>'] = cmp.mapping.scroll_docs(-4),
-    ['<c-u>'] = cmp.mapping.scroll_docs(4),
-    ['<c-c>'] = cmp.mapping.close(),
-  },
-  sources = {
-    { name = 'nvim_lsp' },
-    { name = 'vsnip' },
-    { name = 'nvim_lua' },
-    { name = 'nvim_lsp_signature_help' },
-    { name = 'buffer' },
-    { name = 'path' },
-  },
-  snippet = {
-    expand = args -> vim.fn['vsnip#anonymous'](args.body),
-  },
-})
-
 local LSP_SERVERS = {
-  clangd = {},
   cssls = {},
+  eslint = {},
   graphql = {},
   gopls = {},
-  eslint = {},
   tsserver = {},
   stylelint_lsp = {
     settings = {
