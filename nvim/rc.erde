@@ -118,7 +118,7 @@ packer.use('tridactyl/vim-tridactyl')
 
 -- local plugins
 packer.use('~/repos/vim-erde')
--- packer.use('~/repos/emacs-bindings.nvim')
+packer.use('~/repos/emacs-bindings.nvim')
 
 -- modules
 load('modules.terminal')

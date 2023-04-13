@@ -223,7 +223,7 @@ function notifications:toggle() {
 -- -----------------------------------------------------------------------------
 
 function activate(new_active_component) {
-  if active_component && new_active_component == active_component {
+  if new_active_component == active_component && active_component && active_component.toggle {
     active_component:toggle()
   } else {
     if active_component {
