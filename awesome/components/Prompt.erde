@@ -1,7 +1,7 @@
 local awful = require('awful')
 local wibox = require('wibox')
 local { palette } = require('core.theme')
-local Class = require('core.Class')
+local Class = require('utils.Class')
 
 local WORDCHARS = { _ = true }
 for byte = string.byte('0'), string.byte('9') { WORDCHARS[string.char(byte)] = true }

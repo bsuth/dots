@@ -60,6 +60,9 @@ vim.keymap.set('n', 'K', () -> nil)
 -- remove annoying default map of backgrounding neovim
 vim.keymap.set('n', '<c-z>', () -> nil)
 
+-- command open
+vim.keymap.set('c', '<c-space>', '<c-f>')
+
 -- quick links
 vim.keymap.set('n', '<leader>swp', ':Explore ~/.local/share/nvim/swap<cr>')
 

@@ -1,6 +1,6 @@
 local awful = require('awful')
 local wibox = require('wibox')
-local Class = require('core.Class')
+local Class = require('utils.Class')
 
 local Veil = Class()
 

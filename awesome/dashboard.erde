@@ -1,13 +1,13 @@
 local awful = require('awful')
 local wibox = require('wibox')
 local { global_keys } = require('core.bindings')
-local models = require('core.models')
 local { palette } = require('core.theme')
-local Class = require('core.Class')
-local { get_full_asset_path } = require('core.utils')
 local Button = require('components.Button')
 local Menu = require('components.Menu')
 local Veil = require('components.Veil')
+local models = require('models')
+local Class = require('utils.Class')
+local { get_full_asset_path } = require('utils.theme')
 
 -- -----------------------------------------------------------------------------
 -- State
@@ -67,12 +67,13 @@ local power = SystemAction({ command = '/sbin/poweroff', icon = 'power.svg' })
 -- -----------------------------------------------------------------------------
 
 local HOME_DMENU_OPTIONS = {
+  { label = 'discord', action = 'discord' },
   { label = 'firefox', action = 'firefox-developer-edition' },
   { label = 'flameshot', action = 'flameshot gui' },
-  { label = 'discord', action = 'discord' },
+  { label = 'gpick', action = () -> awful.spawn.with_shell("gpick -s -o | tr -d '\\n' | xclip -sel c") },
+  { label = 'runescape', action = 'runelite' },
   { label = 'simplescreenrecorder', action = 'simplescreenrecorder' },
   { label = 'steam', action = 'steam' },
-  { label = 'gpick', action = () -> awful.spawn.with_shell("gpick -s -o | tr -d '\\n' | xclip -sel c") },
 }
 
 local dmenu = Menu({
@@ -112,9 +113,9 @@ function SystemStatus:_set_active(new_active) {
 -- -----------------------------------------------------------------------------
 
 function get_battery_icon() {
-  return models.battery.discharging
-    && get_full_asset_path('battery-discharging.svg')
-    || get_full_asset_path('battery-charging.svg')
+  return models.battery.charging
+    && get_full_asset_path('battery-charging.svg')
+    || get_full_asset_path('battery-discharging.svg')
 }
 
 local battery = SystemStatus({
@@ -123,8 +124,11 @@ local battery = SystemStatus({
   value = models.battery.percent,
 })
 
-models.battery:connect_signal('update', () -> {
+models.battery:subscribe('change_percent', () -> {
   battery.button.value = models.battery.percent
+})
+
+models.battery:subscribe('change_charging', () -> {
   battery.button.icon = get_battery_icon()
 })
 
@@ -138,20 +142,20 @@ local brightness = SystemStatus({
   value = models.brightness.percent
 })
 
-models.brightness:connect_signal('update', () -> {
+models.brightness:subscribe('change_percent', () -> {
   brightness.button.value = models.brightness.percent
 })
 
 function brightness:keypress(modifiers, key) {
   if #modifiers == 0 {
     if key == 'j' {
-      models.brightness:set(models.brightness.percent - 5)
+      models.brightness.percent -= 5
     } elseif key == 'k' {
-      models.brightness:set(models.brightness.percent + 5)
+      models.brightness.percent += 5
     } elseif key == 'd' {
-      models.brightness:set(models.brightness.percent - 15)
+      models.brightness.percent -= 15
     } elseif key == 'u' {
-      models.brightness:set(models.brightness.percent + 15)
+      models.brightness.percent += 15
     }
   }
 }
@@ -172,8 +176,11 @@ local volume = SystemStatus({
   value = models.volume.percent,
 })
 
-models.volume:connect_signal('update', () -> {
+models.volume:subscribe('change_percent', () -> {
   volume.button.value = models.volume.percent
+})
+
+models.volume:subscribe('change_active', () -> {
   volume.button.icon = get_volume_icon()
 })
 
@@ -184,13 +191,13 @@ function volume:toggle() {
 function volume:keypress(modifiers, key) {
   if #modifiers == 0 {
     if key == 'j' {
-      models.volume:set(models.volume.percent - 5)
+      models.volume.percent -= 5
     } elseif key == 'k' {
-      models.volume:set(models.volume.percent + 5)
+      models.volume.percent += 5
     } elseif key == 'd' {
-      models.volume:set(models.volume.percent - 15)
+      models.volume.percent -= 15
     } elseif key == 'u' {
-      models.volume:set(models.volume.percent + 15)
+      models.volume.percent += 15
     }
   }
 }
@@ -210,7 +217,7 @@ local notifications = SystemStatus({
   icon = get_notifications_icon(),
 })
 
-models.notifications:connect_signal('update', () -> {
+models.notifications:subscribe('change_active', () -> {
   notifications.button.icon = get_notifications_icon()
 })
 

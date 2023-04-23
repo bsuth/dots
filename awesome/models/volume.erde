@@ -1,0 +1,29 @@
+local awful = require('awful')
+local Object = require('utils.Object')
+
+return Object({
+  _init = () => {
+    self:rawset('percent', 0)
+    awful.spawn.easy_async_with_shell(
+      [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[([0-9]+)%\].*/\1/' ]],
+      stdout -> self:set('percent', tonumber(stdout)),
+    )
+
+    self.active = false
+    awful.spawn.easy_async_with_shell(
+      [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[(off|on)\].*/\1/' ]],
+      stdout -> self:set('active', !!string.find(stdout, 'on')),
+    )
+  },
+  _set_percent = new_percent => {
+    new_percent = math.min(math.max(0, new_percent), 100)
+    awful.spawn.easy_async_with_shell(
+      ('amixer sset Master %d%%'):format(new_percent),
+      () -> self:rawset('percent', new_percent),
+    )
+  },
+  toggle = () => awful.spawn.easy_async_with_shell(
+    'amixer sset Master toggle',
+    () -> self:set('active', !self.active),
+  ),
+})

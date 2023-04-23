@@ -3,11 +3,11 @@ local gears = require('gears')
 local wibox = require('wibox')
 local { global_keys } = require('core.bindings')
 local { palette } = require('core.theme')
-local { trim } = require('core.utils')
-local Class = require('core.Class')
 local Menu = require('components.Menu')
 local Prompt = require('components.Prompt')
 local Veil = require('components.Veil')
+local Class = require('utils.Class')
+local { trim } = require('utils.string')
 
 local TAGBAR_HEIGHT = 48
 local TAGBAR_FONT = 'Quicksand Regular 14'

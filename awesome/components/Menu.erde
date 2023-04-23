@@ -1,10 +1,10 @@
 local awful = require('awful')
 local gears = require('gears')
 local wibox = require('wibox')
-local Class = require('core.Class')
 local { palette } = require('core.theme')
-local { trim } = require('core.utils')
 local Prompt = require('components.Prompt')
+local Class = require('utils.Class')
+local { trim } = require('utils.string')
 
 local MENU_ITEM_WIDTH = 384
 local MENU_ITEM_HEIGHT = 60

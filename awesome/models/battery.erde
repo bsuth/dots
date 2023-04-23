@@ -1,0 +1,33 @@
+local naughty = require('naughty')
+local upower = require('lgi').require('UPowerGlib')
+local Object = require('utils.Object')
+
+local device = upower.Client():get_display_device()
+local get_is_charging = () -> (
+  device.state != upower.DeviceState.DISCHARGING &&
+  device.state != upower.DeviceState.PENDING_DISCHARGE
+)
+
+local battery = Object({
+  _init = () => {
+    self.percent = device.percentage
+    self.charging = get_is_charging()
+    self.sent_low_warning = false
+  },
+})
+
+device.on_notify = () -> {
+  battery.percent = device.percentage
+  battery.charging = get_is_charging()
+
+  if battery.percent < 15 {
+    if !battery.sent_low_warning {
+      naughty.notify({ text = 'Low Battery', force = true })
+      battery.sent_low_warning = true
+    }
+  } elseif battery.sent_low_warning {
+    battery.sent_low_warning = false
+  }
+}
+
+return battery

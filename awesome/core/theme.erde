@@ -2,7 +2,7 @@ local awful = require('awful')
 local beautiful = require('beautiful')
 local gears = require('gears')
 local naughty = require('naughty')
-local { get_full_asset_path } = require('core.utils')
+local { get_full_asset_path } = require('utils.theme')
 
 -- -----------------------------------------------------------------------------
 -- Palette

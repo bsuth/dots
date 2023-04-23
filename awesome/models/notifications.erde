@@ -1,0 +1,15 @@
+local naughty = require('naughty')
+local Object = require('utils.Object')
+
+local notifications = Object({
+  -- DO NOT USE `naughty.is_suspended()`. We use a custom `active` property instead,
+  -- since `naughty.suspend()` will ***save and queue*** notifications.
+  _init = () => self:set('active', false),
+  toggle = () => self:set('active', !self.active),
+})
+
+-- `notification.force` is a custom property to bypass `notifications.active`
+naughty.config.notify_callback = notification ->
+  (notifications.active || notification.force) && notification || nil
+
+return notifications

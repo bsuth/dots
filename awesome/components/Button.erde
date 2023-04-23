@@ -1,8 +1,8 @@
 local gears = require('gears')
 local wibox = require('wibox')
 local { palette } = require('core.theme')
-local Class = require('core.Class')
-local { hex2rgb } = require('core.utils')
+local Class = require('utils.Class')
+local { hex2rgb } = require('utils.theme')
 
 local BUTTON_DEFAULT_ICON_SIZE = 56
 local BUTTON_DEFAULT_SIZE = 112 -- 64 + 32 + 16

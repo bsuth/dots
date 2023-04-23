@@ -1,6 +1,6 @@
 local awful = require('awful')
 local naughty = require('naughty')
-local models = require('core.models')
+local models = require('models')
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -30,20 +30,20 @@ module global_keys = {
   }),
 
   awful.key({}, 'XF86AudioLowerVolume', () -> {
-    models.volume:set(models.volume.percent - 5)
+    models.volume.percent -= 5
   }),
   awful.key({}, 'XF86AudioRaiseVolume', () -> {
-    models.volume:set(models.volume.percent + 5)
+    models.volume.percent += 5
   }),
   awful.key({}, 'XF86AudioMute', () -> {
     models.volume:toggle()
   }),
 
   awful.key({}, 'XF86MonBrightnessDown', () -> {
-    models.brightness:set(models.brightness.percent - 8)
+    models.brightness.percent -= 8
   }),
   awful.key({}, 'XF86MonBrightnessUp', () -> {
-    models.brightness:set(models.brightness.percent + 8)
+    models.brightness.percent += 8
   }),
 
   awful.key({ 'Mod4' }, 'h', () -> {

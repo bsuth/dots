@@ -1,4 +1,4 @@
-local Object = require('core.Object')
+local Object = require('utils.Object')
 
 -- -----------------------------------------------------------------------------
 -- Class
