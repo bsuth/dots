@@ -1,7 +1,5 @@
-local C = require('constants')
 local packer = require('packer')
 
 packer.use('lambdalisue/suda.vim')
 
 vim.g.suda_smart_edit = true
-table.insert(C.TRACK_CWD_BUFNAME_FILTER, '^suda://')

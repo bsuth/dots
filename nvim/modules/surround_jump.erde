@@ -54,33 +54,25 @@ function next_chars() {
   return iterator, vimpos
 }
 
--- If on surround closing, jump to opening.
--- Else if parent, jump to parent opening.
--- Else if previous sibling, jump to previous sibling opening.
 function surround_jump_back() {
   if CLOSE_SURROUND_CHARS[get_cursor_char()] {
     vim.cmd('normal %')
     return
   }
 
-  -- NOTE: Technically, we should keep track of each surround depth in case of
-  -- unbalanced surrounds but this is much simpler and covers 99% of cases.
+  local _, start_line, start_column = unpack(vim.fn.getcurpos())
   local jump_line, jump_column
-  local depth = 0
 
   for line, column, char in prev_chars() {
-    if CLOSE_SURROUND_CHARS[char] {
-      depth += 1
-    } elseif !OPEN_SURROUND_CHARS[char] {
-      continue
-    } elseif depth == 0 {
+    if OPEN_SURROUND_CHARS[char] {
       jump_line, jump_column = line, column
       break
-    } elseif depth == 1 && !jump_line && !jump_column {
-      depth -= 1
-      jump_line, jump_column = line, column
-    } else {
-      depth -= 1
+    } elseif CLOSE_SURROUND_CHARS[char] {
+      vim.fn.setcursorcharpos(line, column)
+      vim.cmd('keepjumps normal %')
+      _, jump_line, jump_column = unpack(vim.fn.getcurpos())
+      vim.fn.setcursorcharpos(start_line, start_column)
+      break
     }
   }
 
@@ -90,29 +82,25 @@ function surround_jump_back() {
   }
 }
 
--- If on surround opening, jump to closing.
--- Else if next sibling, jump to next sibling opening.
 function surround_jump_forward() {
   if OPEN_SURROUND_CHARS[get_cursor_char()] {
     vim.cmd('normal %')
     return
   }
 
-  -- NOTE: Technically, we should keep track of each surround depth in case of
-  -- unbalanced surrounds but this is much simpler and covers 99% of cases.
+  local _, start_line, start_column = unpack(vim.fn.getcurpos())
   local jump_line, jump_column
-  local depth = 0
 
   for line, column, char in next_chars() {
-    if OPEN_SURROUND_CHARS[char] {
-      depth += 1
-    } elseif !CLOSE_SURROUND_CHARS[char] {
-      continue
-    } elseif depth == 1 {
+    if CLOSE_SURROUND_CHARS[char] {
       jump_line, jump_column = line, column
       break
-    } else {
-      depth -= 1
+    } elseif OPEN_SURROUND_CHARS[char] {
+      vim.fn.setcursorcharpos(line, column)
+      vim.cmd('keepjumps normal %')
+      _, jump_line, jump_column = unpack(vim.fn.getcurpos())
+      vim.fn.setcursorcharpos(start_line, start_column)
+      break
     }
   }
 

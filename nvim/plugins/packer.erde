@@ -15,4 +15,4 @@ packer.init({ compile_path = "{vim.fn.stdpath('config')}/packer_compiled.lua" })
 packer.reset()
 packer.use('wbthomason/packer.nvim')
 
-vim.keymap.set('n', '<leader>pack', ':Explore ~/.local/share/nvim/site/pack/packer/start<cr>')
+vim.keymap.set('n', '<leader>pack', ':edit ~/.local/share/nvim/site/pack/packer/start<cr>')

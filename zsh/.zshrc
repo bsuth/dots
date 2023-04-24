@@ -96,11 +96,9 @@ SPACESHIP_PROMPT_ORDER=(
 # Hooks
 # ------------------------------------------------------------------------------
 
-# TODO: move this inside vimrc? (i.e. rebind <c-space> to feed in hooks?
-# TODO: need to call save_term_cd...
 function on_cd() {
   if [[ ! -z $NVIM ]]; then
-    nvim --server $NVIM --remote-send "<c-[>:cd $(pwd)<cr>i"
+    nvim --server $NVIM --remote-send "<c-\\><c-n>:cd $(pwd) | lua save_term_cwd()<cr>i"
   fi
 }
 
@@ -112,7 +110,6 @@ chpwd_functions=(${chpwd_functions[@]} "on_cd")
 
 alias ls='ls --color=auto'
 alias lj='luajit'
-alias sysupdate='sudo pacman -Sy archlinux-keyring && yay -Su'
 
 alias erdejit='luajit ~/.luarocks/share/lua/5.1/erde/cli/init.lua'
 alias erde5.1='lua5.1 ~/.luarocks/share/lua/5.1/erde/cli/init.lua'

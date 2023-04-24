@@ -49,6 +49,7 @@ vim.keymap.set('n', '`m', ':Telescope man_pages<cr>')
 vim.keymap.set('n', '`g', ':Telescope git_files<cr>')
 vim.keymap.set('n', '`f', ':Telescope find_files<cr>')
 vim.keymap.set('n', '`r', ':Telescope grep_string only_sort_text=true search=<cr>')
+vim.keymap.set('n', '`d', ':Telescope lsp_workspace_diagnostics<cr>')
 
 vim.keymap.set('n', '``', () -> telescope_builtin.find_files({
   cwd = '~',

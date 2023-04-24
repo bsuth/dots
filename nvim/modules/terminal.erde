@@ -18,7 +18,7 @@ vim.api.nvim_create_autocmd('TermClose', {
   pattern = C.TERM_PATTERNS,
   callback = () -> {
     local buffer = vim.api.nvim_win_get_buf(0)
-    vim.cmd('silent Explore ' .. vim.fn.getcwd())
+    vim.cmd("silent edit {vim.fn.getcwd()}")
     vim.api.nvim_buf_delete(buffer, {})
   },
 })

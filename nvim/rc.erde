@@ -42,7 +42,7 @@ vim.opt.commentstring = '//%s'
 -- -----------------------------------------------------------------------------
 
 -- vimrc
-vim.keymap.set('n', '<leader>ev', ':Explore ~/dots/nvim<cr>')
+vim.keymap.set('n', '<leader>ev', ':edit ~/dots/nvim<cr>')
 vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
 -- write, quit
@@ -55,31 +55,17 @@ vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
 -- refresh syntax highlighting
 vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable<cr>')
 
--- remove annoying default map of K to manual
-vim.keymap.set('n', 'K', () -> nil)
--- remove annoying default map of backgrounding neovim
-vim.keymap.set('n', '<c-z>', () -> nil)
-
 -- command open
 vim.keymap.set('c', '<c-space>', '<c-f>')
 
 -- quick links
-vim.keymap.set('n', '<leader>swp', ':Explore ~/.local/share/nvim/swap<cr>')
+vim.keymap.set('n', '<leader>swp', ':edit ~/.local/share/nvim/swap<cr>')
 
--- window management
-vim.keymap.set('n', '<leader>w', '<c-w>')
-vim.keymap.set('n', '<c-h>', '<c-w>h')
-vim.keymap.set('n', '<c-j>', '<c-w>j')
-vim.keymap.set('n', '<c-k>', '<c-w>k')
-vim.keymap.set('n', '<c-l>', '<c-w>l')
-vim.keymap.set('n', '<leader><c-l>', ':rightbelow :vsp | :Explore<cr>')
-vim.keymap.set('n', '<leader><c-k>', ':aboveleft :sp | :Explore<cr>')
-vim.keymap.set('n', '<leader><c-j>', ':rightbelow :sp | :Explore<cr>')
-vim.keymap.set('n', '<leader><c-h>', ':aboveleft :vsp | :Explore<cr>')
-vim.keymap.set('n', '<leader><m-l>', '<c-w>L')
-vim.keymap.set('n', '<leader><m-k>', '<c-w>K')
-vim.keymap.set('n', '<leader><m-j>', '<c-w>J')
-vim.keymap.set('n', '<leader><m-h>', '<c-w>H')
+-- remove annoying default map of K to manual
+vim.keymap.set('n', 'K', () -> nil)
+
+-- remove annoying default map of backgrounding neovim
+vim.keymap.set('n', '<c-z>', () -> nil)
 
 -- -----------------------------------------------------------------------------
 -- Plugins / Modules
@@ -107,6 +93,10 @@ load('plugins.formatter')
 packer.use('matze/vim-move')
 load('plugins.sneak')
 packer.use('tpope/vim-surround')
+packer.use('tpope/vim-abolish')
+packer.use('tpope/vim-repeat')
+packer.use('tpope/vim-speeddating')
+load('plugins.cutlass')
 load('plugins.commentary')
 load('plugins.suda')
 
@@ -125,7 +115,11 @@ packer.use('tridactyl/vim-tridactyl')
 packer.use('~/repos/vim-erde')
 packer.use('~/repos/emacs-bindings.nvim')
 
--- modules
+-- -----------------------------------------------------------------------------
+-- Modules
+-- -----------------------------------------------------------------------------
+
+load('modules.windows')
 load('modules.terminal')
 load('modules.tidy')
 load('modules.search_visual')

@@ -4,16 +4,7 @@ local buffer_history = {}
 local buffer_history_pointer = 0
 local ignore_buf_enter = false
 
-function has_blacklist_bufname(buffer) {
-  local bufname = vim.api.nvim_buf_get_name(buffer)
-  for _, pattern in ipairs(C.BUFFER_HISTORY_NAME_BLACKLIST) {
-    if bufname:match(pattern) {
-      return true
-    }
-  }
-}
-
-function has_blacklist_filetype(buffer) {
+function is_blacklist_buffer(buffer) {
   local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
   for _, blacklisted in ipairs(C.BUFFER_HISTORY_FILETYPE_BLACKLIST) {
     if filetype == blacklisted {
@@ -22,12 +13,8 @@ function has_blacklist_filetype(buffer) {
   }
 }
 
-function is_blacklist_buffer(buffer) {
-  return has_blacklist_bufname(buffer) || has_blacklist_filetype(buffer)
-}
-
 function history_back() {
-  for i = buffer_history_pointer - 1, 1, -1 {
+  for i = buffer_history_pointer, 1, -1 {
     if #vim.fn.win_findbuf(buffer_history[i]) == 0 {
       ignore_buf_enter = true
       buffer_history_pointer = i
@@ -38,7 +25,7 @@ function history_back() {
 }
 
 function history_forward() {
-  for i = buffer_history_pointer + 1, #buffer_history {
+  for i = buffer_history_pointer, #buffer_history {
     if #vim.fn.win_findbuf(buffer_history[i]) == 0 {
       ignore_buf_enter = true
       buffer_history_pointer = i
@@ -85,7 +72,7 @@ vim.api.nvim_create_autocmd('FileType', {
   group = 'bsuth',
   callback = () -> {
     local buffer = vim.api.nvim_get_current_buf()
-    if has_blacklist_filetype(buffer) {
+    if is_blacklist_buffer(buffer) {
       history_remove(buffer)
     }
   },

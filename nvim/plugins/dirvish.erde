@@ -10,11 +10,6 @@ table.insert(C.BUFFER_HISTORY_FILETYPE_BLACKLIST, 'dirvish')
 -- https://github.com/justinmk/vim-dirvish/issues/137
 vim.g.loaded_netrwPlugin = true
 
-vim.api.nvim_create_user_command('Explore', 'Dirvish <args>', {
-  nargs = '?',
-  force = true,
-})
-
 function xdg_open() {
   local file = vim.fn.expand('<cWORD>')
   local dir = vim.fn.fnamemodify(file, ':p:h')
