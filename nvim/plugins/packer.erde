@@ -11,7 +11,7 @@ if vim.fn.empty(vim.fn.glob(PACKER_PATH)) > 0 {
 
 local packer = require('packer')
 
-packer.init({ compile_path = "{vim.fn.stdpath('config')}/packer_compiled.lua" })
+packer.init({ compile_on_sync = false })
 packer.reset()
 packer.use('wbthomason/packer.nvim')
 
