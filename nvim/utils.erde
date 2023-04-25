@@ -26,3 +26,16 @@ module function get_buffer_dir(buffer) {
 
   return vim.fn.fnamemodify(buffer_name, ':p:h')
 }
+
+module function edit(file = '') {
+  -- When calling `:edit` from autocommands, it seems like Neovim fails to
+  -- properly "setup" the file. For example, the filetype will not be set and
+  -- `BufEnter` events will fail to fire.
+  --
+  -- To fix this, we edit the file immediately, then update it on Neovim's next
+  -- tick to ensure the buffer is setup properly.
+  --
+  -- TODO: Report this to Neovim? Not sure if this is a bug...
+  vim.cmd("edit {file}")
+  vim.defer_fn(() -> vim.cmd("edit {file}"), 0)
+}

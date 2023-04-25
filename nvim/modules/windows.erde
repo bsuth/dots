@@ -1,22 +1,18 @@
 local C = require('constants')
-local { get_buffer_dir } = require('utils')
+local { edit, get_buffer_dir } = require('utils')
 
 local SPLIT_COMMANDS = {
-  left = 'aboveleft vsp',
-  down = 'rightbelow sp',
-  up = 'aboveleft sp',
-  right = 'rightbelow vsp',
+  left = ':aboveleft vsp',
+  down = ':rightbelow sp',
+  up = ':aboveleft sp',
+  right = ':rightbelow vsp',
 }
 
 function split(direction) {
   local buffer = vim.api.nvim_get_current_buf()
   local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
-
-  if filetype == 'help' || filetype == 'man' {
-    vim.cmd(":{SPLIT_COMMANDS[direction]} | edit {os.getenv('HOME')}")
-  } else {
-    vim.cmd(":{SPLIT_COMMANDS[direction]} | edit {get_buffer_dir(buffer)}")
-  }
+  vim.cmd(SPLIT_COMMANDS[direction])
+  edit((filetype == 'help' || filetype == 'man') && '~/' || get_buffer_dir(buffer))
 }
 
 vim.keymap.set('n', '<leader>w', '<c-w>')

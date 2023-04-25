@@ -27,16 +27,11 @@ vim.api.nvim_create_autocmd('BufEnter', {
   callback = () -> {
     local buffer = vim.api.nvim_get_current_buf()
     local buffer_name = vim.api.nvim_buf_get_name(buffer)
-    local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
 
     if C.BUFFER_CWD[buffer_name] != nil {
       vim.cmd("cd {C.BUFFER_CWD[buffer_name]}")
     } elseif !is_blacklist_buffer(buffer) {
       vim.cmd("cd {get_buffer_dir(buffer)}")
-    }
-
-    if filetype == C.FILE_BROWSER_FILETYPE {
-      vim.cmd('edit') -- refresh file browser
     }
   },
 })

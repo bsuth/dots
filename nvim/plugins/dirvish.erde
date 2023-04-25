@@ -1,4 +1,5 @@
 local C = require('constants')
+local { edit } = require('utils')
 local packer = require('packer')
 
 packer.use('justinmk/vim-dirvish')
@@ -10,7 +11,7 @@ table.insert(C.BUFFER_HISTORY_FILETYPE_BLACKLIST, 'dirvish')
 -- https://github.com/justinmk/vim-dirvish/issues/137
 vim.g.loaded_netrwPlugin = true
 
-function xdg_open() {
+function open() {
   local file = vim.fn.expand('<cWORD>')
   local dir = vim.fn.fnamemodify(file, ':p:h')
   local ext = vim.fn.fnamemodify(file, ':e')
@@ -18,16 +19,27 @@ function xdg_open() {
   if ext == 'png' {
     os.execute('xdg-open ' .. file .. ' &>/dev/null')
   } else {
-    vim.fn['dirvish#open']('edit', 0)
-    vim.cmd('cd ' .. dir)
+    vim.cmd("cd {dir}")
+    edit(file)
   }
 }
 
 vim.api.nvim_create_autocmd('FileType', {
   group = 'bsuth',
   pattern = 'dirvish',
-  callback = () -> vim.keymap.set('n', '<cr>', xdg_open, {
+  callback = () -> vim.keymap.set('n', '<cr>', open, {
     buffer = true,
     silent = true,
   }),
+})
+
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = 'bsuth',
+  callback = () -> {
+    local buffer = vim.api.nvim_get_current_buf()
+    local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
+    if filetype == 'dirvish' {
+      vim.cmd('Dirvish') -- refresh buffer
+    }
+  },
 })

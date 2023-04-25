@@ -1,4 +1,5 @@
 local C = require('constants')
+local { edit } = require('utils')
 
 vim.keymap.set('n', '<c-space>', ':term<cr>')
 vim.keymap.set('t', '<c-[>', '<c-\\><c-n>')
@@ -18,7 +19,7 @@ vim.api.nvim_create_autocmd('TermClose', {
   pattern = C.TERM_PATTERNS,
   callback = () -> {
     local buffer = vim.api.nvim_win_get_buf(0)
-    vim.cmd("silent edit {vim.fn.getcwd()}")
+    edit(vim.fn.getcwd())
     vim.api.nvim_buf_delete(buffer, {})
   },
 })

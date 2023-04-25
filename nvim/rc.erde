@@ -1,3 +1,5 @@
+local { edit } = require('utils')
+
 -- -----------------------------------------------------------------------------
 -- Settings
 -- -----------------------------------------------------------------------------
@@ -42,7 +44,7 @@ vim.opt.commentstring = '//%s'
 -- -----------------------------------------------------------------------------
 
 -- vimrc
-vim.keymap.set('n', '<leader>ev', ':edit ~/dots/nvim<cr>')
+vim.keymap.set('n', '<leader>ev', () -> edit('~/dots/nvim'))
 vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
 -- write, quit
@@ -59,7 +61,7 @@ vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable
 vim.keymap.set('c', '<c-space>', '<c-f>')
 
 -- quick links
-vim.keymap.set('n', '<leader>swp', ':edit ~/.local/share/nvim/swap<cr>')
+vim.keymap.set('n', '<leader>swp', () -> edit('~/.local/share/nvim/swap'))
 
 -- remove annoying default map of K to manual
 vim.keymap.set('n', 'K', () -> nil)
@@ -119,11 +121,11 @@ packer.use('~/repos/emacs-bindings.nvim')
 -- Modules
 -- -----------------------------------------------------------------------------
 
-load('modules.windows')
+load('modules.buffer_history')
+load('modules.search_visual')
+load('modules.surround_jump')
 load('modules.terminal')
 load('modules.tidy')
-load('modules.search_visual')
 load('modules.track_cwd')
-load('modules.surround_jump')
-load('modules.buffer_history')
+load('modules.windows')
 pcall(() -> load('modules.work'))
