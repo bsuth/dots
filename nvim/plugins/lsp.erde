@@ -22,6 +22,7 @@ local LSP_SERVERS = {
   graphql = {},
   gopls = {},
   tsserver = {},
+  clangd = {},
   stylelint_lsp = {
     settings = {
       stylelintplus = {

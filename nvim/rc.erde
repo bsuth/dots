@@ -24,7 +24,7 @@ vim.opt.expandtab = true
 
 -- interface
 vim.opt.termguicolors = true
-vim.opt.number = false
+vim.opt.number = true
 vim.opt.signcolumn = 'yes'
 vim.opt.showmode = false
 vim.opt.synmaxcol = 300 -- limit for performance
@@ -56,6 +56,10 @@ vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
 
 -- refresh syntax highlighting
 vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable<cr>')
+
+-- yanking
+vim.keymap.set('n', 'YY', '"ayy')
+vim.keymap.set('n', 'YP', '"ap')
 
 -- command open
 vim.keymap.set('c', '<c-space>', '<c-f>')
@@ -98,7 +102,6 @@ packer.use('tpope/vim-surround')
 packer.use('tpope/vim-abolish')
 packer.use('tpope/vim-repeat')
 packer.use('tpope/vim-speeddating')
-load('plugins.cutlass')
 load('plugins.commentary')
 load('plugins.suda')
 

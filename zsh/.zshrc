@@ -111,6 +111,11 @@ chpwd_functions=(${chpwd_functions[@]} "on_cd")
 alias ls='ls --color=auto'
 alias lj='luajit'
 
+function qmk_chocofi {
+  qmk compile -kb crkbd/rev1 -km bsuth -e CONVERT_TO=promicro_rp2040
+  qmk flash -kb crkbd/rev1 -km bsuth -e CONVERT_TO=promicro_rp2040
+}
+
 alias erdejit='luajit ~/.luarocks/share/lua/5.1/erde/cli/init.lua'
 alias erde5.1='lua5.1 ~/.luarocks/share/lua/5.1/erde/cli/init.lua'
 alias erde5.2='lua5.2 ~/.luarocks/share/lua/5.2/erde/cli/init.lua'

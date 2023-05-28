@@ -261,7 +261,6 @@ keygrabber = awful.keygrabber({
     { {}, 'v', () => activate(volume) },
     { {}, 'n', () => activate(notifications) },
     { {}, 'BackSpace', () => activate(nil) },
-    { {}, 'Return', () => activate(active_component) },
     { {}, 'Escape', close_dashboard },
     { { 'Control' }, 'c', close_dashboard },
     { { 'Mod4' }, ';', close_dashboard },

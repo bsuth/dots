@@ -1,8 +1,0 @@
-local packer = require('packer')
-
-packer.use('svermeulen/vim-cutlass')
-
-vim.keymap.set('n', 'm', 'd')
-vim.keymap.set('n', 'mm', 'dd')
-vim.keymap.set('n', 'M', 'D')
-vim.keymap.set('v', 'm', 'd')
