@@ -1,0 +1,166 @@
+local awful = require('awful')
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local Object = require('utils.Object')
+local { trim } = require('utils.string')
+local { TAGBAR_HEIGHT, TAGBAR_FONT } = require('tagbar.constants')
+local tagbar_history = require('tagbar.history')
+
+local MAX_SUGGESTIONS = 10
+
+local Suggestions = {}
+
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function Suggestions:_init() {
+  self._filtered_suggestions = tagbar_history
+  self:rawset('selected', 0, true)
+
+  self._suggestion_widgets = {}
+  for i = 1, MAX_SUGGESTIONS {
+    table.insert(self._suggestion_widgets, wibox.widget({
+      text = '',
+      halign = 'center',
+      valign = 'center',
+      font = TAGBAR_FONT,
+      widget = wibox.widget.textbox,
+    }))
+  }
+
+  self.root_widget = wibox.widget({
+    spacing = 16,
+    layout  = wibox.layout.fixed.horizontal,
+  })
+
+  self._popup = awful.popup({
+    widget = {
+      {
+        self.root_widget,
+        widget = wibox.container.place,
+      },
+      left = 16,
+      right = 16,
+      widget = wibox.container.margin,
+    },
+    screen = awful.screen.focused(),
+    visible = false,
+    ontop = true,
+    minimum_height = TAGBAR_HEIGHT,
+    fg = palette.white,
+    bg = palette.dark_gray,
+  })
+}
+
+function Suggestions:_on_change_screen() {
+  self._popup.screen = self.screen
+  self._popup.x = self.screen.geometry.x
+  self._popup.y = self.screen.geometry.y + TAGBAR_HEIGHT
+  self._popup.minimum_width = self.screen.geometry.width
+}
+
+function Suggestions:_on_change_filter() {
+  local trimmed_filter = trim(self.filter)
+  local new_filtered_suggestions = {}
+
+  for i, suggestion in ipairs(tagbar_history) {
+    if suggestion:match(trimmed_filter) {
+      table.insert(new_filtered_suggestions, suggestion)
+      if #new_filtered_suggestions == MAX_SUGGESTIONS {
+        break
+      }
+    }
+  }
+
+  local new_root_children = {}
+  for i = 1, #new_filtered_suggestions {
+    local widget = self._suggestion_widgets[i]
+    widget.text = new_filtered_suggestions[i]
+    table.insert(new_root_children, widget)
+  }
+
+  self._filtered_suggestions = new_filtered_suggestions
+  self.root_widget.children = new_root_children
+  self:rawset('selected', 0, true)
+}
+
+function Suggestions:_on_change_selected() {
+  for i = 1, #self.root_widget.children {
+    local widget = self.root_widget.children[i]
+    local suggestion = self._filtered_suggestions[i]
+
+    if i == self.selected {
+      widget.markup = [[<span foreground="{palette.blue}">{suggestion}</span>]]
+    } else {
+      widget.text = suggestion
+    }
+  }
+}
+
+function Suggestions:_on_change_active() {
+  if self.active {
+    self.filter = ''
+    self.selected = 0
+    self._popup.visible = true
+  } else {
+    self._popup.visible = false
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Public
+-- -----------------------------------------------------------------------------
+
+function Suggestions:current() {
+  if self.selected == 0 {
+    return self.default_suggestion
+  } else {
+    return self._filtered_suggestions[self.selected]
+  }
+}
+
+function Suggestions:prev() {
+  if self.selected == 0 {
+    self.selected = #self._filtered_suggestions
+  } else {
+    self.selected -= 1
+  }
+  return self:current()
+}
+
+function Suggestions:next() {
+  if self.selected == #self._filtered_suggestions {
+    self.selected = 0
+  } else {
+    self.selected += 1
+  }
+  return self:current()
+}
+
+function Suggestions:delete() {
+  local current_suggestion = self:current()
+
+  local num_filtered_suggestions = #self._filtered_suggestions
+  local new_selected = self.selected < num_filtered_suggestions
+    && self.selected || num_filtered_suggestions - 1
+
+  for i, suggestion in ipairs(tagbar_history) {
+    if suggestion == current_suggestion {
+      table.remove(tagbar_history, i)
+      break
+    }
+  }
+
+  tagbar_history:clear(current_suggestion)
+  self:_on_change_filter()
+  self.selected = new_selected
+
+  return self:current()
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Object(Suggestions)

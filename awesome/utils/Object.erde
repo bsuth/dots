@@ -1,3 +1,5 @@
+local unpack = unpack || table.unpack
+
 -- -----------------------------------------------------------------------------
 -- Object
 -- -----------------------------------------------------------------------------
@@ -60,7 +62,9 @@ function Object:publish(event, ...) {
   }
 
   if self._subscriptions[event] {
-    for _, subscription in ipairs(self._subscriptions[event]) {
+    -- Make a shallow copy of `self._subscriptions[event]`, otherwise not every
+    -- subscription will be called if one of them mutates `self._subscriptions[event]`.
+    for _, subscription in ipairs({ unpack(self._subscriptions[event]) }) {
       subscription(...)
     }
   }
@@ -89,6 +93,14 @@ function Object:unsubscribe(event, callback) {
       }
     }
   }
+}
+
+function Object:once(event, callback) {
+  function callback_wrapper(...) { -- needs to be a function for self-reference
+    callback(...)
+    self:unsubscribe(event, callback_wrapper)
+  }
+  self:subscribe(event, callback_wrapper)
 }
 
 -- -----------------------------------------------------------------------------

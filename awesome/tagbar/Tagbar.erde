@@ -1,0 +1,241 @@
+local awful = require('awful')
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local Prompt = require('components.Prompt')
+local Veil = require('components.Veil')
+local { TAGBAR_HEIGHT, TAGBAR_FONT } = require('tagbar.constants')
+local tagbar_history = require('tagbar.history')
+local suggestions = require('tagbar.suggestions')
+local Tab = require('tagbar.Tab')
+local Class = require('utils.Class')
+
+local Tagbar = Class()
+
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function Tagbar:_init(props = {}) {
+  self.screen = props.screen
+
+  self._tabs = {}
+  self._veil = Veil()
+
+  self._tabs_widget = wibox.widget({
+    forced_width = self.screen.geometry.width,
+    layout  = wibox.layout.flex.horizontal,
+  })
+
+  self._wibar = awful.wibar({
+    screen = self.screen,
+    position = 'top',
+    bg = palette.dark_gray,
+    height = TAGBAR_HEIGHT,
+    type = 'dock', -- remove box shadows
+    widget = self._tabs_widget,
+  })
+
+  self._prompt = Prompt({
+    halign = 'center',
+    valign = 'center',
+    font = TAGBAR_FONT,
+    keybindings = {
+      { { 'Control' }, 'q', () -> {
+        local suggestion = suggestions:delete()
+        self._prompt.text = suggestion
+        self._prompt.cursor = #suggestion
+      } },
+      { {}, 'Tab', () -> {
+        local suggestion = suggestions:next()
+        self._prompt.text = suggestion
+        self._prompt.cursor = #suggestion
+      } },
+      { { 'Shift' }, 'Tab', () -> {
+        local suggestion = suggestions:prev()
+        self._prompt.text = suggestion
+        self._prompt.cursor = #suggestion
+      } },
+    },
+  })
+
+  self._prompt:subscribe('user_change', text -> {
+    suggestions.default_suggestion = text
+    suggestions.filter = text
+  })
+
+  self:_refresh()
+  self.screen:connect_signal('tag::history::update', () -> self:_refresh())
+}
+
+function Tagbar:_refresh() {
+  local filtered_tags, num_filtered_tags = {}, 0
+  for _, tag in ipairs(self.screen.tags) {
+    if !tag.name:match('^_') {
+      num_filtered_tags += 1
+      table.insert(filtered_tags, tag)
+    }
+  }
+
+  for i = #self._tabs + 1, num_filtered_tags {
+    table.insert(self._tabs, Tab())
+  }
+
+  for i = #self._tabs, num_filtered_tags + 1, -1 {
+    table.remove(self._tabs)
+  }
+
+  local new_tabs_widget_children = {}
+
+  for i, tag in ipairs(filtered_tags) {
+    local tab = self._tabs[i]
+    tab.text = tag.name
+    tab.selected = tag == self.screen.selected_tag
+    tab.tag = tag -- store custom field for convenience
+    table.insert(new_tabs_widget_children, tab.root_widget)
+  }
+
+  self._tabs_widget.children = new_tabs_widget_children
+}
+
+-- -----------------------------------------------------------------------------
+-- Public
+-- -----------------------------------------------------------------------------
+
+function Tagbar:get_active_tab() {
+  for i, tab in ipairs(self._tabs) {
+    if tab.tag == self.screen.selected_tag {
+      return tab, i
+    }
+  }
+}
+
+function Tagbar:get_prev_tab(tab_index) {
+  if !tab_index { local _; _, tab_index = self:get_active_tab() }
+  local prev_index = tab_index == 1 && #self._tabs || tab_index - 1
+  return self._tabs[prev_index], prev_index
+}
+
+function Tagbar:get_next_tab(tab_index) {
+  if !tab_index { local _; _, tab_index = self:get_active_tab() }
+  local next_index = tab_index == #self._tabs && 1 || tab_index + 1
+  return self._tabs[next_index], next_index
+}
+
+function Tagbar:open() {
+  awful.tag.add(tostring(#self.screen.tags), {
+    screen = self.screen,
+    layout = awful.layout.layouts[1]
+  }):view_only()
+}
+
+function Tagbar:close() {
+  local num_visible_tags = 0
+
+  for _, tag in ipairs(self.screen.tags) {
+    if !tag.name:match('^_') {
+      num_visible_tags += 1
+    }
+  }
+
+  if num_visible_tags > 1 {
+    self.screen.selected_tag:delete()
+  }
+}
+
+function Tagbar:swap(index1, index2) {
+  local tmp = self._tabs[index1]
+  self._tabs[index1] = self._tabs[index2]
+  self._tabs[index2] = tmp
+  self._tabs_widget:swap(index1, index2)
+  self._tabs[index1].tag:swap(self._tabs[index2].tag)
+}
+
+function Tagbar:move_prev() {
+  local num_tabs = #self._tabs
+  local _, active_tab_index = self:get_active_tab()
+  if num_tabs > 1 && active_tab_index > 1 {
+    local _, prev_tab_index = self:get_prev_tab()
+    self:swap(active_tab_index, prev_tab_index)
+  }
+}
+
+function Tagbar:move_next() {
+  local num_tabs = #self._tabs
+  local _, active_tab_index = self:get_active_tab()
+  if num_tabs > 1 && active_tab_index < num_tabs {
+    local _, next_tab_index = self:get_next_tab()
+    self:swap(active_tab_index, next_tab_index)
+  }
+}
+
+function Tagbar:focus_prev(skip_disabled) {
+  if #self._tabs < 2 { return }
+
+  local active_tab, active_tab_index = self:get_active_tab()
+  local prev_tab, prev_tab_index = self:get_prev_tab()
+
+  if skip_disabled {
+    while prev_tab.disabled {
+      if prev_tab == active_tab { break }
+      prev_tab, prev_tab_index = self:get_prev_tab(prev_tab_index)
+    }
+  }
+
+  if prev_tab != active_tab {
+    prev_tab.tag:view_only()
+  }
+}
+
+function Tagbar:focus_next(skip_disabled) {
+  if #self._tabs < 2 { return }
+
+  local active_tab, active_tab_index = self:get_active_tab()
+  local next_tab, next_tab_index = self:get_next_tab()
+
+  if skip_disabled {
+    while next_tab.disabled {
+      if next_tab == active_tab { break }
+      next_tab, next_tab_index = self:get_next_tab(next_tab_index)
+    }
+  }
+
+  if next_tab != active_tab {
+    next_tab.tag:view_only()
+  }
+}
+
+function Tagbar:rename() {
+  local rename_tab = self:get_active_tab()
+  local focused_screen = awful.screen.focused()
+  local focused_veil_popup = self._veil:get_focused_popup()
+
+  self._prompt:once('stop', () -> {
+    rename_tab.text = rename_tab.tag.name
+    focused_veil_popup.shape = nil
+    suggestions.active = false
+    self._veil.active = false
+  })
+
+  self._prompt:once('submit', text -> {
+    if #text > 0 {
+      rename_tab.tag.name = text
+      rename_tab.text = text
+      tagbar_history:push(text)
+    }
+  })
+
+  suggestions.default_suggestion = rename_tab.tag.name
+  rename_tab.text = self._prompt.root_widget
+  focused_veil_popup.shape = (cr, width, height) -> cr:rectangle(0, 2 * TAGBAR_HEIGHT, width, height - (2 * TAGBAR_HEIGHT))
+
+  self._veil.active = true
+  suggestions.screen = self.screen
+  suggestions.active = true
+  self._prompt:start()
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Tagbar

@@ -1,0 +1,173 @@
+local awful = require('awful')
+local Prompt = require('components.Prompt')
+local Veil = require('components.Veil')
+local command_tree = require('system_prompt.command_tree')
+local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
+local Object = require('utils.Object')
+
+local unpack = unpack || table.unpack
+
+local store = {}
+
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function store:_init() {
+  self:_reset()
+
+  self.veil = Veil({
+    color = '#000000dd',
+  })
+
+  self.prompt = Prompt({
+    font = SYSTEM_PROMPT_FONT,
+    keybindings = {
+      { {}, 'Up', () -> self:prev() },
+      { {}, 'Down', () -> self:next() },
+      { { 'Control' }, 'p', () -> self:prev() },
+      { { 'Control' }, 'n', () -> self:next() },
+      { { 'Shift' }, 'Tab', () -> self:prev() },
+      { {}, 'Tab', () -> self:next() },
+      { {}, 'Escape', () -> self:back() },
+      { { 'Mod4' }, ';', () -> self.prompt:cancel() },
+    },
+  })
+
+  self.prompt:subscribe('user_change', () -> self:_update_active_node())
+  self.prompt:subscribe('cancel', () -> self:_on_prompt_cancel())
+  self.prompt:subscribe('submit', () -> self:_on_prompt_submit())
+}
+
+function store:_reset() {
+  self.path = {}
+  self.active_node = command_tree
+  self.description = self.active_node.description
+  self.selected_child_index = 1
+  self.selected_child = self.active_node[self.selected_child_index]
+}
+
+function store:_traverse_command_tree() {
+  local node = command_tree
+  local path_index = 1
+
+  return () -> {
+    local path_part = self.path[path_index]
+    path_index += 1
+
+    for _, child in ipairs(node) {
+      if child.label == path_part {
+        node = child
+        return node
+      }
+    }
+  }
+}
+
+function store:_on_change_path() {
+  local new_description = command_tree.description
+
+  for node in self:_traverse_command_tree() {
+    new_description = node.description || new_description
+  }
+
+  self.description = new_description
+}
+
+function store:_on_prompt_cancel() {
+  self.veil.active = false
+  self:_reset()
+}
+
+function store:_on_prompt_submit() {
+  if !self.selected_child {
+    self.prompt:start(self.prompt.text)
+  } elseif self.selected_child.type == 'reload' {
+    package.loaded['system_prompt.command_tree'] = nil -- force reload
+    command_tree = require('system_prompt.command_tree')
+    self.veil.active = false
+    self:_reset()
+  } elseif self.selected_child.type == 'once' {
+    self.selected_child.callback()
+    self.veil.active = false
+    self:_reset()
+  } elseif self.selected_child.type == 'multiple' {
+    self.selected_child.callback()
+    self.prompt:start(self.prompt.text)
+  } elseif self.selected_child.type == 'view' {
+    self.prompt.root_widget.visible = false
+
+    self.active_view = self.selected_child.view
+    self.active_view:start()
+    self.active_view:once('stop', () -> {
+      self.active_view = nil
+      self.prompt.root_widget.visible = true
+      self.prompt:start()
+      self:back()
+    })
+
+    local new_path = { unpack(self.path) }
+    table.insert(new_path, self.selected_child.label)
+    self.path = new_path
+    self:_update_active_node()
+  } else {
+    local new_path = { unpack(self.path) }
+    table.insert(new_path, self.selected_child.label)
+    self.path = new_path
+
+    self.prompt:start()
+    self:_update_active_node()
+  }
+}
+
+function store:_update_active_node() {
+  local active_node = command_tree
+  for node in self:_traverse_command_tree() {
+    active_node = node
+  }
+
+  local filtered_active_node = {}
+  for _, child in ipairs(active_node) {
+    if child.label:sub(1, #self.prompt.text) == self.prompt.text {
+      table.insert(filtered_active_node, child)
+    }
+  }
+
+  self.active_node = filtered_active_node
+  self.selected_child_index = 1
+  self.selected_child = self.active_node[self.selected_child_index]
+}
+
+-- -----------------------------------------------------------------------------
+-- Public
+-- -----------------------------------------------------------------------------
+
+function store:back() {
+  if self.prompt.text != '' {
+    self.prompt.text = ''
+    self.prompt.cursor = 0
+  } elseif #self.path > 0 {
+    local new_path = { unpack(self.path) }
+    table.remove(new_path)
+    self.path = new_path
+    self:_update_active_node()
+  } else {
+    self.prompt:cancel()
+  }
+}
+
+function store:prev() {
+  self.selected_child_index = ((self.selected_child_index - 2) % #self.active_node) + 1
+  self.selected_child = self.active_node[self.selected_child_index]
+}
+
+function store:next() {
+  self.selected_child_index = (self.selected_child_index % #self.active_node) + 1
+  self.selected_child = self.active_node[self.selected_child_index]
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Object(store)

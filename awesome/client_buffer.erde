@@ -19,6 +19,7 @@ gears.table.merge(global_keys, {
     client.focus:move_to_tag(CLIENT_BUFFER)
     client.focus.minimized = true
   }),
+
   awful.key({ 'Mod4', 'Shift' }, 'm', () -> {
     local clients = CLIENT_BUFFER:clients()
     if #clients > 0 {

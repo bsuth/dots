@@ -1,0 +1,31 @@
+local wibox = require('wibox')
+local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
+local store = require('system_prompt.store')
+
+local text_widget = wibox.widget({
+  font = 'Quicksand Semibold 36',
+  widget = wibox.widget.textbox,
+})
+
+local default_widget = wibox.widget({
+  text_widget,
+  widget = wibox.container.place,
+})
+
+local root_widget = wibox.widget({
+  widget = wibox.container.margin, -- dummy container
+})
+
+function update_widget() {
+  if type(store.description) == 'string' {
+    text_widget.text = store.description
+    root_widget.children = { default_widget }
+  } else {
+    root_widget.children = { store.description }
+  }
+}
+
+update_widget()
+store:subscribe('change_description', update_widget)
+
+return root_widget

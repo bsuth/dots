@@ -13,14 +13,13 @@ for i = 1, #ENV_WORDCHARS { WORDCHARS[ENV_WORDCHARS:sub(i, i)] = true }
 
 local Prompt = Class()
 
-function Prompt:_init(props = {}) {
-  self.text = ''
-  self.cursor = 0
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
 
-  self.on_stop = props.on_stop
-  self.on_cancel = props.on_cancel
-  self.on_submit = props.on_submit
-  self.on_user_change = props.on_user_change
+function Prompt:_init(props = {}) {
+  self:rawset('text', '', true)
+  self:rawset('cursor', 0, true)
 
   self.root_widget = wibox.widget({
     markup = '',
@@ -52,31 +51,48 @@ function Prompt:_init(props = {}) {
 
   if props.keybindings {
     for _, keybinding in ipairs(props.keybindings) {
-      table.insert(keybindings, keybinding)
+      -- Place custom keybindings at the beginning!
+      --
+      -- If a keybinding is specified mulitple times, only the first one is used
+      -- and we give priority to `props.keybindings`
+      table.insert(keybindings, 1, keybinding)
     }
   }
 
-  self.keygrabber = awful.keygrabber({
+  self._keygrabber = awful.keygrabber({
     keybindings = keybindings,
     keyreleased_callback = (_, mod, key) -> {
       if #mod == 0 && #key == 1 {
-        self:update(table.concat({ self.text:sub(1, self.cursor), key, self.text:sub(self.cursor + 1), }), self.cursor + 1)
-        if self.on_user_change { self.on_user_change() }
+        self:rawset('text', table.concat({ self.text:sub(1, self.cursor), key, self.text:sub(self.cursor + 1), }), false)
+        self:rawset('cursor', self.cursor + 1, false)
+        self:_update_markup()
+        self:publish('user_change', self.text)
       }
     },
   })
 }
 
+function Prompt:_update_markup() {
+  local new_widget_markup = self.text:sub(1, self.cursor)
+  new_widget_markup ..= [[<span foreground="{palette.white}">|</span>]]
+  new_widget_markup ..= self.text:sub(self.cursor + 1)
+  self.root_widget.markup = new_widget_markup
+}
+
+function Prompt:_on_change_text() {
+  self:_update_markup()
+}
+
+function Prompt:_on_change_cursor() {
+  self:_update_markup()
+}
+
 function Prompt:_move_char_back() {
-  if self.cursor > 0 {
-    self:update(nil, self.cursor - 1)
-  }
+  self.cursor = math.max(0, self.cursor - 1)
 }
 
 function Prompt:_move_char_forward() {
-  if self.cursor < #self.text {
-    self:update(nil, self.cursor + 1)
-  }
+  self.cursor = math.min(#self.text, self.cursor + 1)
 }
 
 function Prompt:_move_word_back() {
@@ -94,7 +110,7 @@ function Prompt:_move_word_back() {
       char = self.text:sub(new_cursor, new_cursor)
     }
 
-    self:update(nil, new_cursor)
+    self.cursor = new_cursor
   }
 }
 
@@ -113,29 +129,31 @@ function Prompt:_move_word_forward() {
       next_char = self.text:sub(new_cursor + 1, new_cursor + 1)
     }
 
-    self:update(nil, new_cursor)
+    self.cursor = new_cursor
   }
 }
 
 function Prompt:_move_line_start() {
-  self:update(nil, 0)
+  self.cursor = 0
 }
 
 function Prompt:_move_line_end() {
-  self:update(nil, #self.text)
+  self.cursor = #self.text
 }
 
 function Prompt:_delete_char_back() {
   if self.cursor > 0 {
-    self:update(self.text:sub(1, self.cursor - 1) .. self.text:sub(self.cursor + 1), self.cursor - 1)
-    if self.on_user_change { self.on_user_change() }
+    self:rawset('text', self.text:sub(1, self.cursor - 1) .. self.text:sub(self.cursor + 1), false)
+    self:rawset('cursor', self.cursor - 1, false)
+    self:_update_markup()
+    self:publish('user_change', self.text)
   }
 }
 
 function Prompt:_delete_char_forward() {
   if self.cursor < #self.text {
-    self:update(self.text:sub(1, self.cursor) .. self.text:sub(self.cursor + 2))
-    if self.on_user_change { self.on_user_change() }
+    self.text = self.text:sub(1, self.cursor) .. self.text:sub(self.cursor + 2)
+    self:publish('user_change', self.text)
   }
 }
 
@@ -154,8 +172,10 @@ function Prompt:_delete_word_back() {
       char = self.text:sub(new_cursor, new_cursor)
     }
 
-    self:update(self.text:sub(1, new_cursor) .. self.text:sub(self.cursor + 1), new_cursor)
-    if self.on_user_change { self.on_user_change() }
+    self:rawset('text', self.text:sub(1, new_cursor) .. self.text:sub(self.cursor + 1), false)
+    self:rawset('cursor', new_cursor, false)
+    self:_update_markup()
+    self:publish('user_change', self.text)
   }
 }
 
@@ -174,50 +194,52 @@ function Prompt:_delete_word_forward() {
       char = self.text:sub(new_cursor, new_cursor)
     }
 
-    self:update(self.text:sub(1, self.cursor) .. self.text:sub(new_cursor), nil)
-    if self.on_user_change { self.on_user_change() }
+    self.text = self.text:sub(1, self.cursor) .. self.text:sub(new_cursor)
+    self:publish('user_change', self.text)
   }
 }
 
 function Prompt:_delete_line_start() {
   if self.cursor > 0 {
-    self:update(self.text:sub(self.cursor + 1), 0)
-    if self.on_user_change { self.on_user_change() }
+    self:rawset('text', self.text:sub(self.cursor + 1), false)
+    self:rawset('cursor', 0, false)
+    self:_update_markup()
+    self:publish('user_change', self.text)
   }
 }
 
 function Prompt:_delete_line_end() {
   if self.cursor < #self.text {
-    self:update(self.text:sub(1, self.cursor))
-    if self.on_user_change { self.on_user_change() }
+    self.text = self.text:sub(1, self.cursor)
+    self:publish('user_change', self.text)
   }
 }
 
-function Prompt:update(new_text, new_cursor) {
-  if new_text { self.text = new_text }
-  if new_cursor { self.cursor = new_cursor }
-
-  local new_widget_markup = self.text:sub(1, self.cursor)
-  new_widget_markup ..= [[<span foreground="{palette.white}">|</span>]]
-  new_widget_markup ..= self.text:sub(self.cursor + 1)
-  self.root_widget.markup = new_widget_markup
-}
+-- -----------------------------------------------------------------------------
+-- Public
+-- -----------------------------------------------------------------------------
 
 function Prompt:start(initial_text = '') {
-  self:update(initial_text, #initial_text)
-  self.keygrabber:start()
+  self:rawset('text', initial_text, false)
+  self:rawset('cursor', #initial_text, false)
+  self:_update_markup()
+  self._keygrabber:start()
 }
 
 function Prompt:cancel() {
-  self.keygrabber:stop()
-  if self.on_stop { self.on_stop() }
-  if self.on_cancel { self.on_cancel() }
+  self._keygrabber:stop()
+  self:publish('stop')
+  self:publish('cancel')
 }
 
 function Prompt:submit() {
-  self.keygrabber:stop()
-  if self.on_stop { self.on_stop() }
-  if self.on_submit { self.on_submit() }
+  self._keygrabber:stop()
+  self:publish('stop')
+  self:publish('submit', self.text)
 }
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
 
 return Prompt

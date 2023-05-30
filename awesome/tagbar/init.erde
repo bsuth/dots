@@ -1,0 +1,38 @@
+local awful = require('awful')
+local gears = require('gears')
+local { global_keys } = require('core.bindings')
+local Tagbar = require('tagbar.Tagbar')
+
+local tagbars = {}
+
+function get_current_tagbar() {
+  local focused_screen = awful.screen.focused()
+  for _, tagbar in ipairs(tagbars) {
+    if tagbar.screen == focused_screen {
+      return tagbar
+    }
+  }
+}
+
+gears.table.merge(global_keys, {
+  awful.key({ 'Mod4' }, 't', () -> get_current_tagbar():open()),
+  awful.key({ 'Mod4' }, 'w', () -> get_current_tagbar():close()),
+  awful.key({ 'Mod4', 'Shift' }, ',', () -> get_current_tagbar():move_prev()),
+  awful.key({ 'Mod4', 'Shift' }, '.', () -> get_current_tagbar():move_next()),
+  awful.key({ 'Mod4', 'Shift' }, 'Tab', () -> get_current_tagbar():focus_prev(true)),
+  awful.key({ 'Mod4' }, 'Tab', () -> get_current_tagbar():focus_next(true)),
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'Tab', () -> get_current_tagbar():focus_prev()),
+  awful.key({ 'Mod4', 'Control' }, 'Tab', () -> get_current_tagbar():focus_next()),
+  awful.key({ 'Mod4', 'Shift' }, 't', () -> get_current_tagbar():rename()),
+  awful.key({ 'Mod4', 'Control' }, 't', () -> get_current_tagbar():get_active_tab():toggle()),
+})
+
+awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Tagbar({ screen = s })))
+awful.screen.disconnect_for_each_screen(s -> {
+  for i, tagbar in ipairs(tagbars) {
+    if tagbar.screen == s {
+      table.remove(tagbars, i)
+      break
+    }
+  }
+})

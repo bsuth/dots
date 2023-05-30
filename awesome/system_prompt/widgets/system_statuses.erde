@@ -1,0 +1,145 @@
+local gears = require('gears')
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local models = require('models')
+local Class = require('utils.Class')
+local Card = require('components.Card')
+local { get_full_asset_path } = require('utils.theme')
+
+local SYSTEM_STATUS_CARD_FONT = 'Quicksand Bold 16'
+local SYSTEM_STATUS_CARD_ICON_SIZE = 48
+
+-- -----------------------------------------------------------------------------
+-- Battery
+-- -----------------------------------------------------------------------------
+
+local battery = Card({
+  bg = palette.red,
+  font = SYSTEM_STATUS_CARD_FONT,
+  icon_size = SYSTEM_STATUS_CARD_ICON_SIZE,
+})
+
+function update_battery_text() {
+  battery.text = "{models.battery.percent}%"
+}
+
+update_battery_text()
+models.battery:subscribe('change_percent', update_battery_text)
+
+function update_battery_icon() {
+  battery.icon = models.battery.charging
+    && get_full_asset_path('battery-charging-black.svg')
+    || get_full_asset_path('battery-discharging-black.svg')
+}
+
+update_battery_icon()
+models.battery:subscribe('change_charging', update_battery_icon)
+
+-- -----------------------------------------------------------------------------
+-- Brightness
+-- -----------------------------------------------------------------------------
+
+local brightness = Card({
+  bg = palette.yellow,
+  font = SYSTEM_STATUS_CARD_FONT,
+  icon = get_full_asset_path('brightness-black.svg'),
+  icon_size = SYSTEM_STATUS_CARD_ICON_SIZE,
+})
+
+function update_brightness_text() {
+  brightness.text = "{models.brightness.percent}%"
+}
+
+update_brightness_text()
+models.brightness:subscribe('change_percent', update_brightness_text)
+
+-- -----------------------------------------------------------------------------
+-- Volume
+-- -----------------------------------------------------------------------------
+
+local volume = Card({
+  bg = palette.green,
+  font = SYSTEM_STATUS_CARD_FONT,
+  icon_size = SYSTEM_STATUS_CARD_ICON_SIZE,
+})
+
+function update_volume_text() {
+  volume.text = "{models.volume.percent}%"
+}
+
+update_volume_text()
+models.volume:subscribe('change_percent', update_volume_text)
+
+function update_volume_icon() {
+  volume.icon = models.volume.active
+    && get_full_asset_path('volume-active-black.svg')
+    || get_full_asset_path('volume-inactive-black.svg')
+}
+
+update_volume_icon()
+models.volume:subscribe('change_active', update_volume_icon)
+
+-- -----------------------------------------------------------------------------
+-- Notifications
+-- -----------------------------------------------------------------------------
+
+local notifications = Card({
+  bg = palette.blue,
+  font = SYSTEM_STATUS_CARD_FONT,
+  icon_size = SYSTEM_STATUS_CARD_ICON_SIZE,
+})
+
+function update_notifications() {
+  if models.notifications.active {
+    notifications.text = 'on'
+    notifications.icon = get_full_asset_path('notifications-active-black.svg')
+  } else {
+    notifications.text = 'off'
+    notifications.icon = get_full_asset_path('notifications-inactive-black.svg')
+  }
+}
+
+update_notifications()
+models.notifications:subscribe('change_active', update_notifications)
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return wibox.widget({
+  {
+    {
+      {
+        format = '%H:%M',
+        font = 'Quicksand Semibold 50',
+        widget = wibox.widget.textclock,
+      },
+      widget = wibox.container.place,
+    },
+    {
+      {
+        format = '%A %B %d',
+        font = 'Quicksand Semibold 20',
+        widget = wibox.widget.textclock,
+      },
+      widget = wibox.container.place,
+    },
+    {
+      {
+        {
+          battery.root_widget,
+          brightness.root_widget,
+          volume.root_widget,
+          notifications.root_widget,
+          spacing = 8,
+          layout = wibox.layout.fixed.horizontal,
+        },
+        top = 16,
+        widget = wibox.container.margin,
+      },
+      widget = wibox.container.place,
+    },
+    layout = wibox.layout.fixed.vertical,
+  },
+  widget = wibox.container.place,
+})

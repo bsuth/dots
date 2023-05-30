@@ -9,10 +9,10 @@ return Object({
       stdout -> self:set('percent', tonumber(stdout)),
     )
 
-    self.active = false
+    self:rawset('active', false, true)
     awful.spawn.easy_async_with_shell(
       [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[(off|on)\].*/\1/' ]],
-      stdout -> self:set('active', !!string.find(stdout, 'on')),
+      stdout -> self:set('active', !!string.find(stdout, 'on'))
     )
   },
   _set_percent = new_percent => {
@@ -22,8 +22,8 @@ return Object({
       () -> self:rawset('percent', new_percent),
     )
   },
-  toggle = () => awful.spawn.easy_async_with_shell(
-    'amixer sset Master toggle',
-    () -> self:set('active', !self.active),
+  _on_change_active = active => awful.spawn.easy_async_with_shell(
+    "amixer sset Master { active && 'on' || 'off' }",
   ),
+  toggle = () => self:set('active', !self.active),
 })

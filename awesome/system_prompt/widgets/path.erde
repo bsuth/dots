@@ -1,0 +1,23 @@
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
+local store = require('system_prompt.store')
+local path_utils = require('utils.path')
+
+local root_widget = wibox.widget({
+  font = SYSTEM_PROMPT_FONT,
+  widget = wibox.widget.textbox,
+})
+
+function update_widget() {
+  root_widget.text = path_utils.pad(table.concat(store.path, path_utils.separator))
+}
+
+update_widget()
+store:subscribe('change_path', update_widget)
+
+return wibox.widget({
+  root_widget,
+  fg = palette.green,
+  widget = wibox.container.background,
+})

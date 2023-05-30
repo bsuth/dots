@@ -1,0 +1,86 @@
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
+local store = require('system_prompt.store')
+local Class = require('utils.Class')
+local path_utils = require('utils.path')
+
+local MAX_NUM_SUGGESTIONS = 10
+
+-- -----------------------------------------------------------------------------
+-- Suggestion
+-- -----------------------------------------------------------------------------
+
+local Suggestion = Class()
+
+function Suggestion:_init() {
+  self._text_widget = wibox.widget({
+    font = SYSTEM_PROMPT_FONT,
+    widget = wibox.widget.textbox,
+  })
+
+  self.root_widget = wibox.widget({
+    self._text_widget,
+    widget = wibox.container.background,
+  })
+}
+
+function Suggestion:_get_text() {
+  return self._text_widget.text
+}
+
+function Suggestion:_set_text(new_text) {
+  self._text_widget.text = new_text
+}
+
+function Suggestion:_on_change_active() {
+  self.root_widget.fg = self.active && palette.blue || palette.white
+}
+
+-- -----------------------------------------------------------------------------
+-- Suggestions
+-- -----------------------------------------------------------------------------
+
+local suggestions = {}
+local root_widget = wibox.widget({ layout = wibox.layout.fixed.vertical })
+
+for i = 1, MAX_NUM_SUGGESTIONS {
+  local suggestion = Suggestion()
+  table.insert(suggestions, suggestion)
+  root_widget:add(suggestion.root_widget)
+}
+
+function update_widget() {
+  local page = 0
+
+  for i, child in ipairs(store.active_node) {
+    if child == store.selected_child {
+      page = math.floor((i - 1) / MAX_NUM_SUGGESTIONS)
+      break
+    }
+  }
+
+  local num_suggestions = math.min(
+    MAX_NUM_SUGGESTIONS,
+    #store.active_node - page * MAX_NUM_SUGGESTIONS,
+  )
+
+  for i = 1, num_suggestions {
+    local suggestion = suggestions[i]
+    local node = store.active_node[page * MAX_NUM_SUGGESTIONS + i]
+
+    suggestion.root_widget.visible = true
+    suggestion.text = node.label
+    suggestion.active = node == store.selected_child
+  }
+
+  for i = num_suggestions + 1, MAX_NUM_SUGGESTIONS {
+    suggestions[i].root_widget.visible = false
+  }
+}
+
+update_widget()
+store:subscribe('change_active_node', update_widget)
+store:subscribe('change_selected_child', update_widget)
+
+return root_widget

@@ -1,20 +1,22 @@
 local awful = require('awful')
 local wibox = require('wibox')
 local Class = require('utils.Class')
+local dummy_widget = require('utils.dummy_widget')
 
 local Veil = Class()
 
-local dummy_widget = wibox.widget({ widget = wibox.container.place })
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
 
-function Veil:_init() {
-  self.popups = {}
+function Veil:_init(props = {}) {
+  self._popups = {}
 
   awful.screen.connect_for_each_screen(s -> {
-    table.insert(self.popups, awful.popup({
+    table.insert(self._popups, awful.popup({
       widget = dummy_widget,
       screen = s,
       visible = false,
-      bg = '#000000aa',
       placement = awful.placement.maximize,
       ontop = true,
       type = dock,
@@ -22,40 +24,62 @@ function Veil:_init() {
   })
 
   awful.screen.disconnect_for_each_screen(s -> {
-    for i, popup in ipairs(self.popups) {
+    for i, popup in ipairs(self._popups) {
       if popup.screen == s {
-        table.remove(self.popups, i)
+        table.remove(self._popups, i)
         break
       }
     }
   })
+
+  self.widget = props.widget
+  self.color = props.color || '#000000aa'
 }
 
-function Veil:get_focused_veil() {
+function Veil:_get_active() {
+  for _, popup in ipairs(self._popups) {
+    if popup.visible {
+      return true
+    }
+  }
+}
+
+function Veil:_set_active(new_active) {
   local focused_screen = awful.screen.focused()
-  for _, popup in ipairs(self.popups) {
+  for _, popup in ipairs(self._popups) {
+    popup.visible = new_active
+    popup.widget = popup.screen == focused_screen && self.widget || dummy_widget
+  }
+}
+
+function Veil:_on_change_color() {
+  for _, popup in ipairs(self._popups) {
+    popup.bg = self.color
+  }
+}
+
+function Veil:_on_change_widget() {
+  local focused_screen = awful.screen.focused()
+  for _, popup in ipairs(self._popups) {
+    popup.widget = popup.screen == focused_screen && self.widget || dummy_widget
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Public
+-- -----------------------------------------------------------------------------
+
+function Veil:get_focused_popup() {
+  local focused_screen = awful.screen.focused()
+  for _, popup in ipairs(self._popups) {
     if popup.screen == focused_screen {
       return popup
     }
   }
 }
 
-function Veil:show(widget) {
-  local focused_screen = awful.screen.focused()
-
-  for _, popup in ipairs(self.popups) {
-    popup.widget = popup.screen == focused_screen && widget || dummy_widget
-  }
-
-  for _, popup in ipairs(self.popups) {
-    popup.visible = true
-  }
-}
-
-function Veil:hide() {
-  for _, popup in ipairs(self.popups) {
-    popup.visible = false
-  }
-}
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
 
 return Veil

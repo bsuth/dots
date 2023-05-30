@@ -1,0 +1,38 @@
+-- Get the current platform path separator. Note that while this is undocumented
+-- in the Lua 5.1 manual, it is indeed supported in 5.1+.
+-- https://www.lua.org/manual/5.3/manual.html#pdf-package.config
+module separator = package.config:sub(1, 1)
+
+module function dedup(s) {
+  return (s:gsub(separator .. '+', separator))
+}
+
+module function format(s, left, right) {
+  s = left  && (separator .. s) || s:gsub("^{separator}+", '')
+  s = right && (s .. separator) || s:gsub("{separator}+$", '')
+  return dedup(s)
+}
+
+module function trim(s, ltrim = true, rtrim = true) {
+  if ltrim { s = s:gsub("^{separator}+", '') }
+  if rtrim { s = s:gsub("{separator}+$", '') }
+  return dedup(s)
+}
+
+module function pad(s, lpad = true, rpad = true) {
+  if lpad { s = separator .. s }
+  if rpad { s = s .. separator }
+  return dedup(s)
+}
+
+module function join(...) {
+  return dedup(table.concat({ ... }, separator))
+}
+
+module function basename(s) {
+  return s:match("[^{separator}]*$")
+}
+
+module function dirname(s) {
+  return (s:gsub("[^{separator}]*$", ''))
+}

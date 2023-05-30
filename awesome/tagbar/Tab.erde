@@ -1,0 +1,62 @@
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local { TAGBAR_FONT } = require('tagbar.constants')
+local Class = require('utils.Class')
+
+local Tab = Class()
+
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function Tab:_init() {
+  self._text_widget = wibox.widget({
+    halign = 'center',
+    valign = 'center',
+    font = TAGBAR_FONT,
+    widget = wibox.widget.textbox,
+  })
+
+  self._content_widget = wibox.widget({
+    self._text_widget,
+    widget = wibox.container.place,
+  })
+
+  self.root_widget = wibox.widget({
+    self._content_widget,
+    fg = palette.white,
+    bg = palette.dark_gray,
+    widget = wibox.container.background,
+  })
+}
+
+function Tab:_on_change_text() {
+  if type(self.text) == 'string' {
+    self._text_widget.text = self.text
+    self._content_widget.children = { self._text_widget }
+  } else {
+    self._content_widget.children = { self.text }
+  }
+}
+
+function Tab:_on_change_disabled() {
+  self.root_widget.fg = self.disabled && '#888888' || palette.white
+}
+
+function Tab:_on_change_selected() {
+  self.root_widget.bg = self.selected && palette.light_gray || palette.dark_gray
+}
+
+-- -----------------------------------------------------------------------------
+-- Public
+-- -----------------------------------------------------------------------------
+
+function Tab:toggle() {
+  self.disabled = !self.disabled
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Tab

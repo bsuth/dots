@@ -13,11 +13,12 @@ require('core.client')
 require('core.theme')
 require('client_buffer')
 require('tagbar')
-require('dashboard')
+require('system_prompt')
 
 -- Init tags
 awful.screen.connect_for_each_screen(s -> {
   local tag = awful.tag.add('1', { screen = s, layout = layout })
+  awful.tag.add('2', { screen = s, layout = layout }) -- TODO: remove me
   tag:view_only() -- force 'tag::history::update' signal
 })
 

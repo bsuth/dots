@@ -1,0 +1,71 @@
+local gears = require('gears')
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local Class = require('utils.Class')
+
+local Card = Class()
+
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function Card:_init(props = {}) {
+  self._text_widget = wibox.widget({ widget = wibox.widget.textbox })
+  self._icon_widget = wibox.widget({ widget = wibox.widget.imagebox })
+
+  self.root_widget = wibox.widget({
+    {
+      {
+        { self._icon_widget, widget = wibox.container.place },
+        { self._text_widget, widget = wibox.container.place },
+        layout = wibox.layout.fixed.vertical,
+      },
+      margins = 16,
+      widget = wibox.container.margin,
+    },
+    fg = props.color || palette.black,
+    bg = palette.red,
+    shape = (cr, width, height) -> { gears.shape.rounded_rect(cr, width, height, 8) },
+    widget = wibox.container.background,
+  })
+
+  self.fg = props.fg || palette.black
+  self.bg = props.bg || palette.white
+
+  self.text = props.text || ''
+  self.font = props.font
+
+  self.icon = props.icon
+  self.icon_size = props.icon_size
+}
+
+function Card:_on_change_bg() {
+  self.root_widget.bg = self.bg
+}
+
+function Card:_on_change_fg() {
+  self.root_widget.fg = self.fg
+}
+
+function Card:_on_change_text() {
+  self._text_widget.text = self.text
+}
+
+function Card:_on_change_font() {
+  self._text_widget.font = self.font
+}
+
+function Card:_on_change_icon() {
+  self._icon_widget.image = self.icon
+}
+
+function Card:_on_change_icon_size() {
+  self._icon_widget.forced_width = self.icon_size
+  self._icon_widget.forced_height = self.icon_size
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Card

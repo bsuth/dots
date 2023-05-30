@@ -1,0 +1,62 @@
+local tagbar_history = {}
+
+local TAGBAR_HISTORY_FILENAME = "{os.getenv('HOME')}/.cache/awesome/tagbar_history"
+local TAGBAR_HISTORY_SIZE = 50
+
+-- -----------------------------------------------------------------------------
+-- Setup
+-- -----------------------------------------------------------------------------
+
+do {
+  local tagbar_history_file = io.open(TAGBAR_HISTORY_FILENAME, 'r+')
+
+  if tagbar_history_file {
+    for name in tagbar_history_file:lines() {
+      table.insert(tagbar_history, name)
+    }
+
+    tagbar_history_file:close()
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Methods
+-- -----------------------------------------------------------------------------
+
+function tagbar_history:write() {
+  local tagbar_history_file = io.open(TAGBAR_HISTORY_FILENAME, 'w')
+  tagbar_history_file:write(table.concat(tagbar_history, '\n'))
+  tagbar_history_file:close()
+}
+
+function tagbar_history:clear(name, write = true) {
+  for i = #tagbar_history, 1, -1 {
+    if tagbar_history[i] == name {
+      table.remove(tagbar_history, i)
+    }
+  }
+
+  if write {
+    self:write()
+  }
+}
+
+function tagbar_history:push(name, write = true) {
+  self:clear(name, false)
+  table.insert(tagbar_history, 1, name)
+
+  for i = #tagbar_history, TAGBAR_HISTORY_SIZE + 1, -1 {
+    -- Constrain number of saved recently used tab names
+    table.remove(tagbar_history, i)
+  }
+
+  if write {
+    self:write()
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return tagbar_history

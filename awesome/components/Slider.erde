@@ -1,0 +1,187 @@
+local awful = require('awful')
+local gears = require('gears')
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local { get_full_asset_path } = require('utils.theme')
+local Class = require('utils.Class')
+
+local SLIDER_ICON_SIZE = 48
+
+-- -----------------------------------------------------------------------------
+-- SliderCard
+-- -----------------------------------------------------------------------------
+
+local SliderCard = Class()
+
+function SliderCard:_init(props = {}) {
+  self._content_widget = wibox.widget({ widget = wibox.container.place })
+
+  self.root_widget = wibox.widget({
+    self._content_widget,
+    forced_width = 128,
+    forced_height = 128,
+    fg = palette.white,
+    shape_border_width = 1,
+    shape_border_color = palette.white,
+    shape = (cr, width, height) -> { gears.shape.rounded_rect(cr, width, height, 8) },
+    widget = wibox.container.background,
+  })
+
+  self.widget = props.widget
+}
+
+function SliderCard:_on_change_widget() {
+  self._content_widget.children = { self.widget }
+}
+
+function SliderCard:_on_change_fg() {
+  self.root_widget.fg = self.fg
+}
+
+function SliderCard:_on_change_bg() {
+  self.root_widget.bg = self.bg
+}
+
+-- -----------------------------------------------------------------------------
+-- Slider
+-- -----------------------------------------------------------------------------
+
+local Slider = Class()
+
+function Slider:_init(props = {}) {
+  self._center_card = SliderCard({ widget = props.widget })
+
+  self._page_down_card = SliderCard({
+    widget = wibox.widget({
+      {
+        forced_width = SLIDER_ICON_SIZE,
+        forced_height = SLIDER_ICON_SIZE,
+        image = get_full_asset_path('double-arrow-white.svg'),
+        widget = wibox.widget.imagebox,
+      },
+      direction = 'south',
+      widget = wibox.container.rotate
+    }),
+  })
+
+  self._page_up_card = SliderCard({
+    widget = wibox.widget({
+      forced_width = SLIDER_ICON_SIZE,
+      forced_height = SLIDER_ICON_SIZE,
+      image = get_full_asset_path('double-arrow-white.svg'),
+      widget = wibox.widget.imagebox,
+    }),
+  })
+
+  self._down_card = SliderCard({
+    widget = wibox.widget({
+      {
+        forced_width = SLIDER_ICON_SIZE,
+        forced_height = SLIDER_ICON_SIZE,
+        image = get_full_asset_path('arrow-white.svg'),
+        widget = wibox.widget.imagebox,
+      },
+      direction = 'south',
+      widget = wibox.container.rotate
+    }),
+  })
+
+  self._up_card = SliderCard({
+    widget = wibox.widget({
+      forced_width = SLIDER_ICON_SIZE,
+      forced_height = SLIDER_ICON_SIZE,
+      image = get_full_asset_path('arrow-white.svg'),
+      widget = wibox.widget.imagebox,
+    }),
+  })
+
+  self.root_widget = wibox.widget({
+    self._page_down_card.root_widget,
+    self._down_card.root_widget,
+    self._center_card.root_widget,
+    self._up_card.root_widget,
+    self._page_up_card.root_widget,
+    spacing = 16,
+    layout = wibox.layout.fixed.horizontal,
+  })
+
+  local keybindings = {
+    { {}, 'Escape', () -> self:stop() },
+    { { 'Control' }, 'c', () -> self:stop() },
+  }
+
+  if props.keybindings {
+    for _, keybinding in ipairs(props.keybindings) {
+      -- Place custom keybindings at the beginning!
+      --
+      -- If a keybinding is specified mulitple times, only the first one is used
+      -- and we give priority to `props.keybindings`
+      table.insert(keybindings, 1, keybinding)
+    }
+  }
+
+  self._keygrabber = awful.keygrabber({
+    keybindings = keybindings,
+    keypressed_callback = (_, mod, key) -> {
+      if #mod == 0 {
+        if key == 'Down' || key == 'j' || key == 'h' {
+          self._down_card.fg = palette.black
+          self._down_card.bg = palette.white
+          self._down_card.widget.children[1].image = get_full_asset_path('arrow-black.svg')
+        } elseif key == 'Up' || key == 'k' || key == 'l' {
+          self._up_card.fg = palette.black
+          self._up_card.bg = palette.white
+          self._up_card.widget.image = get_full_asset_path('arrow-black.svg')
+        } elseif key == 'd' {
+          self._page_down_card.fg = palette.black
+          self._page_down_card.bg = palette.white
+          self._page_down_card.widget.children[1].image = get_full_asset_path('double-arrow-black.svg')
+        } elseif key == 'u' {
+          self._page_up_card.fg = palette.black
+          self._page_up_card.bg = palette.white
+          self._page_up_card.widget.image = get_full_asset_path('double-arrow-black.svg')
+        }
+      }
+    },
+    keyreleased_callback = (_, mod, key) -> {
+      if #mod == 0 {
+        if key == 'Down' || key == 'j' || key == 'h' {
+          self._down_card.fg = palette.white
+          self._down_card.bg = nil
+          self._down_card.widget.children[1].image = get_full_asset_path('arrow-white.svg')
+          self:publish('down')
+        } elseif key == 'Up' || key == 'k' || key == 'l' {
+          self._up_card.fg = palette.white
+          self._up_card.bg = nil
+          self._up_card.widget.image = get_full_asset_path('arrow-white.svg')
+          self:publish('up')
+        } elseif key == 'd' {
+          self._page_down_card.fg = palette.white
+          self._page_down_card.bg = nil
+          self._page_down_card.widget.children[1].image = get_full_asset_path('double-arrow-white.svg')
+          self:publish('page_down')
+        } elseif key == 'u' {
+          self._page_up_card.fg = palette.white
+          self._page_up_card.bg = nil
+          self._page_up_card.widget.image = get_full_asset_path('double-arrow-white.svg')
+          self:publish('page_up')
+        }
+      }
+    },
+  })
+}
+
+function Slider:start() {
+  self._keygrabber:start()
+}
+
+function Slider:stop() {
+  self._keygrabber:stop()
+  self:publish('stop')
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Slider

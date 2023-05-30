@@ -1,0 +1,3 @@
+module TAGBAR_HEIGHT = 48
+
+module TAGBAR_FONT = 'Quicksand Regular 14'

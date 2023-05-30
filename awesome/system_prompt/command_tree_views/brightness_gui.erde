@@ -1,0 +1,35 @@
+local wibox = require('wibox')
+local models = require('models')
+local Slider = require('components.Slider')
+
+local text_widget = wibox.widget({
+  font = 'Quicksand Bold 16',
+  widget = wibox.widget.textbox,
+})
+
+local brightness_gui = Slider({ widget = text_widget })
+
+function update_text() {
+  text_widget.text = "{ models.brightness.percent }%"
+}
+
+update_text()
+models.brightness:subscribe('change_percent', update_text)
+
+brightness_gui:subscribe('up', () -> {
+  models.brightness.percent += 5
+})
+
+brightness_gui:subscribe('down', () -> {
+  models.brightness.percent -= 5
+})
+
+brightness_gui:subscribe('page_up', () -> {
+  models.brightness.percent += 8
+})
+
+brightness_gui:subscribe('page_down', () -> {
+  models.brightness.percent -= 8
+})
+
+return brightness_gui
