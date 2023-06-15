@@ -1,29 +1,59 @@
 local awful = require('awful')
+local gears = require('gears')
 local Object = require('utils.Object')
 
-return Object({
-  _init = () => {
-    self:rawset('percent', 0)
-    awful.spawn.easy_async_with_shell(
-      [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[([0-9]+)%\].*/\1/' ]],
-      stdout -> self:set('percent', tonumber(stdout)),
-    )
+local volume = {}
 
-    self:rawset('active', false, true)
-    awful.spawn.easy_async_with_shell(
-      [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[(off|on)\].*/\1/' ]],
-      stdout -> self:set('active', !!string.find(stdout, 'on'))
-    )
-  },
-  _set_percent = new_percent => {
-    new_percent = math.min(math.max(0, new_percent), 100)
-    awful.spawn.easy_async_with_shell(
-      ('amixer sset Master %d%%'):format(new_percent),
-      () -> self:rawset('percent', new_percent),
-    )
-  },
-  _on_change_active = active => awful.spawn.easy_async_with_shell(
-    "amixer sset Master { active && 'on' || 'off' }",
-  ),
-  toggle = () => self:set('active', !self.active),
-})
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function volume:_init() {
+  self:rawset('percent', 0, true)
+  self:rawset('active', false, true)
+
+  gears.timer({
+    timeout = 60, -- seconds
+    call_now = true,
+    autostart = true,
+    callback = () -> self:_update(),
+  })
+}
+
+function volume:_update() {
+  awful.spawn.easy_async_with_shell(
+    [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[([0-9]+)%\].*/\1/' ]],
+    stdout -> { self.percent = tonumber(stdout) },
+  )
+
+  awful.spawn.easy_async_with_shell(
+    [[ amixer sget Master | tail -n 1 | sed -E 's/.*\[(off|on)\].*/\1/' ]],
+    stdout -> { self.active = !!string.find(stdout, 'on') },
+  )
+}
+
+function volume:_set_percent(new_percent) {
+  self:rawset('percent', math.min(math.max(0, new_percent), 100))
+}
+
+function volume:_on_change_percent() {
+  awful.spawn.with_shell("amixer sset Master { self.percent }%")
+}
+
+function volume:_on_change_active() {
+  awful.spawn.with_shell("amixer sset Master { self.active && 'on' || 'off' }")
+}
+
+-- -----------------------------------------------------------------------------
+-- Public
+-- -----------------------------------------------------------------------------
+
+function volume:toggle() {
+  self.active = !self.active
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Object(volume)

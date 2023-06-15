@@ -6,18 +6,11 @@ local Class = require('utils.Class')
 local Card = require('components.Card')
 local { get_full_asset_path } = require('utils.theme')
 
-local SYSTEM_STATUS_CARD_FONT = 'Quicksand Bold 16'
-local SYSTEM_STATUS_CARD_ICON_SIZE = 48
-
 -- -----------------------------------------------------------------------------
 -- Battery
 -- -----------------------------------------------------------------------------
 
-local battery = Card({
-  bg = palette.red,
-  font = SYSTEM_STATUS_CARD_FONT,
-  icon_size = SYSTEM_STATUS_CARD_ICON_SIZE,
-})
+local battery = Card({ bg = palette.red })
 
 function update_battery_text() {
   battery.text = "{models.battery.percent}%"
@@ -41,9 +34,7 @@ models.battery:subscribe('change_charging', update_battery_icon)
 
 local brightness = Card({
   bg = palette.yellow,
-  font = SYSTEM_STATUS_CARD_FONT,
   icon = get_full_asset_path('brightness-black.svg'),
-  icon_size = SYSTEM_STATUS_CARD_ICON_SIZE,
 })
 
 function update_brightness_text() {
@@ -57,11 +48,7 @@ models.brightness:subscribe('change_percent', update_brightness_text)
 -- Volume
 -- -----------------------------------------------------------------------------
 
-local volume = Card({
-  bg = palette.green,
-  font = SYSTEM_STATUS_CARD_FONT,
-  icon_size = SYSTEM_STATUS_CARD_ICON_SIZE,
-})
+local volume = Card({ bg = palette.green })
 
 function update_volume_text() {
   volume.text = "{models.volume.percent}%"
@@ -83,11 +70,7 @@ models.volume:subscribe('change_active', update_volume_icon)
 -- Notifications
 -- -----------------------------------------------------------------------------
 
-local notifications = Card({
-  bg = palette.blue,
-  font = SYSTEM_STATUS_CARD_FONT,
-  icon_size = SYSTEM_STATUS_CARD_ICON_SIZE,
-})
+local notifications = Card({ bg = palette.blue })
 
 function update_notifications() {
   if models.notifications.active {

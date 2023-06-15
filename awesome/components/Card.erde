@@ -3,6 +3,9 @@ local wibox = require('wibox')
 local { palette } = require('core.theme')
 local Class = require('utils.Class')
 
+local DEFAULT_CARD_FONT = 'Quicksand Bold 16'
+local DEFAULT_CARD_ICON_SIZE = 48
+
 local Card = Class()
 
 -- -----------------------------------------------------------------------------
@@ -33,10 +36,10 @@ function Card:_init(props = {}) {
   self.bg = props.bg || palette.white
 
   self.text = props.text || ''
-  self.font = props.font
+  self.font = props.font || DEFAULT_CARD_FONT
 
   self.icon = props.icon
-  self.icon_size = props.icon_size
+  self.icon_size = props.icon_size || DEFAULT_CARD_ICON_SIZE
 }
 
 function Card:_on_change_bg() {

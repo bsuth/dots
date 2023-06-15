@@ -33,6 +33,11 @@ return {
     },
   },
   {
+    label = 'dfeet',
+    type = 'once',
+    callback = () -> awful.spawn('d-feet'),
+  },
+  {
     label = 'discord',
     type = 'once',
     callback = () -> awful.spawn('discord'),
@@ -120,11 +125,9 @@ return {
   },
   {
     label = 'volume',
-    description = 'Volume Controls',
     {
       label = 'gui',
       type = 'view',
-      description = 'Volume GUI',
       view = require('system_prompt.command_tree_views.volume_gui'),
     },
     {

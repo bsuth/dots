@@ -1,0 +1,69 @@
+local naughty = require('naughty')
+local lgi = require('lgi')
+local Gio = lgi.require('Gio')
+
+module system_bus = Gio.bus_get_sync(Gio.BusType.SYSTEM)
+module session_bus = Gio.bus_get_sync(Gio.BusType.SESSION)
+
+function lgi_extract_dbus_value(value) {
+  local value_type = type(value)
+
+  if value_type != 'table' && value_type != 'userdata' {
+    return value
+  }
+
+  local value_len = #value
+
+  if value_type == 'userdata' && value_len == 0 {
+    return lgi_extract_dbus_value(value.value)
+  }
+
+  local t = {}
+
+  if value_type == 'table' {
+    for i = 1, value_len {
+      table.insert(t, lgi_extract_dbus_value(value[i]))
+    }
+  } else {
+    for i = 1, value_len {
+      table.insert(t, lgi_extract_dbus_value(value:get_child_value(i - 1)))
+    }
+  }
+
+  if value_len == 1 {
+    return t[1]
+  } else {
+    return t
+  }
+}
+
+module function dbus_call_sync(bus, args) {
+  local var, err = bus:call_sync(
+    args.bus_name,
+    args.object_path,
+    args.interface_name,
+    args.method_name,
+    args.parameters,
+    args.reply_type,
+    args.flags || Gio.DBusCallFlags.NONE,
+    args.timeout_msec || -1,
+    args.cancellable,
+  )
+
+  if err {
+    naughty.notify({
+      force = true,
+      title = 'dbus_call_sync error',
+      text = table.concat({
+        "error: { err.value }",
+        "bus_name: { args.bus_name }",
+        "object_path: { args.object_path }",
+        "interface_name: { args.interface_name }",
+        "method_name: { args.method_name }",
+        "parameters: { args.parameters }",
+      }, '\n'),
+    })
+  }
+
+  return lgi_extract_dbus_value(var)
+}
