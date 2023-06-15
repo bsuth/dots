@@ -9,8 +9,8 @@ local volume = {}
 -- -----------------------------------------------------------------------------
 
 function volume:_init() {
-  self:rawset('percent', 0, true)
-  self:rawset('active', false, true)
+  self:rawset('percent', 0)
+  self:rawset('active', false)
 
   gears.timer({
     timeout = 60, -- seconds
@@ -33,7 +33,7 @@ function volume:_update() {
 }
 
 function volume:_set_percent(new_percent) {
-  self:rawset('percent', math.min(math.max(0, new_percent), 100))
+  self:rawset('percent', math.min(math.max(0, new_percent), 100), true)
 }
 
 function volume:_on_change_percent() {

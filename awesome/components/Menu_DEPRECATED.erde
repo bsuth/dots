@@ -137,7 +137,7 @@ function Menu:_on_change_input() {
 }
 
 function Menu:_on_change_options() {
-  self:rawset('input', '', true)
+  self:rawset('input', '')
   self:filter() -- force filter + refresh, in case input isnt actually changing
 }
 
@@ -167,7 +167,7 @@ function Menu:filter() {
   }
 
   self.active_item_index = self.props.allow_arbitrary_input && 0 || 1
-  self:rawset('item_index_offset', 0, true)
+  self:rawset('item_index_offset', 0)
   self:refresh() -- force refresh, in case input isnt actually changing
 }
 

@@ -34,10 +34,10 @@ function Object:get(key) {
   }
 }
 
-function Object:rawset(key, value, no_publish) {
+function Object:rawset(key, value, publish) {
   local old_value = Object.rawget(self, key)
   self._proxy[key] = value
-  if !no_publish && old_value != value {
+  if publish && old_value != value {
     Object.publish(self, "change_{key}", value, old_value)
   }
 }
@@ -47,7 +47,7 @@ function Object:set(key, value) {
   if type(setter) == 'function' {
     setter(self, value)
   } else {
-    Object.rawset(self, key, value)
+    Object.rawset(self, key, value, true)
   }
 }
 

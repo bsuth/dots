@@ -18,8 +18,8 @@ local Prompt = Class()
 -- -----------------------------------------------------------------------------
 
 function Prompt:_init(props = {}) {
-  self:rawset('text', '', true)
-  self:rawset('cursor', 0, true)
+  self:rawset('text', '')
+  self:rawset('cursor', 0)
 
   self.root_widget = wibox.widget({
     markup = '',
@@ -63,8 +63,8 @@ function Prompt:_init(props = {}) {
     keybindings = keybindings,
     keyreleased_callback = (_, mod, key) -> {
       if #mod == 0 && #key == 1 {
-        self:rawset('text', table.concat({ self.text:sub(1, self.cursor), key, self.text:sub(self.cursor + 1), }), false)
-        self:rawset('cursor', self.cursor + 1, false)
+        self:rawset('text', table.concat({ self.text:sub(1, self.cursor), key, self.text:sub(self.cursor + 1), }))
+        self:rawset('cursor', self.cursor + 1)
         self:_update_markup()
         self:publish('user_change', self.text)
       }
@@ -143,8 +143,8 @@ function Prompt:_move_line_end() {
 
 function Prompt:_delete_char_back() {
   if self.cursor > 0 {
-    self:rawset('text', self.text:sub(1, self.cursor - 1) .. self.text:sub(self.cursor + 1), false)
-    self:rawset('cursor', self.cursor - 1, false)
+    self:rawset('text', self.text:sub(1, self.cursor - 1) .. self.text:sub(self.cursor + 1))
+    self:rawset('cursor', self.cursor - 1)
     self:_update_markup()
     self:publish('user_change', self.text)
   }
@@ -172,8 +172,8 @@ function Prompt:_delete_word_back() {
       char = self.text:sub(new_cursor, new_cursor)
     }
 
-    self:rawset('text', self.text:sub(1, new_cursor) .. self.text:sub(self.cursor + 1), false)
-    self:rawset('cursor', new_cursor, false)
+    self:rawset('text', self.text:sub(1, new_cursor) .. self.text:sub(self.cursor + 1))
+    self:rawset('cursor', new_cursor)
     self:_update_markup()
     self:publish('user_change', self.text)
   }
@@ -201,8 +201,8 @@ function Prompt:_delete_word_forward() {
 
 function Prompt:_delete_line_start() {
   if self.cursor > 0 {
-    self:rawset('text', self.text:sub(self.cursor + 1), false)
-    self:rawset('cursor', 0, false)
+    self:rawset('text', self.text:sub(self.cursor + 1))
+    self:rawset('cursor', 0)
     self:_update_markup()
     self:publish('user_change', self.text)
   }
@@ -220,8 +220,8 @@ function Prompt:_delete_line_end() {
 -- -----------------------------------------------------------------------------
 
 function Prompt:start(initial_text = '') {
-  self:rawset('text', initial_text, false)
-  self:rawset('cursor', #initial_text, false)
+  self:rawset('text', initial_text)
+  self:rawset('cursor', #initial_text)
   self:_update_markup()
   self._keygrabber:start()
 }

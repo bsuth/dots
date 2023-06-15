@@ -1,19 +1,30 @@
 local awful = require('awful')
 local Object = require('utils.Object')
 
-return Object({
-  _init = () => {
-    self:rawset('percent', 0)
-    awful.spawn.easy_async_with_shell(
-      [[ echo $(( 100 * $(brightnessctl get) / $(brightnessctl max) )) ]],
-      stdout -> self:set('percent', tonumber(stdout)),
-    )
-  },
-  _set_percent = new_percent => {
-    new_percent = math.min(math.max(0, new_percent), 100)
-    awful.spawn.easy_async_with_shell(
-      ('brightnessctl set %s%%'):format(new_percent),
-      () -> self:rawset('percent', new_percent),
-    )
-  },
-})
+local brightness = {}
+
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function brightness:_init() {
+  self:rawset('percent', 0)
+  awful.spawn.easy_async_with_shell(
+    [[ echo $(( 100 * $(brightnessctl get) / $(brightnessctl max) )) ]],
+    stdout -> { self.percent = tonumber(stdout) },
+  )
+}
+
+function brightness:_set_percent(new_percent) {
+  self:rawset('percent', math.min(math.max(0, new_percent), 100), true)
+}
+
+function brightness:_on_change_percent() {
+  awful.spawn.with_shell("brightnessctl set { self.percent }%")
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Object(brightness)

@@ -16,7 +16,7 @@ local Suggestions = {}
 
 function Suggestions:_init() {
   self._filtered_suggestions = tagbar_history
-  self:rawset('selected', 0, true)
+  self:rawset('selected', 0)
 
   self._suggestion_widgets = {}
   for i = 1, MAX_SUGGESTIONS {
@@ -82,7 +82,7 @@ function Suggestions:_on_change_filter() {
 
   self._filtered_suggestions = new_filtered_suggestions
   self.root_widget.children = new_root_children
-  self:rawset('selected', 0, true)
+  self:rawset('selected', 0)
 }
 
 function Suggestions:_on_change_selected() {
