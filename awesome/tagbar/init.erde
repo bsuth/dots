@@ -5,7 +5,7 @@ local Tagbar = require('tagbar.Tagbar')
 
 local tagbars = {}
 
-function get_current_tagbar() {
+local function get_current_tagbar() {
   local focused_screen = awful.screen.focused()
   for _, tagbar in ipairs(tagbars) {
     if tagbar.screen == focused_screen {

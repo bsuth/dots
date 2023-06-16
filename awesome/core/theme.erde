@@ -62,7 +62,7 @@ naughty.config.defaults.position = 'top_right'
 -- Wallpaper
 -- -----------------------------------------------------------------------------
 
-function set_wallpaper(s) {
+local function set_wallpaper(s) {
   local wallpaper = s.geometry.width > s.geometry.height
     && get_full_asset_path('horizontal-wallpaper.svg')
     || get_full_asset_path('vertical-wallpaper.svg')

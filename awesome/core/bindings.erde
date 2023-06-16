@@ -6,7 +6,7 @@ local models = require('models')
 -- Helpers
 -- -----------------------------------------------------------------------------
 
-function global_move_client(dir) {
+local function global_move_client(dir) {
   local old_id = awful.client.idx(client.focus)
   awful.client.swap.bydirection(dir)
   local new_id = awful.client.idx(client.focus)

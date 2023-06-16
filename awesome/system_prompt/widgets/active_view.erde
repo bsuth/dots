@@ -5,7 +5,7 @@ local root_widget = wibox.widget({
   widget = wibox.container.place,
 })
 
-function update_widget() {
+local function update_widget() {
   if store.active_view {
     root_widget.children = { store.active_view.root_widget }
   } else {

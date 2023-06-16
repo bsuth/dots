@@ -5,7 +5,7 @@ local Gio = lgi.require('Gio')
 module system_bus = Gio.bus_get_sync(Gio.BusType.SYSTEM)
 module session_bus = Gio.bus_get_sync(Gio.BusType.SESSION)
 
-function lgi_extract_dbus_value(value) {
+local function lgi_extract_dbus_value(value) {
   local value_type = type(value)
 
   if value_type != 'table' && value_type != 'userdata' {

@@ -12,14 +12,14 @@ local { get_full_asset_path } = require('utils.theme')
 
 local battery = Card({ bg = palette.red })
 
-function update_battery_text() {
+local function update_battery_text() {
   battery.text = "{models.battery.percent}%"
 }
 
 update_battery_text()
 models.battery:subscribe('change_percent', update_battery_text)
 
-function update_battery_icon() {
+local function update_battery_icon() {
   battery.icon = models.battery.charging
     && get_full_asset_path('battery-charging-black.svg')
     || get_full_asset_path('battery-discharging-black.svg')
@@ -37,7 +37,7 @@ local brightness = Card({
   icon = get_full_asset_path('brightness-black.svg'),
 })
 
-function update_brightness_text() {
+local function update_brightness_text() {
   brightness.text = "{models.brightness.percent}%"
 }
 
@@ -50,14 +50,14 @@ models.brightness:subscribe('change_percent', update_brightness_text)
 
 local volume = Card({ bg = palette.green })
 
-function update_volume_text() {
+local function update_volume_text() {
   volume.text = "{models.volume.percent}%"
 }
 
 update_volume_text()
 models.volume:subscribe('change_percent', update_volume_text)
 
-function update_volume_icon() {
+local function update_volume_icon() {
   volume.icon = models.volume.active
     && get_full_asset_path('volume-active-black.svg')
     || get_full_asset_path('volume-inactive-black.svg')
@@ -72,7 +72,7 @@ models.volume:subscribe('change_active', update_volume_icon)
 
 local notifications = Card({ bg = palette.blue })
 
-function update_notifications() {
+local function update_notifications() {
   if models.notifications.active {
     notifications.text = 'on'
     notifications.icon = get_full_asset_path('notifications-active-black.svg')

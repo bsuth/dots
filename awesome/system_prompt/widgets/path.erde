@@ -9,7 +9,7 @@ local root_widget = wibox.widget({
   widget = wibox.widget.textbox,
 })
 
-function update_widget() {
+local function update_widget() {
   root_widget.text = path_utils.pad(table.concat(store.path, path_utils.separator))
 }
 

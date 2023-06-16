@@ -4,7 +4,7 @@ local Object = require('utils.Object')
 
 local device = upower.Client():get_display_device()
 
-function get_charging() {
+local function get_charging() {
   return (
     device.state != upower.DeviceState.DISCHARGING &&
     device.state != upower.DeviceState.PENDING_DISCHARGE

@@ -50,7 +50,7 @@ for i = 1, MAX_NUM_SUGGESTIONS {
   root_widget:add(suggestion.root_widget)
 }
 
-function update_widget() {
+local function update_widget() {
   local page = 0
 
   for i, child in ipairs(store.active_node) {

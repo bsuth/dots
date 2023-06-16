@@ -16,7 +16,7 @@ local root_widget = wibox.widget({
   widget = wibox.container.margin, -- dummy container
 })
 
-function update_widget() {
+local function update_widget() {
   if type(store.description) == 'string' {
     text_widget.text = store.description
     root_widget.children = { default_widget }

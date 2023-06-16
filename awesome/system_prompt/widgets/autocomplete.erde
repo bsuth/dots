@@ -10,7 +10,7 @@ local root_widget = wibox.widget({
   widget = wibox.widget.textbox,
 })
 
-function update_widget() {
+local function update_widget() {
   if store.selected_child {
     root_widget.text = store.selected_child.label
   } else {

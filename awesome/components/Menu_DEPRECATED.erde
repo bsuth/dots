@@ -12,7 +12,7 @@ local MENU_PAGE_SIZE = 5
 local MENU_SELECTED_BG = palette.light_gray
 local MENU_UNSELECTED_BG = '#1A1A1A'
 
-function create_menu_item_widget(content_widget) {
+local function create_menu_item_widget(content_widget) {
   return wibox.widget({
     {
       {

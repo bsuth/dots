@@ -96,7 +96,7 @@ function Object:unsubscribe(event, callback) {
 }
 
 function Object:once(event, callback) {
-  function callback_wrapper(...) { -- needs to be a function for self-reference
+  local function callback_wrapper(...) { -- needs to be a function for self-reference
     callback(...)
     self:unsubscribe(event, callback_wrapper)
   }

@@ -9,7 +9,7 @@ local text_widget = wibox.widget({
 
 local brightness_gui = Slider({ widget = text_widget })
 
-function update_text() {
+local function update_text() {
   text_widget.text = "{ models.brightness.percent }%"
 }
 

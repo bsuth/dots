@@ -8,7 +8,7 @@ local text_widget = wibox.widget({
   widget = wibox.widget.textbox,
 })
 
-function update_text() {
+local function update_text() {
   text_widget.text = "{ models.volume.percent }%"
 }
 
@@ -21,7 +21,7 @@ local icon_widget = wibox.widget({
   widget = wibox.widget.imagebox,
 })
 
-function update_icon() {
+local function update_icon() {
   icon_widget.image = models.volume.active
     && get_full_asset_path('volume-active-white.svg')
     || get_full_asset_path('volume-inactive-white.svg')
