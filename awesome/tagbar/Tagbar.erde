@@ -19,6 +19,7 @@ function Tagbar:_init(props = {}) {
   self.screen = props.screen
 
   self._tabs = {}
+  self._disabled_tags = {}
   self._veil = Veil()
 
   self._tabs_widget = wibox.widget({
@@ -67,7 +68,26 @@ function Tagbar:_init(props = {}) {
   self.screen:connect_signal('tag::history::update', () -> self:_refresh())
 }
 
+function Tagbar:_is_tag_disabled(tag) {
+  for _, disabled_tag in ipairs(self._disabled_tags) {
+    if tag == disabled_tag { -- do not add any old (removed) tags
+      return true
+    }
+  }
+}
+
 function Tagbar:_refresh() {
+  local new_disabled_tags = {}
+
+  -- iterate current tags to filter out any old (removed) tags
+  for _, tag in ipairs(self.screen.tags) {
+    if self:_is_tag_disabled(tag) {
+      table.insert(new_disabled_tags, tag)
+    }
+  }
+
+  self._disabled_tags = new_disabled_tags
+
   local filtered_tags, num_filtered_tags = {}, 0
   for _, tag in ipairs(self.screen.tags) {
     if !tag.name:match('^_') {
@@ -88,9 +108,12 @@ function Tagbar:_refresh() {
 
   for i, tag in ipairs(filtered_tags) {
     local tab = self._tabs[i]
+
     tab.text = tag.name
     tab.selected = tag == self.screen.selected_tag
+    tab.disabled = self:_is_tag_disabled(tag)
     tab.tag = tag -- store custom field for convenience
+
     table.insert(new_tabs_widget_children, tab.root_widget)
   }
 
@@ -140,6 +163,21 @@ function Tagbar:close() {
   if num_visible_tags > 1 {
     self.screen.selected_tag:delete()
   }
+}
+
+function Tagbar:toggle() {
+  local active_tab = self:get_active_tab()
+
+  for i, disabled_tag in ipairs(self._disabled_tags) {
+    if active_tab.tag == disabled_tag { -- do not add any old (removed) tags
+      active_tab.disabled = false
+      table.remove(self._disabled_tags, i)
+      return
+    }
+  }
+
+  active_tab.disabled = true
+  table.insert(self._disabled_tags, active_tab.tag)
 }
 
 function Tagbar:swap(index1, index2) {

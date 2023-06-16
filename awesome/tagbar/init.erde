@@ -24,7 +24,7 @@ gears.table.merge(global_keys, {
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'Tab', () -> get_current_tagbar():focus_prev()),
   awful.key({ 'Mod4', 'Control' }, 'Tab', () -> get_current_tagbar():focus_next()),
   awful.key({ 'Mod4', 'Shift' }, 't', () -> get_current_tagbar():rename()),
-  awful.key({ 'Mod4', 'Control' }, 't', () -> get_current_tagbar():get_active_tab():toggle()),
+  awful.key({ 'Mod4', 'Control' }, 't', () -> get_current_tagbar():toggle()),
 })
 
 awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Tagbar({ screen = s })))
