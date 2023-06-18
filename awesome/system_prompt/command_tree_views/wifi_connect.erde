@@ -1,0 +1,29 @@
+local wibox = require('wibox')
+local Prompt = require('components.Prompt')
+local models = require('models')
+local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
+local Object = require('utils.Object')
+
+local wifi_connect_view = {}
+
+function wifi_connect_view:_init() {
+  self._prompt = Prompt({ font = SYSTEM_PROMPT_FONT, hidden = true })
+
+  self.root_widget = wibox.widget({
+    self._prompt.root_widget,
+    widget = wibox.container.place,
+  })
+
+  self._prompt:subscribe('stop', () -> self:publish('stop'))
+
+  self._prompt:subscribe('submit', psk -> {
+    models.wifi:add_and_activate_connection(self._ssid, psk)
+  })
+}
+
+function wifi_connect_view:start(args) {
+  self._ssid = args.ssid
+  self._prompt:start()
+}
+
+return Object(wifi_connect_view)

@@ -53,7 +53,7 @@ for i = 1, MAX_NUM_SUGGESTIONS {
 local function update_widget() {
   local page = 0
 
-  for i, child in ipairs(store.active_node) {
+  for i, child in ipairs(store.filtered_active_node) {
     if child == store.selected_child {
       page = math.floor((i - 1) / MAX_NUM_SUGGESTIONS)
       break
@@ -62,12 +62,12 @@ local function update_widget() {
 
   local num_suggestions = math.min(
     MAX_NUM_SUGGESTIONS,
-    #store.active_node - page * MAX_NUM_SUGGESTIONS,
+    #store.filtered_active_node - page * MAX_NUM_SUGGESTIONS,
   )
 
   for i = 1, num_suggestions {
     local suggestion = suggestions[i]
-    local node = store.active_node[page * MAX_NUM_SUGGESTIONS + i]
+    local node = store.filtered_active_node[page * MAX_NUM_SUGGESTIONS + i]
 
     suggestion.root_widget.visible = true
     suggestion.text = node.label
@@ -80,7 +80,7 @@ local function update_widget() {
 }
 
 update_widget()
-store:subscribe('change_active_node', update_widget)
+store:subscribe('change_filtered_active_node', update_widget)
 store:subscribe('change_selected_child', update_widget)
 
 return root_widget

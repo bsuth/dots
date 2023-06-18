@@ -20,6 +20,7 @@ local Prompt = Class()
 function Prompt:_init(props = {}) {
   self:rawset('text', '')
   self:rawset('cursor', 0)
+  self:rawset('hidden', props.hidden)
 
   self.root_widget = wibox.widget({
     markup = '',
@@ -44,6 +45,7 @@ function Prompt:_init(props = {}) {
     { { 'Mod1' }, 'BackSpace', () -> self:_delete_word_back() },
     { { 'Control' }, 'u', () -> self:_delete_line_start() },
     { { 'Control' }, 'k', () -> self:_delete_line_end() },
+    { { 'Control' }, 'space', () -> { self.hidden = !self.hidden } },
     { {}, 'Escape', () -> self:cancel() },
     { { 'Control' }, 'c', () -> self:cancel() },
     { {}, 'Return', () -> self:submit() },
@@ -61,8 +63,16 @@ function Prompt:_init(props = {}) {
 
   self._keygrabber = awful.keygrabber({
     keybindings = keybindings,
-    keyreleased_callback = (_, mod, key) -> {
-      if #mod == 0 && #key == 1 {
+    keyreleased_callback = (_, modifiers, key) -> {
+      local has_trivial_modifiers = true
+      for _, modifier in ipairs(modifiers) {
+        if modifier != 'Shift' && modifier != 'Lock' {
+          has_trivial_modifiers = false
+          break
+        }
+      }
+
+      if has_trivial_modifiers && #key == 1 {
         self:rawset('text', table.concat({ self.text:sub(1, self.cursor), key, self.text:sub(self.cursor + 1), }))
         self:rawset('cursor', self.cursor + 1)
         self:_update_markup()
@@ -73,10 +83,21 @@ function Prompt:_init(props = {}) {
 }
 
 function Prompt:_update_markup() {
-  local new_widget_markup = self.text:sub(1, self.cursor)
-  new_widget_markup ..= [[<span foreground="{palette.white}">|</span>]]
-  new_widget_markup ..= self.text:sub(self.cursor + 1)
-  self.root_widget.markup = new_widget_markup
+  if self.hidden {
+    local new_widget_markup = ('*'):rep(self.cursor)
+    new_widget_markup ..= [[<span foreground="{palette.white}">|</span>]]
+    new_widget_markup ..= ('*'):rep(#self.text - self.cursor)
+    self.root_widget.markup = new_widget_markup
+  } else {
+    local new_widget_markup = self.text:sub(1, self.cursor)
+    new_widget_markup ..= [[<span foreground="{palette.white}">|</span>]]
+    new_widget_markup ..= self.text:sub(self.cursor + 1)
+    self.root_widget.markup = new_widget_markup
+  }
+}
+
+function Prompt:_on_change_hidden() {
+  self:_update_markup()
 }
 
 function Prompt:_on_change_text() {

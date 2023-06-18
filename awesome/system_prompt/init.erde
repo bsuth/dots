@@ -3,8 +3,7 @@ local wibox = require('wibox')
 local { global_keys } = require('core.bindings')
 local { palette } = require('core.theme')
 local store = require('system_prompt.store')
-local active_view_widget = require('system_prompt.widgets.active_view')
-local autocomplete_widget = require('system_prompt.widgets.autocomplete')
+local view_widget = require('system_prompt.widgets.view')
 local description_widget = require('system_prompt.widgets.description')
 local system_statuses_widget = require('system_prompt.widgets.system_statuses')
 local path_widget = require('system_prompt.widgets.path')
@@ -15,7 +14,7 @@ local root_widget = wibox.widget({
   {
     {
       description_widget,
-      active_view_widget,
+      view_widget,
       layout = wibox.layout.flex.horizontal,
     },
     {
@@ -24,11 +23,7 @@ local root_widget = wibox.widget({
         halign = 'right',
         widget = wibox.container.place,
       },
-      {
-        autocomplete_widget,
-        store.prompt.root_widget,
-        layout = wibox.layout.stack,
-      },
+      store.prompt.root_widget,
       layout = wibox.layout.flex.horizontal,
     },
     {

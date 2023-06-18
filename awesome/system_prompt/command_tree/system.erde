@@ -1,0 +1,30 @@
+local awful = require('awful')
+
+return {
+  label = 'system',
+  {
+    label = 'sleep',
+    type = 'once',
+    callback = () -> awful.spawn('systemctl suspend'),
+  },
+  {
+    label = 'lock',
+    type = 'once',
+    callback = () -> awful.spawn('slock'),
+  },
+  {
+    label = 'logout',
+    type = 'once',
+    callback = () -> awesome.quit(),
+  },
+  {
+    label = 'reboot',
+    type = 'once',
+    callback = () -> awful.spawn('/sbin/reboot'),
+  },
+  {
+    label = 'poweroff',
+    type = 'once',
+    callback = () -> awful.spawn('/sbin/poweroff'),
+  },
+}

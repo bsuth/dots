@@ -2,9 +2,9 @@ local gears = require('gears')
 local wibox = require('wibox')
 local { palette } = require('core.theme')
 local models = require('models')
-local Class = require('utils.Class')
 local Card = require('components.Card')
-local { get_full_asset_path } = require('utils.theme')
+local Class = require('utils.Class')
+local svg = require('utils.svg')
 
 -- -----------------------------------------------------------------------------
 -- Battery
@@ -21,8 +21,8 @@ models.battery:subscribe('change_percent', update_battery_text)
 
 local function update_battery_icon() {
   battery.icon = models.battery.charging
-    && get_full_asset_path('battery-charging-black.svg')
-    || get_full_asset_path('battery-discharging-black.svg')
+    && svg('battery-charging', palette.black)
+    || svg('battery-discharging', palette.black)
 }
 
 update_battery_icon()
@@ -34,7 +34,7 @@ models.battery:subscribe('change_charging', update_battery_icon)
 
 local brightness = Card({
   bg = palette.yellow,
-  icon = get_full_asset_path('brightness-black.svg'),
+  icon = svg('brightness', palette.black),
 })
 
 local function update_brightness_text() {
@@ -59,8 +59,8 @@ models.volume:subscribe('change_percent', update_volume_text)
 
 local function update_volume_icon() {
   volume.icon = models.volume.active
-    && get_full_asset_path('volume-active-black.svg')
-    || get_full_asset_path('volume-inactive-black.svg')
+    && svg('volume-active', palette.black)
+    || svg('volume-inactive', palette.black)
 }
 
 update_volume_icon()
@@ -75,10 +75,10 @@ local notifications = Card({ bg = palette.blue })
 local function update_notifications() {
   if models.notifications.active {
     notifications.text = 'on'
-    notifications.icon = get_full_asset_path('notifications-active-black.svg')
+    notifications.icon = svg('notifications-active', palette.black)
   } else {
     notifications.text = 'off'
-    notifications.icon = get_full_asset_path('notifications-inactive-black.svg')
+    notifications.icon = svg('notifications-inactive', palette.black)
   }
 }
 

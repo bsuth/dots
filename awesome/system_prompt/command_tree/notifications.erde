@@ -1,0 +1,26 @@
+local models = require('models')
+
+return {
+  label = 'notifications',
+  description = require('system_prompt.command_tree_descriptions.notifications'),
+  {
+    label = 'toggle',
+    type = 'multiple',
+    callback = () -> models.notifications:toggle(),
+  },
+  {
+    label = 'clear',
+    type = 'multiple',
+    callback = () -> models.notifications:clear(),
+  },
+  {
+    label = 'off',
+    type = 'multiple',
+    callback = () -> { models.notifications.active = false },
+  },
+  {
+    label = 'on',
+    type = 'multiple',
+    callback = () -> { models.notifications.active = true },
+  },
+}

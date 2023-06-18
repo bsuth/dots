@@ -2,8 +2,8 @@ local awful = require('awful')
 local gears = require('gears')
 local wibox = require('wibox')
 local { palette } = require('core.theme')
-local { get_full_asset_path } = require('utils.theme')
 local Class = require('utils.Class')
+local svg = require('utils.svg')
 
 local SLIDER_ICON_SIZE = 48
 
@@ -56,7 +56,7 @@ function Slider:_init(props = {}) {
       {
         forced_width = SLIDER_ICON_SIZE,
         forced_height = SLIDER_ICON_SIZE,
-        image = get_full_asset_path('double-arrow-white.svg'),
+        image = svg('double-arrow', palette.white),
         widget = wibox.widget.imagebox,
       },
       direction = 'south',
@@ -68,7 +68,7 @@ function Slider:_init(props = {}) {
     widget = wibox.widget({
       forced_width = SLIDER_ICON_SIZE,
       forced_height = SLIDER_ICON_SIZE,
-      image = get_full_asset_path('double-arrow-white.svg'),
+      image = svg('double-arrow', palette.white),
       widget = wibox.widget.imagebox,
     }),
   })
@@ -78,7 +78,7 @@ function Slider:_init(props = {}) {
       {
         forced_width = SLIDER_ICON_SIZE,
         forced_height = SLIDER_ICON_SIZE,
-        image = get_full_asset_path('arrow-white.svg'),
+        image = svg('arrow', palette.white),
         widget = wibox.widget.imagebox,
       },
       direction = 'south',
@@ -90,7 +90,7 @@ function Slider:_init(props = {}) {
     widget = wibox.widget({
       forced_width = SLIDER_ICON_SIZE,
       forced_height = SLIDER_ICON_SIZE,
-      image = get_full_asset_path('arrow-white.svg'),
+      image = svg('arrow', palette.white),
       widget = wibox.widget.imagebox,
     }),
   })
@@ -127,19 +127,19 @@ function Slider:_init(props = {}) {
         if key == 'Down' || key == 'j' || key == 'h' {
           self._down_card.fg = palette.black
           self._down_card.bg = palette.white
-          self._down_card.widget.children[1].image = get_full_asset_path('arrow-black.svg')
+          self._down_card.widget.children[1].image = svg('arrow', palette.black)
         } elseif key == 'Up' || key == 'k' || key == 'l' {
           self._up_card.fg = palette.black
           self._up_card.bg = palette.white
-          self._up_card.widget.image = get_full_asset_path('arrow-black.svg')
+          self._up_card.widget.image = svg('arrow')
         } elseif key == 'd' {
           self._page_down_card.fg = palette.black
           self._page_down_card.bg = palette.white
-          self._page_down_card.widget.children[1].image = get_full_asset_path('double-arrow-black.svg')
+          self._page_down_card.widget.children[1].image = svg('double-arrow', palette.black)
         } elseif key == 'u' {
           self._page_up_card.fg = palette.black
           self._page_up_card.bg = palette.white
-          self._page_up_card.widget.image = get_full_asset_path('double-arrow-black.svg')
+          self._page_up_card.widget.image = svg('double-arrow', palette.black)
         }
       }
     },
@@ -148,22 +148,22 @@ function Slider:_init(props = {}) {
         if key == 'Down' || key == 'j' || key == 'h' {
           self._down_card.fg = palette.white
           self._down_card.bg = nil
-          self._down_card.widget.children[1].image = get_full_asset_path('arrow-white.svg')
+          self._down_card.widget.children[1].image = svg('arrow', palette.white)
           self:publish('down')
         } elseif key == 'Up' || key == 'k' || key == 'l' {
           self._up_card.fg = palette.white
           self._up_card.bg = nil
-          self._up_card.widget.image = get_full_asset_path('arrow-white.svg')
+          self._up_card.widget.image = svg('arrow', palette.white)
           self:publish('up')
         } elseif key == 'd' {
           self._page_down_card.fg = palette.white
           self._page_down_card.bg = nil
-          self._page_down_card.widget.children[1].image = get_full_asset_path('double-arrow-white.svg')
+          self._page_down_card.widget.children[1].image = svg('double-arrow', palette.white)
           self:publish('page_down')
         } elseif key == 'u' {
           self._page_up_card.fg = palette.white
           self._page_up_card.bg = nil
-          self._page_up_card.widget.image = get_full_asset_path('double-arrow-white.svg')
+          self._page_up_card.widget.image = svg('double-arrow', palette.white)
           self:publish('page_up')
         }
       }

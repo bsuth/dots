@@ -1,0 +1,150 @@
+local awful = require('awful')
+local models = require('models')
+local { NM_802_11_AP_SEC_KEY_MGMT_PSK } = require('utils.network_manager')
+local { trim } = require('utils.string')
+
+local unpack = unpack || table.unpack
+
+-- -----------------------------------------------------------------------------
+-- Generators
+-- -----------------------------------------------------------------------------
+
+local function wifi_connect() {
+  local tree = {}
+
+  local sorted_access_points = { unpack(models.wifi.device.access_points) }
+  table.sort(sorted_access_points, (a, b) -> a.strength > b.strength)
+
+  local access_point_ssids = {}
+
+  for _, access_point in ipairs(sorted_access_points) {
+    if !access_point.ssid || access_point_ssids[access_point.ssid] {
+      continue
+    } else {
+      access_point_ssids[access_point.ssid] = true
+    }
+
+    local access_point_connection_object_path = models.wifi:get_ssid_connection_object_path(access_point.ssid)
+
+    if access_point_connection_object_path {
+      table.insert(tree, {
+        label = access_point.ssid,
+        type = 'multiple',
+        callback = () -> models.wifi:activate_connection(access_point_connection_object_path),
+        hover_view = require('system_prompt.command_tree_views.wifi_connect_hover'),
+        hover_view_args = { access_point = access_point },
+      })
+    } elseif access_point.rsn_flags == 0 {
+      table.insert(tree, {
+        label = access_point.ssid,
+        type = 'multiple',
+        callback = () -> models.wifi:add_and_activate_connection(access_point.ssid),
+        hover_view = require('system_prompt.command_tree_views.wifi_connect_hover'),
+        hover_view_args = { access_point = access_point },
+      })
+    } elseif access_point.rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_PSK != 0 {
+      table.insert(tree, {
+        label = access_point.ssid,
+        type = 'view',
+        view = require('system_prompt.command_tree_views.wifi_connect'),
+        view_args = { ssid = access_point.ssid },
+        hover_view = require('system_prompt.command_tree_views.wifi_connect_hover'),
+        hover_view_args = { access_point = access_point },
+      })
+    }
+  }
+
+  return tree
+}
+
+local function wifi_forget() {
+  local tree = {}
+
+  for object_path, { ssid } in pairs(models.wifi.settings.connections) {
+    table.insert(tree, {
+      label = ssid,
+      type = 'multiple',
+      callback = () -> models.wifi.settings:delete(object_path),
+    })
+  }
+
+  return tree
+}
+
+local function wifi_password_show() {
+  local tree = {}
+
+  for _, { ssid, security } in pairs(models.wifi.settings.connections) {
+    if security == 'wpa-psk' {
+      table.insert(tree, {
+        label = ssid,
+        type = 'view',
+        view = require('system_prompt.command_tree_views.wifi_password_show'),
+        view_args = { ssid = ssid },
+      })
+    }
+  }
+
+  return tree
+}
+
+local function wifi_password_copy() {
+  local tree = {}
+
+  for object_path, { ssid, security } in pairs(models.wifi.settings.connections) {
+    if security == 'wpa-psk' {
+      table.insert(tree, {
+        label = ssid,
+        type = 'once',
+        callback = () -> {
+          local password = models.wifi.settings:secrets(object_path)
+          awful.spawn.with_shell("printf '{ password }' | xclip -sel c")
+        },
+      })
+    }
+  }
+
+  return tree
+}
+
+-- -----------------------------------------------------------------------------
+-- Wifi
+-- -----------------------------------------------------------------------------
+
+return {
+  label = 'wifi',
+  description = require('system_prompt.command_tree_descriptions.wifi'),
+  {
+    label = 'connect',
+    type = 'generate',
+    callback = wifi_connect,
+  },
+  {
+    label = 'scan',
+    type = 'multiple',
+    callback = () -> models.wifi.device:scan(),
+  },
+  {
+    label = 'disconnect',
+    type = 'multiple',
+    callback = () -> models.wifi.device:disconnect(),
+  },
+  {
+    label = 'forget',
+    type = 'generate',
+    callback = wifi_forget,
+  },
+  {
+    label = 'password',
+    {
+      label = 'show',
+      type = 'generate',
+      callback = wifi_password_show,
+    },
+    {
+      label = 'copy',
+      type = 'generate',
+      callback = wifi_password_copy,
+    },
+  },
+}

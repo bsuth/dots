@@ -1,67 +1,72 @@
 local wibox = require('wibox')
+local { palette } = require('core.theme')
 local models = require('models')
 local Slider = require('components.Slider')
-local { get_full_asset_path } = require('utils.theme')
+local Object = require('utils.Object')
+local svg = require('utils.svg')
 
-local text_widget = wibox.widget({
-  font = 'Quicksand Bold 16',
-  widget = wibox.widget.textbox,
-})
+local volume_gui_view = {}
 
-local function update_text() {
-  text_widget.text = "{ models.volume.percent }%"
+function volume_gui_view:_init() {
+  self._text_widget = wibox.widget({
+    font = 'Quicksand Bold 16',
+    widget = wibox.widget.textbox,
+  })
+
+  self:_update_text()
+  models.volume:subscribe('change_percent', () -> self:_update_text())
+
+  self._icon_widget = wibox.widget({
+    forced_width = 48,
+    forced_height = 48,
+    widget = wibox.widget.imagebox,
+  })
+
+  self:_update_icon()
+  models.volume:subscribe('change_active', () -> self:_update_icon())
+
+  self._slider = Slider({
+    keybindings = {
+      { {}, ' ', () -> models.volume:toggle() },
+    },
+    widget = wibox.widget({
+      {
+        self._icon_widget,
+        widget = wibox.container.place,
+      },
+      {
+        self._text_widget,
+        widget = wibox.container.place,
+      },
+      spacing = 8,
+      layout = wibox.layout.fixed.vertical,
+    }),
+  })
+
+  self._slider:subscribe('stop', () -> self:publish('stop'))
+  self._slider:subscribe('up', () -> { models.volume.percent += 5 })
+  self._slider:subscribe('down', () -> { models.volume.percent -= 5 })
+  self._slider:subscribe('page_up', () -> { models.volume.percent += 8 })
+  self._slider:subscribe('page_down', () -> { models.volume.percent -= 8 })
+
+  self.root_widget = wibox.widget({
+    self._slider.root_widget,
+    widget = wibox.container.place,
+  })
 }
 
-update_text()
-models.volume:subscribe('change_percent', update_text)
-
-local icon_widget = wibox.widget({
-  forced_width = 48,
-  forced_height = 48,
-  widget = wibox.widget.imagebox,
-})
-
-local function update_icon() {
-  icon_widget.image = models.volume.active
-    && get_full_asset_path('volume-active-white.svg')
-    || get_full_asset_path('volume-inactive-white.svg')
+function volume_gui_view:_update_text() {
+  self._text_widget.text = "{ models.volume.percent }%"
 }
 
-update_icon()
-models.volume:subscribe('change_active', update_icon)
+function volume_gui_view:_update_icon() {
+  self._icon_widget.image = models.volume.active
+    && svg('volume-active', palette.white)
+    || svg('volume-inactive', palette.white)
+}
 
-local volume_gui = Slider({
-  keybindings = {
-    { {}, ' ', () -> models.volume:toggle() },
-  },
-  widget = wibox.widget({
-    {
-      icon_widget,
-      widget = wibox.container.place,
-    },
-    {
-      text_widget,
-      widget = wibox.container.place,
-    },
-    spacing = 8,
-    layout = wibox.layout.fixed.vertical,
-  }),
-})
+function volume_gui_view:start() {
+  self._slider:start()
+}
 
-volume_gui:subscribe('up', () -> {
-  models.volume.percent += 5
-})
-
-volume_gui:subscribe('down', () -> {
-  models.volume.percent -= 5
-})
-
-volume_gui:subscribe('page_up', () -> {
-  models.volume.percent += 8
-})
-
-volume_gui:subscribe('page_down', () -> {
-  models.volume.percent -= 8
-})
-
-return volume_gui
+return Object(volume_gui_view)

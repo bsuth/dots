@@ -1,35 +1,39 @@
 local wibox = require('wibox')
 local models = require('models')
 local Slider = require('components.Slider')
+local Object = require('utils.Object')
 
-local text_widget = wibox.widget({
-  font = 'Quicksand Bold 16',
-  widget = wibox.widget.textbox,
-})
+local brightness_gui_view = {}
 
-local brightness_gui = Slider({ widget = text_widget })
+function brightness_gui_view:_init() {
+  self._text_widget = wibox.widget({
+    font = 'Quicksand Bold 16',
+    widget = wibox.widget.textbox,
+  })
 
-local function update_text() {
-  text_widget.text = "{ models.brightness.percent }%"
+  self:_update_text()
+  models.brightness:subscribe('change_percent', () -> self:_update_text())
+
+  self._slider = Slider({ widget = self._text_widget })
+
+  self._slider:subscribe('stop', () -> self:publish('stop'))
+  self._slider:subscribe('up', () -> { models.brightness.percent += 5 })
+  self._slider:subscribe('down', () -> { models.brightness.percent -= 5 })
+  self._slider:subscribe('page_up', () -> { models.brightness.percent += 8 })
+  self._slider:subscribe('page_down', () -> { models.brightness.percent -= 8 })
+
+  self.root_widget = wibox.widget({
+    self._slider.root_widget,
+    widget = wibox.container.place,
+  })
 }
 
-update_text()
-models.brightness:subscribe('change_percent', update_text)
+function brightness_gui_view:_update_text() {
+  self._text_widget.text = "{ models.brightness.percent }%"
+}
 
-brightness_gui:subscribe('up', () -> {
-  models.brightness.percent += 5
-})
+function brightness_gui_view:start() {
+  self._slider:start()
+}
 
-brightness_gui:subscribe('down', () -> {
-  models.brightness.percent -= 5
-})
-
-brightness_gui:subscribe('page_up', () -> {
-  models.brightness.percent += 8
-})
-
-brightness_gui:subscribe('page_down', () -> {
-  models.brightness.percent -= 8
-})
-
-return brightness_gui
+return Object(brightness_gui_view)

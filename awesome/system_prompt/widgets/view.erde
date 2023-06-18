@@ -1,0 +1,19 @@
+local wibox = require('wibox')
+local store = require('system_prompt.store')
+
+local root_widget = wibox.widget({
+  widget = wibox.container.margin, -- dummy container
+})
+
+local function update_widget() {
+  if store.view {
+    root_widget.children = { store.view.root_widget }
+  } else {
+    root_widget.children = {}
+  }
+}
+
+update_widget()
+store:subscribe('change_view', update_widget)
+
+return root_widget

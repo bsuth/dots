@@ -3,3 +3,24 @@
 module function trim(s) {
   return (s:gsub('^%s*(.*)%s*$', '%1'))
 }
+
+module function decode_char_bytes(char_bytes) {
+  local t = {}
+
+  for _, char_byte in ipairs(char_bytes) {
+    table.insert(t, string.char(char_byte))
+  }
+
+  return table.concat(t)
+}
+
+module function encode_char_bytes(s) {
+  local t = {}
+  local len = #s
+
+  for i = 1, len {
+    table.insert(t, string.byte(s:sub(i, i)))
+  }
+
+  return t
+}

@@ -1,0 +1,60 @@
+local wibox = require('wibox')
+local models = require('models')
+local { palette } = require('core.theme')
+local Card = require('components.Card')
+local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
+local Object = require('utils.Object')
+local { NM_802_11_AP_SEC_KEY_MGMT_PSK } = require('utils.network_manager')
+local svg = require('utils.svg')
+
+local wifi_connect_hover_view = {}
+
+function wifi_connect_hover_view:_init() {
+  self._is_known_card = Card()
+  self._requires_password_card = Card()
+  self._signal_strength_card = Card({ icon = svg('signal', palette.black) })
+
+  self.root_widget = wibox.widget({
+    {
+      self._is_known_card.root_widget,
+      self._requires_password_card.root_widget,
+      self._signal_strength_card.root_widget,
+      spacing = 16,
+      widget = wibox.layout.fixed.horizontal,
+    },
+    widget = wibox.container.place,
+  })
+}
+
+function wifi_connect_hover_view:update(args) {
+  local { ssid, rsn_flags, strength } = args.access_point
+
+  if models.wifi:get_ssid_connection_object_path(ssid) {
+    self._is_known_card.text = "true"
+    self._is_known_card.icon = svg('bookmark', palette.black)
+    self._is_known_card.bg = palette.green
+  } else {
+    self._is_known_card.text = "false"
+    self._is_known_card.icon = svg('unbookmarked', palette.black)
+    self._is_known_card.bg = palette.red
+  }
+
+  if rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_PSK != 0 {
+    self._requires_password_card.text = "true"
+    self._requires_password_card.icon = svg('lock', palette.black)
+    self._requires_password_card.bg = palette.green
+  } else {
+    self._requires_password_card.text = "false"
+    self._requires_password_card.icon = svg('unlock', palette.black)
+    self._requires_password_card.bg = palette.red
+  }
+
+  self._signal_strength_card.text = "{ strength }%"
+  self._signal_strength_card.bg = strength > 66
+    && palette.green
+    || strength > 33
+    && palette.yellow
+    || palette.red
+}
+
+return Object(wifi_connect_hover_view)

@@ -5,7 +5,50 @@ local Gio = lgi.require('Gio')
 module system_bus = Gio.bus_get_sync(Gio.BusType.SYSTEM)
 module session_bus = Gio.bus_get_sync(Gio.BusType.SESSION)
 
-local function lgi_extract_dbus_value(value) {
+-- DBus will return maps as arrays of 2-tuples, where the first entry is the
+-- key and the second entry is the value. This function decodes these into
+-- normal Lua tables.
+--
+-- NOTE: That there is no way to distinguish a real 2-tuple
+-- from a map value without knowing the type beforehand, so this may
+-- incorrectly decode values. If the return value contains arrays of strings,
+-- this function should not be used.
+module function decode_dbus_value(value) {
+  if type(value) != 'table' {
+    return value
+  }
+
+  -- DBus will collapse maps that only have one property into a 2-tuple (for
+  -- god knows whatever reason) so we assume that any 2-tuple where the first
+  -- entry is a string is a collapsed map.
+  if #value == 2 && type(value[1]) == 'string' {
+    return { [value[1]] = decode_dbus_value(value[2]) }
+  }
+
+  local is_dbus_map = true
+  for _, subvalue in ipairs(value) {
+    if type(subvalue) != 'table' || #subvalue != 2 || type(subvalue[1]) != 'string' {
+      is_dbus_map = false
+      break
+    }
+  }
+
+  local t = {}
+
+  if is_dbus_map {
+    for _, [ subkey, subvalue ] in ipairs(value) {
+      t[subkey] = decode_dbus_value(subvalue)
+    }
+  } else {
+    for _, subvalue in ipairs(value) {
+      table.insert(t, decode_dbus_value(subvalue))
+    }
+  }
+
+  return t
+}
+
+module function lgi_extract_dbus_value(value) {
   local value_type = type(value)
 
   if value_type != 'table' && value_type != 'userdata' {
@@ -15,7 +58,11 @@ local function lgi_extract_dbus_value(value) {
   local value_len = #value
 
   if value_type == 'userdata' && value_len == 0 {
-    return lgi_extract_dbus_value(value.value)
+    if value == value.value {
+      return value -- object or infinite loop, cannot destruct
+    } else {
+      return lgi_extract_dbus_value(value.value)
+    }
   }
 
   local t = {}
@@ -51,18 +98,17 @@ module function dbus_call_sync(bus, args) {
   )
 
   if err {
-    naughty.notify({
-      force = true,
-      title = 'dbus_call_sync error',
-      text = table.concat({
-        "error: { err.value }",
-        "bus_name: { args.bus_name }",
-        "object_path: { args.object_path }",
-        "interface_name: { args.interface_name }",
-        "method_name: { args.method_name }",
-        "parameters: { args.parameters }",
-      }, '\n'),
-    })
+    local message = table.concat({
+      "DBus Error: { err }",
+      "bus_name: { args.bus_name }",
+      "object_path: { args.object_path }",
+      "interface_name: { args.interface_name }",
+      "method_name: { args.method_name }",
+      "parameters: { args.parameters }",
+    }, '\n')
+
+    naughty.notify({ force = true, text = message })
+    error(message)
   }
 
   return lgi_extract_dbus_value(var)

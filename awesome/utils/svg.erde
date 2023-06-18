@@ -1,0 +1,8 @@
+local gears = require('gears')
+
+local ENV_DOTS = os.getenv('DOTS')
+
+return (name, color) -> {
+  local full_path = "{ENV_DOTS}/awesome/assets/{name}.svg"
+  return color == nil && full_path || gears.color.recolor_image(full_path, color)
+}

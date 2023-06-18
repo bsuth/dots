@@ -1,0 +1,84 @@
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local models = require('models')
+local Class = require('utils.Class')
+local dummy_widget = require('utils.dummy_widget')
+
+-- -----------------------------------------------------------------------------
+-- Notification History Item
+-- -----------------------------------------------------------------------------
+
+local NotificationsHistoryItem = Class()
+
+function NotificationsHistoryItem:_init() {
+  self._text_widget = wibox.widget({
+    font = 'Quicksand Medium 16',
+    widget = wibox.widget.textbox,
+  })
+
+  self._timestamp_widget = wibox.widget({
+    font = 'Quicksand Medium 16',
+    widget = wibox.widget.textbox,
+  })
+
+  self.root_widget = wibox.widget({
+    {
+      self._timestamp_widget,
+      fg = '#777777',
+      widget = wibox.container.background,
+    },
+    self._text_widget,
+    spacing = 16,
+    layout = wibox.layout.fixed.horizontal,
+  })
+}
+
+function NotificationsHistoryItem:_on_change_notification() {
+  self._timestamp_widget.text = os.date('%H:%M:%S', self.notification.timestamp)
+  self._text_widget.text = self.notification.text
+}
+
+-- -----------------------------------------------------------------------------
+-- Description
+-- -----------------------------------------------------------------------------
+
+local notifications_history_items = {}
+
+local notifications_history_widget = wibox.widget({
+  spacing = 32,
+  layout = wibox.layout.fixed.vertical,
+})
+
+local function update_history() {
+  local notifications_history_len = #models.notifications.history
+  local notifications_history_items_len = #notifications_history_items
+
+  for i = notifications_history_items_len + 1, notifications_history_len {
+    table.insert(notifications_history_items, NotificationsHistoryItem())
+  }
+
+  for i = notifications_history_len + 1, notifications_history_items_len {
+    table.remove(notifications_history_items)
+  }
+
+  local new_children = {}
+
+  for i, notifications_history_item in ipairs(notifications_history_items) {
+    notifications_history_item.notification = models.notifications.history[i]
+    table.insert(new_children, notifications_history_item.root_widget)
+  }
+
+  notifications_history_widget.children = new_children
+}
+
+update_history()
+models.notifications:subscribe('change_history', update_history)
+
+return wibox.widget({
+  {
+    notifications_history_widget,
+    widget = wibox.container.place,
+  },
+  margins = 64,
+  widget = wibox.container.margin,
+})

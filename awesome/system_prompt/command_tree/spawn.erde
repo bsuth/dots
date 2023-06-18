@@ -1,0 +1,50 @@
+local awful = require('awful')
+
+return {
+  label = 'spawn',
+  {
+    label = 'dfeet',
+    type = 'once',
+    callback = () -> awful.spawn('d-feet'),
+  },
+  {
+    label = 'discord',
+    type = 'once',
+    callback = () -> awful.spawn('discord'),
+  },
+  {
+    label = 'firefox',
+    type = 'once',
+    callback = () -> awful.spawn('firefox-developer-edition'),
+  },
+  {
+    label = 'flameshot',
+    type = 'once',
+    callback = () -> awful.spawn('flameshot gui'),
+  },
+  {
+    label = 'gimp',
+    type = 'once',
+    callback = () -> awful.spawn('gimp'),
+  },
+  {
+    label = 'gpick',
+    type = 'once',
+    callback = () -> awful.spawn.with_shell("gpick -s -o | tr -d '\\n' | xclip -sel c"),
+  },
+  {
+    label = 'inkscape',
+    type = 'once',
+    callback = () -> awful.spawn('inkscape'),
+  },
+  {
+    label = 'simplescreenrecorder',
+    type = 'once',
+    callback = () -> awful.spawn('simplescreenrecorder'),
+  },
+  {
+    label = 'steam',
+    type = 'once',
+    callback = () -> awful.spawn('steam'),
+  },
+}

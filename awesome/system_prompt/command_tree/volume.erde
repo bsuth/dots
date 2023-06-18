@@ -1,0 +1,45 @@
+local models = require('models')
+
+return {
+  label = 'volume',
+  {
+    label = 'gui',
+    type = 'view',
+    view = require('system_prompt.command_tree_views.volume_gui'),
+  },
+  {
+    label = 'mute',
+    type = 'multiple',
+    callback = () -> { models.volume.active = false },
+  },
+  {
+    label = 'unmute',
+    type = 'multiple',
+    callback = () -> { models.volume.active = true },
+  },
+  {
+    label = 'toggle',
+    type = 'multiple',
+    callback = () -> models.volume:toggle(),
+  },
+  {
+    label = 'min',
+    type = 'multiple',
+    callback = () -> { models.volume.percent = 0 },
+  },
+  {
+    label = 'max',
+    type = 'multiple',
+    callback = () -> { models.volume.percent = 100 },
+  },
+  {
+    label = 'up',
+    type = 'multiple',
+    callback = () -> { models.volume.percent += 5 },
+  },
+  {
+    label = 'down',
+    type = 'multiple',
+    callback = () -> { models.volume.percent -= 5 },
+  },
+}

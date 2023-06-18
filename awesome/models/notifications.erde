@@ -1,15 +1,59 @@
 local naughty = require('naughty')
 local Object = require('utils.Object')
 
+local NOTIFICATIONS_HISTORY_SIZE = 5
+
+-- -----------------------------------------------------------------------------
+-- Notifications
+-- -----------------------------------------------------------------------------
+
 local notifications = Object({
-  -- DO NOT USE `naughty.is_suspended()`. We use a custom `active` property instead,
-  -- since `naughty.suspend()` will ***save and queue*** notifications.
-  _init = () => self:set('active', false),
-  toggle = () => self:set('active', !self.active),
+  _init = () => {
+    self:rawset('history', {})
+
+    -- DO NOT USE `naughty.is_suspended()`. We use a custom `active` property instead,
+    -- since `naughty.suspend()` will ***save and queue*** notifications.
+    self:rawset('active', false)
+  },
+  toggle = () => {
+    self.active = !self.active
+  },
+  clear = () => {
+    self.history = {}
+  },
 })
 
+-- -----------------------------------------------------------------------------
+-- Notify
+-- -----------------------------------------------------------------------------
+
 -- `notification.force` is a custom property to bypass `notifications.active`
-naughty.config.notify_callback = notification ->
-  (notifications.active || notification.force) && notification || nil
+naughty.config.notify_callback = notification -> {
+  -- Some notifications use `text` (awesomewm) and some use `message` (notify-send)
+  local notification_text = notification.text || notification.message
+
+  if notification_text {
+    local new_history = {}
+
+    table.insert(new_history, {
+      text = notification_text,
+      timestamp = os.time(os.date("!*t")),
+    })
+
+    local history_limit = math.min(#notifications.history, NOTIFICATIONS_HISTORY_SIZE - 1)
+    for i = 1, history_limit {
+      table.insert(new_history, notifications.history[i])
+    }
+
+    notifications.history = new_history
+  }
+
+  notifications:publish('notify', notification)
+  return (notifications.active || notification.force) && notification
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
 
 return notifications

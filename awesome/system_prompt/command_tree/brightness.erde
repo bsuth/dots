@@ -1,0 +1,31 @@
+local models = require('models')
+
+return {
+  label = 'brightness',
+  description = require('system_prompt.command_tree_descriptions.brightness'),
+  {
+    label = 'gui',
+    type = 'view',
+    view = require('system_prompt.command_tree_views.brightness_gui'),
+  },
+  {
+    label = 'min',
+    type = 'multiple',
+    callback = () -> { models.brightness.percent = 0 },
+  },
+  {
+    label = 'max',
+    type = 'multiple',
+    callback = () -> { models.brightness.percent = 100 },
+  },
+  {
+    label = 'up',
+    type = 'multiple',
+    callback = () -> { models.brightness.percent += 8 },
+  },
+  {
+    label = 'down',
+    type = 'multiple',
+    callback = () -> { models.brightness.percent -= 8 },
+  },
+}
