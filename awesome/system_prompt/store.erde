@@ -14,8 +14,6 @@ local store = {}
 -- -----------------------------------------------------------------------------
 
 function store:_init() {
-  self:_reset()
-
   self.veil = Veil({
     color = '#000000dd',
   })
@@ -37,15 +35,8 @@ function store:_init() {
   self.prompt:subscribe('user_change', () -> self:_update_filter())
   self.prompt:subscribe('cancel', () -> self:_on_prompt_cancel())
   self.prompt:subscribe('submit', () -> self:_on_prompt_submit())
-}
 
-function store:_reset() {
-  self:rawset('path', {})
-  self.active_node = command_tree
-  self.filtered_active_node = command_tree
-  self.description = self.active_node.description
-  self.selected_child_index = 1
-  self.selected_child = self.filtered_active_node[self.selected_child_index]
+  self.path = {}
 }
 
 function store:_traverse_node(node) {
@@ -98,7 +89,7 @@ function store:_on_change_selected_child() {
 
 function store:_on_prompt_cancel() {
   self.veil.active = false
-  self:_reset()
+  self.path = {}
 }
 
 function store:_on_prompt_submit() {
@@ -108,11 +99,11 @@ function store:_on_prompt_submit() {
     package.loaded['system_prompt.command_tree'] = nil -- force reload
     command_tree = require('system_prompt.command_tree')
     self.veil.active = false
-    self:_reset()
+    self.path = {}
   } elseif self.selected_child.type == 'once' {
     self.selected_child.callback()
     self.veil.active = false
-    self:_reset()
+    self.path = {}
   } elseif self.selected_child.type == 'multiple' {
     self.selected_child.callback()
     self.prompt:start()
