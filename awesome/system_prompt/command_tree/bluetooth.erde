@@ -1,0 +1,107 @@
+local models = require('models')
+
+-- -----------------------------------------------------------------------------
+-- Generators
+-- -----------------------------------------------------------------------------
+
+local function bluetooth_connect() {
+  local tree = {}
+
+  for object_path, device in pairs(models.bluetooth.devices) {
+    if device.paired && !device.connected {
+      table.insert(tree, {
+        label = device.name,
+        type = 'multiple',
+        callback = () -> device:connect(),
+      })
+    }
+  }
+
+  return tree
+}
+
+local function bluetooth_disconnect() {
+  local tree = {}
+
+  for _, device in pairs(models.bluetooth.devices) {
+    if device.connected {
+      table.insert(tree, {
+        label = device.name,
+        type = 'multiple',
+        callback = () -> device:disconnect(),
+      })
+    }
+  }
+
+  return tree
+}
+
+local function bluetooth_pair() {
+  local tree = {}
+
+  for _, device in pairs(models.bluetooth.devices) {
+    if !device.paired {
+      table.insert(tree, {
+        label = device.name,
+        type = 'multiple',
+        callback = () -> device:pair(),
+      })
+    }
+  }
+
+  return tree
+}
+
+local function bluetooth_forget() {
+  local tree = {}
+
+  for _, device in pairs(models.bluetooth.devices) {
+    if device.paired {
+      table.insert(tree, {
+        label = device.name,
+        type = 'multiple',
+        callback = () -> models.bluetooth.adapter:forget(device.object_path),
+      })
+    }
+  }
+
+  return tree
+}
+
+-- -----------------------------------------------------------------------------
+-- Bluetooth
+-- -----------------------------------------------------------------------------
+
+return {
+  label = 'bluetooth',
+  {
+    label = 'connect',
+    type = 'generate',
+    callback = bluetooth_connect,
+  },
+  {
+    label = 'disconnect',
+    type = 'generate',
+    callback = bluetooth_disconnect,
+  },
+  {
+    label = 'pair',
+    type = 'generate',
+    callback = bluetooth_pair,
+  },
+  {
+    label = 'forget',
+    type = 'generate',
+    callback = bluetooth_forget,
+  },
+  {
+    label = 'start discovery',
+    type = 'multiple',
+    callback = () -> models.bluetooth.adapter:start_discovery(),
+  },
+  {
+    label = 'stop discovery',
+    type = 'multiple',
+    callback = () -> models.bluetooth.adapter:stop_discovery(),
+  },
+}

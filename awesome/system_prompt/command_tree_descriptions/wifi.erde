@@ -39,8 +39,18 @@ local ssid_widget = wibox.widget({
 local requires_password_card = Card()
 local signal_strength_card = Card({ icon = svg('signal', palette.black) })
 
+local function update_access_point_strength() {
+  local { strength } = models.wifi.device.active_access_point
+  signal_strength_card.text = "{ strength }%"
+  signal_strength_card.bg = strength > 66
+    && palette.green
+    || strength > 33
+    && palette.yellow
+    || palette.red
+}
+
 local function update_access_point() {
-  local { ssid, rsn_flags, strength } = models.wifi.device.active_access_point
+  local { ssid, rsn_flags } = models.wifi.device.active_access_point
 
   ssid_widget.text = ssid
 
@@ -54,12 +64,7 @@ local function update_access_point() {
     requires_password_card.bg = palette.red
   }
 
-  signal_strength_card.text = "{ strength }%"
-  signal_strength_card.bg = strength > 66
-    && palette.green
-    || strength > 33
-    && palette.yellow
-    || palette.red
+  update_access_point_strength()
 }
 
 if models.wifi.device.active_access_point {
@@ -68,11 +73,11 @@ if models.wifi.device.active_access_point {
 
 models.wifi.device:subscribe('change_active_access_point', (new_active_access_point, old_active_access_point) -> {
   if old_active_access_point {
-    old_active_access_point:unsubscribe('update', update_access_point)
+    old_active_access_point:unsubscribe('change_strength', update_access_point_strength)
   }
 
   if new_active_access_point {
-    new_active_access_point:subscribe('update', update_access_point)
+    new_active_access_point:subscribe('change_strength', update_access_point_strength)
     update_access_point()
   }
 })

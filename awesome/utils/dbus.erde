@@ -98,18 +98,18 @@ module function dbus_call_sync(bus, args) {
   )
 
   if err {
-    local message = table.concat({
-      "DBus Error: { err }",
-      "bus_name: { args.bus_name }",
-      "object_path: { args.object_path }",
-      "interface_name: { args.interface_name }",
-      "method_name: { args.method_name }",
-      "parameters: { args.parameters }",
-    }, '\n')
-
-    naughty.notify({ force = true, text = message })
-    error(message)
+    naughty.notify({
+      force = true,
+      text = table.concat({
+        "DBus Error: { err }",
+        "bus_name: { args.bus_name }",
+        "object_path: { args.object_path }",
+        "interface_name: { args.interface_name }",
+        "method_name: { args.method_name }",
+        "parameters: { args.parameters }",
+      }, '\n'),
+    })
+  } else {
+    return lgi_extract_dbus_value(var)
   }
-
-  return lgi_extract_dbus_value(var)
 }

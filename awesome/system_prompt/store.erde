@@ -28,6 +28,8 @@ function store:_init() {
       { { 'Shift' }, 'Tab', () -> self:prev() },
       { {}, 'Tab', () -> self:next() },
       { {}, 'Escape', () -> self:back() },
+      { { 'Control' }, 'r', () -> self:_update_filter() },
+      { { 'Mod4' }, ';', () -> self.prompt:cancel() },
       { { 'Mod4' }, ';', () -> self.prompt:cancel() },
     },
   })

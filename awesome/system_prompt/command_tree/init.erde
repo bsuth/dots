@@ -1,5 +1,6 @@
 return {
   description = 'System Prompt',
+  require('system_prompt.command_tree.bluetooth'),
   require('system_prompt.command_tree.brightness'),
   require('system_prompt.command_tree.notifications'),
   { label = 'reload', type = 'reload' },

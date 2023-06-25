@@ -1,4 +1,5 @@
 module battery = require('models.battery')
+module bluetooth = require('models.bluetooth')
 module brightness = require('models.brightness')
 module notifications = require('models.notifications')
 module volume = require('models.volume')

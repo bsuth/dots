@@ -1,0 +1,244 @@
+local naughty = require('naughty')
+local lgi = require('lgi')
+local GLib = lgi.require('GLib')
+local Gio = lgi.require('Gio')
+local Class = require('utils.Class')
+local Object = require('utils.Object')
+local { system_bus, decode_dbus_value, lgi_extract_dbus_value, dbus_call_sync } = require('utils.dbus')
+
+-- -----------------------------------------------------------------------------
+-- Bluetooth Adapter
+-- -----------------------------------------------------------------------------
+
+local bluetooth_adapter = {}
+
+function bluetooth_adapter:_init() {
+  self.discovering = false
+}
+
+function bluetooth_adapter:_on_change_object_path() {
+  if self._properties_changed_subscription {
+    system_bus:signal_unsubscribe(self._properties_changed_subscription)
+  }
+
+  if self.object_path {
+    self._properties_changed_subscription = system_bus:signal_subscribe(
+      nil,
+      'org.freedesktop.DBus.Properties',
+      'PropertiesChanged',
+      self.object_path,
+      nil,
+      Gio.DBusSignalFlags.NONE,
+      (_, _, _, _, _, parameters) -> {
+        local [ _, properties ] = lgi_extract_dbus_value(parameters)
+        self:_update_properties(decode_dbus_value(properties))
+      },
+    )
+  }
+}
+
+function bluetooth_adapter:_update_properties(properties) {
+  if properties.Discovering != nil {
+    self.discovering = properties.Discovering
+  }
+}
+
+function bluetooth_adapter:sanity_check() {
+  if !self.object_path {
+    naughty.notify({ force = true, text = 'No bluetooth adapter found' })
+  }
+
+  return self.object_path
+}
+
+function bluetooth_adapter:start_discovery() {
+  if !self:sanity_check() {
+    return
+  }
+
+  if !self.discovering {
+    dbus_call_sync(system_bus, {
+      bus_name = 'org.bluez',
+      object_path = self.object_path,
+      interface_name = 'org.bluez.Adapter1',
+      method_name = 'StartDiscovery',
+    })
+  }
+}
+
+function bluetooth_adapter:stop_discovery() {
+  if !self:sanity_check() {
+    return
+  }
+
+  if self.discovering {
+    dbus_call_sync(system_bus, {
+      bus_name = 'org.bluez',
+      object_path = self.object_path,
+      interface_name = 'org.bluez.Adapter1',
+      method_name = 'StopDiscovery',
+    })
+  }
+}
+
+function bluetooth_adapter:forget(device_object_path) {
+  if !self:sanity_check() {
+    return
+  }
+
+  dbus_call_sync(system_bus, {
+    bus_name = 'org.bluez',
+    object_path = self.object_path,
+    interface_name = 'org.bluez.Adapter1',
+    method_name = 'RemoveDevice',
+    parameters = GLib.Variant('(o)', { device_object_path }),
+  })
+}
+
+-- -----------------------------------------------------------------------------
+-- Bluetooth Device
+-- -----------------------------------------------------------------------------
+
+local BluetoothDevice = Class()
+
+function BluetoothDevice:_init(props = {}) {
+  self.object_path = props.object_path
+  self.name = props.name
+  self.connected = props.connected
+  self.paired = props.paired
+
+  self._properties_changed_subscription = system_bus:signal_subscribe(
+    nil,
+    'org.freedesktop.DBus.Properties',
+    'PropertiesChanged',
+    self.object_path,
+    nil,
+    Gio.DBusSignalFlags.NONE,
+    (_, _, _, _, _, parameters) -> {
+      local [ _, properties ] = lgi_extract_dbus_value(parameters)
+      self:_update_properties(decode_dbus_value(properties))
+    },
+  )
+}
+
+function BluetoothDevice:_update_properties(properties) {
+  if properties.Connected != nil {
+    self.connected = properties.Connected
+  }
+
+  if properties.Paired != nil {
+    self.paired = properties.Paired
+  }
+}
+
+function BluetoothDevice:cleanup() {
+  system_bus:signal_unsubscribe(self._properties_changed_subscription)
+}
+
+function BluetoothDevice:connect() {
+  dbus_call_sync(system_bus, {
+    bus_name = 'org.bluez',
+    object_path = self.object_path,
+    interface_name = 'org.bluez.Device1',
+    method_name = 'Connect',
+  })
+}
+
+function BluetoothDevice:disconnect() {
+  dbus_call_sync(system_bus, {
+    bus_name = 'org.bluez',
+    object_path = self.object_path,
+    interface_name = 'org.bluez.Device1',
+    method_name = 'Disconnect',
+  })
+}
+
+function BluetoothDevice:pair() {
+  dbus_call_sync(system_bus, {
+    bus_name = 'org.bluez',
+    object_path = self.object_path,
+    interface_name = 'org.bluez.Device1',
+    method_name = 'Pair',
+  })
+}
+
+-- -----------------------------------------------------------------------------
+-- Bluetooth
+-- -----------------------------------------------------------------------------
+
+local bluetooth = {}
+
+function bluetooth:_init() {
+  self.adapter = Object(bluetooth_adapter)
+  self.devices = {}
+
+  local managed_objects = decode_dbus_value(dbus_call_sync(system_bus, {
+    bus_name = 'org.bluez',
+    object_path = '/',
+    interface_name = 'org.freedesktop.DBus.ObjectManager',
+    method_name = 'GetManagedObjects',
+  }))
+
+  if managed_objects != nil {
+    for object_path, managed_object in pairs(managed_objects) {
+      self:_add_managed_object(object_path, managed_object)
+    }
+  }
+
+  system_bus:signal_subscribe(
+    'org.bluez',
+    'org.freedesktop.DBus.ObjectManager',
+    'InterfacesAdded',
+    '/',
+    nil,
+    Gio.DBusSignalFlags.NONE,
+    (_, _, _, _, _, parameters) -> {
+      local [ object_path, managed_object ] = lgi_extract_dbus_value(parameters)
+      self:_add_managed_object(object_path, decode_dbus_value(managed_object))
+    },
+  )
+
+  system_bus:signal_subscribe(
+    'org.bluez',
+    'org.freedesktop.DBus.ObjectManager',
+    'InterfacesRemoved',
+    '/',
+    nil,
+    Gio.DBusSignalFlags.NONE,
+    (_, _, _, _, _, parameters) -> {
+      local [ object_path, removed_interfaces ] = lgi_extract_dbus_value(parameters)
+      self:_remove_managed_object(object_path, removed_interfaces)
+    },
+  )
+}
+
+function bluetooth:_add_managed_object(object_path, managed_object) {
+  if managed_object['org.bluez.Adapter1'] {
+    self.adapter.object_path = object_path
+    self.adapter.discovering = managed_object['org.bluez.Adapter1'].Discovering
+  } elseif managed_object['org.bluez.Device1'] && managed_object['org.bluez.Device1'].Name {
+    self.devices[object_path] ||= BluetoothDevice({
+      object_path = object_path,
+      name = managed_object['org.bluez.Device1'].Name,
+      connected = managed_object['org.bluez.Device1'].Connected,
+      paired = managed_object['org.bluez.Device1'].Paired,
+    })
+  }
+}
+
+function bluetooth:_remove_managed_object(object_path, removed_interfaces) {
+  for _, removed_interface in ipairs(removed_interfaces) {
+    if removed_interface == 'org.bluez.Adapter1' {
+      self.adapter.object_path = nil
+    } elseif removed_interface == 'org.bluez.Device1' && self.devices[object_path] {
+      self.devices[object_path]:cleanup()
+      self.devices[object_path] = nil
+    }
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Object(bluetooth)
