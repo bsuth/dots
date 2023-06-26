@@ -97,11 +97,6 @@ function store:_on_prompt_cancel() {
 function store:_on_prompt_submit() {
   if !self.selected_child {
     self.prompt:start(self.prompt.text)
-  } elseif self.selected_child.type == 'reload' {
-    package.loaded['system_prompt.command_tree'] = nil -- force reload
-    command_tree = require('system_prompt.command_tree')
-    self.veil.active = false
-    self.path = {}
   } elseif self.selected_child.type == 'once' {
     self.selected_child.callback()
     self.veil.active = false

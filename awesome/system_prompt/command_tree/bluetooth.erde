@@ -52,7 +52,7 @@ local function bluetooth_pair() {
   return tree
 }
 
-local function bluetooth_forget() {
+local function bluetooth_remove() {
   local tree = {}
 
   for _, device in pairs(models.bluetooth.devices) {
@@ -60,7 +60,7 @@ local function bluetooth_forget() {
       table.insert(tree, {
         label = device.name,
         type = 'multiple',
-        callback = () -> models.bluetooth.adapter:forget(device.object_path),
+        callback = () -> device:remove(),
       })
     }
   }
@@ -74,6 +74,7 @@ local function bluetooth_forget() {
 
 return {
   label = 'bluetooth',
+  description = require('system_prompt.command_tree_descriptions.bluetooth'),
   {
     label = 'connect',
     type = 'generate',
@@ -90,9 +91,19 @@ return {
     callback = bluetooth_pair,
   },
   {
-    label = 'forget',
+    label = 'remove',
     type = 'generate',
-    callback = bluetooth_forget,
+    callback = bluetooth_remove,
+  },
+  {
+    label = 'power on',
+    type = 'multiple',
+    callback = () -> models.bluetooth.adapter:power_on(),
+  },
+  {
+    label = 'power off',
+    type = 'multiple',
+    callback = () -> models.bluetooth.adapter:power_off(),
   },
   {
     label = 'start discovery',

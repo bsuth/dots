@@ -1,0 +1,109 @@
+local wibox = require('wibox')
+local { palette } = require('core.theme')
+local models = require('models')
+local Card = require('components.Card')
+local svg = require('utils.svg')
+
+-- -----------------------------------------------------------------------------
+-- Adapter Powered
+-- -----------------------------------------------------------------------------
+
+local adapter_powered = Card({ icon = svg('battery-charging', palette.black) })
+
+local function update_adapter_powered() {
+  if models.bluetooth.adapter.powered {
+    adapter_powered.text = 'true'
+    adapter_powered.bg = palette.green
+  } else {
+    adapter_powered.text = 'false'
+    adapter_powered.bg = palette.red
+  }
+}
+
+update_adapter_powered()
+models.bluetooth.adapter:subscribe('change_powered', update_adapter_powered)
+
+-- -----------------------------------------------------------------------------
+-- Adapter Discovering
+-- -----------------------------------------------------------------------------
+
+local adapter_discovering = Card({ icon = svg('signal', palette.black) })
+
+local function update_adapter_discovering() {
+  if models.bluetooth.adapter.discovering {
+    adapter_discovering.text = 'true'
+    adapter_discovering.bg = palette.green
+  } else {
+    adapter_discovering.text = 'false'
+    adapter_discovering.bg = palette.red
+  }
+}
+
+update_adapter_discovering()
+models.bluetooth.adapter:subscribe('change_discovering', update_adapter_discovering)
+
+-- -----------------------------------------------------------------------------
+-- Connected Devices
+-- -----------------------------------------------------------------------------
+
+local connected_devices_widget = wibox.widget({
+  spacing = 8,
+  layout = wibox.layout.fixed.vertical,
+})
+
+local function update_connected_devices() {
+  local new_children = {}
+
+  for _, device in pairs(models.bluetooth.devices) {
+    if device.connected {
+      table.insert(new_children, wibox.widget({
+        text = device.name,
+        font = 'Quicksand SemiBold 24',
+        align = 'center',
+        widget = wibox.widget.textbox,
+      }))
+    }
+  }
+
+  connected_devices_widget.children = new_children
+}
+
+update_connected_devices()
+for _, device in pairs(models.bluetooth.devices) {
+  device:subscribe('change_connected', update_connected_devices)
+}
+
+models.bluetooth:subscribe('device_added', device -> {
+  device:subscribe('change_connected', update_connected_devices)
+  if device.connected {
+    update_connected_devices()
+  }
+})
+
+models.bluetooth:subscribe('device_removed', device -> {
+  if device.connected {
+    update_connected_devices()
+  }
+})
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return wibox.widget({
+  {
+    connected_devices_widget,
+    {
+      {
+        adapter_powered.root_widget,
+        adapter_discovering.root_widget,
+        spacing = 8,
+        layout = wibox.layout.fixed.horizontal,
+      },
+      widget = wibox.container.place,
+    },
+    spacing = 16,
+    layout = wibox.layout.fixed.vertical,
+  },
+  widget = wibox.container.place,
+})

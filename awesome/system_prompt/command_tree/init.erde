@@ -3,7 +3,6 @@ return {
   require('system_prompt.command_tree.bluetooth'),
   require('system_prompt.command_tree.brightness'),
   require('system_prompt.command_tree.notifications'),
-  { label = 'reload', type = 'reload' },
   require('system_prompt.command_tree.spawn'),
   require('system_prompt.command_tree.system'),
   require('system_prompt.command_tree.volume'),

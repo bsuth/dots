@@ -13,6 +13,7 @@ local { system_bus, decode_dbus_value, lgi_extract_dbus_value, dbus_call_sync } 
 local bluetooth_adapter = {}
 
 function bluetooth_adapter:_init() {
+  self.powered = false
   self.discovering = false
 }
 
@@ -21,7 +22,22 @@ function bluetooth_adapter:_on_change_object_path() {
     system_bus:signal_unsubscribe(self._properties_changed_subscription)
   }
 
-  if self.object_path {
+  if self.object_path == nil {
+    self.powered = false
+    self.discovering = false
+  } else {
+    local all_properties = decode_dbus_value(dbus_call_sync(system_bus, {
+      bus_name = 'org.bluez',
+      object_path = self.object_path,
+      interface_name = 'org.freedesktop.DBus.Properties',
+      method_name = 'GetAll',
+      parameters = GLib.Variant('(s)', { 'org.bluez.Adapter1' }),
+    }))
+
+    if all_properties != nil {
+      self:_update_properties(all_properties)
+    }
+
     self._properties_changed_subscription = system_bus:signal_subscribe(
       nil,
       'org.freedesktop.DBus.Properties',
@@ -38,6 +54,10 @@ function bluetooth_adapter:_on_change_object_path() {
 }
 
 function bluetooth_adapter:_update_properties(properties) {
+  if properties.Powered != nil {
+    self.powered = properties.Powered
+  }
+
   if properties.Discovering != nil {
     self.discovering = properties.Discovering
   }
@@ -49,6 +69,34 @@ function bluetooth_adapter:sanity_check() {
   }
 
   return self.object_path
+}
+
+function bluetooth_adapter:power_on() {
+  if !self:sanity_check() {
+    return
+  }
+
+  dbus_call_sync(system_bus, {
+    bus_name = 'org.bluez',
+    object_path = self.object_path,
+    interface_name = 'org.freedesktop.DBus.Properties',
+    method_name = 'Set',
+    parameters = GLib.Variant('(ssv)', { 'org.bluez.Adapter1', 'Powered', GLib.Variant('b', true) }),
+  })
+}
+
+function bluetooth_adapter:power_off() {
+  if !self:sanity_check() {
+    return
+  }
+
+  dbus_call_sync(system_bus, {
+    bus_name = 'org.bluez',
+    object_path = self.object_path,
+    interface_name = 'org.freedesktop.DBus.Properties',
+    method_name = 'Set',
+    parameters = GLib.Variant('(ssv)', { 'org.bluez.Adapter1', 'Powered', GLib.Variant('b', false) }),
+  })
 }
 
 function bluetooth_adapter:start_discovery() {
@@ -81,20 +129,6 @@ function bluetooth_adapter:stop_discovery() {
   }
 }
 
-function bluetooth_adapter:forget(device_object_path) {
-  if !self:sanity_check() {
-    return
-  }
-
-  dbus_call_sync(system_bus, {
-    bus_name = 'org.bluez',
-    object_path = self.object_path,
-    interface_name = 'org.bluez.Adapter1',
-    method_name = 'RemoveDevice',
-    parameters = GLib.Variant('(o)', { device_object_path }),
-  })
-}
-
 -- -----------------------------------------------------------------------------
 -- Bluetooth Device
 -- -----------------------------------------------------------------------------
@@ -103,6 +137,7 @@ local BluetoothDevice = Class()
 
 function BluetoothDevice:_init(props = {}) {
   self.object_path = props.object_path
+  self.adapter_object_path = props.adapter_object_path
   self.name = props.name
   self.connected = props.connected
   self.paired = props.paired
@@ -136,6 +171,9 @@ function BluetoothDevice:cleanup() {
 }
 
 function BluetoothDevice:connect() {
+  -- TODO: revert if incorrect
+  self.connected = true -- optimistic
+
   dbus_call_sync(system_bus, {
     bus_name = 'org.bluez',
     object_path = self.object_path,
@@ -145,6 +183,9 @@ function BluetoothDevice:connect() {
 }
 
 function BluetoothDevice:disconnect() {
+  -- TODO: revert if incorrect
+  self.connected = false -- optimistic
+
   dbus_call_sync(system_bus, {
     bus_name = 'org.bluez',
     object_path = self.object_path,
@@ -154,11 +195,27 @@ function BluetoothDevice:disconnect() {
 }
 
 function BluetoothDevice:pair() {
+  -- TODO: revert if incorrect
+  self.paired = true -- optimistic
+
   dbus_call_sync(system_bus, {
     bus_name = 'org.bluez',
     object_path = self.object_path,
     interface_name = 'org.bluez.Device1',
     method_name = 'Pair',
+  })
+}
+
+function BluetoothDevice:remove() {
+  -- TODO: revert if incorrect
+  self.paired = false -- optimistic
+
+  dbus_call_sync(system_bus, {
+    bus_name = 'org.bluez',
+    object_path = self.adapter_object_path,
+    interface_name = 'org.bluez.Adapter1',
+    method_name = 'RemoveDevice',
+    parameters = GLib.Variant('(o)', { self.object_path }),
   })
 }
 
@@ -215,14 +272,17 @@ function bluetooth:_init() {
 function bluetooth:_add_managed_object(object_path, managed_object) {
   if managed_object['org.bluez.Adapter1'] {
     self.adapter.object_path = object_path
-    self.adapter.discovering = managed_object['org.bluez.Adapter1'].Discovering
-  } elseif managed_object['org.bluez.Device1'] && managed_object['org.bluez.Device1'].Name {
-    self.devices[object_path] ||= BluetoothDevice({
+  } elseif managed_object['org.bluez.Device1'] && managed_object['org.bluez.Device1'].Name && !self.devices[object_path] {
+    local device = BluetoothDevice({
       object_path = object_path,
+      adapter_object_path = managed_object['org.bluez.Device1'].Adapter,
       name = managed_object['org.bluez.Device1'].Name,
       connected = managed_object['org.bluez.Device1'].Connected,
       paired = managed_object['org.bluez.Device1'].Paired,
     })
+
+    self.devices[object_path] = device
+    self:publish('device_added', device)
   }
 }
 
@@ -231,8 +291,10 @@ function bluetooth:_remove_managed_object(object_path, removed_interfaces) {
     if removed_interface == 'org.bluez.Adapter1' {
       self.adapter.object_path = nil
     } elseif removed_interface == 'org.bluez.Device1' && self.devices[object_path] {
-      self.devices[object_path]:cleanup()
+      local device = self.devices[object_path]
+      device:cleanup()
       self.devices[object_path] = nil
+      self:publish('device_removed', device)
     }
   }
 }
