@@ -84,8 +84,8 @@ module function lgi_extract_dbus_value(value) {
   }
 }
 
-module function dbus_call_sync(bus, args) {
-  local var, err = bus:call_sync(
+module function dbus_call_async(bus, args) {
+  bus:call(
     args.bus_name,
     args.object_path,
     args.interface_name,
@@ -95,21 +95,23 @@ module function dbus_call_sync(bus, args) {
     args.flags || Gio.DBusCallFlags.NONE,
     args.timeout_msec || -1,
     args.cancellable,
-  )
+    (_, result) -> {
+      local variant, err = bus:call_finish(result)
 
-  if err {
-    naughty.notify({
-      force = true,
-      text = table.concat({
-        "DBus Error: { err }",
-        "bus_name: { args.bus_name }",
-        "object_path: { args.object_path }",
-        "interface_name: { args.interface_name }",
-        "method_name: { args.method_name }",
-        "parameters: { args.parameters }",
-      }, '\n'),
-    })
-  } else {
-    return lgi_extract_dbus_value(var)
-  }
+      if err && args.on_error {
+        args.on_error(table.concat({
+          "DBus Error: { err }",
+          "bus_name: { args.bus_name }",
+          "object_path: { args.object_path }",
+          "interface_name: { args.interface_name }",
+          "method_name: { args.method_name }",
+          "parameters: { args.parameters }",
+        }, '\n'))
+      }
+
+      if !err && args.on_finish {
+        args.on_finish(lgi_extract_dbus_value(variant))
+      }
+    }
+  )
 }

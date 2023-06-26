@@ -12,18 +12,27 @@ local unpack = unpack || table.unpack
 local function wifi_connect() {
   local tree = {}
 
-  local sorted_access_points = { unpack(models.wifi.device.access_points) }
-  table.sort(sorted_access_points, (a, b) -> a.strength > b.strength)
+  local connect_access_point_ssids = {}
+  local connect_access_points = {}
 
-  local access_point_ssids = {}
+  for _, access_point in ipairs(models.wifi.device.access_points) {
+    local is_valid_access_point = (
+      access_point.ssid &&
+      access_point.rsn_flags &&
+      access_point.strength &&
+      !connect_access_point_ssids[access_point.ssid] &&
+      access_point != models.wifi.device.active_access_point
+    )
 
-  for _, access_point in ipairs(sorted_access_points) {
-    if !access_point.ssid || access_point_ssids[access_point.ssid] {
-      continue
-    } else {
-      access_point_ssids[access_point.ssid] = true
+    if is_valid_access_point {
+      connect_access_point_ssids[access_point.ssid] = true
+      table.insert(connect_access_points, access_point)
     }
+  }
 
+  table.sort(connect_access_points, (a, b) -> a.strength > b.strength)
+
+  for _, access_point in ipairs(connect_access_points) {
     local access_point_connection_object_path = models.wifi:get_ssid_connection_object_path(access_point.ssid)
 
     if access_point_connection_object_path {
@@ -96,10 +105,9 @@ local function wifi_password_copy() {
       table.insert(tree, {
         label = ssid,
         type = 'once',
-        callback = () -> {
-          local password = models.wifi.settings:secrets(object_path)
-          awful.spawn.with_shell("printf '{ password }' | xclip -sel c")
-        },
+        callback = () -> models.wifi.settings:get_secrets(object_path, psk -> {
+          awful.spawn.with_shell("printf '{ psk }' | xclip -sel c")
+        }),
       })
     }
   }

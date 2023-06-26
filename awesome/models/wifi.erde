@@ -5,7 +5,7 @@ local GLib = lgi.require('GLib')
 local Gio = lgi.require('Gio')
 local Class = require('utils.Class')
 local Object = require('utils.Object')
-local { system_bus, decode_dbus_value, lgi_extract_dbus_value, dbus_call_sync } = require('utils.dbus')
+local { system_bus, decode_dbus_value, lgi_extract_dbus_value, dbus_call_async } = require('utils.dbus')
 local { encode_char_bytes, decode_char_bytes } = require('utils.string')
 
 -- -----------------------------------------------------------------------------
@@ -17,18 +17,17 @@ local network_manager_settings = {}
 function network_manager_settings:_init() {
   self.connections = {}
 
-  local connection_object_paths = dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = '/org/freedesktop/NetworkManager/Settings',
     interface_name = 'org.freedesktop.NetworkManager.Settings',
     method_name = 'ListConnections',
+    on_finish = connection_object_paths -> {
+      for _, connection_object_path in ipairs(connection_object_paths) {
+        self:read(connection_object_path)
+      }
+    },
   })
-
-  if connection_object_paths != nil {
-    for _, connection_object_path in ipairs(connection_object_paths) {
-      self:read(connection_object_path)
-    }
-  }
 
   system_bus:signal_subscribe(
     nil,
@@ -58,56 +57,57 @@ function network_manager_settings:_init() {
 }
 
 function network_manager_settings:read(connection_object_path) {
-  local connection_settings = decode_dbus_value(dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = connection_object_path,
     interface_name = 'org.freedesktop.NetworkManager.Settings.Connection',
     method_name = 'GetSettings',
-  }))
+    on_finish = raw_connection_settings -> {
+      local connection_settings = decode_dbus_value(raw_connection_settings)
 
-  if connection_settings == nil {
-    return
-  }
+      local ssid = connection_settings['802-11-wireless']
+        && connection_settings['802-11-wireless'].ssid
+        && decode_char_bytes(connection_settings['802-11-wireless'].ssid)
 
-  local ssid = connection_settings['802-11-wireless']
-    && connection_settings['802-11-wireless'].ssid
-    && decode_char_bytes(connection_settings['802-11-wireless'].ssid)
-
-  if ssid {
-    self.connections[connection_object_path] = {
-      ssid = ssid,
-      security = connection_settings['802-11-wireless-security']
-        && connection_settings['802-11-wireless-security']['key-mgmt']
-        || 'none',
-    }
-  }
+      if ssid {
+        self.connections[connection_object_path] = {
+          ssid = ssid,
+          security = connection_settings['802-11-wireless-security']
+            && connection_settings['802-11-wireless-security']['key-mgmt']
+            || 'none',
+        }
+      }
+    },
+  })
 }
 
-function network_manager_settings:secrets(connection_object_path) {
-  local connection_settings = decode_dbus_value(dbus_call_sync(system_bus, {
+function network_manager_settings:get_secrets(connection_object_path, on_finish) {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = connection_object_path,
     interface_name = 'org.freedesktop.NetworkManager.Settings.Connection',
     method_name = 'GetSecrets',
     parameters = GLib.Variant('(s)', { '802-11-wireless-security' }),
-  }))
-
-  if connection_settings != nil && connection_settings['802-11-wireless-security'] {
-    return connection_settings['802-11-wireless-security'].psk
-  }
+    on_finish = raw_connection_settings -> {
+      local connection_settings = decode_dbus_value(raw_connection_settings)
+      if connection_settings['802-11-wireless-security'] {
+        on_finish(connection_settings['802-11-wireless-security'].psk)
+      }
+    },
+  })
 }
 
 function network_manager_settings:delete(connection_object_path) {
-  dbus_call_sync(system_bus, {
+  local connection = self.connections[connection_object_path]
+  self.connections[connection_object_path] = nil -- optimistic update
+
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = connection_object_path,
     interface_name = 'org.freedesktop.NetworkManager.Settings.Connection',
     method_name = 'Delete',
+    on_error = () -> { self.connections[connection_object_path] = connection },
   })
-
-  -- Update immediately in case we need to do something before the signal has a
-  -- chance to update.
-  self.connections[connection_object_path] = nil
 }
 
 -- -----------------------------------------------------------------------------
@@ -119,19 +119,19 @@ local AccessPoint = Class()
 function AccessPoint:_init(object_path) {
   self.object_path = object_path
 
-  local all_properties = decode_dbus_value(dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = self.object_path,
     interface_name = 'org.freedesktop.DBus.Properties',
     method_name = 'GetAll',
     parameters = GLib.Variant('(s)', { 'org.freedesktop.NetworkManager.AccessPoint' }),
-  }))
-
-  if all_properties != nil {
-    self.ssid = decode_char_bytes(all_properties.Ssid)
-    self.rsn_flags = all_properties.RsnFlags
-    self.strength = all_properties.Strength
-  }
+    on_finish = raw_properties -> {
+      local properties = decode_dbus_value(raw_properties)
+      self.ssid = decode_char_bytes(properties.Ssid)
+      self.rsn_flags = properties.RsnFlags
+      self.strength = properties.Strength
+    },
+  })
 
   self._properties_changed_subscription = system_bus:signal_subscribe(
     nil,
@@ -169,29 +169,23 @@ function network_manager_wifi_device:_init() {
 }
 
 function network_manager_wifi_device:_on_change_object_path() {
-  local device_properties = decode_dbus_value(dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = self.object_path,
     interface_name = 'org.freedesktop.DBus.Properties',
     method_name = 'GetAll',
     parameters = GLib.Variant('(s)', { 'org.freedesktop.NetworkManager.Device' }),
-  }))
+    on_finish = properties -> self:_update_properties(decode_dbus_value(properties)),
+  })
 
-  if device_properties != nil {
-    self:_update_properties(device_properties)
-  }
-
-  local wireless_properties = decode_dbus_value(dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = self.object_path,
     interface_name = 'org.freedesktop.DBus.Properties',
     method_name = 'GetAll',
     parameters = GLib.Variant('(s)', { 'org.freedesktop.NetworkManager.Device.Wireless' }),
-  }))
-
-  if wireless_properties != nil {
-    self:_update_properties(wireless_properties)
-  }
+    on_finish = properties -> self:_update_properties(decode_dbus_value(properties)),
+  })
 
   self._properties_changed_subscription = system_bus:signal_subscribe(
     nil,
@@ -256,31 +250,28 @@ function network_manager_wifi_device:_update_object_path() {
     return -- nothing to do
   }
 
-  local device_object_paths = dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = '/org/freedesktop/NetworkManager',
     interface_name = 'org.freedesktop.NetworkManager',
     method_name = 'GetAllDevices',
+    on_finish = device_object_paths -> {
+      for _, device_object_path in ipairs(device_object_paths) {
+        dbus_call_async(system_bus, {
+          bus_name = 'org.freedesktop.NetworkManager',
+          object_path = device_object_path,
+          interface_name = 'org.freedesktop.DBus.Properties',
+          method_name = 'Get',
+          parameters = GLib.Variant('(ss)', { 'org.freedesktop.NetworkManager.Device', 'DeviceType' }),
+          on_finish = device_type -> {
+            if device_type == 2 && !self.object_path {
+              self.object_path = device_object_path
+            }
+          },
+        })
+      }
+    },
   })
-
-  if device_object_paths == nil {
-    return
-  }
-
-  for _, device_object_path in ipairs(device_object_paths) {
-    local device_type = dbus_call_sync(system_bus, {
-      bus_name = 'org.freedesktop.NetworkManager',
-      object_path = device_object_path,
-      interface_name = 'org.freedesktop.DBus.Properties',
-      method_name = 'Get',
-      parameters = GLib.Variant('(ss)', { 'org.freedesktop.NetworkManager.Device', 'DeviceType' })
-    })
-
-    if device_type == 2 {
-      self.object_path = device_object_path
-      return device_object_path
-    }
-  }
 }
 
 function network_manager_wifi_device:add_access_point(access_point_object_path) {
@@ -327,31 +318,29 @@ function network_manager_wifi_device:scan() {
     return
   }
 
-  dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = self.object_path,
     interface_name = 'org.freedesktop.NetworkManager.Device.Wireless',
     method_name = 'RequestScan',
-    parameters = GLib.Variant('(a{sv})', { {} })
+    parameters = GLib.Variant('(a{sv})', { {} }),
+    on_finish = () -> dbus_call_async(system_bus, {
+      bus_name = 'org.freedesktop.NetworkManager',
+      object_path = self.object_path,
+      interface_name = 'org.freedesktop.NetworkManager.Device.Wireless',
+      method_name = 'GetAllAccessPoints',
+      on_finish = access_point_object_paths -> {
+        -- For some reason, sometimes `GetAllAccessPoints` returns a string instead of a table.
+        if type(access_point_object_paths) != 'table' {
+          return
+        }
+
+        for _, access_point_object_path in ipairs(access_point_object_paths) {
+          self:add_access_point(access_point_object_path)
+        }
+      }
+    }),
   })
-
-  local access_point_object_paths = dbus_call_sync(system_bus, {
-    bus_name = 'org.freedesktop.NetworkManager',
-    object_path = self.object_path,
-    interface_name = 'org.freedesktop.NetworkManager.Device.Wireless',
-    method_name = 'GetAllAccessPoints',
-  })
-
-  -- For some reason, sometimes `GetAllAccessPoints` returns a string instead
-  -- of a table. In this case, we cannot continue so simply show a warning.
-  if type(access_point_object_paths) != 'table' {
-    naughty.notify({ force = true, text = 'Failed to scan wifi.' })
-    return
-  }
-
-  for _, access_point_object_path in ipairs(access_point_object_paths) {
-    self:add_access_point(access_point_object_path)
-  }
 }
 
 function network_manager_wifi_device:disconnect() {
@@ -359,7 +348,7 @@ function network_manager_wifi_device:disconnect() {
     return
   }
 
-  dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = self.object_path,
     interface_name = 'org.freedesktop.NetworkManager.Device',
@@ -415,23 +404,19 @@ function wifi:add_and_activate_connection(ssid, psk) {
     }
   }
 
-  local return_values = dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = '/org/freedesktop/NetworkManager',
     interface_name = 'org.freedesktop.NetworkManager',
     method_name = 'AddAndActivateConnection',
     parameters = GLib.Variant('(a{sa{sv}}oo)', { connection_settings, self.device.object_path, '/' }),
+    on_finish = [ connection_object_path ] -> {
+      self.settings.connections[connection_object_path] = {
+        ssid = ssid,
+        security = psk && 'wpa-psk' || 'none',
+      }
+    },
   })
-
-  if return_values != nil {
-    -- Update immediately in case we need to do something before the signal has a
-    -- chance to update.
-    local connection_object_path = return_values[1]
-    self.settings.connections[connection_object_path] = {
-      ssid = ssid,
-      security = psk && 'wpa-psk' || 'none',
-    }
-  }
 }
 
 function wifi:activate_connection(connection_object_path) {
@@ -439,7 +424,7 @@ function wifi:activate_connection(connection_object_path) {
     return
   }
 
-  dbus_call_sync(system_bus, {
+  dbus_call_async(system_bus, {
     bus_name = 'org.freedesktop.NetworkManager',
     object_path = '/org/freedesktop/NetworkManager',
     interface_name = 'org.freedesktop.NetworkManager',

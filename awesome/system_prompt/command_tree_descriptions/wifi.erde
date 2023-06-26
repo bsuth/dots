@@ -13,10 +13,6 @@ local models = require('models')
 local Card = require('components.Card')
 local svg = require('utils.svg')
 
-local root_widget = wibox.widget({
-  widget = wibox.container.place,
-})
-
 -- -----------------------------------------------------------------------------
 -- Connection Status
 -- -----------------------------------------------------------------------------
@@ -39,6 +35,22 @@ local ssid_widget = wibox.widget({
 local requires_password_card = Card()
 local signal_strength_card = Card({ icon = svg('signal', palette.black) })
 
+local function update_access_point_ssid() {
+  ssid_widget.text = models.wifi.device.active_access_point.ssid
+}
+
+local function update_access_point_rsn_flags() {
+  if models.wifi.device.active_access_point.rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_PSK != 0 {
+    requires_password_card.text = "true"
+    requires_password_card.icon = svg('lock', palette.black)
+    requires_password_card.bg = palette.green
+  } else {
+    requires_password_card.text = "false"
+    requires_password_card.icon = svg('unlock', palette.black)
+    requires_password_card.bg = palette.red
+  }
+}
+
 local function update_access_point_strength() {
   local { strength } = models.wifi.device.active_access_point
   signal_strength_card.text = "{ strength }%"
@@ -50,33 +62,35 @@ local function update_access_point_strength() {
 }
 
 local function update_access_point() {
-  local { ssid, rsn_flags } = models.wifi.device.active_access_point
-
-  ssid_widget.text = ssid
-
-  if rsn_flags & NM_802_11_AP_SEC_KEY_MGMT_PSK != 0 {
-    requires_password_card.text = "true"
-    requires_password_card.icon = svg('lock', palette.black)
-    requires_password_card.bg = palette.green
-  } else {
-    requires_password_card.text = "false"
-    requires_password_card.icon = svg('unlock', palette.black)
-    requires_password_card.bg = palette.red
+  if !models.wifi.device.active_access_point {
+    return
   }
 
-  update_access_point_strength()
+  if models.wifi.device.active_access_point.ssid {
+    update_access_point_ssid()
+  }
+
+  if models.wifi.device.active_access_point.rsn_flags {
+    update_access_point_rsn_flags()
+  }
+
+  if models.wifi.device.active_access_point.strength {
+    update_access_point_strength()
+  }
 }
 
-if models.wifi.device.active_access_point {
-  update_access_point()
-}
+update_access_point()
 
 models.wifi.device:subscribe('change_active_access_point', (new_active_access_point, old_active_access_point) -> {
   if old_active_access_point {
+    old_active_access_point:unsubscribe('change_ssid', update_access_point_ssid)
+    old_active_access_point:unsubscribe('change_rsn_flags', update_access_point_rsn_flags)
     old_active_access_point:unsubscribe('change_strength', update_access_point_strength)
   }
 
   if new_active_access_point {
+    new_active_access_point:subscribe('change_ssid', update_access_point_ssid)
+    new_active_access_point:subscribe('change_rsn_flags', update_access_point_rsn_flags)
     new_active_access_point:subscribe('change_strength', update_access_point_strength)
     update_access_point()
   }
@@ -100,6 +114,10 @@ local connected_widget = wibox.widget({
 -- -----------------------------------------------------------------------------
 -- Return
 -- -----------------------------------------------------------------------------
+
+local root_widget = wibox.widget({
+  widget = wibox.container.place,
+})
 
 local function update_state() {
   local is_connecting = (
