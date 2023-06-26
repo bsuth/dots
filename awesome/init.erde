@@ -23,8 +23,8 @@ awful.screen.connect_for_each_screen(s -> {
   local tag = awful.tag.add('1', { screen = s, layout = layout })
 
   -- for development
-  awful.tag.add('2', { screen = s, layout = layout })
-  awful.tag.add('3', { screen = s, layout = layout })
+  -- awful.tag.add('2', { screen = s, layout = layout })
+  -- awful.tag.add('3', { screen = s, layout = layout })
 
   tag:view_only() -- force 'tag::history::update' signal
 })
