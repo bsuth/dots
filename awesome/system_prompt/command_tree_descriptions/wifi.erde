@@ -17,10 +17,15 @@ local svg = require('utils.svg')
 -- Connection Status
 -- -----------------------------------------------------------------------------
 
-local connection_status_widget = wibox.widget({
-  forced_width = 256,
-  forced_height= 84,
+local connection_status_icon_widget = wibox.widget({
+  forced_width = 64,
+  forced_height= 64,
   widget = wibox.widget.imagebox,
+})
+
+local connection_status_widget = wibox.widget({
+  connection_status_icon_widget,
+  widget = wibox.container.rotate,
 })
 
 -- -----------------------------------------------------------------------------
@@ -128,15 +133,18 @@ local function update_state() {
   )
 
   if is_connecting {
-    connection_status_widget.image = svg('wifi-connecting', palette.yellow)
+    connection_status_icon_widget.image = svg('double-arrow', palette.yellow)
+    connection_status_widget.direction = 'east'
     root_widget.children = { connection_status_widget }
   } elseif models.wifi.device.state == NM_DEVICE_STATE_ACTIVATED {
     root_widget.children = { connected_widget }
   } elseif models.wifi.device.state == NM_DEVICE_STATE_DEACTIVATING {
-    connection_status_widget.image = svg('wifi-disconnecting', palette.yellow)
+    connection_status_icon_widget.image = svg('double-arrow', palette.yellow)
+    connection_status_widget.direction = 'west'
     root_widget.children = { connection_status_widget }
   } else {
-    connection_status_widget.image = svg('wifi-disconnected', palette.red)
+    connection_status_icon_widget.image = svg('cross', palette.red)
+    connection_status_widget.direction = 'north'
     root_widget.children = { connection_status_widget }
   }
 }
