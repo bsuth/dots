@@ -64,15 +64,9 @@ function Prompt:_init(props = {}) {
   self._keygrabber = awful.keygrabber({
     keybindings = keybindings,
     keyreleased_callback = (_, modifiers, key) -> {
-      local has_trivial_modifiers = true
-      for _, modifier in ipairs(modifiers) {
-        if modifier != 'Shift' && modifier != 'Lock' {
-          has_trivial_modifiers = false
-          break
-        }
-      }
+      local has_non_trivial_modifier = table.find(modifiers, modifier -> modifier != 'Shift' && modifier != 'Lock')
 
-      if has_trivial_modifiers && #key == 1 {
+      if !has_non_trivial_modifier && #key == 1 {
         self:rawset('text', table.concat({ self.text:sub(1, self.cursor), key, self.text:sub(self.cursor + 1), }))
         self:rawset('cursor', self.cursor + 1)
         self:_update_markup()

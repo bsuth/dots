@@ -2,7 +2,6 @@ local awful = require('awful')
 local wibox = require('wibox')
 local { palette } = require('core.theme')
 local Object = require('utils.Object')
-local { trim } = require('utils.string')
 local { TAGBAR_HEIGHT, TAGBAR_FONT } = require('tagbar.constants')
 local tagbar_history = require('tagbar.history')
 
@@ -61,7 +60,7 @@ function Suggestions:_on_change_screen() {
 }
 
 function Suggestions:_on_change_filter() {
-  local trimmed_filter = trim(self.filter)
+  local trimmed_filter = self.filter:trim()
   local new_filtered_suggestions = {}
 
   for i, suggestion in ipairs(tagbar_history) {

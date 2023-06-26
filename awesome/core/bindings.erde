@@ -175,9 +175,8 @@ module client_keys = {
   }),
 
   awful.key({ 'Mod4', 'Shift' }, 'i', c -> {
-    local msg = 'name: ' .. c.name
-
-    local attrs = {
+    local attributes = {
+      'name',
       'instance',
       'class',
       'role',
@@ -186,11 +185,10 @@ module client_keys = {
       'maximized',
     }
 
-    for i, attr in ipairs(attrs) {
-      msg = ('%s\n%s: %s'):format(msg, attr, c[attr])
-    }
-
-    naughty.notify({ text = msg, force = true })
+    naughty.notify({
+      force = true,
+      text = table.concat(table.map(attributes, attribute -> "{ attribute }: { c[attribute] }"), '\n'),
+    })
   }),
 
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'i', c -> {

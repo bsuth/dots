@@ -3,7 +3,6 @@ local { palette } = require('core.theme')
 local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
 local store = require('system_prompt.store')
 local Class = require('utils.Class')
-local path_utils = require('utils.path')
 
 local MAX_NUM_SUGGESTIONS = 10
 

@@ -4,13 +4,15 @@ local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
 local store = require('system_prompt.store')
 local path_utils = require('utils.path')
 
+local unpack = unpack || table.unpack
+
 local root_widget = wibox.widget({
   font = SYSTEM_PROMPT_FONT,
   widget = wibox.widget.textbox,
 })
 
 local function update_widget() {
-  root_widget.text = path_utils.pad(table.concat(store.path, path_utils.separator))
+  root_widget.text = path_utils.pad(unpack(store.path))
 }
 
 update_widget()

@@ -7,26 +7,24 @@ module function dedup(s) {
   return (s:gsub(separator .. '+', separator))
 }
 
-module function format(s, left, right) {
-  s = left  && (separator .. s) || s:gsub("^{separator}+", '')
-  s = right && (s .. separator) || s:gsub("{separator}+$", '')
-  return dedup(s)
-}
-
-module function trim(s, ltrim = true, rtrim = true) {
-  if ltrim { s = s:gsub("^{separator}+", '') }
-  if rtrim { s = s:gsub("{separator}+$", '') }
-  return dedup(s)
-}
-
-module function pad(s, lpad = true, rpad = true) {
-  if lpad { s = separator .. s }
-  if rpad { s = s .. separator }
-  return dedup(s)
-}
-
 module function join(...) {
   return dedup(table.concat({ ... }, separator))
+}
+
+module function trim(...) {
+  return (join(...):gsub("^{separator}+", ''):gsub("{separator}+$", ''))
+}
+
+module function pad(...) {
+  return dedup(separator .. join(...) .. separator)
+}
+
+module function lead(...) {
+  return separator .. trim(...)
+}
+
+module function trail(...) {
+  return trim(...) .. separator
 }
 
 module function basename(s) {

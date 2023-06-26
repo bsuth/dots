@@ -1,7 +1,6 @@
 local awful = require('awful')
 local models = require('models')
 local { NM_802_11_AP_SEC_KEY_MGMT_PSK } = require('utils.network_manager')
-local { trim } = require('utils.string')
 
 local unpack = unpack || table.unpack
 

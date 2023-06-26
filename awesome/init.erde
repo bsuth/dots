@@ -5,6 +5,9 @@ local ruled = require('ruled')
 -- Autofocus another client when the current one is closed
 require('awful/autofocus')
 
+-- Load stdlib
+require('utils.stdlib').load()
+
 -- Load modules
 local bindings = require('core.bindings')
 local layout = require('core.layout')

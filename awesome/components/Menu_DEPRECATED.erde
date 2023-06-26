@@ -4,7 +4,6 @@ local wibox = require('wibox')
 local { palette } = require('core.theme')
 local Prompt = require('components.Prompt')
 local Class = require('utils.Class')
-local { trim } = require('utils.string')
 
 local MENU_ITEM_WIDTH = 384
 local MENU_ITEM_HEIGHT = 60
@@ -152,7 +151,7 @@ function Menu:_on_change_active_item_index(_, old_active_item_index) {
 }
 
 function Menu:filter() {
-  local trimmed_input = trim(self.input)
+  local trimmed_input = self.input:trim()
 
   if trimmed_input == '' {
     self.filtered_options = self.options
@@ -207,7 +206,7 @@ function Menu:run_prompt() {
   self.prompt = Prompt({
     on_cancel = () -> self:stop(),
     on_submit = () -> self:submit(),
-    on_user_change = () -> { self.input = trim(self.prompt.text) },
+    on_user_change = () -> { self.input = self.prompt.text:trim() },
     keybindings = {
       { {}, '-', on_back },
       { {}, 'Up', on_prev },
