@@ -1,4 +1,6 @@
-local { edit } = require('utils')
+require('utils.stdlib').load()
+
+local { edit } = require('utils.vim')
 
 -- -----------------------------------------------------------------------------
 -- Settings

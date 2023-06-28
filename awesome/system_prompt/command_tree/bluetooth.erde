@@ -7,7 +7,7 @@ local models = require('models')
 local function bluetooth_connect() {
   local tree = {}
 
-  for object_path, device in pairs(models.bluetooth.devices) {
+  for _, device in pairs(models.bluetooth.devices) {
     if device.paired && !device.connected {
       table.insert(tree, {
         label = device.name,

@@ -40,10 +40,11 @@ naughty.config.notify_callback = notification -> {
       timestamp = os.time(os.date("!*t")),
     })
 
-    local history_limit = math.min(#notifications.history, NOTIFICATIONS_HISTORY_SIZE - 1)
-    for i = 1, history_limit {
-      table.insert(new_history, notifications.history[i])
-    }
+    table.merge(new_history, table.slice(
+      notifications.history,
+      1,
+      math.min(#notifications.history, NOTIFICATIONS_HISTORY_SIZE - 1),
+    ))
 
     notifications.history = new_history
   }

@@ -61,26 +61,20 @@ function Suggestions:_on_change_screen() {
 
 function Suggestions:_on_change_filter() {
   local trimmed_filter = self.filter:trim()
-  local new_filtered_suggestions = {}
+  local suggestions = table.collect(ipairs(tagbar_history))
 
-  for i, suggestion in ipairs(tagbar_history) {
-    if suggestion:match(trimmed_filter) {
-      table.insert(new_filtered_suggestions, suggestion)
-      if #new_filtered_suggestions == MAX_SUGGESTIONS {
-        break
-      }
-    }
-  }
+  self._filtered_suggestions = table.slice(
+    table.filter(suggestions, suggestion -> suggestion:match(trimmed_filter)),
+    1,
+    MAX_SUGGESTIONS,
+  )
 
-  local new_root_children = {}
-  for i = 1, #new_filtered_suggestions {
+  self.root_widget.children = table.map(self._filtered_suggestions, (suggestion, i) -> {
     local widget = self._suggestion_widgets[i]
-    widget.text = new_filtered_suggestions[i]
-    table.insert(new_root_children, widget)
-  }
+    widget.text = suggestion
+    return widget
+  })
 
-  self._filtered_suggestions = new_filtered_suggestions
-  self.root_widget.children = new_root_children
   self:rawset('selected', 0)
 }
 
@@ -143,13 +137,6 @@ function Suggestions:delete() {
   local num_filtered_suggestions = #self._filtered_suggestions
   local new_selected = self.selected < num_filtered_suggestions
     && self.selected || num_filtered_suggestions - 1
-
-  for i, suggestion in ipairs(tagbar_history) {
-    if suggestion == current_suggestion {
-      table.remove(tagbar_history, i)
-      break
-    }
-  }
 
   tagbar_history:clear(current_suggestion)
   self:_on_change_filter()

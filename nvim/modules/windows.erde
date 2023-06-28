@@ -1,5 +1,5 @@
 local C = require('constants')
-local { edit, get_buffer_dir } = require('utils')
+local { edit, get_buffer_dir } = require('utils.vim')
 
 local SPLIT_COMMANDS = {
   left = ':aboveleft vsp',

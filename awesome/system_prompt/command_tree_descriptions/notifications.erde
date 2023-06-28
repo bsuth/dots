@@ -61,14 +61,13 @@ local function update_history() {
     table.remove(notifications_history_items)
   }
 
-  local new_children = {}
-
-  for i, notifications_history_item in ipairs(notifications_history_items) {
-    notifications_history_item.notification = models.notifications.history[i]
-    table.insert(new_children, notifications_history_item.root_widget)
-  }
-
-  notifications_history_widget.children = new_children
+  notifications_history_widget.children = table.map(
+    notifications_history_items,
+    (notifications_history_item, i) -> {
+      notifications_history_item.notification = models.notifications.history[i]
+      return notifications_history_item.root_widget
+    },
+  )
 }
 
 update_history()

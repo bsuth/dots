@@ -6,11 +6,7 @@ local ignore_buf_enter = false
 
 function is_blacklist_buffer(buffer) {
   local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
-  for _, blacklisted in ipairs(C.BUFFER_HISTORY_FILETYPE_BLACKLIST) {
-    if filetype == blacklisted {
-      return true
-    }
-  }
+  return table.has(C.BUFFER_HISTORY_FILETYPE_BLACKLIST, filetype)
 }
 
 function history_back() {
@@ -36,13 +32,8 @@ function history_forward() {
 }
 
 function history_remove(buffer) {
-  for i, history_buffer in ipairs(buffer_history) {
-    if history_buffer == buffer {
-      table.remove(buffer_history, i)
-      buffer_history_pointer = math.min(buffer_history_pointer, #buffer_history)
-      break
-    }
-  }
+  table.clear(buffer_history, buffer)
+  buffer_history_pointer = math.min(buffer_history_pointer, #buffer_history)
 }
 
 function history_push(buffer) {

@@ -105,20 +105,16 @@ function Slider:_init(props = {}) {
     layout = wibox.layout.fixed.horizontal,
   })
 
-  local keybindings = {
+  -- Place custom keybindings at the beginning!
+  --
+  -- If a keybinding is specified mulitple times, only the first one is used
+  -- and we give priority to `props.keybindings`
+  local keybindings = {}
+  table.merge(keybindings, props.keybindings || {})
+  table.merge(keybindings, {
     { {}, 'Escape', () -> self:stop() },
     { { 'Control' }, 'c', () -> self:stop() },
-  }
-
-  if props.keybindings {
-    for _, keybinding in ipairs(props.keybindings) {
-      -- Place custom keybindings at the beginning!
-      --
-      -- If a keybinding is specified mulitple times, only the first one is used
-      -- and we give priority to `props.keybindings`
-      table.insert(keybindings, 1, keybinding)
-    }
-  }
+  })
 
   self._keygrabber = awful.keygrabber({
     keybindings = keybindings,

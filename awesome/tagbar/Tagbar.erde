@@ -68,33 +68,12 @@ function Tagbar:_init(props = {}) {
   self.screen:connect_signal('tag::history::update', () -> self:_refresh())
 }
 
-function Tagbar:_is_tag_disabled(tag) {
-  for _, disabled_tag in ipairs(self._disabled_tags) {
-    if tag == disabled_tag { -- do not add any old (removed) tags
-      return true
-    }
-  }
-}
-
 function Tagbar:_refresh() {
-  local new_disabled_tags = {}
-
   -- iterate current tags to filter out any old (removed) tags
-  for _, tag in ipairs(self.screen.tags) {
-    if self:_is_tag_disabled(tag) {
-      table.insert(new_disabled_tags, tag)
-    }
-  }
+  self._disabled_tags = table.filter(self.screen.tags, tag -> table.has(self._disabled_tags, tag))
 
-  self._disabled_tags = new_disabled_tags
-
-  local filtered_tags, num_filtered_tags = {}, 0
-  for _, tag in ipairs(self.screen.tags) {
-    if !tag.name:match('^_') {
-      num_filtered_tags += 1
-      table.insert(filtered_tags, tag)
-    }
-  }
+  local filtered_tags = table.filter(self.screen.tags, tag -> !tag.name:match('^_'))
+  local num_filtered_tags = #filtered_tags
 
   for i = #self._tabs + 1, num_filtered_tags {
     table.insert(self._tabs, Tab())
@@ -104,20 +83,14 @@ function Tagbar:_refresh() {
     table.remove(self._tabs)
   }
 
-  local new_tabs_widget_children = {}
-
-  for i, tag in ipairs(filtered_tags) {
+  self._tabs_widget.children = table.map(filtered_tags, (tag, i) -> {
     local tab = self._tabs[i]
-
     tab.text = tag.name
     tab.selected = tag == self.screen.selected_tag
-    tab.disabled = self:_is_tag_disabled(tag)
+    tab.disabled = table.has(self._disabled_tags, tag)
     tab.tag = tag -- store custom field for convenience
-
-    table.insert(new_tabs_widget_children, tab.root_widget)
-  }
-
-  self._tabs_widget.children = new_tabs_widget_children
+    return tab.root_widget
+  })
 }
 
 -- -----------------------------------------------------------------------------
@@ -125,11 +98,7 @@ function Tagbar:_refresh() {
 -- -----------------------------------------------------------------------------
 
 function Tagbar:get_active_tab() {
-  for i, tab in ipairs(self._tabs) {
-    if tab.tag == self.screen.selected_tag {
-      return tab, i
-    }
-  }
+  return table.find(self._tabs, tab -> tab.tag == self.screen.selected_tag)
 }
 
 function Tagbar:get_prev_tab(tab_index) {
@@ -152,32 +121,22 @@ function Tagbar:open() {
 }
 
 function Tagbar:close() {
-  local num_visible_tags = 0
-
-  for _, tag in ipairs(self.screen.tags) {
-    if !tag.name:match('^_') {
-      num_visible_tags += 1
-    }
-  }
-
-  if num_visible_tags > 1 {
+  if #table.filter(self.screen.tags, tag -> !tag.name:match('^_')) > 1 {
     self.screen.selected_tag:delete()
   }
 }
 
 function Tagbar:toggle() {
   local active_tab = self:get_active_tab()
+  local _, disabled_tag_index = table.find(self._disabled_tags, active_tab.tag)
 
-  for i, disabled_tag in ipairs(self._disabled_tags) {
-    if active_tab.tag == disabled_tag { -- do not add any old (removed) tags
-      active_tab.disabled = false
-      table.remove(self._disabled_tags, i)
-      return
-    }
+  if disabled_tag_index {
+    active_tab.disabled = false
+    table.remove(self._disabled_tags, disabled_tag_index)
+  } else {
+    active_tab.disabled = true
+    table.insert(self._disabled_tags, active_tab.tag)
   }
-
-  active_tab.disabled = true
-  table.insert(self._disabled_tags, active_tab.tag)
 }
 
 function Tagbar:swap(index1, index2) {

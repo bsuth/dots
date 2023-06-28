@@ -1,4 +1,4 @@
-local { get_visual_selection } = require('utils')
+local { get_visual_selection } = require('utils.vim')
 
 vim.keymap.set('v', '<c-n>', () -> {
   vim.fn.setreg('/', "\\V{get_visual_selection():gsub('[\\/]', '\\%1')}")

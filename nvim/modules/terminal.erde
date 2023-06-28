@@ -1,5 +1,5 @@
 local C = require('constants')
-local { edit } = require('utils')
+local { edit } = require('utils.vim')
 
 vim.keymap.set('n', '<c-space>', ':term<cr>')
 vim.keymap.set('t', '<c-[>', '<c-\\><c-n>')

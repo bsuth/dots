@@ -7,11 +7,7 @@ local tagbars = {}
 
 local function get_current_tagbar() {
   local focused_screen = awful.screen.focused()
-  for _, tagbar in ipairs(tagbars) {
-    if tagbar.screen == focused_screen {
-      return tagbar
-    }
-  }
+  return table.find(tagbars, tagbar -> tagbar.screen == focused_screen)
 }
 
 gears.table.merge(global_keys, {
@@ -28,11 +24,4 @@ gears.table.merge(global_keys, {
 })
 
 awful.screen.connect_for_each_screen(s -> table.insert(tagbars, Tagbar({ screen = s })))
-awful.screen.disconnect_for_each_screen(s -> {
-  for i, tagbar in ipairs(tagbars) {
-    if tagbar.screen == s {
-      table.remove(tagbars, i)
-      break
-    }
-  }
-})
+awful.screen.disconnect_for_each_screen(s -> table.clear(tagbars, tagbar -> tagbar.screen == s))

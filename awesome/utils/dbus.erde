@@ -25,27 +25,9 @@ module function decode_dbus_value(value) {
     return { [value[1]] = decode_dbus_value(value[2]) }
   }
 
-  local is_dbus_map = true
-  for _, subvalue in ipairs(value) {
-    if type(subvalue) != 'table' || #subvalue != 2 || type(subvalue[1]) != 'string' {
-      is_dbus_map = false
-      break
-    }
-  }
-
-  local t = {}
-
-  if is_dbus_map {
-    for _, [ subkey, subvalue ] in ipairs(value) {
-      t[subkey] = decode_dbus_value(subvalue)
-    }
-  } else {
-    for _, subvalue in ipairs(value) {
-      table.insert(t, decode_dbus_value(subvalue))
-    }
-  }
-
-  return t
+  return table.has(value, subvalue -> (type(subvalue) != 'table' || #subvalue != 2 || type(subvalue[1]) != 'string'))
+    && table.map(value, decode_dbus_value)
+    || table.map(value, [ subkey, subvalue ] -> (decode_dbus_value(subvalue), subkey))
 }
 
 module function lgi_extract_dbus_value(value) {

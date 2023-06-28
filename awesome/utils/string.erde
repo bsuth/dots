@@ -1,20 +1,8 @@
 module function decode_char_bytes(char_bytes) {
-  local t = {}
-
-  for _, char_byte in ipairs(char_bytes) {
-    table.insert(t, string.char(char_byte))
-  }
-
-  return table.concat(t)
+  -- Do not feed in `string.char` directly, since we don't want to feed in the key
+  return table.concat(table.map(char_bytes, char_byte -> string.char(char_byte)))
 }
 
 module function encode_char_bytes(s) {
-  local t = {}
-  local len = #s
-
-  for i = 1, len {
-    table.insert(t, string.byte(s:sub(i, i)))
-  }
-
-  return t
+  return table.map(table.collect(string.chars(s)), char -> string.byte(char))
 }

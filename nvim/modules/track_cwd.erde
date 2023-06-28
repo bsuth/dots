@@ -1,18 +1,15 @@
 local C = require('constants')
-local { get_buffer_dir } = require('utils')
+local { get_buffer_dir } = require('utils.vim')
 
 function is_blacklist_buffer(buffer) {
   local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
-  if filetype == 'help' || filetype == 'man' {
-    return true
-  }
-
   local buffer_name = vim.api.nvim_buf_get_name(buffer)
-  for _, pattern in ipairs(C.TRACK_CWD_BLACKLIST) {
-    if buffer_name:match(pattern) {
-      return true
-    }
-  }
+
+  return (
+    filetype == 'help' ||
+    filetype == 'man' ||
+    table.has(C.TRACK_CWD_BLACKLIST, pattern -> buffer_name:match(pattern))
+  )
 }
 
 -- Do not make this local! zsh needs this for cd hook in nested terminal.

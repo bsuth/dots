@@ -290,15 +290,7 @@ function network_manager_wifi_device:add_access_point(access_point_object_path) 
 function network_manager_wifi_device:remove_access_point(access_point_object_path) {
   if self.access_points[access_point_object_path] {
     local old_access_point = self.access_points[access_point_object_path]
-
-    self.access_points[access_point_object_path] = nil
-    for i, access_point in ipairs(self.access_points) {
-      if access_point == old_access_point {
-        table.remove(self.access_points, i)
-        break
-      }
-    }
-
+    table.clear(self.access_points, old_access_point)
     old_access_point:cleanup()
   }
 }
