@@ -29,16 +29,19 @@ vim.opt.termguicolors = true
 vim.opt.number = false
 vim.opt.signcolumn = 'yes'
 vim.opt.showmode = false
-vim.opt.synmaxcol = 300 -- limit for performance
 vim.opt.laststatus = 3
 vim.opt.colorcolumn = '80'
 vim.cmd('highlight ColorColumn guibg=#585858')
 
+-- performance
+vim.g.matchparen_timeout = 10
+vim.opt.synmaxcol = 300
+vim.opt.updatetime = 300
+vim.opt.scrollback = 100000
+
 -- misc
 vim.opt.wrap = false
 vim.opt.clipboard = 'unnamedplus'
-vim.opt.updatetime = 300
-vim.opt.scrollback = 100000
 vim.opt.commentstring = '//%s'
 
 -- -----------------------------------------------------------------------------
