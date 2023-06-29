@@ -30,7 +30,6 @@ function store:_init() {
       { {}, 'Escape', () -> self:back() },
       { { 'Control' }, 'r', () -> self:_update_filter() },
       { { 'Mod4' }, ';', () -> self.prompt:cancel() },
-      { { 'Mod4' }, ';', () -> self.prompt:cancel() },
     },
   })
 
@@ -104,8 +103,13 @@ function store:_on_prompt_submit() {
     self.prompt:start(self.prompt.text)
   } elseif self.selected_child.type == 'once' {
     self.selected_child.callback()
-    self.veil.active = false
+
+    -- Reset the text before updating the path to ensure the filter gets
+    -- updated properly
+    self.prompt:rawset('text', '')
+
     self.path = {}
+    self.veil.active = false
   } elseif self.selected_child.type == 'multiple' {
     self.selected_child.callback()
     self.prompt:start()

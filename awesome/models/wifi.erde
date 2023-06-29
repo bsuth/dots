@@ -127,7 +127,12 @@ function AccessPoint:_init(object_path) {
     parameters = GLib.Variant('(s)', { 'org.freedesktop.NetworkManager.AccessPoint' }),
     on_finish = raw_properties -> {
       local properties = decode_dbus_value(raw_properties)
-      self.ssid = decode_char_bytes(properties.Ssid)
+
+      -- Sometimes this is a string, apparently
+      if type(properties.Ssid) == 'table' {
+        self.ssid = decode_char_bytes(properties.Ssid)
+      }
+
       self.rsn_flags = properties.RsnFlags
       self.strength = properties.Strength
     },
