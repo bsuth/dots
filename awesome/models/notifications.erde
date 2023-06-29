@@ -27,8 +27,7 @@ local notifications = Object({
 -- Notify
 -- -----------------------------------------------------------------------------
 
--- `notification.force` is a custom property to bypass `notifications.active`
-naughty.config.notify_callback = notification -> {
+local function update_notification_history(notification) {
   -- Some notifications use `text` (awesomewm) and some use `message` (notify-send)
   local notification_text = notification.text || notification.message
 
@@ -48,9 +47,17 @@ naughty.config.notify_callback = notification -> {
 
     notifications.history = new_history
   }
+}
+
+naughty.config.notify_callback = notification -> {
+  update_notification_history(notification)
+
+  if !notifications.active && !notification.force {
+    notification.ignore = true
+  }
 
   notifications:publish('notify', notification)
-  return (notifications.active || notification.force) && notification
+  return notification
 }
 
 -- -----------------------------------------------------------------------------
