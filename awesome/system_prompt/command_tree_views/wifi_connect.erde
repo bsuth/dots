@@ -14,10 +14,12 @@ function wifi_connect_view:_init() {
     widget = wibox.container.place,
   })
 
-  self._prompt:subscribe('stop', () -> self:publish('stop'))
+  self._prompt:subscribe('stop', (reason, psk) -> {
+    if reason == 'submit' {
+      models.wifi:add_and_activate_connection(self._ssid, psk)
+    }
 
-  self._prompt:subscribe('submit', psk -> {
-    models.wifi:add_and_activate_connection(self._ssid, psk)
+    self:publish('stop')
   })
 }
 

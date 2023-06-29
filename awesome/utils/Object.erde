@@ -101,6 +101,7 @@ function Object:once(event, callback) {
     self:unsubscribe(event, callback_wrapper)
   }
   self:subscribe(event, callback_wrapper)
+  return callback_wrapper
 }
 
 -- -----------------------------------------------------------------------------

@@ -35,8 +35,13 @@ function store:_init() {
   })
 
   self.prompt:subscribe('user_change', () -> self:_update_filter())
-  self.prompt:subscribe('cancel', () -> self:_on_prompt_cancel())
-  self.prompt:subscribe('submit', () -> self:_on_prompt_submit())
+  self.prompt:subscribe('stop', reason -> {
+    if reason == 'cancel' {
+      self:_on_prompt_cancel()
+    } elseif reason == 'submit' {
+      self:_on_prompt_submit()
+    }
+  })
 
   self.path = {}
 }

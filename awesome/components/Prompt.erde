@@ -243,14 +243,12 @@ function Prompt:start(initial_text = '') {
 
 function Prompt:cancel() {
   self._keygrabber:stop()
-  self:publish('stop')
-  self:publish('cancel')
+  self:publish('stop', 'cancel')
 }
 
 function Prompt:submit() {
   self._keygrabber:stop()
-  self:publish('stop')
-  self:publish('submit', self.text)
+  self:publish('stop', 'submit', self.text)
 }
 
 -- -----------------------------------------------------------------------------

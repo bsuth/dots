@@ -206,19 +206,18 @@ function Tagbar:rename() {
   local focused_screen = awful.screen.focused()
   local focused_veil_popup = self._veil:get_focused_popup()
 
-  self._prompt:once('stop', () -> {
-    rename_tab.text = rename_tab.tag.name
-    focused_veil_popup.shape = nil
-    suggestions.active = false
-    self._veil.active = false
-  })
-
-  self._prompt:once('submit', text -> {
-    if #text > 0 {
+  self._prompt:once('stop', (reason, text) -> {
+    if reason == 'cancel' {
+      rename_tab.text = rename_tab.tag.name
+    } elseif reason == 'submit' && #text > 0 {
       rename_tab.tag.name = text
       rename_tab.text = text
       tagbar_history:push(text)
     }
+
+    focused_veil_popup.shape = nil
+    suggestions.active = false
+    self._veil.active = false
   })
 
   suggestions.default_suggestion = rename_tab.tag.name
