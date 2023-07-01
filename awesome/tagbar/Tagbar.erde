@@ -72,18 +72,17 @@ function Tagbar:_refresh() {
   -- iterate current tags to filter out any old (removed) tags
   self._disabled_tags = table.filter(self.screen.tags, tag -> table.has(self._disabled_tags, tag))
 
-  local filtered_tags = table.filter(self.screen.tags, tag -> !tag.name:match('^_'))
-  local num_filtered_tags = #filtered_tags
+  local num_tags = #self.screen.tags
 
-  for i = #self._tabs + 1, num_filtered_tags {
+  for i = #self._tabs + 1, num_tags {
     table.insert(self._tabs, Tab())
   }
 
-  for i = #self._tabs, num_filtered_tags + 1, -1 {
+  for i = #self._tabs, num_tags + 1, -1 {
     table.remove(self._tabs)
   }
 
-  self._tabs_widget.children = table.map(filtered_tags, (tag, i) -> {
+  self._tabs_widget.children = table.map(self.screen.tags, (tag, i) -> {
     local tab = self._tabs[i]
     tab.text = tag.name
     tab.selected = tag == self.screen.selected_tag
@@ -121,7 +120,7 @@ function Tagbar:open() {
 }
 
 function Tagbar:close() {
-  if #table.filter(self.screen.tags, tag -> !tag.name:match('^_')) > 1 {
+  if #self.screen.tags > 1 {
     self.screen.selected_tag:delete()
   }
 }

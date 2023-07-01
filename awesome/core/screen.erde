@@ -25,22 +25,27 @@ do {
 awful.screen.connect_for_each_screen(s -> {
   local screen_state = screen_states[s.index]
 
-  if !screen_state {
+  if !screen_state || #screen_state.tag_names == 0 {
     local tag = awful.tag.add('1', { screen = s, layout = layout })
     tag:view_only() -- force 'tag::history::update' signal
   } else {
+    local default_selected_tag = nil
+
     for _, tag_name in ipairs(screen_state.tag_names) {
       local tag = awful.tag.add(tag_name, { screen = s, layout = layout })
+      default_selected_tag ||= tag
       if tag_name == screen_state.selected_tag_name {
-        tag:view_only()
+        default_selected_tag = tag
       }
     }
+
+    default_selected_tag:view_only()
   }
 })
 
 -- When a screen is disconnected, reassign tags
 awful.tag.attached_connect_signal(nil, 'request::screen', tag -> {
-  if #tag:clients() > 0 || tag.name:match('^_') {
+  if #tag:clients() > 0 {
     local screens = table.collect(screen)
     local backup_screen = screens.find(s -> s != tag.screen)
     if backup_screen {
@@ -58,7 +63,7 @@ awesome.connect_signal('exit', () -> {
     local screen_state = { tag_names = {} }
 
     for _, tag in ipairs(s.tags) {
-      if !tag.name:match('^_') && #tag:clients() > 0 {
+      if #tag:clients() > 0 {
         table.insert(screen_state.tag_names, tag.name)
         if tag == s.selected_tag {
           screen_state.selected_tag_name = tag.name
