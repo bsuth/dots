@@ -1,6 +1,5 @@
 local gears = require('gears')
-
-local ENV_DOTS = os.getenv('DOTS')
+local { ENV_DOTS } = require('constants')
 
 return (name, color) -> {
   local full_path = "{ENV_DOTS}/awesome/assets/{name}.svg"

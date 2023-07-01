@@ -7,7 +7,7 @@ local {
   NM_DEVICE_STATE_IP_CHECK,
   NM_DEVICE_STATE_ACTIVATED,
   NM_DEVICE_STATE_DEACTIVATING,
-} = require('utils.network_manager')
+} = require('constants')
 local { palette } = require('core.theme')
 local models = require('models')
 local Card = require('components.Card')

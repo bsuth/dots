@@ -1,0 +1,22 @@
+module ENV_HOME = os.getenv('HOME')
+module ENV_DOTS = os.getenv('DOTS')
+module ENV_WORDCHARS = os.getenv('WORDCHARS')
+
+module AWESOME_CACHE_DIR = "{ ENV_HOME }/.cache/awesome"
+
+module WORDCHARS = { _ = true }
+for byte = string.byte('0'), string.byte('9') { WORDCHARS[string.char(byte)] = true }
+for byte = string.byte('a'), string.byte('z') { WORDCHARS[string.char(byte)] = true }
+for byte = string.byte('A'), string.byte('Z') { WORDCHARS[string.char(byte)] = true }
+for i = 1, #ENV_WORDCHARS { WORDCHARS[ENV_WORDCHARS:sub(i, i)] = true }
+
+-- https://developer-old.gnome.org/NetworkManager/stable/nm-dbus-types.html#NM80211ApSecurityFlags
+module NM_802_11_AP_SEC_KEY_MGMT_PSK = 0x100
+
+-- https://developer-old.gnome.org/NetworkManager/stable/nm-dbus-types.html#NMDeviceState
+module NM_DEVICE_STATE_PREPARE = 40
+module NM_DEVICE_STATE_CONFIG = 50
+module NM_DEVICE_STATE_IP_CONFIG = 70
+module NM_DEVICE_STATE_IP_CHECK = 80
+module NM_DEVICE_STATE_ACTIVATED = 100
+module NM_DEVICE_STATE_DEACTIVATING = 110

@@ -1,0 +1,74 @@
+local awful = require('awful')
+local cjson = require('cjson')
+local { AWESOME_CACHE_DIR } = require('constants')
+local layout = require('core.layout')
+
+local SCREEN_STATES_FILENAME = "{ AWESOME_CACHE_DIR }/screen_states"
+
+local screen_states = {}
+
+do {
+  local screen_states_file = io.open(SCREEN_STATES_FILENAME, 'r')
+
+  if screen_states_file {
+    local contents = screen_states_file:read('*a')
+
+    if contents != '' {
+      screen_states = cjson.decode(contents)
+    }
+
+    screen_states_file:close()
+  }
+}
+
+-- Init tags
+awful.screen.connect_for_each_screen(s -> {
+  local screen_state = screen_states[s.index]
+
+  if !screen_state {
+    local tag = awful.tag.add('1', { screen = s, layout = layout })
+    tag:view_only() -- force 'tag::history::update' signal
+  } else {
+    for _, tag_name in ipairs(screen_state.tag_names) {
+      local tag = awful.tag.add(tag_name, { screen = s, layout = layout })
+      if tag_name == screen_state.selected_tag_name {
+        tag:view_only()
+      }
+    }
+  }
+})
+
+-- When a screen is disconnected, reassign tags
+awful.tag.attached_connect_signal(nil, 'request::screen', tag -> {
+  if #tag:clients() > 0 || tag.name:match('^_') {
+    local screens = table.collect(screen)
+    local backup_screen = screens.find(s -> s != tag.screen)
+    if backup_screen {
+      tag.screen = backup_screen
+      tag:view_only()
+    }
+  }
+})
+
+awesome.connect_signal('exit', () -> {
+  local screen_states_file = io.open(SCREEN_STATES_FILENAME, 'w')
+  local new_screen_states = {}
+
+  for s in screen {
+    local screen_state = { tag_names = {} }
+
+    for _, tag in ipairs(s.tags) {
+      if !tag.name:match('^_') && #tag:clients() > 0 {
+        table.insert(screen_state.tag_names, tag.name)
+        if tag == s.selected_tag {
+          screen_state.selected_tag_name = tag.name
+        }
+      }
+    }
+
+    new_screen_states[s.index] = screen_state
+  }
+
+  screen_states_file:write(cjson.encode(new_screen_states))
+  screen_states_file:close()
+})

@@ -1,6 +1,8 @@
+local { AWESOME_CACHE_DIR } = require('constants')
+
 local tagbar_history = {}
 
-local TAGBAR_HISTORY_FILENAME = "{os.getenv('HOME')}/.cache/awesome/tagbar_history"
+local TAGBAR_HISTORY_FILENAME = "{ AWESOME_CACHE_DIR }/tagbar_history"
 local TAGBAR_HISTORY_SIZE = 50
 
 -- -----------------------------------------------------------------------------

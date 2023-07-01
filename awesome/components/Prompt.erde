@@ -1,15 +1,8 @@
 local awful = require('awful')
 local wibox = require('wibox')
+local { WORDCHARS } = require('constants')
 local { palette } = require('core.theme')
 local Class = require('utils.Class')
-
-local WORDCHARS = { _ = true }
-for byte = string.byte('0'), string.byte('9') { WORDCHARS[string.char(byte)] = true }
-for byte = string.byte('a'), string.byte('z') { WORDCHARS[string.char(byte)] = true }
-for byte = string.byte('A'), string.byte('Z') { WORDCHARS[string.char(byte)] = true }
-
-local ENV_WORDCHARS = os.getenv('WORDCHARS')
-for i = 1, #ENV_WORDCHARS { WORDCHARS[ENV_WORDCHARS:sub(i, i)] = true }
 
 local Prompt = Class()
 

@@ -1,4 +1,3 @@
-local awful = require('awful')
 local gears = require('gears')
 local ruled = require('ruled')
 
@@ -10,36 +9,13 @@ require('utils.stdlib').load()
 
 -- Load modules
 local bindings = require('core.bindings')
-local layout = require('core.layout')
 
 require('core.client')
+require('core.screen')
 require('core.theme')
 require('client_buffer')
 require('tagbar')
 require('system_prompt')
-
--- Init tags
-awful.screen.connect_for_each_screen(s -> {
-  local tag = awful.tag.add('1', { screen = s, layout = layout })
-
-  -- for development
-  -- awful.tag.add('2', { screen = s, layout = layout })
-  -- awful.tag.add('3', { screen = s, layout = layout })
-
-  tag:view_only() -- force 'tag::history::update' signal
-})
-
--- When a screen is disconnected, reassign tags
-awful.tag.attached_connect_signal(nil, 'request::screen', tag -> {
-  if #tag:clients() > 0 || tag.name:match('^_') {
-    local screens = table.collect(screen)
-    local backup_screen = screens.find(s -> s != tag.screen)
-    if backup_screen {
-      tag.screen = backup_screen
-      tag:view_only()
-    }
-  }
-})
 
 -- Init keybindings
 --
