@@ -8,7 +8,7 @@ local function bluetooth_connect() {
   local tree = {}
 
   for _, device in pairs(models.bluetooth.devices) {
-    if device.paired && !device.connected {
+    if device.paired_state == 'paired' && device.connected_state == 'disconnected' {
       table.insert(tree, {
         label = device.name,
         type = 'multiple',
@@ -24,7 +24,7 @@ local function bluetooth_disconnect() {
   local tree = {}
 
   for _, device in pairs(models.bluetooth.devices) {
-    if device.connected {
+    if device.connected_state == 'connected' {
       table.insert(tree, {
         label = device.name,
         type = 'multiple',
@@ -40,7 +40,7 @@ local function bluetooth_pair() {
   local tree = {}
 
   for _, device in pairs(models.bluetooth.devices) {
-    if !device.paired {
+    if device.paired_state == 'unpaired' {
       table.insert(tree, {
         label = device.name,
         type = 'multiple',
@@ -56,7 +56,7 @@ local function bluetooth_remove() {
   local tree = {}
 
   for _, device in pairs(models.bluetooth.devices) {
-    if device.paired {
+    if device.paired_state == 'paired' {
       table.insert(tree, {
         label = device.name,
         type = 'multiple',
@@ -89,6 +89,7 @@ return {
     label = 'pair',
     type = 'generate',
     callback = bluetooth_pair,
+    view = require('system_prompt.command_tree_views.bluetooth_pair'),
   },
   {
     label = 'remove',
@@ -106,13 +107,13 @@ return {
     callback = () -> models.bluetooth.adapter:power_off(),
   },
   {
-    label = 'start discovery',
+    label = 'scan on',
     type = 'multiple',
-    callback = () -> models.bluetooth.adapter:start_discovery(),
+    callback = () -> models.bluetooth.adapter:scan_on(),
   },
   {
-    label = 'stop discovery',
+    label = 'scan off',
     type = 'multiple',
-    callback = () -> models.bluetooth.adapter:stop_discovery(),
+    callback = () -> models.bluetooth.adapter:scan_off(),
   },
 }

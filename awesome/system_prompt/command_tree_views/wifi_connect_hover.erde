@@ -3,7 +3,6 @@ local { NM_802_11_AP_SEC_KEY_MGMT_PSK } = require('constants')
 local models = require('models')
 local { palette } = require('core.theme')
 local Card = require('components.Card')
-local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
 local Object = require('utils.Object')
 local svg = require('utils.svg')
 
@@ -20,7 +19,7 @@ function wifi_connect_hover_view:_init() {
       self._requires_password_card.root_widget,
       self._signal_strength_card.root_widget,
       spacing = 16,
-      widget = wibox.layout.fixed.horizontal,
+      layout = wibox.layout.fixed.horizontal,
     },
     widget = wibox.container.place,
   })

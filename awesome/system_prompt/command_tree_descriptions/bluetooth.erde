@@ -2,6 +2,7 @@ local wibox = require('wibox')
 local { palette } = require('core.theme')
 local models = require('models')
 local Card = require('components.Card')
+local Class = require('utils.Class')
 local svg = require('utils.svg')
 
 -- -----------------------------------------------------------------------------
@@ -43,46 +44,99 @@ update_adapter_discovering()
 models.bluetooth.adapter:subscribe('change_discovering', update_adapter_discovering)
 
 -- -----------------------------------------------------------------------------
--- Connected Devices
+-- KnownDevice
 -- -----------------------------------------------------------------------------
 
-local connected_devices_widget = wibox.widget({
+local KnownDevice = Class()
+
+function KnownDevice:_init(name) {
+  self._background_widget = wibox.widget({
+    {
+      text = name,
+      font = 'Quicksand Regular 20',
+      align = 'center',
+      valign = 'center',
+      widget = wibox.widget.textbox,
+    },
+    fg = palette.white,
+    widget = wibox.container.background,
+  })
+
+  self.root_widget = wibox.widget({
+    self._background_widget,
+    widget = wibox.container.place,
+  })
+}
+
+function KnownDevice:_on_change_paired_state() {
+  self:_update()
+}
+
+function KnownDevice:_on_change_connected_state() {
+  self:_update()
+}
+
+function KnownDevice:_update() {
+  local has_transition_state = (
+    self.paired_state == 'pairing' ||
+    self.paired_state == 'unpairing' ||
+    self.connected_state == 'connecting' ||
+    self.connected_state == 'disconnecting'
+  )
+
+  self._background_widget.fg = has_transition_state
+    && palette.yellow
+    || self.connected_state == 'connected'
+    && palette.green
+    || palette.white
+}
+
+-- -----------------------------------------------------------------------------
+-- Known Devices
+-- -----------------------------------------------------------------------------
+
+local known_devices = {}
+
+local known_devices_widget = wibox.widget({
   spacing = 8,
   layout = wibox.layout.fixed.vertical,
 })
 
-local function update_connected_devices() {
+local function update_known_devices() {
+  local new_known_devices = {}
   local new_children = {}
 
   for _, device in pairs(models.bluetooth.devices) {
-    if device.connected {
-      table.insert(new_children, wibox.widget({
-        text = device.name,
-        font = 'Quicksand SemiBold 24',
-        align = 'center',
-        widget = wibox.widget.textbox,
-      }))
+    if device.paired_state != 'unpaired' {
+      local known_device = known_devices[device.name] || KnownDevice(device.name)
+
+      known_device.paired_state = device.paired_state
+      known_device.connected_state = device.connected_state
+
+      new_known_devices[device.name] = known_device
+      table.insert(new_children, known_device.root_widget)
     }
   }
 
-  connected_devices_widget.children = new_children
-}
-
-update_connected_devices()
-for _, device in pairs(models.bluetooth.devices) {
-  device:subscribe('change_connected', update_connected_devices)
+  known_devices = new_known_devices
+  known_devices_widget.children = new_children
 }
 
 models.bluetooth:subscribe('device_added', device -> {
-  device:subscribe('change_connected', update_connected_devices)
-  if device.connected {
-    update_connected_devices()
+  device:subscribe('change_connected_state', update_known_devices)
+  device:subscribe('change_paired_state', update_known_devices)
+
+  if device.paired_state != 'unpaired' {
+    update_known_devices()
   }
 })
 
 models.bluetooth:subscribe('device_removed', device -> {
-  if device.connected {
-    update_connected_devices()
+  device:unsubscribe('change_connected_state', update_known_devices)
+  device:unsubscribe('change_paired_state', update_known_devices)
+
+  if device.paired_state != 'unpaired' {
+    update_known_devices()
   }
 })
 
@@ -92,7 +146,6 @@ models.bluetooth:subscribe('device_removed', device -> {
 
 return wibox.widget({
   {
-    connected_devices_widget,
     {
       {
         adapter_powered.root_widget,
@@ -102,7 +155,13 @@ return wibox.widget({
       },
       widget = wibox.container.place,
     },
-    spacing = 16,
+    known_devices_widget,
+    spacing = 64,
+    spacing_widget = {
+      thickness = 1,
+      color = palette.white,
+      widget = wibox.widget.separator,
+    },
     layout = wibox.layout.fixed.vertical,
   },
   widget = wibox.container.place,

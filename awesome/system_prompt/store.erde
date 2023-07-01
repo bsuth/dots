@@ -82,8 +82,14 @@ function store:_on_change_path() {
   self:_update_active_node()
 }
 
-function store:_on_change_selected_child() {
+function store:_on_change_active_node() {
   if self.active_node.type != 'view' {
+    self.view = self.active_node.view
+  }
+}
+
+function store:_on_change_selected_child() {
+  if self.active_node.type != 'view' && !self.active_node.view {
     if self.selected_child && self.selected_child.hover_view {
       self.view = self.selected_child.hover_view
       self.view:update(self.selected_child.hover_view_args)

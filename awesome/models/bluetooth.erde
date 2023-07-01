@@ -96,7 +96,7 @@ function bluetooth_adapter:power_off() {
   })
 }
 
-function bluetooth_adapter:start_discovery() {
+function bluetooth_adapter:scan_on() {
   if !self:sanity_check() {
     return
   }
@@ -111,7 +111,7 @@ function bluetooth_adapter:start_discovery() {
   }
 }
 
-function bluetooth_adapter:stop_discovery() {
+function bluetooth_adapter:scan_off() {
   if !self:sanity_check() {
     return
   }
@@ -136,8 +136,8 @@ function BluetoothDevice:_init(props = {}) {
   self.object_path = props.object_path
   self.adapter_object_path = props.adapter_object_path
   self.name = props.name
-  self.connected = props.connected
-  self.paired = props.paired
+  self.connected_state = props.connected && 'connected' || 'disconnected'
+  self.paired_state = props.paired && 'paired' || 'unpaired'
 
   self._properties_changed_subscription = system_bus:signal_subscribe(
     nil,
@@ -155,11 +155,11 @@ function BluetoothDevice:_init(props = {}) {
 
 function BluetoothDevice:_update_properties(properties) {
   if properties.Connected != nil {
-    self.connected = properties.Connected
+    self.connected_state = properties.Connected && 'connected' || 'disconnected'
   }
 
   if properties.Paired != nil {
-    self.paired = properties.Paired
+    self.paired_state = properties.Paired && 'paired' || 'unpaired'
   }
 }
 
@@ -168,43 +168,43 @@ function BluetoothDevice:cleanup() {
 }
 
 function BluetoothDevice:connect() {
-  self.connected = true -- optimistic update
+  self.connected_state = 'connecting'
 
   dbus_call_async(system_bus, {
     bus_name = 'org.bluez',
     object_path = self.object_path,
     interface_name = 'org.bluez.Device1',
     method_name = 'Connect',
-    on_error = () -> { self.connected = false }, -- revert optimistic update
+    on_error = () -> { self.connected_state = 'disconnected' },
   })
 }
 
 function BluetoothDevice:disconnect() {
-  self.connected = false -- optimistic update
+  self.connected_state = 'disconnecting'
 
   dbus_call_async(system_bus, {
     bus_name = 'org.bluez',
     object_path = self.object_path,
     interface_name = 'org.bluez.Device1',
     method_name = 'Disconnect',
-    on_error = () -> { self.connected = true }, -- revert optimistic update
+    on_error = () -> { self.connected_state = 'connected' },
   })
 }
 
 function BluetoothDevice:pair() {
-  self.paired = true -- optimistic update
+  self.paired_state = 'pairing'
 
   dbus_call_async(system_bus, {
     bus_name = 'org.bluez',
     object_path = self.object_path,
     interface_name = 'org.bluez.Device1',
     method_name = 'Pair',
-    on_error = () -> { self.paired = false }, -- revert optimistic update
+    on_error = () -> { self.paired_state = 'unpaired' },
   })
 }
 
 function BluetoothDevice:remove() {
-  self.paired = false -- optimistic update
+  self.paired_state = 'unpairing'
 
   dbus_call_async(system_bus, {
     bus_name = 'org.bluez',
@@ -212,7 +212,7 @@ function BluetoothDevice:remove() {
     interface_name = 'org.bluez.Adapter1',
     method_name = 'RemoveDevice',
     parameters = GLib.Variant('(o)', { self.object_path }),
-    on_error = () -> { self.paired = true }, -- revert optimistic update
+    on_error = () -> { self.paired_state = 'paired' },
   })
 }
 
