@@ -1,4 +1,4 @@
-local C = require('constants')
+local { TRACK_CWD_BLACKLIST_FILTERS } = require('constants')
 local packer = require('packer')
 
 packer.use('tpope/vim-fugitive')
@@ -11,4 +11,4 @@ vim.keymap.set('n', '<leader>gd', ':Git diff<cr>')
 vim.keymap.set('n', '<leader>gl', ':Git log<cr>')
 vim.keymap.set('n', '<leader>gb', ':Git blame<cr>')
 
-table.insert(C.TRACK_CWD_BLACKLIST, '^fugitive://')
+table.insert(TRACK_CWD_BLACKLIST_FILTERS, buffer -> vim.api.nvim_buf_get_name(buffer):match('^fugitive://'))

@@ -1,0 +1,43 @@
+local scratchpad_buffer = 1
+local scratchpad_window = nil
+
+local function get_scratchpad_window_config() {
+  return {
+    relative = 'editor',
+    style = 'minimal',
+    border = 'single',
+    width = math.ceil(vim.o.columns * 0.8),
+    height = math.ceil(vim.o.lines * 0.8),
+    col = vim.o.columns * 0.1,
+    row = vim.o.lines * 0.1,
+  }
+}
+
+local function toggle() {
+  if scratchpad_window && vim.api.nvim_win_is_valid(scratchpad_window) {
+    vim.api.nvim_win_hide(scratchpad_window)
+  } else {
+    scratchpad_window = vim.api.nvim_open_win(scratchpad_buffer, true, get_scratchpad_window_config())
+  }
+}
+
+vim.keymap.set('n', '<m-space>', toggle)
+vim.keymap.set('t', '<m-space>', toggle)
+
+vim.api.nvim_create_autocmd('VimResized', {
+  group = 'bsuth',
+  callback = () -> {
+    if scratchpad_window && vim.api.nvim_win_is_valid(scratchpad_window) {
+      vim.api.nvim_win_set_config(scratchpad_window, get_scratchpad_window_config())
+    }
+  },
+})
+
+vim.api.nvim_create_autocmd('BufWinEnter', {
+  group = 'bsuth',
+  callback = () -> {
+    if vim.api.nvim_get_current_win() == scratchpad_window {
+      scratchpad_buffer = vim.api.nvim_get_current_buf()
+    }
+  },
+})

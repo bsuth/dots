@@ -1,50 +1,40 @@
-local C = require('constants')
+local { TERM_PATTERNS, TRACK_CWD_BLACKLIST_FILTERS } = require('constants')
 local { get_buffer_dir } = require('utils.vim')
 
-function is_blacklist_buffer(buffer) {
-  local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
-  local buffer_name = vim.api.nvim_buf_get_name(buffer)
-
-  return (
-    filetype == 'help' ||
-    filetype == 'man' ||
-    table.has(C.TRACK_CWD_BLACKLIST, pattern -> buffer_name:match(pattern))
-  )
-}
+local buffer_cwd = {}
 
 -- Do not make this local! zsh needs this for cd hook in nested terminal.
-global function save_term_cwd() {
-  local buffer = vim.api.nvim_get_current_buf()
-  local buffer_name = vim.api.nvim_buf_get_name(buffer)
-  C.BUFFER_CWD[buffer_name] = vim.fn.getcwd()
+global function save_buffer_cwd() {
+  buffer_cwd[vim.api.nvim_get_current_buf()] = vim.fn.getcwd()
 }
 
 vim.api.nvim_create_autocmd('BufEnter', {
   group = 'bsuth',
   callback = () -> {
     local buffer = vim.api.nvim_get_current_buf()
-    local buffer_name = vim.api.nvim_buf_get_name(buffer)
 
-    if C.BUFFER_CWD[buffer_name] != nil {
-      vim.cmd("cd {C.BUFFER_CWD[buffer_name]}")
-    } elseif !is_blacklist_buffer(buffer) {
-      vim.cmd("cd {get_buffer_dir(buffer)}")
+    if buffer_cwd[buffer] != nil {
+      vim.cmd("cd {buffer_cwd[buffer]}")
     }
+
+    for _, blacklist_filter in ipairs(TRACK_CWD_BLACKLIST_FILTERS) {
+      if blacklist_filter(buffer) {
+        return
+      }
+    }
+
+    vim.cmd("cd {get_buffer_dir(buffer)}")
   },
 })
 
 vim.api.nvim_create_autocmd('TermOpen', {
   group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
-  callback = save_term_cwd,
+  pattern = TERM_PATTERNS,
+  callback = save_buffer_cwd,
 })
 
 vim.api.nvim_create_autocmd('TermClose', {
   group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
-  callback = () -> {
-    local buffer = vim.api.nvim_get_current_buf()
-    local buffer_name = vim.api.nvim_buf_get_name(buffer)
-    C.BUFFER_CWD[buffer_name] = nil
-  },
+  pattern = TERM_PATTERNS,
+  callback = () -> { buffer_cwd[vim.api.nvim_get_current_buf()] = nil },
 })

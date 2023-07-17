@@ -1,4 +1,4 @@
-local C = require('constants')
+local { TERM_PATTERNS } = require('constants')
 local { edit } = require('utils.vim')
 
 vim.keymap.set('n', '<c-space>', ':term<cr>')
@@ -7,7 +7,7 @@ vim.keymap.set('t', '<esc>', '<c-\\><c-n>')
 
 vim.api.nvim_create_autocmd('TermOpen', {
   group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
+  pattern = TERM_PATTERNS,
   callback = () -> {
     vim.cmd('setlocal nonumber wrap')
     vim.cmd('startinsert')
@@ -16,7 +16,7 @@ vim.api.nvim_create_autocmd('TermOpen', {
 
 vim.api.nvim_create_autocmd('TermClose', {
   group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
+  pattern = TERM_PATTERNS,
   callback = () -> {
     local buffer = vim.api.nvim_win_get_buf(0)
     edit(vim.fn.getcwd())

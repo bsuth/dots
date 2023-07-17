@@ -98,7 +98,7 @@ SPACESHIP_PROMPT_ORDER=(
 
 function on_cd() {
   if [[ ! -z $NVIM ]]; then
-    nvim --server $NVIM --remote-send "<c-\\><c-n>:cd $(pwd) | lua save_term_cwd()<cr>i"
+    nvim --server $NVIM --remote-send "<c-\\><c-n>:cd $(pwd) | lua save_buffer_cwd()<cr>i"
   fi
 }
 
@@ -112,8 +112,10 @@ alias ls='ls --color=auto'
 alias lj='luajit'
 
 function qmk_chocofi {
-  qmk compile -kb crkbd/rev1 -km bsuth -e CONVERT_TO=promicro_rp2040
-  qmk flash -kb crkbd/rev1 -km bsuth -e CONVERT_TO=promicro_rp2040
+  cd ~/extern/qmk_firmware
+  # https://joshajohnson.com/sea-picro/#documentation
+  qmk flash -c -kb crkbd -km bsuth -e CONVERT_TO=promicro_rp2040
+  cd -
 }
 
 alias erdejit='luajit ~/.luarocks/share/lua/5.1/erde/cli.lua'

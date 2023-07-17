@@ -102,13 +102,12 @@ load('plugins.formatter')
 
 -- utils
 packer.use('matze/vim-move')
-load('plugins.sneak')
 packer.use('tpope/vim-surround')
 packer.use('tpope/vim-abolish')
 packer.use('tpope/vim-repeat')
-packer.use('tpope/vim-speeddating')
 load('plugins.commentary')
 load('plugins.suda')
+packer.use('~/repos/emacs-bindings.nvim')
 
 -- ui
 load('plugins.dirvish')
@@ -118,18 +117,14 @@ load('plugins.lualine')
 
 -- languages
 load('plugins.go')
-packer.use('peterhoeg/vim-qml')
-packer.use('tridactyl/vim-tridactyl')
-
--- local plugins
 packer.use('~/repos/vim-erde')
-packer.use('~/repos/emacs-bindings.nvim')
 
 -- -----------------------------------------------------------------------------
 -- Modules
 -- -----------------------------------------------------------------------------
 
 load('modules.buffer_history')
+load('modules.scratchpad')
 load('modules.search_visual')
 load('modules.surround_jump')
 load('modules.terminal')

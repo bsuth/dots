@@ -1,7 +1,10 @@
 module FILE_BROWSER_FILETYPE = 'netrw'
 
-module BUFFER_CWD = {}
-module TRACK_CWD_BLACKLIST = { '^term://' }
+module TRACK_CWD_BLACKLIST_FILTERS = {
+  buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'help',
+  buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'man',
+  buffer -> vim.api.nvim_buf_get_name(buffer):match('^term://'),
+}
 
 module BUFFER_HISTORY_FILETYPE_BLACKLIST = { FILE_BROWSER_FILETYPE }
 
