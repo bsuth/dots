@@ -21,9 +21,6 @@ local function toggle() {
   }
 }
 
-vim.keymap.set('n', '<m-space>', toggle)
-vim.keymap.set('t', '<m-space>', toggle)
-
 vim.api.nvim_create_autocmd('VimResized', {
   group = 'bsuth',
   callback = () -> {
@@ -41,3 +38,6 @@ vim.api.nvim_create_autocmd('BufWinEnter', {
     }
   },
 })
+
+vim.keymap.set('n', '<m-space>', toggle)
+vim.keymap.set('t', '<m-space>', toggle)

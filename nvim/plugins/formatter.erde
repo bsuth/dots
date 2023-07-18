@@ -1,4 +1,4 @@
-local C = require('constants')
+local { CSS_PATTERNS } = require('constants')
 local packer = require('packer')
 
 packer.use('mhartington/formatter.nvim')
@@ -7,7 +7,7 @@ local formatters = require('formatter.defaults')
 
 vim.api.nvim_create_autocmd('BufWritePre', {
   group = 'bsuth',
-  pattern = C.CSS_PATTERNS,
+  pattern = CSS_PATTERNS,
   command = 'lua vim.lsp.buf.format()', -- stylelint
 })
 

@@ -2,6 +2,7 @@ local awful = require('awful')
 local wibox = require('wibox')
 local { WORDCHARS } = require('constants')
 local { palette } = require('core.theme')
+local models = require('models')
 local Class = require('utils.Class')
 
 local Prompt = Class()
@@ -24,6 +25,11 @@ function Prompt:_init(props = {}) {
   })
 
   local keybindings = {
+    { {}, 'XF86AudioLowerVolume', () -> { models.volume.percent -= 5 } },
+    { {}, 'XF86AudioRaiseVolume', () -> { models.volume.percent += 5 } },
+    { {}, 'XF86AudioMute', () -> models.volume:toggle() },
+    { {}, 'XF86MonBrightnessDown', () -> { models.brightness.percent -= 8 } },
+    { {}, 'XF86MonBrightnessUp', () -> { models.brightness.percent += 8 } },
     { {}, 'Right', () -> self:_move_char_forward() },
     { {}, 'Left', () -> self:_move_char_back() },
     { { 'Control' }, 'f', () -> self:_move_char_forward() },
