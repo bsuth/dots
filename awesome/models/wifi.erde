@@ -362,6 +362,67 @@ local wifi = {}
 function wifi:_init() {
   self.settings = Object(network_manager_settings)
   self.device = Object(network_manager_wifi_device)
+  self.enabled = true
+
+  dbus_call_async(system_bus, {
+    bus_name = 'org.freedesktop.NetworkManager',
+    object_path = '/org/freedesktop/NetworkManager',
+    interface_name = 'org.freedesktop.DBus.Properties',
+    method_name = 'Get',
+    parameters = GLib.Variant('(ss)', { 'org.freedesktop.NetworkManager', 'WirelessEnabled' }),
+    on_finish = wireless_enabled -> { self.enabled = wireless_enabled },
+  })
+
+  system_bus:signal_subscribe(
+    nil,
+    'org.freedesktop.DBus.Properties',
+    'PropertiesChanged',
+    '/org/freedesktop/NetworkManager',
+    nil,
+    Gio.DBusSignalFlags.NONE,
+    (_, _, _, _, _, parameters) -> {
+      local [ _, properties ] = lgi_extract_dbus_value(parameters)
+      self:_update_properties(decode_dbus_value(properties))
+    },
+  )
+}
+
+function wifi:_update_properties(properties) {
+  if properties.WirelessEnabled != nil {
+    self.enabled = properties.WirelessEnabled
+  }
+}
+
+function wifi:enable() {
+  if !self.enabled {
+    dbus_call_async(system_bus, {
+      bus_name = 'org.freedesktop.NetworkManager',
+      object_path = '/org/freedesktop/NetworkManager',
+      interface_name = 'org.freedesktop.DBus.Properties',
+      method_name = 'Set',
+      parameters = GLib.Variant('(ssv)', {
+        'org.freedesktop.NetworkManager',
+        'WirelessEnabled',
+        GLib.Variant('b', true),
+      }),
+    })
+  }
+}
+
+function wifi:disable() {
+  if self.enabled {
+    dbus_call_async(system_bus, {
+      bus_name = 'org.freedesktop.NetworkManager',
+      object_path = '/org/freedesktop/NetworkManager',
+      interface_name = 'org.freedesktop.DBus.Properties',
+      method_name = 'Set',
+      parameters = GLib.Variant('(ssv)', {
+        'org.freedesktop.NetworkManager',
+        'WirelessEnabled',
+        GLib.Variant('b', false),
+      }),
+    })
+  }
 }
 
 function wifi:get_ssid_connection_object_path(ssid) {

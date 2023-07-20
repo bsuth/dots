@@ -17,14 +17,10 @@ local svg = require('utils.svg')
 -- Connection Status
 -- -----------------------------------------------------------------------------
 
-local connection_status_icon_widget = wibox.widget({
-  forced_width = 64,
-  forced_height= 64,
-  widget = wibox.widget.imagebox,
-})
+local connection_status_card = Card()
 
 local connection_status_widget = wibox.widget({
-  connection_status_icon_widget,
+  connection_status_card.root_widget,
   widget = wibox.container.rotate,
 })
 
@@ -132,24 +128,31 @@ local function update_state() {
     models.wifi.device.state == NM_DEVICE_STATE_IP_CHECK
   )
 
-  if is_connecting {
-    connection_status_icon_widget.image = svg('double-arrow', palette.yellow)
-    connection_status_widget.direction = 'east'
+  if models.wifi.enabled == false {
+    connection_status_card.icon = svg('battery-charging', palette.black)
+    connection_status_card.bg = palette.red
     root_widget.children = { connection_status_widget }
   } elseif models.wifi.device.state == NM_DEVICE_STATE_ACTIVATED {
     root_widget.children = { connected_widget }
+  } elseif is_connecting {
+    connection_status_card.icon = svg('double-arrow', palette.black)
+    connection_status_card.bg = palette.yellow
+    connection_status_widget.direction = 'east'
+    root_widget.children = { connection_status_widget }
   } elseif models.wifi.device.state == NM_DEVICE_STATE_DEACTIVATING {
-    connection_status_icon_widget.image = svg('double-arrow', palette.yellow)
+    connection_status_card.icon = svg('double-arrow', palette.black)
+    connection_status_card.bg = palette.yellow
     connection_status_widget.direction = 'west'
     root_widget.children = { connection_status_widget }
   } else {
-    connection_status_icon_widget.image = svg('cross', palette.red)
-    connection_status_widget.direction = 'north'
+    connection_status_card.icon = svg('cross', palette.black)
+    connection_status_card.bg = palette.red
     root_widget.children = { connection_status_widget }
   }
 }
 
 update_state()
+models.wifi:subscribe('change_enabled', update_state)
 models.wifi.device:subscribe('change_state', update_state)
 
 return root_widget

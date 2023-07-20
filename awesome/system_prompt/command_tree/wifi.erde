@@ -142,6 +142,16 @@ return {
     callback = wifi_forget,
   },
   {
+    label = 'enable',
+    type = 'multiple',
+    callback = () -> models.wifi:enable(),
+  },
+  {
+    label = 'disable',
+    type = 'multiple',
+    callback = () -> models.wifi:disable(),
+  },
+  {
     label = 'password',
     {
       label = 'show',
