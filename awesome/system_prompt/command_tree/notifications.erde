@@ -4,16 +4,6 @@ return {
   label = 'notifications',
   description = require('system_prompt.command_tree_descriptions.notifications'),
   {
-    label = 'toggle',
-    type = 'multiple',
-    callback = () -> models.notifications:toggle(),
-  },
-  {
-    label = 'clear',
-    type = 'multiple',
-    callback = () -> models.notifications:clear(),
-  },
-  {
     label = 'off',
     type = 'multiple',
     callback = () -> { models.notifications.active = false },
@@ -22,5 +12,10 @@ return {
     label = 'on',
     type = 'multiple',
     callback = () -> { models.notifications.active = true },
+  },
+  {
+    label = 'clear',
+    type = 'multiple',
+    callback = () -> models.notifications:clear(),
   },
 }

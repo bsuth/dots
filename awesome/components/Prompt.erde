@@ -45,6 +45,8 @@ function Prompt:_init(props = {}) {
     { { 'Control' }, 'u', () -> self:_delete_line_start() },
     { { 'Control' }, 'k', () -> self:_delete_line_end() },
     { { 'Control' }, 'space', () -> { self.hidden = !self.hidden } },
+    { { 'Control' }, 'v', () -> self:_paste_clipboard() },
+    { { 'Shift', 'Control' }, 'v', () -> self:_paste_clipboard() },
     { {}, 'Escape', () -> self:cancel() },
     { { 'Control' }, 'c', () -> self:cancel() },
     { {}, 'Return', () -> self:submit() },
@@ -227,6 +229,19 @@ function Prompt:_delete_line_end() {
     self.text = self.text:sub(1, self.cursor)
     self:publish('user_change', self.text)
   }
+}
+
+function Prompt:_paste_clipboard() {
+  awful.spawn.easy_async('xsel --clipboard --output', stdout -> {
+    local content = stdout:trim()
+
+    if content != '' {
+      self:rawset('text', self.text .. content)
+      self:rawset('cursor', self.cursor + #content)
+      self:_update_markup()
+      self:publish('user_change', self.text)
+    }
+  })
 }
 
 -- -----------------------------------------------------------------------------

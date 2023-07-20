@@ -18,11 +18,6 @@ return {
     callback = () -> { models.volume.active = true },
   },
   {
-    label = 'toggle',
-    type = 'multiple',
-    callback = () -> models.volume:toggle(),
-  },
-  {
     label = 'min',
     type = 'multiple',
     callback = () -> { models.volume.percent = 0 },
@@ -31,15 +26,5 @@ return {
     label = 'max',
     type = 'multiple',
     callback = () -> { models.volume.percent = 100 },
-  },
-  {
-    label = 'up',
-    type = 'multiple',
-    callback = () -> { models.volume.percent += 5 },
-  },
-  {
-    label = 'down',
-    type = 'multiple',
-    callback = () -> { models.volume.percent -= 5 },
   },
 }

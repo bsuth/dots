@@ -1,16 +1,24 @@
 local awful = require('awful')
+local { save_screen_state } = require('core.screen')
 
 return {
   label = 'system',
   {
     label = 'sleep',
     type = 'once',
-    callback = () -> awful.spawn('systemctl suspend'),
+    callback = () -> {
+      save_screen_state()
+      awful.spawn('systemctl suspend')
+    }
   },
   {
     label = 'lock',
     type = 'once',
     callback = () -> awful.spawn('slock'),
+    callback = () -> {
+      save_screen_state()
+      awful.spawn('slock')
+    }
   },
   {
     label = 'logout',
@@ -20,11 +28,22 @@ return {
   {
     label = 'reboot',
     type = 'once',
-    callback = () -> awful.spawn('/sbin/reboot'),
+    callback = () -> {
+      save_screen_state()
+      awful.spawn('/sbin/reboot')
+    }
+  },
+  {
+    label = 'refresh',
+    type = 'once',
+    callback = () -> awesome.restart(),
   },
   {
     label = 'poweroff',
     type = 'once',
-    callback = () -> awful.spawn('/sbin/poweroff'),
+    callback = () -> {
+      save_screen_state()
+      awful.spawn('/sbin/poweroff')
+    }
   },
 }

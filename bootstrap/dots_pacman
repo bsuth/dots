@@ -20,6 +20,7 @@ declare -a PACMAN_PACKAGES=(
   xorg-xinit
   xorg-xev
   xclip
+  xsel
   awesome
   picom
 

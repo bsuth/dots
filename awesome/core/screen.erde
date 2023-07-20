@@ -21,6 +21,27 @@ do {
   }
 }
 
+module function save_screen_state() {
+  local screen_states_file = io.open(SCREEN_STATES_FILENAME, 'w')
+  local new_screen_states = {}
+
+  for s in screen {
+    local screen_state = { tag_names = {} }
+
+    for _, tag in ipairs(s.tags) {
+      table.insert(screen_state.tag_names, tag.name)
+      if tag == s.selected_tag {
+        screen_state.selected_tag_name = tag.name
+      }
+    }
+
+    new_screen_states[s.index] = screen_state
+  }
+
+  screen_states_file:write(cjson.encode(new_screen_states))
+  screen_states_file:close()
+}
+
 -- Init tags
 awful.screen.connect_for_each_screen(s -> {
   local screen_state = screen_states[s.index]
@@ -55,25 +76,4 @@ awful.tag.attached_connect_signal(nil, 'request::screen', tag -> {
   }
 })
 
-awesome.connect_signal('exit', () -> {
-  local screen_states_file = io.open(SCREEN_STATES_FILENAME, 'w')
-  local new_screen_states = {}
-
-  for s in screen {
-    local screen_state = { tag_names = {} }
-
-    for _, tag in ipairs(s.tags) {
-      if #tag:clients() > 0 {
-        table.insert(screen_state.tag_names, tag.name)
-        if tag == s.selected_tag {
-          screen_state.selected_tag_name = tag.name
-        }
-      }
-    }
-
-    new_screen_states[s.index] = screen_state
-  }
-
-  screen_states_file:write(cjson.encode(new_screen_states))
-  screen_states_file:close()
-})
+awesome.connect_signal('exit', () -> save_screen_state)

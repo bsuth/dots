@@ -18,14 +18,4 @@ return {
     type = 'multiple',
     callback = () -> { models.brightness.percent = 100 },
   },
-  {
-    label = 'up',
-    type = 'multiple',
-    callback = () -> { models.brightness.percent += 8 },
-  },
-  {
-    label = 'down',
-    type = 'multiple',
-    callback = () -> { models.brightness.percent -= 8 },
-  },
 }
