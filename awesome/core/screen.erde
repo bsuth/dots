@@ -22,7 +22,6 @@ do {
 }
 
 module function save_screen_state() {
-  local screen_states_file = io.open(SCREEN_STATES_FILENAME, 'w')
   local new_screen_states = {}
 
   for s in screen {
@@ -38,6 +37,7 @@ module function save_screen_state() {
     new_screen_states[s.index] = screen_state
   }
 
+  local screen_states_file = io.open(SCREEN_STATES_FILENAME, 'w')
   screen_states_file:write(cjson.encode(new_screen_states))
   screen_states_file:close()
 }
@@ -76,4 +76,4 @@ awful.tag.attached_connect_signal(nil, 'request::screen', tag -> {
   }
 })
 
-awesome.connect_signal('exit', () -> save_screen_state)
+awesome.connect_signal('exit', save_screen_state)
