@@ -127,11 +127,6 @@ return {
     callback = wifi_connect,
   },
   {
-    label = 'scan',
-    type = 'multiple',
-    callback = () -> models.wifi.device:scan(),
-  },
-  {
     label = 'disconnect',
     type = 'multiple',
     callback = () -> models.wifi.device:disconnect(),
@@ -142,14 +137,15 @@ return {
     callback = wifi_forget,
   },
   {
-    label = 'enable',
+    label = 'toggle',
     type = 'multiple',
-    callback = () -> models.wifi:enable(),
-  },
-  {
-    label = 'disable',
-    type = 'multiple',
-    callback = () -> models.wifi:disable(),
+    callback = () -> {
+      if models.wifi.enabled {
+        models.wifi:disable()
+      } else {
+        models.wifi:enable()
+      }
+    }
   },
   {
     label = 'password',

@@ -43,6 +43,7 @@ vim.opt.scrollback = 100000
 vim.opt.wrap = false
 vim.opt.clipboard = 'unnamedplus'
 vim.opt.commentstring = '//%s'
+vim.opt.formatoptions = 'jcroql'
 
 -- -----------------------------------------------------------------------------
 -- Mappings

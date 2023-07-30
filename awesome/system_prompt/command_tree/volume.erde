@@ -8,14 +8,9 @@ return {
     view = require('system_prompt.command_tree_views.volume_gui'),
   },
   {
-    label = 'mute',
+    label = 'toggle',
     type = 'multiple',
-    callback = () -> { models.volume.active = false },
-  },
-  {
-    label = 'unmute',
-    type = 'multiple',
-    callback = () -> { models.volume.active = true },
+    callback = () -> models.volume:toggle(),
   },
   {
     label = 'min',

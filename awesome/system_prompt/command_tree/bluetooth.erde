@@ -52,7 +52,7 @@ local function bluetooth_pair() {
   return tree
 }
 
-local function bluetooth_remove() {
+local function bluetooth_forget() {
   local tree = {}
 
   for _, device in pairs(models.bluetooth.devices) {
@@ -90,30 +90,23 @@ return {
     type = 'generate',
     callback = bluetooth_pair,
     view = require('system_prompt.command_tree_views.bluetooth_pair'),
+    on_enter = () -> models.bluetooth.adapter:scan_on(),
+    on_exit = () -> models.bluetooth.adapter:scan_off(),
   },
   {
-    label = 'remove',
+    label = 'forget',
     type = 'generate',
-    callback = bluetooth_remove,
+    callback = bluetooth_forget,
   },
   {
-    label = 'power on',
+    label = 'toggle',
     type = 'multiple',
-    callback = () -> models.bluetooth.adapter:power_on(),
-  },
-  {
-    label = 'power off',
-    type = 'multiple',
-    callback = () -> models.bluetooth.adapter:power_off(),
-  },
-  {
-    label = 'scan on',
-    type = 'multiple',
-    callback = () -> models.bluetooth.adapter:scan_on(),
-  },
-  {
-    label = 'scan off',
-    type = 'multiple',
-    callback = () -> models.bluetooth.adapter:scan_off(),
+    callback = () -> {
+      if models.bluetooth.adapter.powered {
+        models.bluetooth.adapter:power_off()
+      } else {
+        models.bluetooth.adapter:power_on()
+      }
+    },
   },
 }

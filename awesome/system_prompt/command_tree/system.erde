@@ -1,7 +1,12 @@
 local awful = require('awful')
+local { ENV_HOME } = require('constants')
 local { save_screen_state } = require('core.screen')
 
-return {
+-- -----------------------------------------------------------------------------
+-- System Tree
+-- -----------------------------------------------------------------------------
+
+local system_tree = {
   label = 'system',
   {
     label = 'sleep',
@@ -21,7 +26,7 @@ return {
     }
   },
   {
-    label = 'logout',
+    label = 'quit',
     type = 'once',
     callback = () -> awesome.quit(),
   },
@@ -34,7 +39,7 @@ return {
     }
   },
   {
-    label = 'refresh',
+    label = 'restart',
     type = 'once',
     callback = () -> awesome.restart(),
   },
@@ -47,3 +52,25 @@ return {
     }
   },
 }
+
+-- -----------------------------------------------------------------------------
+-- Screen Layout
+-- -----------------------------------------------------------------------------
+
+for _, layout in ipairs({ 'single', 'double', 'triple' }) {
+  local layout_script = "{ ENV_HOME }/.screenlayout/{ layout }.sh"
+
+  if io.exists(layout_script) {
+    table.insert(system_tree, {
+      label = layout,
+      type = 'once',
+      callback = () -> awful.spawn(layout_script),
+    })
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return system_tree

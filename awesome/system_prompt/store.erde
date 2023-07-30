@@ -53,12 +53,12 @@ function store:_traverse_node(node) {
   }
 }
 
-function store:_traverse_command_tree() {
+function store:_traverse_command_tree(path = self.path) {
   local node = command_tree
   local path_index = 1
 
   return () -> {
-    local path_part = self.path[path_index]
+    local path_part = path[path_index]
     path_index += 1
 
     for _, child in self:_traverse_node(node) {
@@ -70,14 +70,36 @@ function store:_traverse_command_tree() {
   }
 }
 
-function store:_on_change_path() {
-  local new_description = command_tree.description
+function store:_on_change_path(new_path, old_path) {
+  do {
+    local old_nodes = table.collect(self:_traverse_command_tree(old_path))
+    local new_nodes = table.collect(self:_traverse_command_tree(new_path))
 
-  for node in self:_traverse_command_tree() {
-    new_description = node.description || new_description
+    local _, path_fork_index = table.find(old_nodes, (_, i) -> old_nodes[i] != new_nodes[i])
+    path_fork_index ||= #old_nodes + 1
+
+    for _, node in ipairs(table.slice(old_nodes, path_fork_index)) {
+      if node.on_exit {
+        node.on_exit()
+      }
+    }
+
+    for _, node in ipairs(table.slice(new_nodes, path_fork_index)) {
+      if node.on_enter {
+        node.on_enter()
+      }
+    }
   }
 
-  self.description = new_description
+  do {
+    local new_description = command_tree.description
+
+    for node in self:_traverse_command_tree(new_path) {
+      new_description = node.description || new_description
+    }
+
+    self.description = new_description
+  }
 
   self:_update_active_node()
 }
