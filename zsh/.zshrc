@@ -124,11 +124,6 @@ alias erde5.2='lua5.2 ~/.luarocks/share/lua/5.2/erde/cli.lua'
 alias erde5.3='lua5.3 ~/.luarocks/share/lua/5.3/erde/cli.lua'
 alias erde5.4='lua5.4 ~/.luarocks/share/lua/5.4/erde/cli.lua'
 
-function gls() {
-  git fetch --prune --quiet
-  git branch --remotes --sort=committerdate | tac
-}
-
 function ansi() {
   setxkbmap us
   ln -sf ~/dots/.ansi.Xmodmap ~/.Xmodmap
@@ -155,6 +150,28 @@ function lua_install {
   luarocks --local --lua-version="5.2" install "$1"
   luarocks --local --lua-version="5.3" install "$1"
   luarocks --local --lua-version="5.4" install "$1"
+}
+
+function git_ls() {
+  git fetch --prune --quiet
+  git branch --remotes --sort=committerdate | tac
+}
+
+function git_cheat {
+  GIT_ROOT=$(pwd)
+
+  while [[ $GIT_ROOT != '/' ]] && [[ ! -d $GIT_ROOT/.git ]]; do
+    GIT_ROOT=$(dirname "$GIT_ROOT")
+  done
+
+  if [[ $GIT_ROOT == '/' ]]; then
+    echo "Not in a git repository"
+    return 1
+  fi
+
+  git add .
+  git commit -m 'update'
+  git push
 }
 
 # ------------------------------------------------------------------------------

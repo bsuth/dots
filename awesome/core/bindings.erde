@@ -17,6 +17,40 @@ local function global_move_client(dir) {
   }
 }
 
+local function global_move_tag(dir) {
+  if screen:count() < 2 {
+    return
+  }
+
+  local focused_screen = awful.screen.focused()
+  local target_screen = focused_screen:get_next_in_direction(dir)
+
+  if focused_screen == target_screen {
+    return
+  }
+
+  local num_tags = #focused_screen.tags
+  local target_tag = focused_screen.selected_tag
+  local fallback_tag = focused_screen.selected_tag
+
+  if num_tags == 1 {
+    fallback_tag = awful.tag.add('1', {
+      screen = focused_screen,
+      layout = awful.layout.layouts[1]
+    })
+  } elseif focused_screen.tags[1] == target_tag {
+    fallback_tag = focused_screen.tags[2]
+  } else {
+    local _, target_tag_index = table.find(focused_screen.tags, target_tag)
+    fallback_tag = focused_screen.tags[target_tag_index - 1]
+  }
+
+  target_tag.screen = target_screen
+  fallback_tag:view_only()
+  target_tag:view_only()
+  awful.screen.focus(target_screen)
+}
+
 -- -----------------------------------------------------------------------------
 -- Global Keys
 -- -----------------------------------------------------------------------------
@@ -144,6 +178,31 @@ module global_keys = {
   }),
   awful.key({ 'Mod4', 'Control', 'Shift' }, 'Right', () -> {
     awful.client.swap.global_bydirection('right')
+  }),
+
+  awful.key({ 'Mod4', 'Mod1' }, 'h', () -> {
+    global_move_tag('left')
+  }),
+  awful.key({ 'Mod4', 'Mod1' }, 'j', () -> {
+    global_move_tag('down')
+  }),
+  awful.key({ 'Mod4', 'Mod1' }, 'k', () -> {
+    global_move_tag('up')
+  }),
+  awful.key({ 'Mod4', 'Mod1' }, 'l', () -> {
+    global_move_tag('right')
+  }),
+  awful.key({ 'Mod4', 'Mod1' }, 'Left', () -> {
+    global_move_tag('left')
+  }),
+  awful.key({ 'Mod4', 'Mod1' }, 'Down', () -> {
+    global_move_tag('down')
+  }),
+  awful.key({ 'Mod4', 'Mod1' }, 'Up', () -> {
+    global_move_tag('up')
+  }),
+  awful.key({ 'Mod4', 'Mod1' }, 'Right', () -> {
+    global_move_tag('right')
   }),
 
   awful.key({ 'Mod4' }, 'space', () -> {

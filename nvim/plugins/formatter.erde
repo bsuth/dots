@@ -20,6 +20,7 @@ require('formatter').setup({
   filetype = {
     json = { formatters.prettierd },
     graphql = { formatters.prettierd },
+    html = { formatters.prettierd },
     css = { formatters.prettierd },
     scss = { formatters.prettierd },
     less = { formatters.prettierd },
