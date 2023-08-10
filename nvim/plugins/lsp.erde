@@ -23,29 +23,12 @@ local LSP_SERVERS = {
   gopls = {},
   tsserver = {},
   clangd = {},
+  jsonls = { filetypes = { 'json', 'jsonc' } },
   stylelint_lsp = {
     settings = {
       stylelintplus = {
         autoFixOnFormat = true,
       }
-    },
-  },
-  jsonls = {
-    filetypes = { 'json', 'jsonc' },
-    settings = {
-      json = {
-        -- https://www.schemastore.org
-        schemas = {
-          {
-            fileMatch = { 'package.json' },
-            url = 'https://json.schemastore.org/package.json',
-          },
-          {
-            fileMatch = { 'tsconfig*.json' },
-            url = 'https://json.schemastore.org/tsconfig.json',
-          },
-        },
-      },
     },
   },
 }

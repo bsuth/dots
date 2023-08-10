@@ -99,7 +99,7 @@ load('plugins.treesitter')
 load('plugins.mason') -- must come before plugins.lsp!
 load('plugins.cmp') -- must come before plugins.lsp!
 load('plugins.lsp')
-load('plugins.formatter')
+load('plugins.null_ls')
 
 -- utils
 packer.use('matze/vim-move')
