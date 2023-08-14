@@ -63,6 +63,10 @@ module global_keys = {
     awesome.restart()
   }),
 
+  awful.key({}, 'Caps_Lock', () -> {
+    models.capslock.active = !models.capslock.active
+  }),
+
   awful.key({}, 'XF86AudioLowerVolume', () -> {
     models.volume.percent -= 5
   }),

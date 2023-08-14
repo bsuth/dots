@@ -1,0 +1,22 @@
+local awful = require('awful')
+local Object = require('utils.Object')
+
+local capslock = {}
+
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function capslock:_init() {
+  self:rawset('active', false)
+  awful.spawn.easy_async_with_shell(
+    [[ xset -q | sed -n 's/^.*Caps Lock:\s*\(\S*\).*$/\1/p' ]],
+    stdout -> { self.active = stdout:trim() == 'on' },
+  )
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Object(capslock)

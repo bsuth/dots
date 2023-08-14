@@ -1,0 +1,50 @@
+local awful = require('awful')
+local gears = require('gears')
+local wibox = require('wibox')
+local { global_keys } = require('core.bindings')
+local { palette } = require('core.theme')
+local { TAGBAR_HEIGHT } = require('tagbar.constants')
+
+local caps_lock_active = false
+
+local caps_lock_widget = wibox.widget({
+  {
+    {
+      markup = 'CAPS LOCK',
+      font = TAGBAR_FONT,
+      widget = wibox.widget.textbox,
+    },
+    widget = wibox.container.place,
+  },
+  forced_height = TAGBAR_HEIGHT, -- Take place of tagbar
+  fg = palette.red,
+  bg = palette.dark_gray,
+  widget = wibox.container.background,
+})
+
+local caps_lock_popup = awful.popup({
+  widget = caps_lock_widget,
+  visible = false,
+  ontop = true,
+  placement = awful.placement.top + awful.placement.maximize_horizontally,
+})
+
+local function update_caps_lock(new_caps_lock_active) {
+  caps_lock_active = new_caps_lock_active
+
+  if caps_lock_active {
+    caps_lock_popup.screen = awful.screen.focused()
+    caps_lock_popup.visible = true
+  } else {
+    caps_lock_popup.visible = false
+  }
+}
+
+awful.spawn.easy_async_with_shell(
+  [[ xset -q | sed -n 's/^.*Caps Lock:\s*\(\S*\).*$/\1/p' ]],
+  stdout -> update_caps_lock(stdout:trim() == 'on'),
+)
+
+gears.table.merge(global_keys, {
+  awful.key({}, 'Caps_Lock', () -> update_caps_lock(!caps_lock_active)),
+})

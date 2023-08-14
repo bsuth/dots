@@ -3,6 +3,7 @@ local wibox = require('wibox')
 local { palette } = require('core.theme')
 local Prompt = require('components.Prompt')
 local Veil = require('components.Veil')
+local { capslock } = require('models')
 local { TAGBAR_HEIGHT, TAGBAR_FONT } = require('tagbar.constants')
 local tagbar_history = require('tagbar.history')
 local suggestions = require('tagbar.suggestions')
@@ -25,6 +26,22 @@ function Tagbar:_init(props = {}) {
   self._tabs_widget = wibox.widget({
     forced_width = self.screen.geometry.width,
     layout  = wibox.layout.flex.horizontal,
+  })
+
+  self._caps_lock_widget = wibox.widget({
+    {
+      {
+        markup = 'CAPS LOCK',
+        font = 'Quicksand SemiBold 14',
+        widget = wibox.widget.textbox,
+      },
+      widget = wibox.container.place,
+    },
+    forced_width = self.screen.geometry.width,
+    forced_height = TAGBAR_HEIGHT,
+    fg = palette.black,
+    bg = palette.red,
+    widget = wibox.container.background,
   })
 
   self._wibar = awful.wibar({
@@ -66,6 +83,14 @@ function Tagbar:_init(props = {}) {
 
   self:_refresh()
   self.screen:connect_signal('tag::history::update', () -> self:_refresh())
+
+  capslock:subscribe('change_active', () -> {
+    if capslock.active {
+      self._wibar.widget = self._caps_lock_widget
+    } else {
+      self._wibar.widget = self._tabs_widget
+    }
+  })
 }
 
 function Tagbar:_refresh() {
