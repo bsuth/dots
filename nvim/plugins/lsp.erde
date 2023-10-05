@@ -18,10 +18,12 @@ vim.keymap.set('n', "'a", vim.lsp.buf.code_action) -- a(ction)
 
 local LSP_SERVERS = {
   cssls = {},
+  tailwindcss = {},
   eslint = {},
   graphql = {},
   gopls = {},
   tsserver = {},
+  volar = { filetypes = { 'vue', 'typescript' } },
   clangd = {},
   jsonls = { filetypes = { 'json', 'jsonc' } },
   stylelint_lsp = {
@@ -40,3 +42,33 @@ for server, config in pairs(LSP_SERVERS) {
     ),
   }, config))
 }
+
+-- -----------------------------------------------------------------------------
+-- Volar Takeover Mode
+--
+-- https://vuejs.org/guide/typescript/overview.html#volar-takeover-mode
+-- -----------------------------------------------------------------------------
+
+local volar_client = nil
+local tsserver_client = nil
+
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = 'bsuth',
+  callback = { data } -> {
+    local client = vim.lsp.get_client_by_id(data.client_id)
+
+    if client.name == "tsserver" {
+      if volar_client {
+        client:stop()
+      } else {
+        tsserver_client = client
+      }
+    } elseif client.name == "volar" {
+      volar_client = client
+
+      if tsserver_client {
+        tsserver_client:stop()
+      }
+    }
+  },
+})

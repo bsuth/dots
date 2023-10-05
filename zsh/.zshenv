@@ -19,6 +19,8 @@ export GTK_IM_MODULE=fcitx
 export QT_IM_MODULE=fcitx
 export XMODIFIERS=@im=fcitx
 
+export DOCKER_HOST=unix:///var/run/docker.sock
+
 # ------------------------------------------------------------------------------
 # Lua
 # ------------------------------------------------------------------------------

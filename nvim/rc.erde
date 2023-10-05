@@ -42,7 +42,7 @@ vim.opt.scrollback = 100000
 -- misc
 vim.opt.wrap = false
 vim.opt.clipboard = 'unnamedplus'
-vim.opt.commentstring = '//%s'
+vim.opt.commentstring = '// %s'
 vim.opt.formatoptions = 'jcroql'
 
 -- -----------------------------------------------------------------------------
@@ -78,6 +78,16 @@ vim.keymap.set('n', 'K', () -> nil)
 
 -- remove annoying default map of backgrounding neovim
 vim.keymap.set('n', '<c-z>', () -> nil)
+
+-- -----------------------------------------------------------------------------
+-- Misc Settings
+-- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'bsuth',
+  pattern = { 'c', 'cpp' },
+  command = 'setlocal commentstring=//\\ %s',
+})
 
 -- -----------------------------------------------------------------------------
 -- Plugins / Modules
