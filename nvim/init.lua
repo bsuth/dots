@@ -8,7 +8,7 @@
 -- modules), so we adjust package.path for our neovim modules manually.
 --
 -- @see https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_init_packages.lua
-local nvim_package_path = os.getenv('DOTS') .. '/nvim'
+local nvim_package_path = os.getenv('DOTS') .. '/nvim/lua'
 
 if not package.path:find(nvim_package_path) then
   package.path = ('%s/?.lua;%s/?/init.lua;%s'):format(nvim_package_path, nvim_package_path, package.path)

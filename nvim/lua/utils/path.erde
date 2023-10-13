@@ -1,0 +1,42 @@
+-- Get the current platform path separator. Note that while this is undocumented
+-- in the Lua 5.1 manual, it is indeed supported in 5.1+.
+-- https://www.lua.org/manual/5.3/manual.html#pdf-package.config
+module separator = package.config:sub(1, 1)
+
+module function dedup(s) {
+  -- Store in local variable to ensure we return only 1 (stylua will remove wrapping parens)
+  local deduped = s:gsub(separator .. '+', separator)
+  return deduped
+}
+
+module function join(...) {
+  return dedup(table.concat({ ... }, separator))
+}
+
+module function trim(...) {
+  -- Store in local variable to ensure we return only 1 (stylua will remove wrapping parens)
+  local trimmed = join(...):gsub("^{separator}+", ''):gsub("{separator}+$", '')
+  return trimmed
+}
+
+module function pad(...) {
+  return dedup(separator .. join(...) .. separator)
+}
+
+module function lead(...) {
+  return separator .. trim(...)
+}
+
+module function trail(...) {
+  return trim(...) .. separator
+}
+
+module function basename(s) {
+  return s:match("[^{separator}]*$")
+}
+
+module function dirname(s) {
+  -- Store in local variable to ensure we return only 1 (stylua will remove wrapping parens)
+  local name = s:gsub("[^{separator}]*$", '')
+  return name
+}

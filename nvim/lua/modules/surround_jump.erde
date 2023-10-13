@@ -1,0 +1,104 @@
+local OPEN_SURROUND_CHARS = {
+  ['('] = true,
+  ['{'] = true,
+  ['['] = true,
+}
+
+local CLOSE_SURROUND_CHARS = {
+  [')'] = true,
+  ['}'] = true,
+  [']'] = true,
+}
+
+local function cursor_jump(line, column) {
+  -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
+  vim.cmd("normal {line}G{column}|")
+}
+
+local function get_cursor_char() {
+  local [ _, line, column ] = vim.fn.getpos('.')
+  return vim.fn.getline(line):sub(column, column)
+}
+
+local function prev_chars() {
+  local [ _, line, column ] = vim.fn.getpos('.')
+  local line_chars = vim.fn.getline(line)
+
+  local iterator = () -> {
+    if column > 1 {
+      column -= 1
+      return line, column, line_chars:sub(column, column)
+    } elseif line > 1 {
+      line -= 1
+      line_chars = vim.fn.getline(line)
+      column = #line_chars
+      return line, column, line_chars:sub(column, column)
+    }
+  }
+
+  return iterator, vimpos
+}
+
+local function next_chars() {
+  local [ _, line, column ] = vim.fn.getpos('.')
+  local line_chars = vim.fn.getline(line)
+  local line_limit, column_limit = vim.fn.line('$'), #line_chars
+
+  local iterator = () -> {
+    if column < column_limit {
+      column += 1
+      return line, column, line_chars:sub(column, column)
+    } elseif line < line_limit {
+      line += 1
+      line_chars = vim.fn.getline(line)
+      column, column_limit = 1, #line_chars
+      return line, column, line_chars:sub(column, column)
+    }
+  }
+
+  return iterator, vimpos
+}
+
+local function deep_surround_jump_back() {
+  for line, column, char in prev_chars() {
+    if OPEN_SURROUND_CHARS[char] || CLOSE_SURROUND_CHARS[char] {
+      cursor_jump(line, column)
+      return
+    }
+  }
+}
+
+local function shallow_surround_jump_back() {
+  if CLOSE_SURROUND_CHARS[get_cursor_char()] {
+    vim.cmd('normal %')
+  } else {
+    deep_surround_jump_back()
+  }
+}
+
+local function deep_surround_jump_forward() {
+  for line, column, char in next_chars() {
+    if OPEN_SURROUND_CHARS[char] || CLOSE_SURROUND_CHARS[char] {
+      cursor_jump(line, column)
+      return
+    }
+  }
+}
+
+local function shallow_surround_jump_forward() {
+  if OPEN_SURROUND_CHARS[get_cursor_char()] {
+    vim.cmd('normal %')
+  } else {
+    deep_surround_jump_forward()
+  }
+}
+
+vim.keymap.set('n', '{', deep_surround_jump_back)
+vim.keymap.set('v', '{', deep_surround_jump_back)
+vim.keymap.set('n', '}', deep_surround_jump_forward)
+vim.keymap.set('v', '}', deep_surround_jump_forward)
+
+vim.keymap.set('n', '(', shallow_surround_jump_back)
+vim.keymap.set('v', '(', shallow_surround_jump_back)
+vim.keymap.set('n', ')', shallow_surround_jump_forward)
+vim.keymap.set('v', ')', shallow_surround_jump_forward)

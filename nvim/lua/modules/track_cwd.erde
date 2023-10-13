@@ -1,5 +1,5 @@
 local { TERM_PATTERNS, TRACK_CWD_BLACKLIST_FILTERS } = require('constants')
-local { get_buffer_dir } = require('utils.vim')
+local { get_buffer_dir } = require('utils.buffer')
 
 local buffer_cwd = {}
 
@@ -15,6 +15,7 @@ vim.api.nvim_create_autocmd('BufEnter', {
 
     if buffer_cwd[buffer] != nil {
       vim.cmd("cd {buffer_cwd[buffer]}")
+      return
     }
 
     for _, blacklist_filter in ipairs(TRACK_CWD_BLACKLIST_FILTERS) {
@@ -35,6 +36,5 @@ vim.api.nvim_create_autocmd('TermOpen', {
 
 vim.api.nvim_create_autocmd('TermClose', {
   group = 'bsuth',
-  pattern = TERM_PATTERNS,
-  callback = () -> { buffer_cwd[vim.api.nvim_get_current_buf()] = nil },
+  callback = { buf } -> { buffer_cwd[buf] = nil },
 })

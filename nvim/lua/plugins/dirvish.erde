@@ -1,11 +1,7 @@
-local C = require('constants')
-local { edit } = require('utils.vim')
 local packer = require('packer')
+local { edit } = require('utils.edit')
 
 packer.use('justinmk/vim-dirvish')
-
-C.FILE_BROWSER_FILETYPE = 'dirvish'
-table.insert(C.BUFFER_HISTORY_FILETYPE_BLACKLIST, 'dirvish')
 
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
@@ -35,11 +31,6 @@ vim.api.nvim_create_autocmd('FileType', {
 
 vim.api.nvim_create_autocmd('BufEnter', {
   group = 'bsuth',
-  callback = () -> {
-    local buffer = vim.api.nvim_get_current_buf()
-    local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
-    if filetype == 'dirvish' {
-      vim.cmd('Dirvish') -- refresh buffer
-    }
-  },
+  -- Refresh Dirvish buffer
+  callback = () -> vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' && vim.cmd('Dirvish'),
 })

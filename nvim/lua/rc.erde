@@ -1,6 +1,6 @@
 require('utils.stdlib').load()
 
-local { edit } = require('utils.vim')
+local { edit } = require('utils.edit')
 
 -- -----------------------------------------------------------------------------
 -- Settings
@@ -50,7 +50,7 @@ vim.opt.formatoptions = 'jcroql'
 -- -----------------------------------------------------------------------------
 
 -- vimrc
-vim.keymap.set('n', '<leader>ev', () -> edit('~/dots/nvim'))
+vim.keymap.set('n', '<leader>ev', () -> edit('~/dots/nvim/lua'))
 vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 
 -- write, quit
@@ -63,15 +63,11 @@ vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
 -- refresh syntax highlighting
 vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable<cr>')
 
--- yanking
-vim.keymap.set('n', 'YY', '"ayy')
-vim.keymap.set('n', 'YP', '"ap')
-
 -- command open
 vim.keymap.set('c', '<c-space>', '<c-f>')
 
 -- quick links
-vim.keymap.set('n', '<leader>swp', () -> edit('~/.local/share/nvim/swap'))
+vim.keymap.set('n', '<leader>swap', () -> edit('~/.local/share/nvim/swap'))
 
 -- remove annoying default map of K to manual
 vim.keymap.set('n', 'K', () -> nil)
@@ -93,7 +89,7 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Plugins / Modules
 -- -----------------------------------------------------------------------------
 
-function load(name) {
+local function load(name) {
   package.loaded[name] = nil -- unset to force reloading
   require(name)
 }
@@ -101,15 +97,11 @@ function load(name) {
 -- core
 load('plugins.packer')
 require('packer').use('nvim-lua/plenary.nvim')
-local packer = require('packer')
+local packer = require('packer') -- TODO: remove me
 
 -- ide
-load('plugins.onedark')
-load('plugins.treesitter')
-load('plugins.mason') -- must come before plugins.lsp!
-load('plugins.cmp') -- must come before plugins.lsp!
+load('plugins.syntax')
 load('plugins.lsp')
-load('plugins.null_ls')
 
 -- utils
 packer.use('matze/vim-move')
@@ -117,32 +109,27 @@ packer.use('tpope/vim-surround')
 packer.use('tpope/vim-abolish')
 packer.use('tpope/vim-repeat')
 load('plugins.commentary')
-load('plugins.suda')
+load('plugins.suda') -- TODO: remove me
 packer.use('~/repos/emacs-bindings.nvim')
 
 -- ui
 load('plugins.dirvish')
-load('plugins.fugitive')
 load('plugins.telescope')
-load('plugins.lualine')
-
--- languages
-load('plugins.go')
-packer.use('~/repos/vim-erde')
+load('plugins.lualine') -- TODO: remove me?
 
 -- -----------------------------------------------------------------------------
 -- Modules
 -- -----------------------------------------------------------------------------
 
-load('modules.buffer_history')
+load('modules.format')
 load('modules.scratchpad')
-load('modules.search_visual')
+-- load('modules.search_visual') -- TODO: remove me
 load('modules.surround_jump')
 load('modules.terminal')
-load('modules.tidy')
 load('modules.track_cwd')
 load('modules.windows')
 pcall(() -> load('modules.work'))
 
+-- TODO: this has to be last for some reason?
 vim.api.nvim_set_hl(0, 'FloatBorder', { bg = '#232326', fg = '#3F92DE' })
 vim.api.nvim_set_hl(0, 'NormalFloat', { bg = '#232326' })

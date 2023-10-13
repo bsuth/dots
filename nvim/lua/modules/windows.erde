@@ -1,26 +1,19 @@
-local { edit, get_buffer_dir } = require('utils.vim')
+local { edit } = require('utils.edit')
 
-function split(direction) {
+local function split(direction) {
   if direction == 'left' {
-    vim.cmd(':aboveleft vsp')
+    vim.cmd('aboveleft vsp')
   } elseif direction == 'down' {
-    vim.cmd(':rightbelow sp')
+    vim.cmd('rightbelow sp')
   } elseif direction == 'up' {
-    vim.cmd(':aboveleft sp')
+    vim.cmd('aboveleft sp')
   } elseif direction == 'right' {
-    vim.cmd(':rightbelow vsp')
+    vim.cmd('rightbelow vsp')
   } else {
     error("Invalid split direction: { direction }")
   }
 
-  local buffer = vim.api.nvim_get_current_buf()
-  local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
-
-  if filetype == 'help' || filetype == 'man' {
-    edit('~/')
-  } else {
-    edit(get_buffer_dir(buffer))
-  }
+  edit(vim.fn.getcwd())
 }
 
 vim.keymap.set('n', '<leader>w', '<c-w>')
@@ -40,3 +33,5 @@ vim.keymap.set('n', '<leader><c-left>', () -> split('left'))
 vim.keymap.set('n', '<leader><c-down>', () -> split('down'))
 vim.keymap.set('n', '<leader><c-up>', () -> split('up'))
 vim.keymap.set('n', '<leader><c-right>', () -> split('right'))
+
+-- TODO: automatic tiling?

@@ -1,0 +1,141 @@
+local packer = require('packer')
+local {
+  HOME,
+  C_PATTERNS,
+  JS_PATTERNS,
+  CSS_PATTERNS,
+  HTML_PATTERNS,
+  JSON_PATTERNS,
+} = require('constants')
+local { get_buffer_dir } = require('utils.buffer')
+local path = require('utils.path')
+
+-- -----------------------------------------------------------------------------
+-- Jobs
+-- -----------------------------------------------------------------------------
+
+local buffer_format_jobs = {}
+
+vim.api.nvim_create_autocmd('BufModifiedSet', {
+  group = 'bsuth',
+  callback = { buf } -> {
+    if vim.api.nvim_buf_get_option(buf, 'modified') {
+      for job_id, buffer in pairs(buffer_format_jobs) {
+        if buffer == buf {
+          vim.fn.jobstop(job_id)
+        }
+      }
+    }
+  },
+})
+
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
+
+local function has_ancestor(filenames) {
+  local dir = path.lead(path.dirname(vim.api.nvim_buf_get_name(0)))
+
+  while dir:match("^{ HOME }") {
+    for _, filename in ipairs(filenames) {
+      if io.exists(path.join(dir, filename)) {
+        return true
+      }
+    }
+
+    dir = path.lead(path.dirname(dir))
+  }
+}
+
+local function format(command) {
+  local job_id = vim.fn.jobstart(command, {
+    stdout_buffered = true,
+    on_stdout = (job_id, data) -> {
+      if data[1] != "" {
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, data)
+        vim.cmd('noautocmd write')
+      }
+    },
+    on_exit = job_id -> {
+      buffer_format_jobs[job_id] = nil
+    },
+  })
+
+  buffer_format_jobs[job_id] = vim.api.nvim_get_current_buf()
+}
+
+-- -----------------------------------------------------------------------------
+-- Tidy
+--
+-- Modified version of https://github.com/mcauley-penney/tidy.nvim
+-- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = 'bsuth',
+  callback = () -> {
+    local cursor = vim.api.nvim_win_get_cursor(0)
+
+    vim.cmd([[keepjumps keeppatterns %s/\s\+$//e]]) -- trailing whitespace
+    vim.cmd([[keepjumps keeppatterns silent! 0;/^\%(\n*.\)\@!/,$d_]]) -- trailing newlines
+
+    cursor[1] = math.min(cursor[1], vim.api.nvim_buf_line_count(0))
+    vim.api.nvim_win_set_cursor(0, cursor)
+  },
+})
+
+-- -----------------------------------------------------------------------------
+-- Clang Format
+-- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('BufWritePost', {
+  group = 'bsuth',
+  pattern = C_PATTERNS,
+  callback = () -> {
+    if has_ancestor({ '.clang-format' }) {
+      format("clang-format { vim.api.nvim_buf_get_name(0) }")
+    }
+  },
+})
+
+-- -----------------------------------------------------------------------------
+-- Eslint
+-- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = 'bsuth',
+  pattern = JS_PATTERNS,
+  callback = () -> vim.fn.exists(':EslintFixAll') != 0 && vim.cmd('EslintFixAll'),
+})
+
+-- -----------------------------------------------------------------------------
+-- Prettier
+-- -----------------------------------------------------------------------------
+
+local prettier_patterns = {}
+table.merge(prettier_patterns, JS_PATTERNS, CSS_PATTERNS, HTML_PATTERNS, JSON_PATTERNS)
+
+-- https://prettier.io/docs/en/configuration.html
+local prettier_configs = {
+  '.prettierrc',
+  '.prettierrc.json',
+  '.prettierrc.yml',
+  '.prettierrc.yaml',
+  '.prettierrc.json5',
+  '.prettierrc.js',
+  'prettier.config.js',
+  '.prettierrc.mjs',
+  'prettier.config.mjs',
+  '.prettierrc.cjs',
+  'prettier.config.cjs',
+  '.prettierrc.toml',
+}
+
+vim.api.nvim_create_autocmd('BufWritePost', {
+  group = 'bsuth',
+  pattern = prettier_patterns,
+  callback = () -> {
+    if has_ancestor(prettier_configs) {
+      format("npx prettier { vim.api.nvim_buf_get_name(0) }")
+    }
+  },
+})

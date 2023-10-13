@@ -1,0 +1,32 @@
+local packer = require('packer')
+
+-- -----------------------------------------------------------------------------
+-- Color Scheme
+-- -----------------------------------------------------------------------------
+
+packer.use('navarasu/onedark.nvim')
+
+local onedark = require('onedark')
+
+onedark.setup({ style = 'warmer' })
+onedark.load()
+
+-- -----------------------------------------------------------------------------
+-- Treesitter
+-- -----------------------------------------------------------------------------
+
+packer.use('nvim-treesitter/nvim-treesitter')
+
+local treesitter_configs = require('nvim-treesitter.configs')
+
+treesitter_configs.setup({
+  ensure_installed = 'all',
+  indent = { enable = true },
+  highlight = { enable = true },
+})
+
+-- -----------------------------------------------------------------------------
+-- Erde
+-- -----------------------------------------------------------------------------
+
+packer.use('~/repos/vim-erde')

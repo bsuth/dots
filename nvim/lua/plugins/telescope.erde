@@ -3,6 +3,8 @@ local packer = require('packer')
 packer.use('nvim-telescope/telescope.nvim')
 packer.use({ 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
 
+-- TODO: https://github.com/nvim-telescope/telescope-ui-select.nvim?
+
 local telescope = require('telescope')
 local telescope_actions = require('telescope.actions')
 local telescope_action_state = require('telescope.actions.state')
@@ -76,7 +78,6 @@ vim.keymap.set('n', '`m', ':Telescope man_pages<cr>')
 vim.keymap.set('n', '`g', ':Telescope git_files<cr>')
 vim.keymap.set('n', '`f', ':Telescope find_files<cr>')
 vim.keymap.set('n', '`r', ':Telescope grep_string only_sort_text=true search=<cr>')
-vim.keymap.set('n', '`d', ':Telescope lsp_workspace_diagnostics<cr>')
 
 vim.keymap.set('n', '``', () -> telescope_builtin.find_files({
   cwd = '~',

@@ -1,10 +1,5 @@
 local packer = require('packer')
 
-packer.use('neovim/nvim-lspconfig')
-
-local lspconfig = require('lspconfig')
-local cmp_nvim_lsp = require('cmp_nvim_lsp')
-
 vim.keymap.set('n', '<leader>lsp', ':silent :LspRestart<cr>')
 vim.keymap.set('n', "''", vim.lsp.buf.hover)
 vim.keymap.set('n', "'o", vim.diagnostic.open_float) -- o(pen)
@@ -16,6 +11,57 @@ vim.keymap.set('n', "'l", vim.diagnostic.setloclist) -- l(ist)
 vim.keymap.set('n', "'u", vim.lsp.buf.references) -- u(sage)
 vim.keymap.set('n', "'a", vim.lsp.buf.code_action) -- a(ction)
 
+-- -----------------------------------------------------------------------------
+-- Mason (Language Servers)
+-- -----------------------------------------------------------------------------
+
+packer.use('williamboman/mason.nvim')
+packer.use('williamboman/mason-lspconfig.nvim')
+
+require('mason').setup()
+require('mason-lspconfig').setup()
+
+-- -----------------------------------------------------------------------------
+-- Completion
+-- -----------------------------------------------------------------------------
+
+packer.use('hrsh7th/nvim-cmp')
+packer.use('hrsh7th/cmp-nvim-lsp') -- lsp
+packer.use('hrsh7th/cmp-path') -- file paths
+packer.use('hrsh7th/cmp-buffer') -- words in current buffer
+
+local cmp = require('cmp')
+
+cmp.setup({
+  mapping = {
+    ['<c-Space>'] = cmp.mapping.complete(),
+    ['<c-p>'] = cmp.mapping.select_prev_item(),
+    ['<c-n>'] = cmp.mapping.select_next_item(),
+    ['<s-Tab>'] = cmp.mapping.select_prev_item(),
+    ['<Tab>'] = cmp.mapping.select_next_item(),
+    ['<up>'] = cmp.mapping.select_prev_item(),
+    ['<down>'] = cmp.mapping.select_next_item(),
+    ['<cr>'] = cmp.mapping.confirm(),
+    ['<c-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<c-u>'] = cmp.mapping.scroll_docs(4),
+    ['<c-c>'] = cmp.mapping.close(),
+  },
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'path' },
+    { name = 'buffer' },
+  },
+})
+
+-- -----------------------------------------------------------------------------
+-- LSP Config
+-- -----------------------------------------------------------------------------
+
+packer.use('neovim/nvim-lspconfig')
+
+local lspconfig = require('lspconfig')
+local cmp_nvim_lsp = require('cmp_nvim_lsp')
+
 local LSP_SERVERS = {
   cssls = {},
   tailwindcss = {},
@@ -23,7 +69,15 @@ local LSP_SERVERS = {
   graphql = {},
   gopls = {},
   tsserver = {},
-  volar = { filetypes = { 'vue', 'typescript' } },
+  volar = { filetypes = { 'vue', 'typescript' },
+    settings = {
+      scss = {
+        lint = {
+          unknownAtRules = 'ignore',
+        },
+      }
+    },
+  },
   clangd = {},
   jsonls = { filetypes = { 'json', 'jsonc' } },
   stylelint_lsp = {

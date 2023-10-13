@@ -1,5 +1,5 @@
 local scratchpad_buffer = 1
-local scratchpad_window = nil
+local scratchpad_window = -1
 
 local function get_scratchpad_window_config() {
   return {
@@ -14,17 +14,22 @@ local function get_scratchpad_window_config() {
 }
 
 local function toggle() {
-  if scratchpad_window && vim.api.nvim_win_is_valid(scratchpad_window) {
+  if vim.api.nvim_win_is_valid(scratchpad_window) {
     vim.api.nvim_win_hide(scratchpad_window)
+    scratchpad_window = -1
   } else {
-    scratchpad_window = vim.api.nvim_open_win(scratchpad_buffer, true, get_scratchpad_window_config())
+    scratchpad_window = vim.api.nvim_open_win(
+      scratchpad_buffer,
+      true,
+      get_scratchpad_window_config(),
+    )
   }
 }
 
 vim.api.nvim_create_autocmd('VimResized', {
   group = 'bsuth',
   callback = () -> {
-    if scratchpad_window && vim.api.nvim_win_is_valid(scratchpad_window) {
+    if vim.api.nvim_win_is_valid(scratchpad_window) {
       vim.api.nvim_win_set_config(scratchpad_window, get_scratchpad_window_config())
     }
   },

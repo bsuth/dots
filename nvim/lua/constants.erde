@@ -1,4 +1,4 @@
-module FILE_BROWSER_FILETYPE = 'netrw'
+module HOME = os.getenv('HOME')
 
 module TRACK_CWD_BLACKLIST_FILTERS = {
   buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'help',
@@ -6,9 +6,9 @@ module TRACK_CWD_BLACKLIST_FILTERS = {
   buffer -> vim.api.nvim_buf_get_name(buffer):match('^term://'),
 }
 
-module BUFFER_HISTORY_FILETYPE_BLACKLIST = { FILE_BROWSER_FILETYPE }
-
-module TERM_PATTERNS = { 'term://*zsh*', 'term://*bash*' }
-module JS_PATTERNS = { '*.js', '*.mjs', '*.jsx', '*.ts', '*.tsx' }
+module TERM_PATTERNS = { 'term://*' }
+module C_PATTERNS = { '*.h', '*.c', '*.jsx', '*.ts', '*.tsx', '*.vue' }
+module JS_PATTERNS = { '*.js', '*.mjs', '*.jsx', '*.ts', '*.tsx', '*.vue' }
 module CSS_PATTERNS = { '*.css', '*.scss', '*.less' }
+module HTML_PATTERNS = { '*.html' }
 module JSON_PATTERNS = { '*.json', '*.cjson' }
