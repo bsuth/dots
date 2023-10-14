@@ -1,0 +1,45 @@
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
+
+local function sudo_exec(command) {
+  vim.fn.inputsave()
+  local password = vim.fn.inputsecret('sudo: ')
+  vim.fn.inputrestore()
+
+  if !password || #password == 0 {
+    return "no password"
+  }
+
+  local stdout = vim.fn.system("sudo -S { command }", "{ password }\n")
+
+  if vim.v.shell_error != 0 {
+    return "incorrect password"
+  }
+}
+
+local function sudo_read() {
+  -- TODO
+}
+
+local function sudo_write() {
+  local tmpfile = vim.fn.tempname()
+  local filepath = vim.fn.expand('%:p')
+
+  vim.cmd("silent write! { tmpfile }")
+  local sudo_exec_err = sudo_exec([[cp { tmpfile } { filepath }]])
+  vim.fn.delete(tmpfile)
+
+  if sudo_exec_err {
+    print(sudo_exec_err)
+  } else {
+    print([["{ filepath }" written]])
+    vim.cmd('edit!')
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Mappings
+-- -----------------------------------------------------------------------------
+
+vim.keymap.set('n', '<m-w>', sudo_write)

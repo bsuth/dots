@@ -3,12 +3,14 @@ local packer = require('packer')
 packer.use('nvim-telescope/telescope.nvim')
 packer.use({ 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
 
--- TODO: https://github.com/nvim-telescope/telescope-ui-select.nvim?
-
 local telescope = require('telescope')
 local telescope_actions = require('telescope.actions')
 local telescope_action_state = require('telescope.actions.state')
 local telescope_builtin = require('telescope.builtin')
+
+-- -----------------------------------------------------------------------------
+-- Setup
+-- -----------------------------------------------------------------------------
 
 telescope.setup({
   defaults = {
@@ -20,7 +22,6 @@ telescope.setup({
     selection_caret = '  ',
     multi_icon = '·',
     get_status_text = () -> '',
-
     mappings = {
       i = {
         -- remove default mappings
@@ -41,24 +42,28 @@ telescope.setup({
         ['<c-[>'] = telescope_actions.close,
         ['<esc>'] = telescope_actions.close,
 
-        ['<Tab>'] = telescope_actions.move_selection_next,
         ['<S-Tab>'] = telescope_actions.move_selection_previous,
+        ['<Tab>'] = telescope_actions.move_selection_next,
+        ['<up>'] = telescope_actions.move_selection_previous,
+        ['<down>'] = telescope_actions.move_selection_next,
+        ['<c-p>'] = telescope_actions.move_selection_previous,
+        ['<c-n>'] = telescope_actions.move_selection_next,
 
         ['<c-space>'] = telescope_actions.toggle_selection,
         ['<m-space>'] = telescope_actions.toggle_all,
-        ['<cr>'] = (prompt_bufnr, ...) -> {
-          local picker = telescope_action_state.get_current_picker(prompt_bufnr)
+
+        ['<cr>'] = (prompt_buffer, ...) -> {
+          local picker = telescope_action_state.get_current_picker(prompt_buffer)
           if #picker:get_multi_selection() > 0 {
-            telescope_actions.send_selected_to_qflist(prompt_bufnr, ...)
-            telescope_actions.open_qflist(prompt_bufnr, ...)
+            telescope_actions.send_selected_to_qflist(prompt_buffer, ...)
+            telescope_actions.open_qflist(prompt_buffer, ...)
           } else {
-            telescope_actions.select_default(prompt_bufnr, ...)
+            telescope_actions.select_default(prompt_buffer, ...)
           }
         },
       },
     },
   },
-
   pickers = {
     buffers = {
       mappings = {
@@ -72,13 +77,14 @@ telescope.setup({
 
 telescope.load_extension('fzf')
 
+-- -----------------------------------------------------------------------------
+-- Mappings
+-- -----------------------------------------------------------------------------
+
 vim.keymap.set('n', '`b', ':Telescope buffers<cr>')
-vim.keymap.set('n', '`h', ':Telescope help_tags<cr>')
-vim.keymap.set('n', '`m', ':Telescope man_pages<cr>')
 vim.keymap.set('n', '`g', ':Telescope git_files<cr>')
 vim.keymap.set('n', '`f', ':Telescope find_files<cr>')
 vim.keymap.set('n', '`r', ':Telescope grep_string only_sort_text=true search=<cr>')
-
 vim.keymap.set('n', '``', () -> telescope_builtin.find_files({
   cwd = '~',
   search_dirs = { 'dots', 'repos' },

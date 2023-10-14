@@ -1,5 +1,0 @@
-local packer = require('packer')
-
-packer.use('lambdalisue/suda.vim')
-
-vim.g.suda_smart_edit = true

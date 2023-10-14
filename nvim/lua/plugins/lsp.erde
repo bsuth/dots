@@ -1,5 +1,9 @@
 local packer = require('packer')
 
+-- -----------------------------------------------------------------------------
+-- Mappings
+-- -----------------------------------------------------------------------------
+
 vim.keymap.set('n', '<leader>lsp', ':silent :LspRestart<cr>')
 vim.keymap.set('n', "''", vim.lsp.buf.hover)
 vim.keymap.set('n', "'o", vim.diagnostic.open_float) -- o(pen)
@@ -26,9 +30,9 @@ require('mason-lspconfig').setup()
 -- -----------------------------------------------------------------------------
 
 packer.use('hrsh7th/nvim-cmp')
-packer.use('hrsh7th/cmp-nvim-lsp') -- lsp
-packer.use('hrsh7th/cmp-path') -- file paths
-packer.use('hrsh7th/cmp-buffer') -- words in current buffer
+packer.use('hrsh7th/cmp-nvim-lsp')
+packer.use('hrsh7th/cmp-path')
+packer.use('hrsh7th/cmp-buffer')
 
 local cmp = require('cmp')
 
@@ -63,27 +67,28 @@ local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
 local LSP_SERVERS = {
+  clangd = {},
   cssls = {},
-  tailwindcss = {},
   eslint = {},
-  graphql = {},
   gopls = {},
+  graphql = {},
+  jsonls = {},
+  stylelint_lsp = {
+    settings = {
+      stylelintplus = {
+        autoFixOnFormat = true,
+      }
+    },
+  },
+  tailwindcss = {},
   tsserver = {},
-  volar = { filetypes = { 'vue', 'typescript' },
+  volar = {
+    filetypes = { 'vue', 'typescript' },
     settings = {
       scss = {
         lint = {
           unknownAtRules = 'ignore',
         },
-      }
-    },
-  },
-  clangd = {},
-  jsonls = { filetypes = { 'json', 'jsonc' } },
-  stylelint_lsp = {
-    settings = {
-      stylelintplus = {
-        autoFixOnFormat = true,
       }
     },
   },

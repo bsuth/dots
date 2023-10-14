@@ -1,0 +1,54 @@
+local { TERM_PATTERNS } = require('constants')
+local { get_buffer_dir } = require('utils.buffer')
+
+-- -----------------------------------------------------------------------------
+-- Variables
+-- -----------------------------------------------------------------------------
+
+local buffer_cwd = {}
+
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
+
+-- Do not make this local! zsh needs this for cd hook in nested terminal.
+global function save_buffer_cwd() {
+  local buffer = vim.api.nvim_get_current_buf()
+  buffer_cwd[buffer] = vim.fn.getcwd()
+}
+
+-- -----------------------------------------------------------------------------
+-- Auto Commands
+-- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('TermOpen', {
+  group = 'bsuth',
+  pattern = TERM_PATTERNS,
+  callback = save_buffer_cwd,
+})
+
+vim.api.nvim_create_autocmd('TermClose', {
+  group = 'bsuth',
+  callback = { buf } -> { buffer_cwd[buf] = nil },
+})
+
+vim.api.nvim_create_autocmd('BufEnter', {
+  group = 'bsuth',
+  callback = () -> {
+    local buffer = vim.api.nvim_get_current_buf()
+
+    if buffer_cwd[buffer] != nil {
+      vim.cmd("cd {buffer_cwd[buffer]}")
+      return
+    }
+
+    local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
+    local buftype = vim.api.nvim_buf_get_option(buffer, 'buftype')
+
+    if filetype == 'help' || filetype == 'man' || buftype == 'terminal' {
+      return
+    }
+
+    vim.cmd("cd {get_buffer_dir(buffer)}")
+  },
+})

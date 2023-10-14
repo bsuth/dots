@@ -1,0 +1,81 @@
+-- -----------------------------------------------------------------------------
+-- Mode
+-- -----------------------------------------------------------------------------
+
+local STATUSLINE_MODE_LABELS = {
+  ['n'] = 'NORMAL',
+  ['no'] = 'NORMAL',
+  ['v'] = 'VISUAL',
+  ['V'] = 'VISUAL LINE',
+  [''] = 'VISUAL BLOCK',
+  ['s'] = 'SELECT',
+  ['S'] = 'SELECT LINE',
+  [''] = 'SELECT BLOCK',
+  ['i'] = 'INSERT',
+  ['ic'] = 'INSERT',
+  ['R'] = 'REPLACE',
+  ['Rv'] = 'VISUAL REPLACE',
+  ['c'] = 'COMMAND',
+  ['cv'] = 'VIM EX',
+  ['ce'] = 'EX',
+  ['r'] = 'PROMPT',
+  ['rm'] = 'MORE',
+  ['r?'] = 'CONFIRM',
+  ['!'] = 'SHELL',
+  ['t'] = 'TERMINAL',
+}
+
+local function statusline_mode() {
+  local statusline = ''
+  local mode = vim.api.nvim_get_mode().mode
+
+  if mode == 'n' {
+    statusline ..= '%#StatuslineAccent#'
+  } elseif mode == 'i' || mode == 'ic' {
+    statusline ..= '%#StatuslineInsertAccent#'
+  } elseif mode == 'v' || mode == 'V' || mode == '' {
+    statusline ..= '%#StatuslineVisualAccent#'
+  } elseif mode == 'R' {
+    statusline ..= '%#StatuslineReplaceAccent#'
+  } elseif mode == 'c' {
+    statusline ..= '%#StatuslineCmdLineAccent#'
+  } elseif mode == 't' {
+    statusline ..= '%#StatuslineTerminalAccent#'
+  } else {
+    statusline ..= '%#StatusLineAccent#'
+  }
+
+  statusline ..= " { STATUSLINE_MODE_LABELS[mode] } %#Normal#"
+
+  return statusline
+}
+
+-- -----------------------------------------------------------------------------
+-- File
+-- -----------------------------------------------------------------------------
+
+local function statusline_file() {
+  local fpath = vim.fn.fnamemodify(vim.fn.expand('%'), ':~:.:h')
+
+  if fpath == '' || fpath == '.' {
+    return ' '
+  }
+
+  return string.format(' %%<%s/', fpath)
+}
+
+-- -----------------------------------------------------------------------------
+-- Statusline
+-- -----------------------------------------------------------------------------
+
+global function statusline() {
+  local mode = vim.api.nvim_get_mode().mode
+
+  return table.concat({
+    "%#Statusline#",
+    statusline_mode(),
+    "%#Normal# ",
+  })
+}
+
+vim.opt.statusline = "%!v:lua.statusline()"

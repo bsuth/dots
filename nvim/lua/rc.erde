@@ -1,5 +1,6 @@
 require('utils.stdlib').load()
 
+local { DOTS } = require('constants')
 local { edit } = require('utils.edit')
 
 -- -----------------------------------------------------------------------------
@@ -8,6 +9,7 @@ local { edit } = require('utils.edit')
 
 -- core
 vim.g.mapleader = ' '
+vim.opt.clipboard = 'unnamedplus'
 vim.api.nvim_create_augroup('bsuth', {})
 
 -- casing
@@ -27,6 +29,7 @@ vim.opt.expandtab = true
 -- interface
 vim.opt.termguicolors = true
 vim.opt.number = false
+vim.opt.wrap = false
 vim.opt.signcolumn = 'yes'
 vim.opt.showmode = false
 vim.opt.laststatus = 3
@@ -39,11 +42,15 @@ vim.opt.synmaxcol = 300
 vim.opt.updatetime = 300
 vim.opt.scrollback = 100000
 
--- misc
-vim.opt.wrap = false
-vim.opt.clipboard = 'unnamedplus'
+-- formating
 vim.opt.commentstring = '// %s'
 vim.opt.formatoptions = 'jcroql'
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'bsuth',
+  pattern = { 'c', 'cpp' },
+  -- override comment string for c / cpp (uses `/* ... */` by default)
+  command = 'setlocal commentstring=//\\ %s',
+})
 
 -- -----------------------------------------------------------------------------
 -- Mappings
@@ -57,33 +64,18 @@ vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
 vim.keymap.set('n', '<c-w>', ':write<cr>')
 vim.keymap.set('n', '<c-q>', ':quit<cr>')
 
--- clear search highlighting
+-- clear, refresh search highlighting
 vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
-
--- refresh syntax highlighting
 vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable<cr>')
 
--- command open
-vim.keymap.set('c', '<c-space>', '<c-f>')
-
 -- quick links
+vim.keymap.set('n', '<leader>root', () -> edit('/'))
+vim.keymap.set('n', '<leader>dots', () -> edit(DOTS))
 vim.keymap.set('n', '<leader>swap', () -> edit('~/.local/share/nvim/swap'))
 
--- remove annoying default map of K to manual
-vim.keymap.set('n', 'K', () -> nil)
-
--- remove annoying default map of backgrounding neovim
-vim.keymap.set('n', '<c-z>', () -> nil)
-
--- -----------------------------------------------------------------------------
--- Misc Settings
--- -----------------------------------------------------------------------------
-
-vim.api.nvim_create_autocmd('FileType', {
-  group = 'bsuth',
-  pattern = { 'c', 'cpp' },
-  command = 'setlocal commentstring=//\\ %s',
-})
+-- remove annoying defaults
+vim.keymap.set('n', 'K', () -> nil) -- open manual
+vim.keymap.set('n', '<c-z>', () -> nil) -- background neovim
 
 -- -----------------------------------------------------------------------------
 -- Plugins / Modules
@@ -99,37 +91,19 @@ load('plugins.packer')
 require('packer').use('nvim-lua/plenary.nvim')
 local packer = require('packer') -- TODO: remove me
 
--- ide
-load('plugins.syntax')
-load('plugins.lsp')
-
--- utils
-packer.use('matze/vim-move')
-packer.use('tpope/vim-surround')
-packer.use('tpope/vim-abolish')
-packer.use('tpope/vim-repeat')
-load('plugins.commentary')
-load('plugins.suda') -- TODO: remove me
-packer.use('~/repos/emacs-bindings.nvim')
-
--- ui
-load('plugins.dirvish')
-load('plugins.telescope')
-load('plugins.lualine') -- TODO: remove me?
-
--- -----------------------------------------------------------------------------
--- Modules
--- -----------------------------------------------------------------------------
-
+load('modules.cwd')
+load('modules.emacs')
 load('modules.format')
+load('modules.pack')
 load('modules.scratchpad')
--- load('modules.search_visual') -- TODO: remove me
-load('modules.surround_jump')
+load('modules.statusline')
+load('modules.sudo')
+load('modules.surroundjump')
 load('modules.terminal')
-load('modules.track_cwd')
 load('modules.windows')
-pcall(() -> load('modules.work'))
 
--- TODO: this has to be last for some reason?
-vim.api.nvim_set_hl(0, 'FloatBorder', { bg = '#232326', fg = '#3F92DE' })
-vim.api.nvim_set_hl(0, 'NormalFloat', { bg = '#232326' })
+load('plugins.dirvish')
+load('plugins.lsp')
+load('plugins.syntax')
+load('plugins.telescope')
+load('plugins.utility')

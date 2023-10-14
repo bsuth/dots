@@ -1,3 +1,7 @@
+-- -----------------------------------------------------------------------------
+-- Variables
+-- -----------------------------------------------------------------------------
+
 local OPEN_SURROUND_CHARS = {
   ['('] = true,
   ['{'] = true,
@@ -9,6 +13,10 @@ local CLOSE_SURROUND_CHARS = {
   ['}'] = true,
   [']'] = true,
 }
+
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
 
 local function cursor_jump(line, column) {
   -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
@@ -92,6 +100,10 @@ local function shallow_surround_jump_forward() {
     deep_surround_jump_forward()
   }
 }
+
+-- -----------------------------------------------------------------------------
+-- Mappings
+-- -----------------------------------------------------------------------------
 
 vim.keymap.set('n', '{', deep_surround_jump_back)
 vim.keymap.set('v', '{', deep_surround_jump_back)

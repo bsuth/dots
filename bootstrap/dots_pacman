@@ -76,6 +76,7 @@ declare -a PACMAN_PACKAGES=(
   firefox-developer-edition
   arandr
   inkscape
+  mpv
 )
 
 sudo pacman -Syu --needed "${PACMAN_PACKAGES[@]}"

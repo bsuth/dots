@@ -1,0 +1,196 @@
+-- -----------------------------------------------------------------------------
+-- Variables
+-- -----------------------------------------------------------------------------
+
+local WORDCHARS = { _ = true }
+
+for _, char in string.chars(os.getenv('WORDCHARS') || '') {
+  WORDCHARS[char] = true
+}
+
+for byte = string.byte('0'), string.byte('9') {
+  WORDCHARS[string.char(byte)] = true
+}
+
+for byte = string.byte('a'), string.byte('z') {
+  WORDCHARS[string.char(byte)] = true
+}
+
+for byte = string.byte('A'), string.byte('Z') {
+  WORDCHARS[string.char(byte)] = true
+}
+
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
+
+local function feed_term_codes(term_codes) {
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(term_codes, true, false, true), 'n', false)
+}
+
+local function get_word_back_col(line, col) {
+  local next_char = line:sub(col - 1, col - 1)
+
+  while col > 1 && !WORDCHARS[next_char] {
+    col -= 1
+    next_char = line:sub(col - 1, col - 1)
+  }
+
+  while col > 1 && WORDCHARS[next_char] {
+    col -= 1
+    next_char = line:sub(col - 1, col - 1)
+  }
+
+  return col
+}
+
+local function get_move_word_forward_col(line, col) {
+  local next_char = line:sub(col + 1, col + 1)
+
+  while col < #line && WORDCHARS[next_char] {
+    col += 1
+    next_char = line:sub(col + 1, col + 1)
+  }
+
+  while col < #line && !WORDCHARS[next_char] {
+    col += 1
+    next_char = line:sub(col + 1, col + 1)
+  }
+
+  return col + 1
+}
+
+local function get_delete_word_forward_col(line, col) {
+  local next_char = line:sub(col + 1, col + 1)
+
+  while col < #line && !WORDCHARS[next_char] {
+    col += 1
+    next_char = line:sub(col + 1, col + 1)
+  }
+
+  while col < #line && WORDCHARS[next_char] {
+    col += 1
+    next_char = line:sub(col + 1, col + 1)
+  }
+
+  return col + 1
+}
+
+local function move_word_back() {
+  if vim.fn.mode() == 'c' {
+    local col = vim.fn.getcmdpos()
+    local line = vim.fn.getcmdline()
+    feed_term_codes(('<Left>'):rep(col - get_word_back_col(line, col)))
+  } else {
+    local [_, lnum, col] = vim.fn.getpos('.')
+    local line = vim.fn.getline('.')
+    vim.fn.setcharpos('.', { 0, lnum, get_word_back_col(line, col), 0 })
+  }
+}
+
+local function move_word_forward() {
+  if vim.fn.mode() == 'c' {
+    local col = vim.fn.getcmdpos()
+    local line = vim.fn.getcmdline()
+    feed_term_codes(('<Right>'):rep(get_move_word_forward_col(line, col) - col))
+  } else {
+    local [_, lnum, col] = vim.fn.getpos('.')
+    local line = vim.fn.getline('.')
+    vim.fn.setcharpos('.', { 0, lnum, get_move_word_forward_col(line, col), 0 })
+  }
+}
+
+local function delete_char_back() {
+  local [_, _, col] = vim.fn.getpos('.')
+  if vim.fn.mode() == 'c' || col > 1 {
+    feed_term_codes('<BS>')
+  }
+}
+
+local function delete_char_forward() {
+  local [_, _, col] = vim.fn.getpos('.')
+  local line = vim.fn.getline('.')
+  if vim.fn.mode() == 'c' || col <= #line {
+    feed_term_codes('<Delete>')
+  }
+}
+
+local function delete_word_back() {
+  if vim.fn.mode() == 'c' {
+    local col = vim.fn.getcmdpos()
+    local line = vim.fn.getcmdline()
+    feed_term_codes(('<BS>'):rep(col - get_word_back_col(line, col)))
+  } else {
+    local [_, lnum, col] = vim.fn.getpos('.')
+    local line = vim.fn.getline('.')
+    local new_col = get_word_back_col(line, col)
+    vim.fn.setline(lnum, line:sub(1, new_col - 1) .. line:sub(col))
+    vim.fn.setcharpos('.', { 0, lnum, new_col, 0 })
+  }
+}
+
+local function delete_word_forward() {
+  if vim.fn.mode() == 'c' {
+    local col = vim.fn.getcmdpos()
+    local line = vim.fn.getcmdline()
+    feed_term_codes(('<Delete>'):rep(get_delete_word_forward_col(line, col) - col))
+  } else {
+    local [_, lnum, col] = vim.fn.getpos('.')
+    local line = vim.fn.getline('.')
+    local new_col = get_delete_word_forward_col(line, col)
+    vim.fn.setline(lnum, line:sub(1, col - 1) .. line:sub(new_col))
+  }
+}
+
+local function delete_line_back() {
+  if vim.fn.mode() == 'c' {
+    feed_term_codes(('<BS>'):rep(vim.fn.getcmdpos()))
+  } else {
+    local [_, lnum, col] = vim.fn.getpos('.')
+    local line = vim.fn.getline('.')
+    vim.fn.setline(lnum, line:sub(col))
+    vim.fn.setcharpos('.', { 0, lnum, 1, 0 })
+  }
+}
+
+local function delete_line_forward() {
+  if vim.fn.mode() == 'c' {
+    local col = vim.fn.getcmdpos()
+    local line = vim.fn.getcmdline()
+    feed_term_codes(('<Delete>'):rep(#line - col + 1))
+  } else {
+    local [_, lnum, col] = vim.fn.getpos('.')
+    local line = vim.fn.getline('.')
+    vim.fn.setline(lnum, line:sub(1, col - 1))
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Mappings
+-- -----------------------------------------------------------------------------
+
+vim.keymap.set('i', '<c-b>', '<Left>')
+vim.keymap.set('i', '<c-f>', '<Right>')
+vim.keymap.set('i', '<c-a>', '<Home>')
+vim.keymap.set('i', '<c-e>', '<End>')
+vim.keymap.set('i', '<m-b>', move_word_back)
+vim.keymap.set('i', '<m-f>', move_word_forward)
+vim.keymap.set('i', '<c-h>', delete_char_back)
+vim.keymap.set('i', '<c-d>', delete_char_forward)
+vim.keymap.set('i', '<m-backspace>', delete_word_back)
+vim.keymap.set('i', '<m-d>', delete_word_forward)
+vim.keymap.set('i', '<c-u>', delete_line_back)
+vim.keymap.set('i', '<c-k>', delete_line_forward)
+
+vim.keymap.set('c', '<c-b>', '<Left>')
+vim.keymap.set('c', '<c-f>', '<Right>')
+vim.keymap.set('c', '<c-a>', '<Home>')
+vim.keymap.set('c', '<c-e>', '<End>')
+vim.keymap.set('c', '<m-b>', move_word_back)
+vim.keymap.set('c', '<m-f>', move_word_forward)
+vim.keymap.set('c', '<c-h>', delete_char_back)
+vim.keymap.set('c', '<c-d>', delete_char_forward)
+vim.keymap.set('c', '<m-backspace>', delete_word_back)
+vim.keymap.set('c', '<m-d>', delete_word_forward)
+vim.keymap.set('c', '<c-u>', delete_line_back)
+vim.keymap.set('c', '<c-k>', delete_line_forward)

@@ -1,0 +1,38 @@
+local packer = require('packer')
+
+packer.use('tpope/vim-surround')
+
+-- -----------------------------------------------------------------------------
+-- Commentary
+-- -----------------------------------------------------------------------------
+
+packer.use('tpope/vim-commentary')
+
+vim.keymap.set('n', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
+vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
+
+-- -----------------------------------------------------------------------------
+-- Move
+-- -----------------------------------------------------------------------------
+
+packer.use('matze/vim-move')
+
+vim.g.move_map_keys = false
+
+vim.keymap.set('n', '<m-h>', '<Plug>MoveCharLeft')
+vim.keymap.set('n', '<m-j>', '<Plug>MoveLineDown')
+vim.keymap.set('n', '<m-k>', '<Plug>MoveLineUp')
+vim.keymap.set('n', '<m-l>', '<Plug>MoveCharRight')
+vim.keymap.set('n', '<m-left>', '<Plug>MoveCharLeft')
+vim.keymap.set('n', '<m-down>', '<Plug>MoveLineDown')
+vim.keymap.set('n', '<m-up>', '<Plug>MoveLineUp')
+vim.keymap.set('n', '<m-right>', '<Plug>MoveCharRight')
+
+vim.keymap.set('v', '<m-h>', '<Plug>MoveBlockLeft')
+vim.keymap.set('v', '<m-j>', '<Plug>MoveBlockDown')
+vim.keymap.set('v', '<m-k>', '<Plug>MoveBlockUp')
+vim.keymap.set('v', '<m-l>', '<Plug>MoveBlockRight')
+vim.keymap.set('v', '<m-left>', '<Plug>MoveBlockLeft')
+vim.keymap.set('v', '<m-down>', '<Plug>MoveBlockDown')
+vim.keymap.set('v', '<m-up>', '<Plug>MoveBlockUp')
+vim.keymap.set('v', '<m-left>', '<Plug>MoveBlockRight')

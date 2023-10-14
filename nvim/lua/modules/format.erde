@@ -48,11 +48,13 @@ local function has_ancestor(filenames) {
 }
 
 local function format(command) {
+  local buffer = vim.api.nvim_get_current_buf()
+
   local job_id = vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_stdout = (job_id, data) -> {
       if data[1] != "" {
-        vim.api.nvim_buf_set_lines(0, 0, -1, false, data)
+        vim.api.nvim_buf_set_lines(buffer, 0, -1, false, data)
         vim.cmd('noautocmd write')
       }
     },
@@ -61,7 +63,7 @@ local function format(command) {
     },
   })
 
-  buffer_format_jobs[job_id] = vim.api.nvim_get_current_buf()
+  buffer_format_jobs[job_id] = buffer
 }
 
 -- -----------------------------------------------------------------------------

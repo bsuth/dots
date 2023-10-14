@@ -3,34 +3,55 @@ local { edit } = require('utils.edit')
 
 packer.use('justinmk/vim-dirvish')
 
+-- -----------------------------------------------------------------------------
+-- Variables
+-- -----------------------------------------------------------------------------
+
 -- prevent netrw from taking over:
 -- https://github.com/justinmk/vim-dirvish/issues/137
 vim.g.loaded_netrwPlugin = true
 
-local function open() {
-  local file = vim.fn.expand('<cWORD>')
-  local dir = vim.fn.fnamemodify(file, ':p:h')
-  local ext = vim.fn.fnamemodify(file, ':e')
+local XDG_OPEN = {
+  jpg = 'firefox-developer-edition',
+  jpeg = 'firefox-developer-edition',
+  mp3 = 'mpv --player-operation-mode=pseudo-gui',
+  mp4 = 'mpv --player-operation-mode=pseudo-gui',
+  pdf = 'firefox-developer-edition',
+  png = 'firefox-developer-edition',
+  wav = 'mpv --player-operation-mode=pseudo-gui',
+}
 
-  if ext == 'png' {
-    os.execute('xdg-open ' .. file .. ' &>/dev/null')
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
+
+local function dirvish_open() {
+  local file = vim.api.nvim_get_current_line()
+  local extension = vim.fn.fnamemodify(file, ':e')
+  local xdg_open = XDG_OPEN[extension]
+
+  if xdg_open != nil {
+    vim.fn.jobstart([[{ xdg_open } "{ file }" & disown]])
   } else {
-    vim.cmd("cd {dir}")
     edit(file)
   }
 }
 
+-- -----------------------------------------------------------------------------
+-- Auto Commands
+-- -----------------------------------------------------------------------------
+
 vim.api.nvim_create_autocmd('FileType', {
   group = 'bsuth',
   pattern = 'dirvish',
-  callback = () -> vim.keymap.set('n', '<cr>', open, {
-    buffer = true,
-    silent = true,
-  }),
+  callback = () -> vim.keymap.set('n', '<cr>', dirvish_open, { buffer = true }),
 })
 
 vim.api.nvim_create_autocmd('BufEnter', {
   group = 'bsuth',
-  -- Refresh Dirvish buffer
-  callback = () -> vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' && vim.cmd('Dirvish'),
+  callback = () -> {
+    if vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' {
+      vim.cmd('Dirvish') -- refresh
+    }
+  },
 })

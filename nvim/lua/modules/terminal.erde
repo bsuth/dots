@@ -1,14 +1,23 @@
 local { TERM_PATTERNS } = require('constants')
 local { edit } = require('utils.edit')
 
+-- -----------------------------------------------------------------------------
+-- Mappings
+-- -----------------------------------------------------------------------------
+
 vim.keymap.set('n', '<c-space>', ':term<cr>')
 vim.keymap.set('t', '<c-[>', '<c-\\><c-n>')
 vim.keymap.set('t', '<esc>', '<c-\\><c-n>')
+
+-- -----------------------------------------------------------------------------
+-- Auto Commands
+-- -----------------------------------------------------------------------------
 
 vim.api.nvim_create_autocmd('TermOpen', {
   group = 'bsuth',
   pattern = TERM_PATTERNS,
   callback = () -> {
+    vim.wo.number = false
     vim.wo.wrap = true
     vim.cmd('startinsert')
   },

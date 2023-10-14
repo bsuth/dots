@@ -1,13 +1,8 @@
 module HOME = os.getenv('HOME')
-
-module TRACK_CWD_BLACKLIST_FILTERS = {
-  buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'help',
-  buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'man',
-  buffer -> vim.api.nvim_buf_get_name(buffer):match('^term://'),
-}
+module DOTS = os.getenv('DOTS')
 
 module TERM_PATTERNS = { 'term://*' }
-module C_PATTERNS = { '*.h', '*.c', '*.jsx', '*.ts', '*.tsx', '*.vue' }
+module C_PATTERNS = { '*.h', '*.c' }
 module JS_PATTERNS = { '*.js', '*.mjs', '*.jsx', '*.ts', '*.tsx', '*.vue' }
 module CSS_PATTERNS = { '*.css', '*.scss', '*.less' }
 module HTML_PATTERNS = { '*.html' }
