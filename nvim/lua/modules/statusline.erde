@@ -1,67 +1,230 @@
+local onedark = require('utils.onedark')
+
+-- -----------------------------------------------------------------------------
+-- Highlight
+-- -----------------------------------------------------------------------------
+
+local highlight_name_counter = 1
+local highlight_groups = {}
+
+local function highlight(config) {
+  local highlight_name = "bsuth_statusline_highlight_{ highlight_name_counter }"
+  highlight_name_counter += 1
+  highlight_groups[highlight_name] = config
+  return highlight_name
+}
+
+vim.api.nvim_create_autocmd('VimEnter', {
+  group = 'bsuth',
+  callback = () -> {
+    for name, config in pairs(highlight_groups) {
+      -- need to wait until VimEnter to setup our custom highlights
+      vim.api.nvim_set_hl(0, name, config)
+    }
+  },
+})
+
 -- -----------------------------------------------------------------------------
 -- Mode
 -- -----------------------------------------------------------------------------
 
-local STATUSLINE_MODE_LABELS = {
-  ['n'] = 'NORMAL',
-  ['no'] = 'NORMAL',
-  ['v'] = 'VISUAL',
-  ['V'] = 'VISUAL LINE',
-  [''] = 'VISUAL BLOCK',
-  ['s'] = 'SELECT',
-  ['S'] = 'SELECT LINE',
-  [''] = 'SELECT BLOCK',
-  ['i'] = 'INSERT',
-  ['ic'] = 'INSERT',
-  ['R'] = 'REPLACE',
-  ['Rv'] = 'VISUAL REPLACE',
-  ['c'] = 'COMMAND',
-  ['cv'] = 'VIM EX',
-  ['ce'] = 'EX',
-  ['r'] = 'PROMPT',
-  ['rm'] = 'MORE',
-  ['r?'] = 'CONFIRM',
-  ['!'] = 'SHELL',
-  ['t'] = 'TERMINAL',
+local MODE_CONFIG = {
+  {
+    label = 'NORMAL',
+    modes = { 'n', 'no', 'nov', 'noV', 'no', 'niI', 'niR', 'niV', 'nt', 'ntT' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.light_grey, bold = true }),
+  },
+  {
+    label = 'VISUAL',
+    modes = { 'v', 'vs' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+  },
+  {
+    label = 'VISUAL LINE',
+    modes = { 'V', 'Vs' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+  },
+  {
+    label = 'VISUAL BLOCK',
+    modes = { '', 's' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+  },
+  {
+    label = 'SELECT',
+    modes = { 's' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+  },
+  {
+    label = 'SELECT LINE',
+    modes = { 'S' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+  },
+  {
+    label = 'SELECT BLOCK',
+    modes = { '' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+  },
+  {
+    label = 'INSERT',
+    modes = { 'i', 'ic', 'ix' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.green, bold = true }),
+  },
+  {
+    label = 'REPLACE',
+    modes = { 'R', 'Rc', 'Rx' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.red, bold = true }),
+  },
+  {
+    label = 'VIRTUAL REPLACE',
+    modes = { 'Rv', 'Rvc', 'Rvx' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.red, bold = true }),
+  },
+  {
+    label = 'COMMAND',
+    modes = { 'c' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.blue, bold = true }),
+  },
+  {
+    label = 'EX',
+    modes = { 'cv' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.blue, bold = true }),
+  },
+  {
+    label = 'PROMPT',
+    modes = { 'r', 'rm', 'r?' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.red, bold = true }),
+  },
+  {
+    label = 'SHELL',
+    modes = { '!' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.red, bold = true }),
+  },
+  {
+    label = 'TERMINAL',
+    modes = { 't' },
+    highlight = highlight({ fg = onedark.black, bg = onedark.yellow, bold = true }),
+  },
+}
+
+local MODE_CONFIG_LOOKUP = {}; do {
+  for _, config in pairs(MODE_CONFIG) {
+    for _, mode in ipairs(config.modes) {
+      MODE_CONFIG_LOOKUP[mode] = config
+    }
+  }
 }
 
 local function statusline_mode() {
-  local statusline = ''
   local mode = vim.api.nvim_get_mode().mode
-
-  if mode == 'n' {
-    statusline ..= '%#StatuslineAccent#'
-  } elseif mode == 'i' || mode == 'ic' {
-    statusline ..= '%#StatuslineInsertAccent#'
-  } elseif mode == 'v' || mode == 'V' || mode == '' {
-    statusline ..= '%#StatuslineVisualAccent#'
-  } elseif mode == 'R' {
-    statusline ..= '%#StatuslineReplaceAccent#'
-  } elseif mode == 'c' {
-    statusline ..= '%#StatuslineCmdLineAccent#'
-  } elseif mode == 't' {
-    statusline ..= '%#StatuslineTerminalAccent#'
-  } else {
-    statusline ..= '%#StatusLineAccent#'
-  }
-
-  statusline ..= " { STATUSLINE_MODE_LABELS[mode] } %#Normal#"
-
-  return statusline
+  local config = MODE_CONFIG_LOOKUP[mode]
+  return "%#{ config.highlight }# { config.label } %#Normal#"
 }
 
 -- -----------------------------------------------------------------------------
--- File
+-- Buffer State
 -- -----------------------------------------------------------------------------
 
-local function statusline_file() {
-  local fpath = vim.fn.fnamemodify(vim.fn.expand('%'), ':~:.:h')
+local BUFFER_STATE_CONFIG = {
+  {
+    label = '[-]',
+    qualifier = () -> !vim.api.nvim_buf_get_option(0, 'modifiable'),
+    highlight = highlight({ fg = onedark.red, bold = true }),
+  },
+  {
+    label = '[RO]',
+    qualifier = () -> vim.api.nvim_buf_get_option(0, 'readonly'),
+    highlight = highlight({ fg = onedark.yellow, bold = true }),
+  },
+  {
+    label = '[+]',
+    qualifier = () -> vim.api.nvim_buf_get_option(0, 'modified'),
+    highlight = highlight({ fg = onedark.blue, bold = true }),
+  },
+}
 
-  if fpath == '' || fpath == '.' {
-    return ' '
+local function statusline_buffer_state() {
+  for _, config in ipairs(BUFFER_STATE_CONFIG) {
+    if config.qualifier() {
+      return "%#{ config.highlight }# { config.label } %#Normal#"
+    }
+  }
+  return ''
+}
+
+-- -----------------------------------------------------------------------------
+-- LSP
+-- -----------------------------------------------------------------------------
+
+local LSP_CONFIG = {
+  {
+    severity = vim.diagnostic.severity.HINT,
+    highlight = highlight({ fg = onedark.dark_purple, bold = true }),
+  },
+  {
+    severity = vim.diagnostic.severity.INFO,
+    highlight = highlight({ fg = onedark.dark_cyan, bold = true }),
+  },
+  {
+    severity = vim.diagnostic.severity.WARN,
+    highlight = highlight({ fg = onedark.dark_yellow, bold = true }),
+  },
+  {
+    severity = vim.diagnostic.severity.ERROR,
+    highlight = highlight({ fg = onedark.dark_red, bold = true }),
+  },
+}
+
+local function statusline_lsp() {
+  local statusline = {}
+
+  for _, config in ipairs(LSP_CONFIG) {
+    local count = #vim.diagnostic.get(0, { severity = config.severity })
+    if count > 0 {
+      table.insert(statusline, "%#{ config.highlight }# [{ count }] %#Normal#")
+    }
   }
 
-  return string.format(' %%<%s/', fpath)
+  return table.concat(statusline)
+}
+
+-- -----------------------------------------------------------------------------
+-- Filetype
+-- -----------------------------------------------------------------------------
+
+local FILETYPE_HIGHLIGHT = highlight({
+  fg = onedark.black,
+  bg = onedark.blue,
+  bold = true,
+})
+
+local FILETYPE_GETTERS = {
+  () -> vim.api.nvim_buf_get_option(0, 'filetype'),
+  () -> vim.api.nvim_buf_get_option(0, 'buftype'),
+  () -> vim.api.nvim_buf_get_option(0, 'syntax'),
+  () -> '???',
+}
+
+local function statusline_filetype() {
+  for _, filetype_getter in ipairs(FILETYPE_GETTERS) {
+    local filetype = filetype_getter()
+    if filetype != '' {
+      return "%#{ FILETYPE_HIGHLIGHT }# { filetype:upper() } %#Normal#"
+    }
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Cursor
+-- -----------------------------------------------------------------------------
+
+local CURSOR_HIGHLIGHT = highlight({
+  fg = onedark.black,
+  bg = onedark.purple,
+  bold = true,
+})
+
+local function statusline_cursor() {
+  return "%#{ CURSOR_HIGHLIGHT }# %l:%c %#Normal#"
 }
 
 -- -----------------------------------------------------------------------------
@@ -69,12 +232,14 @@ local function statusline_file() {
 -- -----------------------------------------------------------------------------
 
 global function statusline() {
-  local mode = vim.api.nvim_get_mode().mode
-
   return table.concat({
-    "%#Statusline#",
     statusline_mode(),
-    "%#Normal# ",
+    ' %F',
+    statusline_buffer_state(),
+    '%=',
+    statusline_lsp(),
+    statusline_filetype(),
+    statusline_cursor(),
   })
 }
 

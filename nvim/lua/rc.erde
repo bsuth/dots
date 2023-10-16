@@ -58,15 +58,20 @@ vim.api.nvim_create_autocmd('FileType', {
 
 -- vimrc
 vim.keymap.set('n', '<leader>ev', () -> edit('~/dots/nvim/lua'))
-vim.keymap.set('n', '<leader>sv', ':source $MYVIMRC<cr>')
+vim.keymap.set('n', '<leader>sv', () -> vim.cmd('source $MYVIMRC'))
 
 -- write, quit
-vim.keymap.set('n', '<c-w>', ':write<cr>')
-vim.keymap.set('n', '<c-q>', ':quit<cr>')
+vim.keymap.set('n', '<c-w>', () -> vim.cmd('write'))
+vim.keymap.set('n', '<c-q>', () -> vim.cmd('quit'))
 
 -- clear, refresh search highlighting
 vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
-vim.keymap.set('n', '<leader>syn', ':syntax clear | syntax reset | syntax enable<cr>')
+vim.keymap.set('n', '<leader>syn', () -> vim.cmd('syntax clear | syntax reset | syntax enable'))
+
+-- toggle number
+vim.keymap.set('i', '<c-n>', () -> { vim.wo.number = !vim.wo.number })
+vim.keymap.set('n', '<c-n>', () -> { vim.wo.number = !vim.wo.number })
+vim.keymap.set('v', '<c-n>', () -> { vim.wo.number = !vim.wo.number })
 
 -- quick links
 vim.keymap.set('n', '<leader>root', () -> edit('/'))

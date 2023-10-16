@@ -7,7 +7,6 @@ local {
   HTML_PATTERNS,
   JSON_PATTERNS,
 } = require('constants')
-local { get_buffer_dir } = require('utils.buffer')
 local path = require('utils.path')
 
 -- -----------------------------------------------------------------------------

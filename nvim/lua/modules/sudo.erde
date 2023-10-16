@@ -18,10 +18,6 @@ local function sudo_exec(command) {
   }
 }
 
-local function sudo_read() {
-  -- TODO
-}
-
 local function sudo_write() {
   local tmpfile = vim.fn.tempname()
   local filepath = vim.fn.expand('%:p')

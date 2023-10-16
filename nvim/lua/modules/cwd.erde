@@ -1,5 +1,4 @@
 local { TERM_PATTERNS } = require('constants')
-local { get_buffer_dir } = require('utils.buffer')
 
 -- -----------------------------------------------------------------------------
 -- Variables
@@ -49,6 +48,6 @@ vim.api.nvim_create_autocmd('BufEnter', {
       return
     }
 
-    vim.cmd("cd {get_buffer_dir(buffer)}")
+    vim.cmd("cd { vim.fn.expand('%:p:h') }")
   },
 })
