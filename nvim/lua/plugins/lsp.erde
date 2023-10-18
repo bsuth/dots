@@ -1,4 +1,4 @@
-local packer = require('packer')
+local plugins = require('utils.plugins')
 
 -- -----------------------------------------------------------------------------
 -- Mappings
@@ -19,8 +19,8 @@ vim.keymap.set('n', "'a", vim.lsp.buf.code_action) -- a(ction)
 -- Mason (Language Servers)
 -- -----------------------------------------------------------------------------
 
-packer.use('williamboman/mason.nvim')
-packer.use('williamboman/mason-lspconfig.nvim')
+plugins.use('williamboman/mason.nvim')
+plugins.use('williamboman/mason-lspconfig.nvim')
 
 require('mason').setup()
 require('mason-lspconfig').setup()
@@ -29,10 +29,10 @@ require('mason-lspconfig').setup()
 -- Completion
 -- -----------------------------------------------------------------------------
 
-packer.use('hrsh7th/nvim-cmp')
-packer.use('hrsh7th/cmp-nvim-lsp')
-packer.use('hrsh7th/cmp-path')
-packer.use('hrsh7th/cmp-buffer')
+plugins.use('hrsh7th/nvim-cmp')
+plugins.use('hrsh7th/cmp-nvim-lsp')
+plugins.use('hrsh7th/cmp-path')
+plugins.use('hrsh7th/cmp-buffer')
 
 local cmp = require('cmp')
 
@@ -61,7 +61,7 @@ cmp.setup({
 -- LSP Config
 -- -----------------------------------------------------------------------------
 
-packer.use('neovim/nvim-lspconfig')
+plugins.use('neovim/nvim-lspconfig')
 
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')

@@ -1,7 +1,7 @@
-local packer = require('packer')
 local { edit } = require('utils.edit')
+local plugins = require('utils.plugins')
 
-packer.use('justinmk/vim-dirvish')
+plugins.use('justinmk/vim-dirvish')
 
 -- -----------------------------------------------------------------------------
 -- Variables

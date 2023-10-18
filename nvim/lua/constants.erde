@@ -1,5 +1,11 @@
+local path = require('utils.path')
+
 module HOME = os.getenv('HOME')
 module DOTS = os.getenv('DOTS')
+
+module DATA_DIR = vim.fn.stdpath('data')
+module PLUGINS_DIR = path.join(DATA_DIR, 'site/pack/plugins/start')
+module SWAP_DIR = path.join(DATA_DIR, 'swap')
 
 module TERM_PATTERNS = { 'term://*' }
 module C_PATTERNS = { '*.h', '*.c' }

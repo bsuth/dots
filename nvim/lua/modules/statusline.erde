@@ -14,7 +14,7 @@ local function highlight(config) {
   return highlight_name
 }
 
-vim.api.nvim_create_autocmd('VimEnter', {
+vim.api.nvim_create_autocmd('SourcePost', {
   group = 'bsuth',
   callback = () -> {
     for name, config in pairs(highlight_groups) {
@@ -180,11 +180,11 @@ local function statusline_lsp() {
   for _, config in ipairs(LSP_CONFIG) {
     local count = #vim.diagnostic.get(0, { severity = config.severity })
     if count > 0 {
-      table.insert(statusline, "%#{ config.highlight }# [{ count }] %#Normal#")
+      table.insert(statusline, "%#{ config.highlight }#[{ count }]%#Normal#")
     }
   }
 
-  return table.concat(statusline)
+  return " { table.concat(statusline, ' ') } "
 }
 
 -- -----------------------------------------------------------------------------
@@ -193,7 +193,7 @@ local function statusline_lsp() {
 
 local FILETYPE_HIGHLIGHT = highlight({
   fg = onedark.black,
-  bg = onedark.blue,
+  bg = onedark.purple,
   bold = true,
 })
 
@@ -219,7 +219,7 @@ local function statusline_filetype() {
 
 local CURSOR_HIGHLIGHT = highlight({
   fg = onedark.black,
-  bg = onedark.purple,
+  bg = onedark.blue,
   bold = true,
 })
 
@@ -238,8 +238,8 @@ global function statusline() {
     statusline_buffer_state(),
     '%=',
     statusline_lsp(),
-    statusline_filetype(),
     statusline_cursor(),
+    statusline_filetype(),
   })
 }
 

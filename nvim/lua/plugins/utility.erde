@@ -1,12 +1,12 @@
-local packer = require('packer')
+local plugins = require('utils.plugins')
 
-packer.use('tpope/vim-surround')
+plugins.use('tpope/vim-surround')
 
 -- -----------------------------------------------------------------------------
 -- Commentary
 -- -----------------------------------------------------------------------------
 
-packer.use('tpope/vim-commentary')
+plugins.use('tpope/vim-commentary')
 
 vim.keymap.set('n', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
@@ -15,7 +15,7 @@ vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
 -- Move
 -- -----------------------------------------------------------------------------
 
-packer.use('matze/vim-move')
+plugins.use('matze/vim-move')
 
 vim.g.move_map_keys = false
 

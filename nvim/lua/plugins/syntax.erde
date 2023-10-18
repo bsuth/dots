@@ -1,10 +1,12 @@
-local packer = require('packer')
+local { HOME } = require('constants')
+local path = require('utils.path')
+local plugins = require('utils.plugins')
 
 -- -----------------------------------------------------------------------------
 -- Color Scheme
 -- -----------------------------------------------------------------------------
 
-packer.use('navarasu/onedark.nvim')
+plugins.use('navarasu/onedark.nvim')
 
 local onedark = require('onedark')
 
@@ -18,7 +20,7 @@ vim.api.nvim_set_hl(0, 'NormalFloat', { bg = '#232326' })
 -- Treesitter
 -- -----------------------------------------------------------------------------
 
-packer.use('nvim-treesitter/nvim-treesitter')
+plugins.use('nvim-treesitter/nvim-treesitter')
 
 local treesitter_configs = require('nvim-treesitter.configs')
 
@@ -32,4 +34,14 @@ treesitter_configs.setup({
 -- Erde
 -- -----------------------------------------------------------------------------
 
-packer.use('~/repos/vim-erde')
+plugins.use(path.join(HOME, 'repos/vim-erde'), { symlink = true })
+
+-- -----------------------------------------------------------------------------
+-- MDX
+-- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('BufRead', {
+  group = 'bsuth',
+  pattern = '*.mdx',
+  callback = () -> { vim.bo.syntax = 'markdown' },
+})

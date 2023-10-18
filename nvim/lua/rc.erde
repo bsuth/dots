@@ -1,7 +1,9 @@
 require('utils.stdlib').load()
 
-local { DOTS } = require('constants')
+local { DOTS, PLUGINS_DIR, SWAP_DIR } = require('constants')
 local { edit } = require('utils.edit')
+local path = require('utils.path')
+local plugins = require('utils.plugins')
 
 -- -----------------------------------------------------------------------------
 -- Settings
@@ -57,7 +59,7 @@ vim.api.nvim_create_autocmd('FileType', {
 -- -----------------------------------------------------------------------------
 
 -- vimrc
-vim.keymap.set('n', '<leader>ev', () -> edit('~/dots/nvim/lua'))
+vim.keymap.set('n', '<leader>ev', () -> edit(path.join(DOTS, 'nvim/lua')))
 vim.keymap.set('n', '<leader>sv', () -> vim.cmd('source $MYVIMRC'))
 
 -- write, quit
@@ -76,7 +78,8 @@ vim.keymap.set('v', '<c-n>', () -> { vim.wo.number = !vim.wo.number })
 -- quick links
 vim.keymap.set('n', '<leader>root', () -> edit('/'))
 vim.keymap.set('n', '<leader>dots', () -> edit(DOTS))
-vim.keymap.set('n', '<leader>swap', () -> edit('~/.local/share/nvim/swap'))
+vim.keymap.set('n', '<leader>swap', () -> edit(SWAP_DIR))
+vim.keymap.set('n', '<leader>plug', () -> edit(PLUGINS_DIR))
 
 -- remove annoying defaults
 vim.keymap.set('n', 'K', () -> nil) -- open manual
@@ -91,15 +94,15 @@ local function load(name) {
   require(name)
 }
 
--- core
-load('plugins.packer')
-require('packer').use('nvim-lua/plenary.nvim')
-local packer = require('packer') -- TODO: remove me
+-- Neovim requires commands for multiline printing...
+-- https://github.com/neovim/neovim/issues/5067
+vim.keymap.set('n', '<leader>pu', ':lua require("utils.plugins").update()<cr>')
+vim.keymap.set('n', '<leader>pc', ':lua require("utils.plugins").clean()<cr>')
 
+-- core
 load('modules.cwd')
 load('modules.emacs')
 load('modules.format')
-load('modules.pack')
 load('modules.scratchpad')
 load('modules.statusline')
 load('modules.sudo')

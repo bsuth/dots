@@ -1,4 +1,3 @@
-local packer = require('packer')
 local {
   HOME,
   C_PATTERNS,
@@ -46,14 +45,42 @@ local function has_ancestor(filenames) {
   }
 }
 
+local function trim_lines(lines) {
+  local num_lines = #lines
+  local trimmed_start = -1
+  local trimmed_end = -1
+  local trimmed_lines = {}
+
+  for i = 1, num_lines {
+    if lines[i] != '' {
+      trimmed_start = i
+      break
+    }
+  }
+
+  for i = num_lines, 1, -1 {
+    if lines[i] != '' {
+      trimmed_end = i
+      break
+    }
+  }
+
+  for i = trimmed_start, trimmed_end {
+    table.insert(trimmed_lines, lines[i])
+  }
+
+  return trimmed_lines
+}
+
 local function format(command) {
   local buffer = vim.api.nvim_get_current_buf()
 
   local job_id = vim.fn.jobstart(command, {
     stdout_buffered = true,
-    on_stdout = (job_id, data) -> {
-      if data[1] != "" {
-        vim.api.nvim_buf_set_lines(buffer, 0, -1, false, data)
+    on_stdout = (job_id, stdout) -> {
+      local trimmed_stdout = trim_lines(stdout)
+      if #trimmed_stdout > 0 {
+        vim.api.nvim_buf_set_lines(buffer, 0, -1, false, trimmed_stdout)
         vim.cmd('noautocmd write')
       }
     },

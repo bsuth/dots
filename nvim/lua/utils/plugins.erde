@@ -1,0 +1,87 @@
+local { HOME, PLUGINS_DIR } = require('constants')
+local path = require('utils.path')
+
+-- -----------------------------------------------------------------------------
+-- Variables
+-- -----------------------------------------------------------------------------
+
+local PLUGIN_PATHS = {}
+
+-- -----------------------------------------------------------------------------
+-- Setup
+-- -----------------------------------------------------------------------------
+
+if !io.exists(PLUGINS_DIR) {
+  os.execute("mkdir -p { PLUGINS_DIR }")
+}
+
+for _, plugin_dir in ipairs(vim.fn.readdir(PLUGINS_DIR)) {
+  PLUGIN_PATHS[path.join(PLUGINS_DIR, plugin_dir)] = false
+}
+
+-- -----------------------------------------------------------------------------
+-- API
+-- TODO: use options
+-- -----------------------------------------------------------------------------
+
+module function use(plugin_name, options) {
+  local plugin_path = path.join(PLUGINS_DIR, path.basename(plugin_name))
+
+  if PLUGIN_PATHS[plugin_path] == nil {
+    local command = (options && options.symlink)
+      && "ln -sn { plugin_name } { plugin_path }"
+      || "git clone --depth 1 https://github.com/{ plugin_name }.git { plugin_path }"
+
+    print(command)
+    print(vim.fn.system(command))
+
+    package.insert(path.join(plugin_path, 'lua/?.lua'))
+    package.insert(path.join(plugin_path, 'lua/?/init.lua'))
+
+    if options && type(options.init) == 'function' {
+      local cwd = vim.fn.getcwd()
+      vim.cmd("cd { plugin_path }")
+      options.init()
+      vim.cmd("cd { cwd }")
+    }
+  }
+
+  PLUGIN_PATHS[plugin_path] = true
+}
+
+module function update() {
+  for plugin_path, loaded in pairs(PLUGIN_PATHS) {
+    local command = "git -C { plugin_path } pull"
+    print(command)
+    print(vim.fn.system(command))
+  }
+}
+
+module function clean() {
+  local unused_plugins = {}
+
+  for plugin_path, loaded in pairs(PLUGIN_PATHS) {
+    if loaded == false {
+      table.insert(unused_plugins, plugin_path)
+    }
+  }
+
+  if #unused_plugins == 0 {
+    print('no unused plugins')
+    return
+  }
+
+  for _, plugin_path in ipairs(unused_plugins) {
+    print(path.basename(plugin_path))
+  }
+
+  repeat {
+    local input = vim.fn.input('remove plugins (y/n)?: ')
+    if input == 'y' {
+      for _, plugin_path in ipairs(unused_plugins) {
+        PLUGIN_PATHS[plugin_path] = nil
+        vim.fn.system("rm -rf { plugin_path }")
+      }
+    }
+  } until input == 'y' || input == 'n'
+}

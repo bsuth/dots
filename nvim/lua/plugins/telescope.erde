@@ -1,7 +1,10 @@
-local packer = require('packer')
+local plugins = require('utils.plugins')
 
-packer.use('nvim-telescope/telescope.nvim')
-packer.use({ 'nvim-telescope/telescope-fzf-native.nvim', run = 'make' })
+plugins.use('nvim-lua/plenary.nvim')
+plugins.use('nvim-telescope/telescope.nvim')
+plugins.use('nvim-telescope/telescope-fzf-native.nvim', {
+  init = plugin_path -> print(vim.fn.system('make')),
+})
 
 local telescope = require('telescope')
 local telescope_actions = require('telescope.actions')
