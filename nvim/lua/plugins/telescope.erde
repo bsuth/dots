@@ -3,7 +3,8 @@ local plugins = require('utils.plugins')
 plugins.use('nvim-lua/plenary.nvim')
 plugins.use('nvim-telescope/telescope.nvim')
 plugins.use('nvim-telescope/telescope-fzf-native.nvim', {
-  init = plugin_path -> print(vim.fn.system('make')),
+  on_install = () -> print(vim.fn.system('make')),
+  on_update = () -> print(vim.fn.system('make')),
 })
 
 local telescope = require('telescope')

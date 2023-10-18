@@ -5,7 +5,7 @@ local path = require('utils.path')
 -- Variables
 -- -----------------------------------------------------------------------------
 
-local PLUGIN_PATHS = {}
+local PLUGINS = {}
 
 -- -----------------------------------------------------------------------------
 -- Setup
@@ -16,53 +16,78 @@ if !io.exists(PLUGINS_DIR) {
 }
 
 for _, plugin_dir in ipairs(vim.fn.readdir(PLUGINS_DIR)) {
-  PLUGIN_PATHS[path.join(PLUGINS_DIR, plugin_dir)] = false
+  table.insert(PLUGINS, {
+    path = path.join(PLUGINS_DIR, plugin_dir),
+    loaded = false,
+    config = nil,
+  })
 }
 
 -- -----------------------------------------------------------------------------
 -- API
--- TODO: use options
 -- -----------------------------------------------------------------------------
 
-module function use(plugin_name, options) {
+module function use(plugin_name, config) {
   local plugin_path = path.join(PLUGINS_DIR, path.basename(plugin_name))
+  local plugin = table.find(PLUGINS, plugin -> plugin.path == plugin_path)
 
-  if PLUGIN_PATHS[plugin_path] == nil {
-    local command = (options && options.symlink)
-      && "ln -sn { plugin_name } { plugin_path }"
-      || "git clone --depth 1 https://github.com/{ plugin_name }.git { plugin_path }"
-
-    print(command)
-    print(vim.fn.system(command))
-
-    package.insert(path.join(plugin_path, 'lua/?.lua'))
-    package.insert(path.join(plugin_path, 'lua/?/init.lua'))
-
-    if options && type(options.init) == 'function' {
-      local cwd = vim.fn.getcwd()
-      vim.cmd("cd { plugin_path }")
-      options.init()
-      vim.cmd("cd { cwd }")
-    }
+  if plugin != nil {
+    plugin.loaded = true
+    plugin.config = config
+    return
   }
 
-  PLUGIN_PATHS[plugin_path] = true
+  local command = (config && config.symlink)
+    && "ln -sn { plugin_name } { plugin_path }"
+    || "git clone --depth 1 https://github.com/{ plugin_name }.git { plugin_path }"
+
+  print(command)
+  print(vim.fn.system(command))
+
+  if io.exists(path.join(plugin_path, 'lua')) {
+    package.insert(path.join(plugin_path, 'lua/?.lua'))
+    package.insert(path.join(plugin_path, 'lua/?/init.lua'))
+  }
+
+  if config && type(config.on_install) == 'function' {
+    local cwd = vim.fn.getcwd()
+    vim.cmd("cd { plugin_path }")
+    config.on_install()
+    vim.cmd("cd { cwd }")
+  }
+
+  table.insert(PLUGINS, {
+    path = plugin_path,
+    loaded = true,
+    config = config,
+  })
 }
 
 module function update() {
-  for plugin_path, loaded in pairs(PLUGIN_PATHS) {
-    local command = "git -C { plugin_path } pull"
+  for _, plugin in ipairs(PLUGINS) {
+    local command = "git -C { plugin.path } pull"
+
     print(command)
     print(vim.fn.system(command))
+
+    if plugin.config && type(plugin.config.on_update) == 'function' {
+      local cwd = vim.fn.getcwd()
+      vim.cmd("cd { plugin.path }")
+      plugin.config.on_update()
+      vim.cmd("cd { cwd }")
+    }
   }
 }
 
 module function clean() {
+  local used_plugins = {}
   local unused_plugins = {}
 
-  for plugin_path, loaded in pairs(PLUGIN_PATHS) {
-    if loaded == false {
-      table.insert(unused_plugins, plugin_path)
+  for _, plugin in ipairs(PLUGINS) {
+    if plugin.loaded == true {
+      table.insert(used_plugins, plugin)
+    } else {
+      table.insert(unused_plugins, plugin)
     }
   }
 
@@ -71,16 +96,16 @@ module function clean() {
     return
   }
 
-  for _, plugin_path in ipairs(unused_plugins) {
-    print(path.basename(plugin_path))
+  for _, plugin in ipairs(unused_plugins) {
+    print(path.basename(plugin.path))
   }
 
   repeat {
     local input = vim.fn.input('remove plugins (y/n)?: ')
     if input == 'y' {
-      for _, plugin_path in ipairs(unused_plugins) {
-        PLUGIN_PATHS[plugin_path] = nil
-        vim.fn.system("rm -rf { plugin_path }")
+      PLUGINS = used_plugins
+      for _, plugin in ipairs(unused_plugins) {
+        vim.fn.system("rm -rf { plugin.path }")
       }
     }
   } until input == 'y' || input == 'n'
