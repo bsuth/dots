@@ -3,6 +3,7 @@ eval $(ssh-agent -s)
 
 fcitx5 -d
 udiskie &
+flameshot &
 
 picom -b \
   --no-fading-openclose \

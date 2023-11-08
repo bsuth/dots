@@ -26,6 +26,7 @@ local treesitter_configs = require('nvim-treesitter.configs')
 
 treesitter_configs.setup({
   ensure_installed = 'all',
+  ignore_install = { 'po' },
   indent = { enable = true },
   highlight = { enable = true },
 })

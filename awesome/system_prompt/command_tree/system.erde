@@ -57,7 +57,7 @@ local system_tree = {
 -- Screen Layout
 -- -----------------------------------------------------------------------------
 
-for _, layout in ipairs({ 'single', 'double', 'triple' }) {
+for _, layout in ipairs({ 'single', 'double', 'triple', 'work' }) {
   local layout_script = "{ ENV_HOME }/.screenlayout/{ layout }.sh"
 
   if io.exists(layout_script) {

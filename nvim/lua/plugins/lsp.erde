@@ -95,11 +95,9 @@ local LSP_SERVERS = {
 }
 
 for server, config in pairs(LSP_SERVERS) {
-  lspconfig[server].setup(vim.tbl_deep_extend('force', {
-    capabilities = cmp_nvim_lsp.default_capabilities(
-      vim.lsp.protocol.make_client_capabilities()
-    ),
-  }, config))
+  local capabilities = cmp_nvim_lsp.default_capabilities( vim.lsp.protocol.make_client_capabilities())
+  capabilities.textDocument.completion.completionItem.snippetSupport = false
+  lspconfig[server].setup(vim.tbl_deep_extend('force', { capabilities = capabilities }, config))
 }
 
 -- -----------------------------------------------------------------------------

@@ -11,7 +11,7 @@ plugins.use('justinmk/vim-dirvish')
 -- https://github.com/justinmk/vim-dirvish/issues/137
 vim.g.loaded_netrwPlugin = true
 
-local XDG_OPEN = {
+local XDG_OPEN_COMMANDS = {
   jpg = 'firefox-developer-edition',
   jpeg = 'firefox-developer-edition',
   mp3 = 'mpv --player-operation-mode=pseudo-gui',
@@ -25,13 +25,13 @@ local XDG_OPEN = {
 -- Helpers
 -- -----------------------------------------------------------------------------
 
-local function dirvish_open() {
+local function xdg_open() {
   local file = vim.api.nvim_get_current_line()
   local extension = vim.fn.fnamemodify(file, ':e')
-  local xdg_open = XDG_OPEN[extension]
+  local xdg_open_command = XDG_OPEN_COMMANDS[extension]
 
-  if xdg_open != nil {
-    vim.fn.jobstart([[{ xdg_open } "{ file }" & disown]])
+  if xdg_open_command != nil {
+    vim.fn.jobstart([[{ xdg_open_command } "{ file }" & disown]])
   } else {
     edit(file)
   }
@@ -44,7 +44,7 @@ local function dirvish_open() {
 vim.api.nvim_create_autocmd('FileType', {
   group = 'bsuth',
   pattern = 'dirvish',
-  callback = () -> vim.keymap.set('n', '<cr>', dirvish_open, { buffer = true }),
+  callback = () -> vim.keymap.set('n', '<cr>', xdg_open, { buffer = true }),
 })
 
 vim.api.nvim_create_autocmd('BufEnter', {
