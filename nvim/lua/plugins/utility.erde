@@ -1,3 +1,4 @@
+local { TRACK_CWD_FILTERS } = require('constants')
 local plugins = require('utils.plugins')
 
 plugins.use('tpope/vim-surround')
@@ -36,3 +37,14 @@ vim.keymap.set('v', '<m-left>', '<Plug>MoveBlockLeft')
 vim.keymap.set('v', '<m-down>', '<Plug>MoveBlockDown')
 vim.keymap.set('v', '<m-up>', '<Plug>MoveBlockUp')
 vim.keymap.set('v', '<m-left>', '<Plug>MoveBlockRight')
+
+-- -----------------------------------------------------------------------------
+-- Fugitive
+-- -----------------------------------------------------------------------------
+
+plugins.use('tpope/vim-fugitive')
+
+table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'fugitive')
+table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'git')
+
+vim.keymap.set('n', '<c-g>', ':Git ')

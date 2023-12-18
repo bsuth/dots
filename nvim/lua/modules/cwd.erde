@@ -1,4 +1,8 @@
-local { TERM_PATTERNS } = require('constants')
+local { TERM_PATTERNS, TRACK_CWD_FILTERS } = require('constants')
+
+table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'help')
+table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'man')
+table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'buftype') == 'terminal')
 
 -- -----------------------------------------------------------------------------
 -- Variables
@@ -44,8 +48,10 @@ vim.api.nvim_create_autocmd('BufEnter', {
     local filetype = vim.api.nvim_buf_get_option(buffer, 'filetype')
     local buftype = vim.api.nvim_buf_get_option(buffer, 'buftype')
 
-    if filetype == 'help' || filetype == 'man' || buftype == 'terminal' {
-      return
+    for _, filter in ipairs(TRACK_CWD_FILTERS) {
+      if filter(buffer) {
+        return
+      }
     }
 
     vim.cmd("cd { vim.fn.expand('%:p:h') }")

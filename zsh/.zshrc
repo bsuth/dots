@@ -111,30 +111,15 @@ chpwd_functions=(${chpwd_functions[@]} "on_cd")
 alias ls='ls --color=auto'
 alias lj='luajit'
 
-function qmk_chocofi {
-  cd ~/extern/qmk_firmware
-  # https://joshajohnson.com/sea-picro/#documentation
-  qmk flash -c -kb crkbd -km bsuth -e CONVERT_TO=promicro_rp2040
-  cd -
-}
+# https://joshajohnson.com/sea-picro/#documentation
+alias qmk_chocofi='qmk flash -c -kb crkbd -km bsuth -e CONVERT_TO=promicro_rp2040'
+alias qmk_ferris='qmk flash -c -kb "ferris/sweep" -km bsuth -e CONVERT_TO=promicro_rp2040'
 
 alias erdejit='luajit ~/.luarocks/share/lua/5.1/erde/cli.lua'
 alias erde5.1='lua5.1 ~/.luarocks/share/lua/5.1/erde/cli.lua'
 alias erde5.2='lua5.2 ~/.luarocks/share/lua/5.2/erde/cli.lua'
 alias erde5.3='lua5.3 ~/.luarocks/share/lua/5.3/erde/cli.lua'
 alias erde5.4='lua5.4 ~/.luarocks/share/lua/5.4/erde/cli.lua'
-
-function ansi() {
-  setxkbmap us
-  ln -sf ~/dots/.ansi.Xmodmap ~/.Xmodmap
-  xmodmap ~/.Xmodmap
-}
-
-function hhkb() {
-  setxkbmap us
-  ln -sf ~/dots/.hhkb.Xmodmap ~/.Xmodmap
-  xmodmap ~/.Xmodmap
-}
 
 function wm {
   SIZE="${1:-800x600}"

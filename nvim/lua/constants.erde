@@ -13,3 +13,5 @@ module JS_PATTERNS = { '*.js', '*.mjs', '*.jsx', '*.ts', '*.tsx', '*.vue' }
 module CSS_PATTERNS = { '*.css', '*.scss', '*.less' }
 module HTML_PATTERNS = { '*.html' }
 module JSON_PATTERNS = { '*.json', '*.cjson' }
+
+module TRACK_CWD_FILTERS = {}

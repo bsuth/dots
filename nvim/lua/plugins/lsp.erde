@@ -1,3 +1,5 @@
+local { HOME } = require('constants')
+local path = require('utils.path')
 local plugins = require('utils.plugins')
 
 -- -----------------------------------------------------------------------------
@@ -73,6 +75,9 @@ local LSP_SERVERS = {
   gopls = {},
   graphql = {},
   jsonls = {},
+  elixirls = {
+    cmd = { path.join(HOME, '.local/share/nvim/mason/bin/elixir-ls') },
+  },
   stylelint_lsp = {
     settings = {
       stylelintplus = {
