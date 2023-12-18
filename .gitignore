@@ -11,6 +11,4 @@ slock/slock
 # zsh
 .zcompdump
 .zhistory
-
-# work
-*work*
+.zwork
