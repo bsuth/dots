@@ -1,0 +1,12 @@
+require('utils.stdlib').load()
+
+local catnip = require('catnip')
+local keymap = require('keymap')
+
+require('canvas')
+require('dump')
+require('wallpaper')
+require('window')
+
+keymap({ 'alt' }, 'r', catnip.reload)
+keymap({ 'alt' }, 'q', catnip.quit)

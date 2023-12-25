@@ -1,0 +1,82 @@
+local Class = require('utils.Class')
+local Workspace = require('window.Workspace')
+
+local Desktop = Class()
+
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function Desktop:_init(box) {
+  self.box = box
+  self.workspaces = {}
+
+  local default_workspace = Workspace(box)
+  table.insert(self.workspaces, default_workspace)
+  self:rawset('active_workspace', default_workspace)
+}
+
+function Desktop:_get_active_workspace_index() {
+  for i, workspace in ipairs(self.workspaces) {
+    if workspace == self.active_workspace {
+      return i
+    }
+  }
+}
+
+function Desktop:_on_change_active_workspace(new_active_workspace, old_active_workspace) {
+  old_active_workspace.visible = false
+  new_active_workspace.visible = true
+}
+
+-- -----------------------------------------------------------------------------
+-- Public
+-- -----------------------------------------------------------------------------
+
+function Desktop:push() {
+  local new_workspace = Workspace(self.box)
+  table.insert(self.workspaces, new_workspace)
+  self.active_workspace = new_workspace
+  return new_workspace
+}
+
+function Desktop:pop() {
+  if #self.active_workspace > 0 {
+    return -- cannot remove workspace with windows
+  }
+
+  local num_workspaces = #self.workspaces
+
+  if num_workspaces == 1 {
+    return -- cannot remove last workspace
+  }
+
+  local old_active_workspace_index = self.active_workspace_index
+
+  self.active_workspace = (old_active_workspace_index == num_workspaces)
+    && self.workspaces[old_active_workspace_index - 1]
+    || self.workspaces[old_active_workspace_index + 1]
+
+  table.remove(self.workspaces, old_active_workspace_index)
+}
+
+function Desktop:cycle(reverse = false) {
+  local num_workspaces = #self.workspaces
+  local old_active_workspace_index = self.active_workspace_index
+
+  if reverse {
+    self.active_workspace = (old_active_workspace_index == num_workspaces)
+      && self.workspaces[1]
+      || self.workspaces[old_active_workspace_index + 1]
+  } else {
+    self.active_workspace = (old_active_workspace_index == 1)
+      && self.workspaces[num_workspaces]
+      || self.workspaces[old_active_workspace_index - 1]
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Desktop

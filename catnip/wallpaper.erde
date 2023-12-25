@@ -3,7 +3,9 @@ local catnip = require('catnip')
 local wallpapers = {}
 local wallpaper_svg = catnip.svg(io.readfile('wallpaper.svg'))
 
-local function create_wallpaper(output)
+local function create_wallpaper(output) {
+  -- TODO: ensure the wallpaper is always in the back
+
   local output_wallpaper = catnip.canvas({
     x = output.x,
     y = output.y,
@@ -18,22 +20,22 @@ local function create_wallpaper(output)
     height = output.height,
   })
 
-  output:subscribe('destroy', function()
-    for i, wallpaper in ipairs(wallpapers) do
-      if wallpaper == output_wallpaper then
+  output:subscribe('destroy', () -> {
+    for i, wallpaper in ipairs(wallpapers) {
+      if wallpaper == output_wallpaper {
         table.remove(wallpapers, i)
         break
-      end
-    end
-  end)
+      }
+    }
+  })
 
   table.insert(wallpapers, output_wallpaper)
-end
+}
 
-do
+do {
   catnip.subscribe('output::create', create_wallpaper)
 
-  for _, output in ipairs(catnip.outputs) do
+  for _, output in ipairs(catnip.outputs) {
     create_wallpaper(output)
-  end
-end
+  }
+}

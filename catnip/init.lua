@@ -1,17 +1,4 @@
-require('utils.stdlib').load()
-
-local catnip = require('catnip')
-local keymap = require('keymap')
-
-require('canvas')
-require('dump')
-require('wallpaper')
-require('windows')
-
-keymap({ 'alt' }, 'r', function()
-  catnip.reload()
-end)
-
-keymap({ 'alt' }, 'q', function()
-  catnip.quit()
-end)
+local erde = require('erde')
+erde.load()
+local ok, result = xpcall(function() require('main') end, erde.rewrite)
+if not ok then error(result) end

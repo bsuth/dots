@@ -1,0 +1,49 @@
+local catnip = require('catnip')
+
+local keymappings = {}
+
+local function get_key_event_mappings(event) {
+  local modifier_flags = {
+    event.shift && 1 || 0,
+    event.ctrl && 1 || 0,
+    event.alt && 1 || 0,
+  }
+
+  local id = table.concat(modifier_flags) .. ':' .. event.code
+  return keymappings[id]
+}
+
+catnip.subscribe('keyboard::keydown', (keyboard, event) -> {
+  local key_event_mappings = get_key_event_mappings(event)
+  event.prevent_notify = (key_event_mappings != nil)
+})
+
+catnip.subscribe('keyboard::keyup', (keyboard, event) -> {
+  local key_event_mappings = get_key_event_mappings(event)
+
+  if key_event_mappings != nil {
+    event.prevent_notify = true
+
+    for _, callback in ipairs(key_event_mappings) {
+      callback()
+    }
+  }
+})
+
+return (modifiers, key, callback) -> {
+  local modifier_flags = { 0, 0, 0 }
+
+  for _, modifier in ipairs(modifiers) {
+    if modifier == 'shift' {
+      modifier_flags[1] = 1
+    } elseif modifier == 'ctrl' {
+      modifier_flags[2] = 1
+    } elseif modifier == 'alt' {
+      modifier_flags[3] = 1
+    }
+  }
+
+  local id = table.concat(modifier_flags) .. ':' .. string.byte(key)
+  keymappings[id] = keymappings[id] || {}
+  table.insert(keymappings[id], callback)
+}

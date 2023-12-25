@@ -1,0 +1,64 @@
+module function is_point_in_box(point, box) {
+  return (
+    box.x <= point.x && point.x <= box.x + box.width &&
+    box.y <= point.y && point.y <= box.y + box.height
+  )
+}
+
+module function is_box_contained(box, container) {
+  return (
+    container.x <= box.x && box.x + box.width <= container.x + container.width &&
+    container.y <= box.y && box.y + box.height <= container.y + container.height
+  )
+}
+
+module function swap_boxes(box1, box2) {
+  local tmp = {
+    x = box1.x,
+    y = box1.y,
+    width = box1.width,
+    height = box1.height,
+  }
+
+  box1.x = box2.x
+  box1.y = box2.y
+  box1.width = box2.width
+  box1.height = box2.height
+
+  box2.x = tmp.x
+  box2.y = tmp.y
+  box2.width = tmp.width
+  box2.height = tmp.height
+}
+
+module function get_box_proximity(source, target, direction) {
+  if direction == "left" {
+    return (
+      target.x < source.x &&
+      target.y <= source.y + source.height &&
+      source.y <= target.y + target.height &&
+      source.x - target.x
+    )
+  } elseif direction == "right" {
+    return (
+      source.x + source.width < target.x + target.width &&
+      target.y <= source.y + source.height &&
+      source.y <= target.y + target.height &&
+      (target.x + target.width) - (source.x + source.width)
+    )
+  } elseif direction == "up" {
+    return (
+      target.y < source.y &&
+      target.x <= source.x + source.width &&
+      source.x <= target.x + target.width &&
+      source.y - target.y
+    )
+  } elseif direction == "down" {
+    return (
+      source.y + source.height < target.y + target.height &&
+      target.x <= source.x + source.width &&
+      source.x <= target.x + target.width &&
+      (target.y + target.height) - (source.y + source.height)
+    )
+  }
+}
