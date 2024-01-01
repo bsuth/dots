@@ -67,7 +67,7 @@ local function tile_master_left(layout, windows, num_windows = #windows) {
     y = layout.y,
     width = column_width,
     height = layout.height,
-  }, slaves, num_windows)
+  }, slaves, num_windows - 1)
 }
 
 local function tile_grid_horizontal(layout, windows, num_windows = #windows) {

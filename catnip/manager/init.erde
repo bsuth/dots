@@ -1,0 +1,78 @@
+local catnip = require('catnip')
+local keymap = require('keymap')
+local { get_closest_box, swap_closest_box } = require('utils.box')
+local { desktops, active_state, window_buffer } = require('manager.state')
+
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
+
+local function activate_relative_window(direction) {
+  active_state:update()
+
+  if active_state.window == nil {
+    return
+  }
+
+  local new_active_window = get_closest_box(
+    active_state.workspace.windows,
+    active_state.window,
+    direction,
+  )
+
+  if new_active_window == nil {
+    return
+  }
+
+  new_active_window.active = true
+}
+
+local function swap_active_and_relative_window(direction) {
+  active_state:update()
+
+  if active_state.window == nil {
+    return
+  }
+
+  swap_closest_box(active_state.workspace.windows, active_state.window, direction)
+}
+
+-- -----------------------------------------------------------------------------
+-- Keymaps
+-- -----------------------------------------------------------------------------
+
+keymap({ 'mod1' }, 'space', () -> os.execute('foot & disown'))
+
+keymap({ 'mod1' }, 't', () -> active_state:update().desktop:push())
+keymap({ 'mod1' }, 'w', () -> active_state:update().desktop:pop())
+keymap({ 'mod1' }, 'Tab', () -> active_state:update().desktop:cycle())
+keymap({ 'mod1', 'shift' }, 'ISO_Left_Tab', () -> active_state:update().desktop:cycle(true))
+
+keymap({ 'mod1' }, 'h', () -> activate_relative_window('left'))
+keymap({ 'mod1' }, 'j', () -> activate_relative_window('down'))
+keymap({ 'mod1' }, 'k', () -> activate_relative_window('up'))
+keymap({ 'mod1' }, 'l', () -> activate_relative_window('right'))
+
+keymap({ 'mod1' }, 'H', () -> swap_active_and_relative_window('left'))
+keymap({ 'mod1' }, 'J', () -> swap_active_and_relative_window('down'))
+keymap({ 'mod1' }, 'K', () -> swap_active_and_relative_window('up'))
+keymap({ 'mod1' }, 'L', () -> swap_active_and_relative_window('right'))
+
+keymap({ 'mod1' }, 'm', () -> active_state:update() && window_buffer:push())
+keymap({ 'mod1' }, 'M', () -> active_state:update() && window_buffer:pop())
+
+-- -----------------------------------------------------------------------------
+-- Subscriptions
+-- -----------------------------------------------------------------------------
+
+catnip.subscribe('window::create', window -> {
+  active_state:update().workspace:add(window)
+})
+
+catnip.subscribe('window::destroy', window -> {
+  for _, desktop in pairs(desktops) {
+    for _, workspace in ipairs(desktop.workspaces) {
+      workspace:remove(window)
+    }
+  }
+})

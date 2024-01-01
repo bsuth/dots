@@ -8,7 +8,7 @@ local function bluetooth_connect() {
   local tree = {}
 
   for _, device in pairs(models.bluetooth.devices) {
-    if device.paired_state == 'paired' && device.connected_state == 'disconnected' {
+    if device.paired_state == 'paired' && device.connected_state != 'connected' {
       table.insert(tree, {
         label = device.name,
         type = 'multiple',

@@ -1,5 +1,5 @@
 local Class = require('utils.Class')
-local Workspace = require('window.Workspace')
+local Workspace = require('manager.Workspace')
 
 local Desktop = Class()
 
@@ -65,13 +65,13 @@ function Desktop:cycle(reverse = false) {
   local old_active_workspace_index = self.active_workspace_index
 
   if reverse {
-    self.active_workspace = (old_active_workspace_index == num_workspaces)
-      && self.workspaces[1]
-      || self.workspaces[old_active_workspace_index + 1]
-  } else {
     self.active_workspace = (old_active_workspace_index == 1)
       && self.workspaces[num_workspaces]
       || self.workspaces[old_active_workspace_index - 1]
+  } else {
+    self.active_workspace = (old_active_workspace_index == num_workspaces)
+      && self.workspaces[1]
+      || self.workspaces[old_active_workspace_index + 1]
   }
 }
 

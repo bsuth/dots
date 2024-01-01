@@ -6,7 +6,20 @@ local keymap = require('keymap')
 require('canvas')
 require('dump')
 require('wallpaper')
-require('window')
+require('manager')
 
-keymap({ 'alt' }, 'r', catnip.reload)
-keymap({ 'alt' }, 'q', catnip.quit)
+keymap({ 'mod1' }, 'r', catnip.reload)
+keymap({ 'mod1' }, 'q', catnip.quit)
+
+-- -----------------------------------------------------------------------------
+-- Init Events
+-- -----------------------------------------------------------------------------
+
+for _, keyboard in pairs(catnip.keyboards) { catnip.publish('keyboard::init', keyboard) }
+catnip.subscribe('keyboard::init', keyboard -> catnip.publish('keyboard::init', keyboard))
+
+for _, output in pairs(catnip.outputs) { catnip.publish('output::init', output) }
+catnip.subscribe('output::init', output -> catnip.publish('output::init', output))
+
+for _, window in pairs(catnip.windows) { catnip.publish('window::init', window) }
+catnip.subscribe('window::init', window -> catnip.publish('window::init', window))

@@ -1,0 +1,64 @@
+local tile = require('manager.tile')
+local Class = require('utils.Class')
+
+local Workspace = Class()
+
+-- -----------------------------------------------------------------------------
+-- Private
+-- -----------------------------------------------------------------------------
+
+function Workspace:_init(box) {
+  self.box = box
+  self.windows = {}
+  self.visible = true
+  self._active_window = nil
+}
+
+function Workspace:_on_change_visible(new_visible) {
+  if !new_visible {
+    self._active_window = table.find(self.windows, window -> window.active)
+  }
+
+  if self._active_window != nil {
+    self._active_window.active = new_visible
+  }
+
+  for _, window in ipairs(self.windows) {
+    window.visible = new_visible
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Public
+-- -----------------------------------------------------------------------------
+
+function Workspace:add(window) {
+  table.insert(self.windows, window)
+  tile(self.box, self.windows)
+}
+
+function Workspace:remove(window) {
+  local _, window_index = table.find(self.windows, window)
+
+  if window_index == nil {
+    return
+  }
+
+  if window.active {
+    local num_windows = #self.windows
+    if window_index < num_windows {
+      self.windows[window_index + 1].active = true
+    } else {
+      self.windows[window_index - 1].active = true
+    }
+  }
+
+  table.remove(self.windows, window_index)
+  tile(self.box, self.windows)
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return Workspace

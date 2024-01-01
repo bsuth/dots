@@ -1,49 +1,65 @@
 local catnip = require('catnip')
 
-local keymappings = {}
+local key_event_callbacks = {}
 
-local function get_key_event_mappings(event) {
-  local modifier_flags = {
-    event.shift && 1 || 0,
-    event.ctrl && 1 || 0,
-    event.alt && 1 || 0,
-  }
-
-  local id = table.concat(modifier_flags) .. ':' .. event.code
-  return keymappings[id]
+local function get_key_event_callbacks(event) {
+  local is_printable_ascii = 32 < event.code && event.code < 127
+  return key_event_callbacks[
+    table.concat({
+      (event.shift && !is_printable_ascii) && 1 || 0,
+      event.ctrl && 1 || 0,
+      event.mod1 && 1 || 0,
+      event.mod2 && 1 || 0,
+      event.mod3 && 1 || 0,
+      event.mod4 && 1 || 0,
+      event.mod5 && 1 || 0,
+      is_printable_ascii && string.char(event.code) || event.name,
+    })
+  ]
 }
 
 catnip.subscribe('keyboard::keydown', (keyboard, event) -> {
-  local key_event_mappings = get_key_event_mappings(event)
-  event.prevent_notify = (key_event_mappings != nil)
+  if get_key_event_callbacks(event) != nil {
+    event.prevent_notify = true
+  }
 })
 
 catnip.subscribe('keyboard::keyup', (keyboard, event) -> {
-  local key_event_mappings = get_key_event_mappings(event)
+  local callbacks = get_key_event_callbacks(event)
 
-  if key_event_mappings != nil {
-    event.prevent_notify = true
+  if callbacks == nil {
+    return
+  }
 
-    for _, callback in ipairs(key_event_mappings) {
-      callback()
-    }
+  event.prevent_notify = true
+
+  for _, callback in ipairs(callbacks) {
+    callback()
   }
 })
 
 return (modifiers, key, callback) -> {
-  local modifier_flags = { 0, 0, 0 }
+  local id_parts = { 0, 0, 0, 0, 0, 0, 0, key }
 
   for _, modifier in ipairs(modifiers) {
     if modifier == 'shift' {
-      modifier_flags[1] = 1
+      id_parts[1] = 1
     } elseif modifier == 'ctrl' {
-      modifier_flags[2] = 1
-    } elseif modifier == 'alt' {
-      modifier_flags[3] = 1
+      id_parts[2] = 1
+    } elseif modifier == 'mod1' {
+      id_parts[3] = 1
+    } elseif modifier == 'mod2' {
+      id_parts[4] = 1
+    } elseif modifier == 'mod3' {
+      id_parts[5] = 1
+    } elseif modifier == 'mod4' {
+      id_parts[6] = 1
+    } elseif modifier == 'mod5' {
+      id_parts[7] = 1
     }
   }
 
-  local id = table.concat(modifier_flags) .. ':' .. string.byte(key)
-  keymappings[id] = keymappings[id] || {}
-  table.insert(keymappings[id], callback)
+  local id = table.concat(id_parts)
+  key_event_callbacks[id] ||= {}
+  table.insert(key_event_callbacks[id], callback)
 }

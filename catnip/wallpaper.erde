@@ -35,7 +35,7 @@ local function create_wallpaper(output) {
 do {
   catnip.subscribe('output::create', create_wallpaper)
 
-  for _, output in ipairs(catnip.outputs) {
+  for _, output in pairs(catnip.outputs) {
     create_wallpaper(output)
   }
 }
