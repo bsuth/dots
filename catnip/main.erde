@@ -8,8 +8,8 @@ require('dump')
 require('wallpaper')
 require('manager')
 
-keymap({ 'mod1' }, 'r', catnip.reload)
-keymap({ 'mod1' }, 'q', catnip.quit)
+keymap({ 'mod1', 'ctrl' }, 'r', catnip.reload)
+keymap({ 'mod1', 'ctrl' }, 'q', catnip.quit)
 
 -- -----------------------------------------------------------------------------
 -- Init Events

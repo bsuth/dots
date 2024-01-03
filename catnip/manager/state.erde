@@ -23,7 +23,7 @@ catnip.subscribe('output::destroy', output -> {
 module active_state = {}
 
 function active_state:update() {
-  for output_id, desktop in pairs(desktops) {
+  for _, desktop in pairs(desktops) {
     for window_index, window in ipairs(desktop.active_workspace.windows) {
       if window.active {
         self.window = window
@@ -36,8 +36,8 @@ function active_state:update() {
     }
   }
 
-  for output_id, desktop in pairs(desktops) {
-    if is_point_in_box(catnip.cursor, desktop.box) {
+  for _, desktop in pairs(desktops) {
+    if is_point_in_box(catnip.cursor, desktop) {
       self.window = nil
       self.window_index = nil
       self.workspace = desktop.active_workspace
@@ -78,7 +78,7 @@ function window_buffer:push() {
     }
   }
 
-  active_state.workspace:remove(active_state.window)
+  active_state.workspace:remove(active_state.window_index)
   table.insert(window_buffer, active_state.window)
   active_state.window.visible = false
 }

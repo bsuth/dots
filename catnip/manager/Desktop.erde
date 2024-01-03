@@ -8,13 +8,16 @@ local Desktop = Class()
 -- -----------------------------------------------------------------------------
 
 function Desktop:_init(box) {
-  self.box = box
-  self.workspaces = {}
-
-  local default_workspace = Workspace(box)
-  table.insert(self.workspaces, default_workspace)
-  self:rawset('active_workspace', default_workspace)
+  self._box = box
+  self.workspaces = { Workspace(box) }
+  self:rawset('active_workspace', self.workspaces[1])
 }
+
+-- Allow Desktop to be treated as a box
+Desktop._get_x = () => self._box.x
+Desktop._get_y = () => self._box.y
+Desktop._get_width = () => self._box.width
+Desktop._get_height = () => self._box.height
 
 function Desktop:_get_active_workspace_index() {
   for i, workspace in ipairs(self.workspaces) {
@@ -34,7 +37,7 @@ function Desktop:_on_change_active_workspace(new_active_workspace, old_active_wo
 -- -----------------------------------------------------------------------------
 
 function Desktop:push() {
-  local new_workspace = Workspace(self.box)
+  local new_workspace = Workspace(self._box)
   table.insert(self.workspaces, new_workspace)
   self.active_workspace = new_workspace
   return new_workspace

@@ -8,11 +8,17 @@ local Workspace = Class()
 -- -----------------------------------------------------------------------------
 
 function Workspace:_init(box) {
-  self.box = box
+  self._box = box
+  self._active_window = nil
   self.windows = {}
   self.visible = true
-  self._active_window = nil
 }
+
+-- Allow Workspace to be treated as a box
+Workspace._get_x = () => self._box.x
+Workspace._get_y = () => self._box.y
+Workspace._get_width = () => self._box.width
+Workspace._get_height = () => self._box.height
 
 function Workspace:_on_change_visible(new_visible) {
   if !new_visible {
@@ -34,27 +40,24 @@ function Workspace:_on_change_visible(new_visible) {
 
 function Workspace:add(window) {
   table.insert(self.windows, window)
-  tile(self.box, self.windows)
+  tile(self._box, self.windows)
 }
 
-function Workspace:remove(window) {
-  local _, window_index = table.find(self.windows, window)
-
-  if window_index == nil {
-    return
-  }
-
-  if window.active {
+function Workspace:remove(window_index, fallback = true) {
+  if fallback && self.windows[window_index].active {
     local num_windows = #self.windows
-    if window_index < num_windows {
-      self.windows[window_index + 1].active = true
-    } else {
-      self.windows[window_index - 1].active = true
+
+    if num_windows > 1 {
+      if window_index < num_windows {
+        self.windows[window_index + 1].active = true
+      } else {
+        self.windows[window_index - 1].active = true
+      }
     }
   }
 
   table.remove(self.windows, window_index)
-  tile(self.box, self.windows)
+  tile(self._box, self.windows)
 }
 
 -- -----------------------------------------------------------------------------

@@ -1,3 +1,10 @@
+module function get_box_center(box) {
+  return {
+    x = box.x + box.width / 2,
+    y = box.y + box.height / 2,
+  }
+}
+
 module function is_point_in_box(point, box) {
   return (
     box.x <= point.x && point.x <= box.x + box.width &&
@@ -66,13 +73,13 @@ module function get_box_proximity(source, target, direction) {
 module function get_closest_box(boxes, source_box, direction) {
   local closest_box = nil
   local closest_box_index = nil
-  local closest_box_proximity = nil
+  local closest_box_proximity = math.huge
 
   for i, box in ipairs(boxes) {
     if box != source_box {
       local proximity = get_box_proximity(source_box, box, direction)
 
-      if proximity && (!closest_box_proximity || proximity < closest_box_proximity) {
+      if proximity && proximity < closest_box_proximity {
         closest_box = box
         closest_box_index = i
         closest_box_proximity = proximity
@@ -81,22 +88,4 @@ module function get_closest_box(boxes, source_box, direction) {
   }
 
   return closest_box, closest_box_index
-}
-
-module function swap_closest_box(boxes, source_box, direction) {
-  local _, source_box_index = table.find(boxes, source_box)
-
-  if source_box_index == nil {
-    return
-  }
-
-  local closest_box, closest_box_index = get_closest_box(boxes, source_box, direction)
-
-  if closest_box == nil {
-    return
-  }
-
-  swap_boxes(source_box, closest_box)
-  boxes[closest_box_index] = source_box
-  boxes[source_box_index] = closest_box
 }
