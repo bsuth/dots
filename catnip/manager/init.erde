@@ -1,11 +1,17 @@
 local catnip = require('catnip')
 local keymap = require('keymap')
-local { get_box_center, get_closest_box, swap_boxes } = require('utils.box')
+local { get_box_center, get_closest_box, is_point_in_box, swap_boxes } = require('utils.box')
 local { desktops, active_state, window_buffer } = require('manager.state')
 
 -- -----------------------------------------------------------------------------
 -- Helpers
 -- -----------------------------------------------------------------------------
+
+local function center_cursor(box) {
+  local new_cursor_position = get_box_center(box)
+  catnip.cursor.x = new_cursor_position.x
+  catnip.cursor.y = new_cursor_position.y
+}
 
 local function destroy_active_window() {
   active_state:update()
@@ -68,10 +74,9 @@ local function activate_relative(direction) {
 
   if relative_state.window != nil {
     relative_state.window.active = true
+    center_cursor(relative_state.window)
   } else {
-    local desktop_center = get_box_center(relative_state.desktop)
-    catnip.cursor.x = desktop_center.x
-    catnip.cursor.y = desktop_center.y
+    center_cursor(relative_state.desktop)
   }
 }
 
@@ -96,6 +101,8 @@ local function move_active_window(direction) {
     relative_state.workspace[relative_state.window_index] = active_state.window
     swap_boxes(active_state.window, relative_state.window)
   }
+
+  center_cursor(active_state.window)
 }
 
 -- -----------------------------------------------------------------------------
@@ -129,6 +136,7 @@ keymap({ 'mod1' }, 'M', () -> active_state:update() && window_buffer:pop())
 
 catnip.subscribe('window::create', window -> {
   active_state:update().workspace:add(window)
+  center_cursor(window)
 })
 
 catnip.subscribe('window::destroy', window -> {
@@ -137,6 +145,17 @@ catnip.subscribe('window::destroy', window -> {
       local window_index = select(2, table.find(workspace.windows, window))
       if window_index != nil {
         workspace:remove(window_index)
+        return
+      }
+    }
+  }
+})
+
+catnip.cursor:subscribe('button::press', button => {
+  for _, desktop in pairs(desktops) {
+    for _, window in ipairs(desktop.active_workspace.windows) {
+      if is_point_in_box(catnip.cursor, window) {
+        window.active = true
         return
       }
     }
