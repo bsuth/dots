@@ -2,6 +2,7 @@ local plugins = require('utils.plugins')
 
 plugins.use('nvim-lua/plenary.nvim')
 plugins.use('nvim-telescope/telescope.nvim')
+plugins.use('nvim-telescope/telescope-file-browser.nvim')
 plugins.use('nvim-telescope/telescope-fzf-native.nvim', {
   on_install = () -> print(vim.fn.system('make')),
   on_update = () -> print(vim.fn.system('make')),
@@ -9,8 +10,11 @@ plugins.use('nvim-telescope/telescope-fzf-native.nvim', {
 
 local telescope = require('telescope')
 local telescope_actions = require('telescope.actions')
+local telescope_actions_set = require('telescope.actions.set')
 local telescope_action_state = require('telescope.actions.state')
 local telescope_builtin = require('telescope.builtin')
+
+local telescope_file_browser = require('telescope').extensions.file_browser.file_browser
 
 -- -----------------------------------------------------------------------------
 -- Setup
@@ -20,12 +24,13 @@ telescope.setup({
   defaults = {
     layout_strategy = 'bottom_pane',
     sorting_strategy = 'ascending',
-    layout_config = { height = 0.4 },
+    layout_config = { height = { padding = 0 } },
     border = false,
     prompt_prefix = '➜ ',
     selection_caret = '  ',
     multi_icon = '·',
     get_status_text = () -> '',
+    preview = false,
     mappings = {
       i = {
         -- remove default mappings
@@ -46,10 +51,11 @@ telescope.setup({
         ['<c-[>'] = telescope_actions.close,
         ['<esc>'] = telescope_actions.close,
 
+        ['<up>'] = telescope_actions.cycle_history_prev,
+        ['<down>'] = telescope_actions.cycle_history_next,
+
         ['<S-Tab>'] = telescope_actions.move_selection_previous,
         ['<Tab>'] = telescope_actions.move_selection_next,
-        ['<up>'] = telescope_actions.move_selection_previous,
-        ['<down>'] = telescope_actions.move_selection_next,
         ['<c-p>'] = telescope_actions.move_selection_previous,
         ['<c-n>'] = telescope_actions.move_selection_next,
 
@@ -77,9 +83,28 @@ telescope.setup({
       },
     },
   },
+  extensions = {
+    file_browser = {
+      dir_icon = ' ',
+      display_stat = false,
+      git_status = false,
+      hijack_netrw = false,
+      mappings = {
+        i = {
+          ['<c-c>'] = (prompt_buffer) -> {
+            local picker = telescope_action_state.get_current_picker(prompt_buffer)
+            local path = picker.finder.path
+            telescope_actions.close(prompt_buffer)
+            vim.cmd("Dirvish { path }")
+          },
+        },
+      },
+    },
+  },
 })
 
 telescope.load_extension('fzf')
+telescope.load_extension('file_browser')
 
 -- -----------------------------------------------------------------------------
 -- Mappings
@@ -88,9 +113,13 @@ telescope.load_extension('fzf')
 vim.keymap.set('n', '`b', ':Telescope buffers<cr>')
 vim.keymap.set('n', '`g', ':Telescope git_files<cr>')
 vim.keymap.set('n', '`f', ':Telescope find_files<cr>')
+vim.keymap.set('n', '`h', ':Telescope help_tags<cr>')
+vim.keymap.set('n', '`m', ':Telescope man_pages<cr>')
+vim.keymap.set('n', '` ', ':Telescope file_browser<cr>')
 vim.keymap.set('n', '`r', ':Telescope grep_string only_sort_text=true search=<cr>')
+
 vim.keymap.set('n', '``', () -> telescope_builtin.find_files({
   cwd = '~',
-  search_dirs = { 'dots', 'repos' },
-  find_command = { 'fd', '--type', 'f', '--type', 'd' },
+  search_dirs = { 'dots', 'extern', 'repos' },
+  find_command = { 'fd', '--type', 'd', '--max-depth', '1' },
 }))

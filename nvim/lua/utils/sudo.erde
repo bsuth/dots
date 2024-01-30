@@ -1,8 +1,4 @@
--- -----------------------------------------------------------------------------
--- Helpers
--- -----------------------------------------------------------------------------
-
-local function sudo_exec(command) {
+module function sudo_exec(command) {
   vim.fn.inputsave()
   local password = vim.fn.inputsecret('sudo: ')
   vim.fn.inputrestore()
@@ -18,7 +14,7 @@ local function sudo_exec(command) {
   }
 }
 
-local function sudo_write() {
+module function sudo_exec() {
   local tmpfile = vim.fn.tempname()
   local filepath = vim.fn.expand('%:p')
 
@@ -33,9 +29,3 @@ local function sudo_write() {
     vim.cmd('edit!')
   }
 }
-
--- -----------------------------------------------------------------------------
--- Mappings
--- -----------------------------------------------------------------------------
-
-vim.keymap.set('n', '<m-w>', sudo_write)

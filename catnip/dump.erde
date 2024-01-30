@@ -59,12 +59,13 @@ local function dump_windows() {
     dump_object("window::{ id }", window, {
       'x',
       'y',
+      'z',
       'width',
       'height',
       'visible',
-      'active',
-      'maximized',
+      'focused',
       'fullscreen',
+      'maximized',
     })
   }
 }

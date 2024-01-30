@@ -1,5 +1,6 @@
 require('utils.stdlib').load()
 
+local uv = require('luv')
 local catnip = require('catnip')
 local keymap = require('keymap')
 
@@ -10,6 +11,21 @@ require('manager')
 
 keymap({ 'mod1', 'ctrl' }, 'r', catnip.reload)
 keymap({ 'mod1', 'ctrl' }, 'q', catnip.quit)
+
+-- -----------------------------------------------------------------------------
+-- LibUV
+-- -----------------------------------------------------------------------------
+
+local timer = uv.new_timer()
+
+timer:start(1000, 0, () -> {
+  print("timeout!")
+  timer:close()
+})
+
+catnip.subscribe('tick', () -> {
+  uv.run('nowait')
+})
 
 -- -----------------------------------------------------------------------------
 -- Init Events

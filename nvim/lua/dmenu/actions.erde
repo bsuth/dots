@@ -1,0 +1,81 @@
+local { DOTS, PLUGINS_DIR, SWAP_DIR } = require('constants')
+local { edit } = require('utils.edit')
+local { sudo_write } = require('utils.sudo')
+local path = require('utils.path')
+
+return {
+  -- ---------------------------------------------------------------------------
+  -- General
+  -- ---------------------------------------------------------------------------
+
+  {
+    label = 'source',
+    callback = () -> vim.cmd('source $MYVIMRC'),
+  },
+  {
+    label = 'sudo write',
+    callback = sudo_write,
+  },
+  {
+    label = 'syntax refresh',
+    callback = () -> vim.cmd('syntax clear | syntax reset | syntax enable'),
+  },
+  {
+    label = 'toggle number',
+    callback = () -> { vim.wo.number = !vim.wo.number },
+  },
+
+  -- ---------------------------------------------------------------------------
+  -- Help, Man
+  -- ---------------------------------------------------------------------------
+
+  {
+    label = 'help',
+    callback = () -> print('todo'),
+  },
+  {
+    label = 'man',
+    callback = () -> print('todo'),
+  },
+
+  -- ---------------------------------------------------------------------------
+  -- Quicklinks
+  -- ---------------------------------------------------------------------------
+
+  {
+    label = 'goto vimrc',
+    callback = () -> edit(path.join(DOTS, 'nvim/lua')),
+  },
+  {
+    label = 'goto root',
+    callback = () -> edit('/'),
+  },
+  {
+    label = 'goto dots',
+    callback = () -> edit(DOTS),
+  },
+  {
+    label = 'goto plugins',
+    callback = () -> edit(PLUGINS_DIR),
+  },
+  {
+    label = 'goto swap',
+    callback = () -> edit(SWAP_DIR),
+  },
+
+  -- ---------------------------------------------------------------------------
+  -- Plugins
+  --
+  -- NOTE: Neovim requires commands for multiline printing...
+  -- https://github.com/neovim/neovim/issues/5067
+  -- ---------------------------------------------------------------------------
+
+  {
+    label = 'plugins update',
+    callback = () -> vim.cmd('lua require("utils.plugins").update()'),
+  },
+  {
+    label = 'plugins clean',
+    callback = () -> vim.cmd('lua require("utils.plugins").clean()'),
+  },
+}

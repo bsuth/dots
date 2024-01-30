@@ -1,7 +1,7 @@
 local catnip = require('catnip')
 local keymap = require('keymap')
 local { get_box_center, get_closest_box, is_point_in_box, swap_boxes } = require('utils.box')
-local { desktops, active_state, window_buffer } = require('manager.state')
+local { desktops, focused, window_buffer } = require('manager.state')
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -14,19 +14,15 @@ local function center_cursor(box) {
 }
 
 local function destroy_active_window() {
-  active_state:update()
-
-  if active_state.window == nil {
-    return
+  if focused.window {
+    focused.window:destroy()
   }
-
-  active_state.window:destroy()
 }
 
 local function get_relative_state(direction) {
   local closest_local_window, closest_local_window_index = get_closest_box(
-    active_state.workspace.windows,
-    active_state.window,
+    focused.workspace.windows,
+    focused.window,
     direction,
   )
 
@@ -34,14 +30,14 @@ local function get_relative_state(direction) {
     return {
       window = closest_local_window,
       window_index = closest_local_window_index,
-      workspace = active_state.workspace,
-      desktop = active_state.desktop,
+      workspace = focused.workspace,
+      desktop = focused.desktop,
     }
   }
 
   local closest_desktop, closest_desktop_index = get_closest_box(
     desktops,
-    active_state.desktop,
+    focused.desktop,
     direction,
   )
 
@@ -51,7 +47,7 @@ local function get_relative_state(direction) {
 
   local closest_global_window, closest_global_window_index = get_closest_box(
     closest_desktop.active_workspace.windows,
-    active_state.window,
+    focused.window,
     direction,
   )
 
@@ -64,8 +60,6 @@ local function get_relative_state(direction) {
 }
 
 local function activate_relative(direction) {
-  active_state:update()
-
   local relative_state = get_relative_state(direction)
 
   if relative_state == nil {
@@ -73,7 +67,7 @@ local function activate_relative(direction) {
   }
 
   if relative_state.window != nil {
-    relative_state.window.active = true
+    relative_state.window.focused = true
     center_cursor(relative_state.window)
   } else {
     center_cursor(relative_state.desktop)
@@ -81,9 +75,7 @@ local function activate_relative(direction) {
 }
 
 local function move_active_window(direction) {
-  active_state:update()
-
-  if active_state.window == nil {
+  if focused.window == nil {
     return
   }
 
@@ -93,16 +85,16 @@ local function move_active_window(direction) {
     return
   }
 
-  if relative_state.desktop != active_state.desktop {
-    active_state.workspace:remove(active_state.window_index, false)
-    relative_state.workspace:add(active_state.window)
+  if relative_state.desktop != focused.desktop {
+    focused.workspace:remove(focused.window_index, false)
+    relative_state.workspace:add(focused.window)
   } else {
-    active_state.workspace[active_state.window_index] = relative_state.window
-    relative_state.workspace[relative_state.window_index] = active_state.window
-    swap_boxes(active_state.window, relative_state.window)
+    focused.workspace[focused.window_index] = relative_state.window
+    relative_state.workspace[relative_state.window_index] = focused.window
+    swap_boxes(focused.window, relative_state.window)
   }
 
-  center_cursor(active_state.window)
+  center_cursor(focused.window)
 }
 
 -- -----------------------------------------------------------------------------
@@ -112,10 +104,10 @@ local function move_active_window(direction) {
 keymap({ 'mod1' }, 'q', destroy_active_window)
 keymap({ 'mod1' }, 'space', () -> os.execute('foot & disown'))
 
-keymap({ 'mod1' }, 't', () -> active_state:update().desktop:push())
-keymap({ 'mod1' }, 'w', () -> active_state:update().desktop:pop())
-keymap({ 'mod1' }, 'Tab', () -> active_state:update().desktop:cycle())
-keymap({ 'mod1', 'shift' }, 'ISO_Left_Tab', () -> active_state:update().desktop:cycle(true))
+keymap({ 'mod1' }, 't', () -> focused.desktop:push())
+keymap({ 'mod1' }, 'w', () -> focused.desktop:pop())
+keymap({ 'mod1' }, 'Tab', () -> focused.desktop:cycle())
+keymap({ 'mod1', 'shift' }, 'ISO_Left_Tab', () -> focused.desktop:cycle(true))
 
 keymap({ 'mod1' }, 'h', () -> activate_relative('left'))
 keymap({ 'mod1' }, 'j', () -> activate_relative('down'))
@@ -127,15 +119,16 @@ keymap({ 'mod1' }, 'J', () -> move_active_window('down'))
 keymap({ 'mod1' }, 'K', () -> move_active_window('up'))
 keymap({ 'mod1' }, 'L', () -> move_active_window('right'))
 
-keymap({ 'mod1' }, 'm', () -> active_state:update() && window_buffer:push())
-keymap({ 'mod1' }, 'M', () -> active_state:update() && window_buffer:pop())
+keymap({ 'mod1' }, 'm', () -> window_buffer:push())
+keymap({ 'mod1' }, 'M', () -> window_buffer:pop())
 
 -- -----------------------------------------------------------------------------
 -- Subscriptions
 -- -----------------------------------------------------------------------------
 
 catnip.subscribe('window::create', window -> {
-  active_state:update().workspace:add(window)
+  window.focused = true
+  focused.workspace:add(window)
   center_cursor(window)
 })
 
@@ -155,7 +148,7 @@ catnip.cursor:subscribe('button::press', button => {
   for _, desktop in pairs(desktops) {
     for _, window in ipairs(desktop.active_workspace.windows) {
       if is_point_in_box(catnip.cursor, window) {
-        window.active = true
+        window.focused = true
         return
       }
     }

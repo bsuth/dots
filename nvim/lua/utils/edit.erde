@@ -8,5 +8,5 @@ module function edit(file = '') {
   --
   -- TODO: Report this to Neovim? Not sure if this is a bug...
   vim.cmd("edit {file}")
-  vim.defer_fn(() -> vim.cmd("edit {file}"), 0)
+  vim.schedule(() -> vim.cmd("edit {file}"))
 }

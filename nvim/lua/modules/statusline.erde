@@ -224,7 +224,7 @@ local CURSOR_HIGHLIGHT = highlight({
 })
 
 local function statusline_cursor() {
-  return "%#{ CURSOR_HIGHLIGHT }# %l:%c %#Normal#"
+  return "%#{ CURSOR_HIGHLIGHT }# %l/%L %#Normal#"
 }
 
 -- -----------------------------------------------------------------------------

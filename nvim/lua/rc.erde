@@ -58,28 +58,15 @@ vim.api.nvim_create_autocmd('FileType', {
 -- Mappings
 -- -----------------------------------------------------------------------------
 
--- vimrc
-vim.keymap.set('n', '<leader>ev', () -> edit(path.join(DOTS, 'nvim/lua')))
-vim.keymap.set('n', '<leader>sv', () -> vim.cmd('source $MYVIMRC'))
+vim.keymap.set('n', '<c-s>', () -> vim.cmd('update'))
+vim.keymap.set('n', '<c-q>', () -> (vim.fn.tabpagenr('$') + vim.fn.winnr('$') > 2) && vim.cmd('quit'))
+vim.keymap.set('n', '_', () -> vim.cmd('nohlsearch'))
 
--- write, quit
-vim.keymap.set('n', '<c-w>', () -> vim.cmd('write'))
-vim.keymap.set('n', '<c-q>', () -> vim.cmd('quit'))
-
--- clear, refresh search highlighting
-vim.keymap.set('n', '<leader>/', ':nohlsearch<cr><c-l>')
-vim.keymap.set('n', '<leader>syn', () -> vim.cmd('syntax clear | syntax reset | syntax enable'))
-
--- toggle number
-vim.keymap.set('i', '<c-n>', () -> { vim.wo.number = !vim.wo.number })
-vim.keymap.set('n', '<c-n>', () -> { vim.wo.number = !vim.wo.number })
-vim.keymap.set('v', '<c-n>', () -> { vim.wo.number = !vim.wo.number })
-
--- quick links
-vim.keymap.set('n', '<leader>root', () -> edit('/'))
-vim.keymap.set('n', '<leader>dots', () -> edit(DOTS))
-vim.keymap.set('n', '<leader>swap', () -> edit(SWAP_DIR))
-vim.keymap.set('n', '<leader>plug', () -> edit(PLUGINS_DIR))
+-- help, man
+vim.keymap.set('n', '<leader>h', ':tab help ')
+vim.keymap.set('v', '<leader>h', 'y:tab help <c-r>+<cr>')
+vim.keymap.set('n', '<leader>m', ':tab man ')
+vim.keymap.set('v', '<leader>m', 'y:tab man <c-r>+<cr>')
 
 -- remove annoying defaults
 vim.keymap.set('n', 'K', () -> nil) -- open manual
@@ -94,19 +81,14 @@ local function load(name) {
   require(name)
 }
 
--- Neovim requires commands for multiline printing...
--- https://github.com/neovim/neovim/issues/5067
-vim.keymap.set('n', '<leader>pu', ':lua require("utils.plugins").update()<cr>')
-vim.keymap.set('n', '<leader>pc', ':lua require("utils.plugins").clean()<cr>')
+load('dmenu')
 
--- core
 load('modules.cwd')
 load('modules.emacs')
 load('modules.format')
-load('modules.scratchpad')
 load('modules.statusline')
-load('modules.sudo')
 load('modules.surroundjump')
+load('modules.tabs')
 load('modules.terminal')
 load('modules.windows')
 

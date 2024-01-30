@@ -9,7 +9,7 @@ local Workspace = Class()
 
 function Workspace:_init(box) {
   self._box = box
-  self._active_window = nil
+  self._last_focused_window = nil
   self.windows = {}
   self.visible = true
 }
@@ -22,11 +22,11 @@ Workspace._get_height = () => self._box.height
 
 function Workspace:_on_change_visible(new_visible) {
   if !new_visible {
-    self._active_window = table.find(self.windows, window -> window.active)
+    self._last_focused_window = table.find(self.windows, window -> window.focused)
   }
 
-  if self._active_window != nil {
-    self._active_window.active = new_visible
+  if self._last_focused_window != nil {
+    self._last_focused_window.focused = new_visible
   }
 
   for _, window in ipairs(self.windows) {
@@ -44,14 +44,14 @@ function Workspace:add(window) {
 }
 
 function Workspace:remove(window_index, fallback = true) {
-  if fallback && self.windows[window_index].active {
+  if fallback && self.windows[window_index].focused {
     local num_windows = #self.windows
 
     if num_windows > 1 {
       if window_index < num_windows {
-        self.windows[window_index + 1].active = true
+        self.windows[window_index + 1].focused = true
       } else {
-        self.windows[window_index - 1].active = true
+        self.windows[window_index - 1].focused = true
       }
     }
   }

@@ -17,38 +17,39 @@ catnip.subscribe('output::destroy', output -> {
 })
 
 -- -----------------------------------------------------------------------------
--- Active State
+-- Focused State
 -- -----------------------------------------------------------------------------
 
-module active_state = {}
+module focused = {}
 
-function active_state:update() {
+local function update_focused_state() {
   for _, desktop in pairs(desktops) {
     for window_index, window in ipairs(desktop.active_workspace.windows) {
-      if window.active {
-        self.window = window
-        self.window_index = window_index
-        self.workspace = desktop.active_workspace
-        self.workspace_index = desktop.active_workspace_index
-        self.desktop = desktop
-        return self
+      if window.focused {
+        focused.window = window
+        focused.window_index = window_index
+        focused.workspace = desktop.active_workspace
+        focused.workspace_index = desktop.active_workspace_index
+        focused.desktop = desktop
+        return
       }
     }
   }
 
   for _, desktop in pairs(desktops) {
     if is_point_in_box(catnip.cursor, desktop) {
-      self.window = nil
-      self.window_index = nil
-      self.workspace = desktop.active_workspace
-      self.workspace_index = desktop.active_workspace_index
-      self.desktop = desktop
-      return self
+      focused.window = nil
+      focused.window_index = nil
+      focused.workspace = desktop.active_workspace
+      focused.workspace_index = desktop.active_workspace_index
+      focused.desktop = desktop
+      return
     }
   }
 }
 
-active_state:update()
+update_focused_state()
+catnip.subscribe('window::property::focused', update_focused_state)
 
 -- -----------------------------------------------------------------------------
 -- Window Buffer
@@ -64,23 +65,23 @@ for _, window in pairs(catnip.windows) {
 }
 
 function window_buffer:push() {
-  if active_state.window == nil {
+  if focused.window == nil {
     return
   }
 
-  local num_windows = #active_state.workspace.windows
+  local num_windows = #focused.workspace.windows
 
   if num_windows > 1 {
-    if active_state.window_index < num_windows {
-      active_state.workspace.windows[active_state.window_index + 1].active = true
+    if focused.window_index < num_windows {
+      focused.workspace.windows[focused.window_index + 1].focused = true
     } else {
-      active_state.workspace.windows[active_state.window_index - 1].active = true
+      focused.workspace.windows[focused.window_index - 1].focused = true
     }
   }
 
-  active_state.workspace:remove(active_state.window_index)
-  table.insert(window_buffer, active_state.window)
-  active_state.window.visible = false
+  focused.workspace:remove(focused.window_index)
+  table.insert(window_buffer, focused.window)
+  focused.window.visible = false
 }
 
 function window_buffer:pop() {
@@ -90,7 +91,7 @@ function window_buffer:pop() {
     return
   }
 
-  active_state.workspace:add(window)
+  focused.workspace:add(window)
   window.visible = true
-  window.active = true
+  window.focused = true
 }

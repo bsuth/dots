@@ -18,13 +18,13 @@ local function get_key_event_callbacks(event) {
   ]
 }
 
-catnip.subscribe('keyboard::keydown', (keyboard, event) -> {
+catnip.subscribe('keyboard::key::press', (keyboard, event) -> {
   if get_key_event_callbacks(event) != nil {
     event.prevent_notify = true
   }
 })
 
-catnip.subscribe('keyboard::keyup', (keyboard, event) -> {
+catnip.subscribe('keyboard::key::release', (keyboard, event) -> {
   local callbacks = get_key_event_callbacks(event)
 
   if callbacks == nil {
