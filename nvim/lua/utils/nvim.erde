@@ -1,4 +1,20 @@
-module function get_visual_selection() {
+module function nvim_buf_keymap(buffer, mode, lhs, rhs) {
+  local options = { noremap = true }
+
+  if type(rhs) == 'function' {
+    options.callback = rhs
+    rhs = ''
+  }
+
+  vim.api.nvim_buf_set_keymap(buffer, mode, lhs, rhs, options)
+}
+
+module function nvim_feed_termcodes(termcodes) {
+  local keys = vim.api.nvim_replace_termcodes(termcodes, true, false, true)
+  vim.api.nvim_feedkeys(keys, 'n', false)
+}
+
+module function nvim_get_visual_selection() {
   -- Do not use '> and '< registers in getpos! These registers are only updated
   -- _after_ leaving visual mode.
   -- @see https://github.com/neovim/neovim/pull/13896#issuecomment-774680224

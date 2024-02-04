@@ -1,3 +1,5 @@
+local { nvim_feed_termcodes } = require('utils.nvim')
+
 -- -----------------------------------------------------------------------------
 -- Variables
 -- -----------------------------------------------------------------------------
@@ -23,10 +25,6 @@ for byte = string.byte('A'), string.byte('Z') {
 -- -----------------------------------------------------------------------------
 -- Helpers
 -- -----------------------------------------------------------------------------
-
-local function feed_term_codes(term_codes) {
-  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes(term_codes, true, false, true), 'n', false)
-}
 
 local function get_word_back_col(line, col) {
   local next_char = line:sub(col - 1, col - 1)
@@ -80,7 +78,7 @@ local function move_word_back() {
   if vim.fn.mode() == 'c' {
     local col = vim.fn.getcmdpos()
     local line = vim.fn.getcmdline()
-    feed_term_codes(('<Left>'):rep(col - get_word_back_col(line, col)))
+    nvim_feed_termcodes(('<Left>'):rep(col - get_word_back_col(line, col)))
   } else {
     local [_, lnum, col] = vim.fn.getpos('.')
     local line = vim.fn.getline('.')
@@ -92,7 +90,7 @@ local function move_word_forward() {
   if vim.fn.mode() == 'c' {
     local col = vim.fn.getcmdpos()
     local line = vim.fn.getcmdline()
-    feed_term_codes(('<Right>'):rep(get_move_word_forward_col(line, col) - col))
+    nvim_feed_termcodes(('<Right>'):rep(get_move_word_forward_col(line, col) - col))
   } else {
     local [_, lnum, col] = vim.fn.getpos('.')
     local line = vim.fn.getline('.')
@@ -103,7 +101,7 @@ local function move_word_forward() {
 local function delete_char_back() {
   local [_, _, col] = vim.fn.getpos('.')
   if vim.fn.mode() == 'c' || col > 1 {
-    feed_term_codes('<BS>')
+    nvim_feed_termcodes('<BS>')
   }
 }
 
@@ -111,7 +109,7 @@ local function delete_char_forward() {
   local [_, _, col] = vim.fn.getpos('.')
   local line = vim.fn.getline('.')
   if vim.fn.mode() == 'c' || col <= #line {
-    feed_term_codes('<Delete>')
+    nvim_feed_termcodes('<Delete>')
   }
 }
 
@@ -119,7 +117,7 @@ local function delete_word_back() {
   if vim.fn.mode() == 'c' {
     local col = vim.fn.getcmdpos()
     local line = vim.fn.getcmdline()
-    feed_term_codes(('<BS>'):rep(col - get_word_back_col(line, col)))
+    nvim_feed_termcodes(('<BS>'):rep(col - get_word_back_col(line, col)))
   } else {
     local [_, lnum, col] = vim.fn.getpos('.')
     local line = vim.fn.getline('.')
@@ -133,7 +131,7 @@ local function delete_word_forward() {
   if vim.fn.mode() == 'c' {
     local col = vim.fn.getcmdpos()
     local line = vim.fn.getcmdline()
-    feed_term_codes(('<Delete>'):rep(get_delete_word_forward_col(line, col) - col))
+    nvim_feed_termcodes(('<Delete>'):rep(get_delete_word_forward_col(line, col) - col))
   } else {
     local [_, lnum, col] = vim.fn.getpos('.')
     local line = vim.fn.getline('.')
@@ -144,7 +142,7 @@ local function delete_word_forward() {
 
 local function delete_line_back() {
   if vim.fn.mode() == 'c' {
-    feed_term_codes(('<BS>'):rep(vim.fn.getcmdpos()))
+    nvim_feed_termcodes(('<BS>'):rep(vim.fn.getcmdpos()))
   } else {
     local [_, lnum, col] = vim.fn.getpos('.')
     local line = vim.fn.getline('.')
@@ -157,7 +155,7 @@ local function delete_line_forward() {
   if vim.fn.mode() == 'c' {
     local col = vim.fn.getcmdpos()
     local line = vim.fn.getcmdline()
-    feed_term_codes(('<Delete>'):rep(#line - col + 1))
+    nvim_feed_termcodes(('<Delete>'):rep(#line - col + 1))
   } else {
     local [_, lnum, col] = vim.fn.getpos('.')
     local line = vim.fn.getline('.')
