@@ -136,6 +136,7 @@ function BluetoothDevice:_init(props = {}) {
   self.object_path = props.object_path
   self.adapter_object_path = props.adapter_object_path
   self.name = props.name
+  self.address = props.address
   self.connected_state = props.connected && 'connected' || 'disconnected'
   self.paired_state = props.paired && 'paired' || 'unpaired'
 
@@ -283,6 +284,7 @@ function bluetooth:_add_managed_object(object_path, managed_object) {
       object_path = object_path,
       adapter_object_path = managed_object['org.bluez.Device1'].Adapter,
       name = managed_object['org.bluez.Device1'].Name,
+      address = managed_object['org.bluez.Device1'].Address,
       connected = managed_object['org.bluez.Device1'].Connected,
       paired = managed_object['org.bluez.Device1'].Paired,
     })

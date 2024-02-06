@@ -45,6 +45,8 @@ local function bluetooth_pair() {
         label = device.name,
         type = 'multiple',
         callback = () -> device:pair(),
+        hover_view = require('system_prompt.command_tree_views.bluetooth_pair_hover'),
+        hover_view_args = { address = device.address },
       })
     }
   }
@@ -89,7 +91,6 @@ return {
     label = 'pair',
     type = 'generate',
     callback = bluetooth_pair,
-    view = require('system_prompt.command_tree_views.bluetooth_pair'),
     on_enter = () -> models.bluetooth.adapter:scan_on(),
     on_exit = () -> models.bluetooth.adapter:scan_off(),
   },

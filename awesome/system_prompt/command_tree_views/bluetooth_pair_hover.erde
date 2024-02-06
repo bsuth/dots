@@ -1,0 +1,23 @@
+local wibox = require('wibox')
+local { SYSTEM_PROMPT_FONT } = require('system_prompt.constants')
+local Object = require('utils.Object')
+
+local bluetooth_pair_hover_view = {}
+
+function bluetooth_pair_hover_view:_init() {
+  self._text_widget = wibox.widget({
+    font = SYSTEM_PROMPT_FONT,
+    widget = wibox.widget.textbox,
+  })
+
+  self.root_widget = wibox.widget({
+    self._text_widget,
+    widget = wibox.container.place,
+  })
+}
+
+function bluetooth_pair_hover_view:update(args) {
+  self._text_widget.text = args.address
+}
+
+return Object(bluetooth_pair_hover_view)
