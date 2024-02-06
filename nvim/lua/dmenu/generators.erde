@@ -1,0 +1,111 @@
+local { HOME } = require('constants')
+local path = require('utils.path')
+
+module function buffer() {
+  local actions = {}
+
+  for buffer_id = 1, vim.fn.bufnr('$') {
+    if vim.api.nvim_buf_is_valid(buffer_id) && vim.api.nvim_buf_get_option(buffer_id, 'buflisted') {
+      table.insert(actions, {
+        vim.api.nvim_buf_get_name(buffer_id),
+        () -> vim.api.nvim_win_set_buf(0, buffer_id),
+      })
+    }
+  }
+
+  return actions
+}
+
+module function directory() {
+  local cwd = vim.fn.getcwd()
+  local actions = {}
+  local pipe = io.popen('fd --type d .', 'r')
+
+  for line in pipe:lines() {
+    table.insert(actions, { line, () -> vim.cmd("edit { path.join(cwd, line) }") })
+  }
+
+  pipe:close()
+  return actions
+}
+
+module function favorites() {
+  local actions = {
+    { 'dots', () -> vim.cmd('edit ~/dots') },
+    { 'extern', () -> vim.cmd('edit ~/extern') },
+    { 'repos', () -> vim.cmd('edit ~/repos') },
+  }
+
+  local pipe = io.popen('fd --type d --max-depth 1 --base-directory ~ . dots extern repos', 'r')
+
+  for line in pipe:lines() {
+    table.insert(actions, { line, () -> vim.cmd("edit { path.join(HOME, line) }") })
+  }
+
+  pipe:close()
+  return actions
+}
+
+module function file() {
+  local cwd = vim.fn.getcwd()
+  local actions = {}
+  local pipe = io.popen('fd --type f .', 'r')
+
+  for line in pipe:lines() {
+    table.insert(actions, { line, () -> vim.cmd("edit { path.join(cwd, line) }") })
+  }
+
+  pipe:close()
+  return actions
+}
+
+module function grep(text) {
+  local cwd = vim.fn.getcwd()
+  local actions = {}
+
+  if text != '' {
+    local pipe = io.popen("rg --line-number { text }", 'r')
+
+    for line in pipe:lines() {
+      local filepath, row, text = line:match('^([^:]+):([0-9]+):%s*(.*)$')
+      table.insert(actions, {
+        "{ filepath }: { text }",
+        () -> vim.cmd("edit +{ row } { path.join(cwd, filepath) }"),
+      })
+    }
+
+    pipe:close()
+  }
+
+  return actions
+}
+
+module function help() {
+  local actions = {}
+
+  for _, filepath in ipairs(vim.api.nvim_get_runtime_file('doc/tags', true)) {
+    local file = io.open(filepath, 'r')
+
+    for line in file:lines() {
+      local [ name ] = line:split()
+      table.insert(actions, { name, () -> vim.cmd("tab help { name }") })
+    }
+
+    file:close()
+  }
+
+  return actions
+}
+
+module function man() {
+  local actions = {}
+  local pipe = io.popen('apropos .', 'r')
+
+  for line in pipe:lines() {
+    local name, section = line:match('^([^%s]+) %(([^%s]+)%)')
+    table.insert(actions, { line, () -> vim.cmd("Man { name }({ section })") })
+  }
+
+  pipe:close()
+  return actions
+}

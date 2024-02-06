@@ -1,4 +1,4 @@
-local actions = require('dmenu.actions')
+local actions_root = require('dmenu.actions')
 local { nvim_buf_keymap, nvim_feed_termcodes } = require('utils.nvim')
 local onedark = require('utils.onedark')
 
@@ -18,6 +18,7 @@ dmenu.restore_window = -1
 dmenu.window = -1
 dmenu.buffer = -1
 
+dmenu.actions = {}
 dmenu.filtered_actions = {}
 dmenu.num_filtered_actions = 0
 
@@ -26,8 +27,11 @@ dmenu.num_visible_actions = 0
 
 dmenu.focused_offset = 0
 
+dmenu.ignore_next_window_changes = 0
 dmenu.ignore_next_buffer_changes = 0
 dmenu.ignore_next_mode_changes = 0
+
+dmenu.dynamic_generator = nil
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -36,26 +40,47 @@ dmenu.ignore_next_mode_changes = 0
 local function update_filter() {
   local filter_text = vim.api.nvim_buf_get_lines(dmenu.buffer, -2, -1, false)[1]
 
-  dmenu.filtered_actions = {}
-  dmenu.num_filtered_actions = 0
+  if dmenu.dynamic_generator {
+    dmenu.actions = dmenu.dynamic_generator(filter_text)
+    dmenu.filtered_actions = dmenu.actions
+    dmenu.num_filtered_actions = #dmenu.actions
+  } else {
+    dmenu.filtered_actions = {}
+    dmenu.num_filtered_actions = 0
 
-  local filter_tokens = filter_text:split()
-
-  for _, action in ipairs(actions) {
-    local include_action = true
-
-    for _, filter_token in ipairs(filter_tokens) {
-      if !action[1]:find(filter_token) {
-        include_action = false
-        break
+    local filter_tokens = {}
+    for i, text in ipairs(filter_text:split()) {
+      if text != '' {
+        table.insert(filter_tokens, {
+          pattern = pcall(() -> text:match(text)) && text || text:escape(),
+          case_insensitive = !text:find('[A-Z]'),
+        })
       }
     }
 
-    if include_action {
-      dmenu.num_filtered_actions += 1
-      dmenu.filtered_actions[dmenu.num_filtered_actions] = action
+    for _, action in ipairs(dmenu.actions) {
+      local action_label = action[1]
+      local action_label_lower = nil -- computed on demand
+
+      local is_filtered_action = !table.find(filter_tokens, filter_token -> {
+        local label = action_label
+
+        if filter_token.case_insensitive {
+          action_label_lower ||= action_label:lower()
+          label = action_label_lower
+        }
+
+        return !label:find(filter_token.pattern)
+      })
+
+      if is_filtered_action {
+        dmenu.num_filtered_actions += 1
+        dmenu.filtered_actions[dmenu.num_filtered_actions] = action
+      }
     }
   }
+
+  -- TODO: sort results by 'weight'
 
   if 1 + dmenu.num_filtered_actions > DMENU_MAX_WINDOW_HEIGHT {
     dmenu.has_overflow = true
@@ -103,7 +128,7 @@ local function update_buffer_lines(mode = vim.api.nvim_get_mode().mode) {
 local function update_highlight() {
   vim.api.nvim_buf_clear_namespace(dmenu.buffer, NAMESPACE_ID, 0, -1)
 
-  if vim.api.nvim_get_mode().mode != 'i' {
+  if vim.api.nvim_get_mode().mode != 'i' || dmenu.dynamic_generator {
     return
   }
 
@@ -129,7 +154,31 @@ local function focus_next_action() {
   update_highlight()
 }
 
+local function select_action_index(index) {
+  local [ _, callback, action_type ] = dmenu.filtered_actions[index]
+  dmenu.focused_offset = 0
+
+  if action_type == 'dynamic' {
+    dmenu.dynamic_generator = callback
+    vim.api.nvim_buf_set_lines(dmenu.buffer, 0, -1, false, { '' })
+    update_filter()
+    update_buffer_lines()
+    update_highlight()
+  } elseif action_type == 'generator' {
+    dmenu.actions = callback()
+    vim.api.nvim_buf_set_lines(dmenu.buffer, 0, -1, false, { '' })
+  } else {
+    vim.api.nvim_set_current_win(dmenu.restore_window)
+    callback()
+  }
+}
+
 local function start() {
+  dmenu.actions = actions_root
+  dmenu.ignore_next_buffer_changes = 0
+  dmenu.ignore_next_mode_changes = 0
+  dmenu.dynamic_generator = nil
+
   dmenu.buffer = vim.api.nvim_create_buf(false, false)
   vim.api.nvim_buf_set_option(dmenu.buffer, 'buftype', 'prompt')
   vim.api.nvim_buf_set_option(dmenu.buffer, 'bufhidden', 'wipe')
@@ -141,7 +190,7 @@ local function start() {
     on_lines = () -> vim.schedule(() -> {
       if dmenu.ignore_next_buffer_changes > 0 {
         dmenu.ignore_next_buffer_changes -= 1
-      } else {
+      } elseif !dmenu.dynamic_generator {
         dmenu.focused_offset = 0
         update_filter()
         update_buffer_lines()
@@ -177,10 +226,11 @@ local function start() {
   })
 
   nvim_buf_keymap(dmenu.buffer, 'i', '<cr>', () -> {
-    vim.api.nvim_set_current_win(dmenu.restore_window)
-    if dmenu.num_filtered_actions > 0 {
-      local action_index = dmenu.num_filtered_actions - dmenu.focused_offset
-      dmenu.filtered_actions[action_index][2]()
+    if dmenu.dynamic_generator {
+      update_filter()
+      update_buffer_lines()
+    } elseif dmenu.num_filtered_actions > 0 {
+      select_action_index(dmenu.num_filtered_actions - dmenu.focused_offset)
     }
   })
 
@@ -189,8 +239,22 @@ local function start() {
     if row > dmenu.num_filtered_actions {
       vim.cmd('startinsert')
     } else {
-      vim.api.nvim_set_current_win(dmenu.restore_window)
-      dmenu.filtered_actions[row][2]()
+      select_action_index(row)
+    }
+  })
+
+  nvim_buf_keymap(dmenu.buffer, 'i', '<m-cr>', () -> {
+    if !dmenu.dynamic_generator && dmenu.num_filtered_actions > 0 {
+      dmenu.ignore_next_window_changes += 1
+      select_action_index(dmenu.num_filtered_actions - dmenu.focused_offset)
+    }
+  })
+
+  nvim_buf_keymap(dmenu.buffer, 'n', '<m-cr>', () -> {
+    local [ row ] = vim.api.nvim_win_get_cursor(dmenu.window)
+    if row <= dmenu.num_filtered_actions {
+      dmenu.ignore_next_window_changes += 1
+      select_action_index(row)
     }
   })
 
@@ -200,6 +264,7 @@ local function start() {
   vim.api.nvim_win_set_buf(dmenu.window, dmenu.buffer)
   vim.api.nvim_win_set_hl_ns(dmenu.window, NAMESPACE_ID) -- Must be called after the buffer is set!
 
+  dmenu.actions = actions_root
   vim.cmd('startinsert')
 
   -- Wait until the next tick so that we can properly detect insert mode.
@@ -233,7 +298,11 @@ vim.api.nvim_create_autocmd('WinLeave', {
   group = 'bsuth',
   callback = () -> {
     if vim.api.nvim_get_current_win() == dmenu.window {
-      vim.api.nvim_win_hide(dmenu.window)
+      if dmenu.ignore_next_window_changes > 0 {
+        dmenu.ignore_next_window_changes -= 1
+      } else {
+        vim.api.nvim_win_hide(dmenu.window)
+      }
     }
   },
 })

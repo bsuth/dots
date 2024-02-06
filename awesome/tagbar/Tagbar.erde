@@ -98,6 +98,7 @@ function Tagbar:_refresh() {
   self._disabled_tags = table.filter(self.screen.tags, tag -> table.has(self._disabled_tags, tag))
 
   local num_tags = #self.screen.tags
+  self._wibar.visible = num_tags > 1
 
   for i = #self._tabs + 1, num_tags {
     table.insert(self._tabs, Tab())
@@ -242,12 +243,17 @@ function Tagbar:rename() {
     focused_veil_popup.shape = nil
     suggestions.active = false
     self._veil.active = false
+
+    if #self.screen.tags == 1 {
+      self._wibar.visible = false
+    }
   })
 
   suggestions.default_suggestion = rename_tab.tag.name
   rename_tab.text = self._prompt.root_widget
   focused_veil_popup.shape = (cr, width, height) -> cr:rectangle(0, 2 * TAGBAR_HEIGHT, width, height - (2 * TAGBAR_HEIGHT))
 
+  self._wibar.visible = true
   self._veil.active = true
   suggestions.screen = self.screen
   suggestions.active = true

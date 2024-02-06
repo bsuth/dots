@@ -3,6 +3,7 @@ local { TERM_PATTERNS, TRACK_CWD_FILTERS } = require('constants')
 table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'help')
 table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'man')
 table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'buftype') == 'terminal')
+table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'buftype') == 'prompt')
 
 -- -----------------------------------------------------------------------------
 -- Variables

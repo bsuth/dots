@@ -1,0 +1,12 @@
+local { HOME } = require('constants')
+local path = require('utils.path')
+
+module function get_git_root(dir = path.lead(vim.fn.getcwd())) {
+  while dir:match("^{ HOME }") {
+    if io.exists(path.join(dir, '.git')) {
+      return dir
+    } else {
+      dir = path.lead(path.dirname(dir))
+    }
+  }
+}

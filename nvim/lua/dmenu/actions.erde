@@ -1,6 +1,9 @@
-local { DOTS, PLUGINS_DIR, SWAP_DIR } = require('constants')
+local { HOME, DOTS, PLUGINS_DIR, SWAP_DIR } = require('constants')
+local generators = require('dmenu.generators')
+local { get_git_root } = require('dmenu.utils')
 local { edit } = require('utils.edit')
 local { sudo_write } = require('utils.sudo')
+local path = require('utils.path')
 
 return {
   -- ---------------------------------------------------------------------------
@@ -8,25 +11,33 @@ return {
   -- ---------------------------------------------------------------------------
 
   { 'source', () -> vim.cmd('source $MYVIMRC') },
-  { 'sudo write', sudo_write },
-  { 'syntax refresh', () -> vim.cmd('syntax clear | syntax reset | syntax enable') },
-  { 'toggle number', () -> { vim.wo.number = !vim.wo.number } },
+  { 'sudo (write)', sudo_write },
+  { 'syntax (refresh)', () -> vim.cmd('syntax clear | syntax reset | syntax enable') },
+  { 'numbers', () -> { vim.wo.number = !vim.wo.number } },
 
   -- ---------------------------------------------------------------------------
-  -- Help, Man
+  -- Generators
   -- ---------------------------------------------------------------------------
 
-  { 'help', () -> print('todo') },
-  { 'man', () -> print('todo') },
+  { 'buffers', generators.buffer, 'generator' },
+  { 'directories', generators.directory, 'generator' },
+  { 'favorites', generators.favorites, 'generator' },
+  { 'files', generators.file, 'generator' },
+  { 'grep', generators.grep, 'dynamic' },
+  { 'help', generators.help, 'generator' },
+  { 'man', generators.man, 'generator' },
 
   -- ---------------------------------------------------------------------------
   -- Quicklinks
   -- ---------------------------------------------------------------------------
 
-  { 'goto root', () -> edit('/') },
-  { 'goto dots', () -> edit(DOTS) },
-  { 'goto plugins', () -> edit(PLUGINS_DIR) },
-  { 'goto swap', () -> edit(SWAP_DIR) },
+  { 'dots', () -> edit(DOTS) },
+  { 'git', () -> edit(get_git_root()) },
+  { 'home', () -> edit(HOME) },
+  { 'plugins', () -> edit(PLUGINS_DIR) },
+  { 'root', () -> edit('/') },
+  { 'swap', () -> edit(SWAP_DIR) },
+  { 'vimrc', () -> edit(path.join(DOTS, 'nvim/lua')) },
 
   -- ---------------------------------------------------------------------------
   -- Plugins
@@ -35,6 +46,6 @@ return {
   -- https://github.com/neovim/neovim/issues/5067
   -- ---------------------------------------------------------------------------
 
-  { 'plugins update', () -> vim.cmd('lua require("utils.plugins").update()') },
-  { 'plugins clean ', () -> vim.cmd('lua require("utils.plugins").clean()') },
+  { 'clean (plugins)', () -> vim.cmd('lua require("utils.plugins").clean()') },
+  { 'update (plugins)', () -> vim.cmd('lua require("utils.plugins").update()') },
 }

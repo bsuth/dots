@@ -200,6 +200,16 @@ function BluetoothDevice:pair() {
     interface_name = 'org.bluez.Device1',
     method_name = 'Pair',
     on_error = () -> { self.paired_state = 'unpaired' },
+  } )
+}
+
+function BluetoothDevice:trust() {
+  dbus_call_async(system_bus, {
+    bus_name = 'org.bluez',
+    object_path = self.object_path,
+    interface_name = 'org.freedesktop.DBus.Properties',
+    method_name = 'Set',
+    parameters = GLib.Variant('(ssv)', { 'org.bluez.Device1', 'Trusted', GLib.Variant('b', true) }),
   })
 }
 
