@@ -1,13 +1,38 @@
 local awful = require('awful')
 local gears = require('gears')
+local wibox = require('wibox')
 local { global_keys } = require('core.bindings')
+local { palette } = require('core.theme')
+local dummy_widget = require('utils.dummy_widget')
 
-local client_buffer = {}
+local client_buffer = {
+  _popups = {},
+  _count_widget = wibox.widget({
+    markup = '0',
+    widget = wibox.widget.textbox
+  })
+}
+
+local function refresh() {
+  local num_client_buffer = #client_buffer
+  local popup_visible = num_client_buffer > 0
+
+  for _, popup in ipairs(client_buffer._popups) {
+    popup.visible = popup_visible
+  }
+
+  client_buffer._count_widget.text = "Client Buffer: { num_client_buffer }"
+}
+
+-- -----------------------------------------------------------------------------
+-- Keybindings
+-- -----------------------------------------------------------------------------
 
 gears.table.merge(global_keys, {
   awful.key({ 'Mod4' }, 'm', () -> {
     table.insert(client_buffer, client.focus)
     client.focus.minimized = true
+    refresh()
   }),
 
   awful.key({ 'Mod4', 'Shift' }, 'm', () -> {
@@ -20,8 +45,14 @@ gears.table.merge(global_keys, {
       c.minimized = false
       client.focus = c
     }
+
+    refresh()
   }),
 })
+
+-- -----------------------------------------------------------------------------
+-- Signals
+-- -----------------------------------------------------------------------------
 
 awesome.connect_signal('startup', () -> {
   for s in screen {
@@ -33,4 +64,37 @@ awesome.connect_signal('startup', () -> {
       }
     }
   }
+
+  refresh()
+})
+
+awful.screen.connect_for_each_screen(s -> {
+  table.insert(client_buffer._popups, awful.popup({
+    screen = s,
+    visible = false,
+    placement = awful.placement.bottom,
+    ontop = true,
+    bg = palette.transparent,
+    type = 'dock',
+    widget = wibox.widget({
+      {
+        {
+          client_buffer._count_widget,
+          margins = 16,
+          widget = wibox.container.margin,
+        },
+        fg = palette.red,
+        bg = palette.black,
+        shape_border_width = 1,
+        shape_border_color = palette.red,
+        widget = wibox.container.background,
+      },
+      bottom = 32,
+      widget = wibox.container.margin,
+    }),
+  }))
+})
+
+awful.screen.disconnect_for_each_screen(s -> {
+  table.clear(client_buffer._popups, popup -> popup.screen == s)
 })

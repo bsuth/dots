@@ -1,4 +1,4 @@
-local actions_root = require('dmenu.actions')
+local get_actions_root = require('dmenu.actions')
 local { nvim_buf_keymap, nvim_feed_termcodes } = require('utils.nvim')
 local onedark = require('utils.onedark')
 
@@ -18,6 +18,7 @@ dmenu.restore_window = -1
 dmenu.window = -1
 dmenu.buffer = -1
 
+dmenu.path = {}
 dmenu.actions = {}
 dmenu.filtered_actions = {}
 dmenu.num_filtered_actions = 0
@@ -76,11 +77,16 @@ local function update_filter() {
       if is_filtered_action {
         dmenu.num_filtered_actions += 1
         dmenu.filtered_actions[dmenu.num_filtered_actions] = action
+
+        -- If the action does not already have a weight associated with it,
+        -- use the inverse of the label length. This favors shorter labels,
+        -- since they will have more proportional overlap with the filter text.
+        action.weight ||= 1 / #action_label
       }
     }
-  }
 
-  -- TODO: sort results by 'weight'
+    table.sort(dmenu.filtered_actions, (a, b) -> a.weight < b.weight)
+  }
 
   if 1 + dmenu.num_filtered_actions > DMENU_MAX_WINDOW_HEIGHT {
     dmenu.has_overflow = true
@@ -156,17 +162,23 @@ local function focus_next_action() {
 
 local function select_action_index(index) {
   local [ _, callback, action_type ] = dmenu.filtered_actions[index]
+
   dmenu.focused_offset = 0
 
   if action_type == 'dynamic' {
+    table.insert(dmenu.path, { dmenu.actions, callback })
     dmenu.dynamic_generator = callback
-    vim.api.nvim_buf_set_lines(dmenu.buffer, 0, -1, false, { '' })
+    vim.api.nvim_buf_set_lines(dmenu.buffer, -2, -1, false, { '' })
+
+    -- Manually trigger updates here, since usually we ignore buffer updates if
+    -- there is a dynamic_generator
     update_filter()
     update_buffer_lines()
     update_highlight()
   } elseif action_type == 'generator' {
+    table.insert(dmenu.path, { dmenu.actions })
     dmenu.actions = callback()
-    vim.api.nvim_buf_set_lines(dmenu.buffer, 0, -1, false, { '' })
+    vim.api.nvim_buf_set_lines(dmenu.buffer, -2, -1, false, { '' })
   } else {
     vim.api.nvim_set_current_win(dmenu.restore_window)
     callback()
@@ -174,7 +186,8 @@ local function select_action_index(index) {
 }
 
 local function start() {
-  dmenu.actions = actions_root
+  dmenu.path = {}
+  dmenu.actions = get_actions_root()
   dmenu.ignore_next_buffer_changes = 0
   dmenu.ignore_next_mode_changes = 0
   dmenu.dynamic_generator = nil
@@ -225,6 +238,14 @@ local function start() {
     vim.api.nvim_set_current_win(dmenu.restore_window)
   })
 
+  nvim_buf_keymap(dmenu.buffer, 'n', '-', () -> {
+    local [ actions, dynamic_generator ] = table.remove(dmenu.path) || { get_actions_root() }
+    dmenu.actions = actions
+    dmenu.dynamic_generator = dynamic_generator
+    vim.api.nvim_buf_set_lines(dmenu.buffer, -2, -1, false, { '' })
+    vim.cmd('startinsert')
+  })
+
   nvim_buf_keymap(dmenu.buffer, 'i', '<cr>', () -> {
     if dmenu.dynamic_generator {
       update_filter()
@@ -264,7 +285,6 @@ local function start() {
   vim.api.nvim_win_set_buf(dmenu.window, dmenu.buffer)
   vim.api.nvim_win_set_hl_ns(dmenu.window, NAMESPACE_ID) -- Must be called after the buffer is set!
 
-  dmenu.actions = actions_root
   vim.cmd('startinsert')
 
   -- Wait until the next tick so that we can properly detect insert mode.

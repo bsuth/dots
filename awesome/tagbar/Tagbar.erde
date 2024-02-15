@@ -19,6 +19,7 @@ local Tagbar = Class()
 function Tagbar:_init(props = {}) {
   self.screen = props.screen
 
+  self:rawset('_force_visible', false)
   self._tabs = {}
   self._disabled_tags = {}
   self._veil = Veil()
@@ -87,10 +88,20 @@ function Tagbar:_init(props = {}) {
   capslock:subscribe('change_active', () -> {
     if capslock.active {
       self._wibar.widget = self._caps_lock_widget
+      self._force_visible = true
     } else {
       self._wibar.widget = self._tabs_widget
+      self._force_visible = false
     }
   })
+}
+
+function Tagbar:_on_change__force_visible() {
+  if self._force_visible {
+    self._wibar.visible = true
+  } else {
+    self._wibar.visible = #self.screen.tags > 1
+  }
 }
 
 function Tagbar:_refresh() {
@@ -243,17 +254,14 @@ function Tagbar:rename() {
     focused_veil_popup.shape = nil
     suggestions.active = false
     self._veil.active = false
-
-    if #self.screen.tags == 1 {
-      self._wibar.visible = false
-    }
+    self._force_visible = false
   })
 
   suggestions.default_suggestion = rename_tab.tag.name
   rename_tab.text = self._prompt.root_widget
   focused_veil_popup.shape = (cr, width, height) -> cr:rectangle(0, 2 * TAGBAR_HEIGHT, width, height - (2 * TAGBAR_HEIGHT))
 
-  self._wibar.visible = true
+  self._force_visible = true
   self._veil.active = true
   suggestions.screen = self.screen
   suggestions.active = true

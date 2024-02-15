@@ -119,49 +119,49 @@ function Slider:_init(props = {}) {
   self._keygrabber = awful.keygrabber({
     keybindings = keybindings,
     keypressed_callback = (_, mod, key) -> {
-      if #mod == 0 {
-        if key == 'Down' || key == 'j' || key == 'h' {
-          self._down_card.fg = palette.black
-          self._down_card.bg = palette.white
-          self._down_card.widget.children[1].image = svg('arrow', palette.black)
-        } elseif key == 'Up' || key == 'k' || key == 'l' {
-          self._up_card.fg = palette.black
-          self._up_card.bg = palette.white
-          self._up_card.widget.image = svg('arrow')
-        } elseif key == 'd' {
-          self._page_down_card.fg = palette.black
-          self._page_down_card.bg = palette.white
-          self._page_down_card.widget.children[1].image = svg('double-arrow', palette.black)
-        } elseif key == 'u' {
-          self._page_up_card.fg = palette.black
-          self._page_up_card.bg = palette.white
-          self._page_up_card.widget.image = svg('double-arrow', palette.black)
-        }
+      if key == 'Down' || key == 'j' || key == 'h' {
+        self._down_card.fg = palette.black
+        self._down_card.bg = palette.white
+        self._down_card.widget.children[1].image = svg('arrow', palette.black)
+      } elseif key == 'Up' || key == 'k' || key == 'l' {
+        self._up_card.fg = palette.black
+        self._up_card.bg = palette.white
+        self._up_card.widget.image = svg('arrow')
+      } elseif key == 'd' {
+        self._page_down_card.fg = palette.black
+        self._page_down_card.bg = palette.white
+        self._page_down_card.widget.children[1].image = svg('double-arrow', palette.black)
+      } elseif key == 'u' {
+        self._page_up_card.fg = palette.black
+        self._page_up_card.bg = palette.white
+        self._page_up_card.widget.image = svg('double-arrow', palette.black)
       }
     },
     keyreleased_callback = (_, mod, key) -> {
-      if #mod == 0 {
-        if key == 'Down' || key == 'j' || key == 'h' {
-          self._down_card.fg = palette.white
-          self._down_card.bg = nil
-          self._down_card.widget.children[1].image = svg('arrow', palette.white)
-          self:publish('down')
-        } elseif key == 'Up' || key == 'k' || key == 'l' {
-          self._up_card.fg = palette.white
-          self._up_card.bg = nil
-          self._up_card.widget.image = svg('arrow', palette.white)
-          self:publish('up')
-        } elseif key == 'd' {
-          self._page_down_card.fg = palette.white
-          self._page_down_card.bg = nil
-          self._page_down_card.widget.children[1].image = svg('double-arrow', palette.white)
-          self:publish('page_down')
-        } elseif key == 'u' {
-          self._page_up_card.fg = palette.white
-          self._page_up_card.bg = nil
-          self._page_up_card.widget.image = svg('double-arrow', palette.white)
-          self:publish('page_up')
-        }
+      if key == 'Down' || key == 'j' || key == 'h' {
+        self._down_card.fg = palette.white
+        self._down_card.bg = nil
+        self._down_card.widget.children[1].image = svg('arrow', palette.white)
+        self:publish('down')
+      } elseif key == 'Up' || key == 'k' || key == 'l' {
+        self._up_card.fg = palette.white
+        self._up_card.bg = nil
+        self._up_card.widget.image = svg('arrow', palette.white)
+        self:publish('up')
+      } elseif key == 'd' {
+        self._page_down_card.fg = palette.white
+        self._page_down_card.bg = nil
+        self._page_down_card.widget.children[1].image = svg('double-arrow', palette.white)
+        self:publish('page_down')
+      } elseif key == 'u' {
+        self._page_up_card.fg = palette.white
+        self._page_up_card.bg = nil
+        self._page_up_card.widget.image = svg('double-arrow', palette.white)
+        self:publish('page_up')
+      } elseif key == 'm' {
+        self:publish('min')
+      } elseif key == 'M' {
+        self:publish('max')
       }
     },
   })

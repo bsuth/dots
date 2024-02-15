@@ -1,7 +1,6 @@
 local catnip = require('catnip')
 
 local wallpapers = {}
-local wallpaper_svg = catnip.svg(io.readfile('wallpaper.svg'))
 
 local function create_wallpaper(output) {
   -- TODO: ensure the wallpaper is always in the back
@@ -13,7 +12,7 @@ local function create_wallpaper(output) {
     height = output.height,
   })
 
-  output_wallpaper:svg(wallpaper_svg, {
+  output_wallpaper:svg('wallpaper.svg', {
     x = output.x,
     y = output.y,
     width = output.width,

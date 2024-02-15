@@ -5,33 +5,39 @@ local { edit } = require('utils.edit')
 local { sudo_write } = require('utils.sudo')
 local path = require('utils.path')
 
-return {
-  -- ---------------------------------------------------------------------------
-  -- General
-  -- ---------------------------------------------------------------------------
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
 
+local function clean_buffers() {
+  for _, bufinfo in ipairs(vim.fn.getbufinfo()) {
+    if bufinfo.listed == 1 && #bufinfo.windows == 0 {
+      vim.api.nvim_buf_delete(bufinfo.bufnr, {})
+    }
+  }
+}
+
+-- -----------------------------------------------------------------------------
+-- Default Actions
+-- -----------------------------------------------------------------------------
+
+local DEFAULT_ACTIONS = {
+  -- General
   { 'source', () -> vim.cmd('source $MYVIMRC') },
   { 'sudo (write)', sudo_write },
   { 'syntax (refresh)', () -> vim.cmd('syntax clear | syntax reset | syntax enable') },
   { 'numbers', () -> { vim.wo.number = !vim.wo.number } },
+  { 'clean (buffers)', clean_buffers },
 
-  -- ---------------------------------------------------------------------------
   -- Generators
-  -- ---------------------------------------------------------------------------
-
   { 'buffers', generators.buffer, 'generator' },
   { 'directories', generators.directory, 'generator' },
-  { 'favorites', generators.favorites, 'generator' },
   { 'files', generators.file, 'generator' },
   { 'grep', generators.grep, 'dynamic' },
   { 'help', generators.help, 'generator' },
   { 'man', generators.man, 'generator' },
 
-  -- ---------------------------------------------------------------------------
   -- Quicklinks
-  -- ---------------------------------------------------------------------------
-
-  { 'dots', () -> edit(DOTS) },
   { 'git', () -> edit(get_git_root()) },
   { 'home', () -> edit(HOME) },
   { 'plugins', () -> edit(PLUGINS_DIR) },
@@ -39,13 +45,19 @@ return {
   { 'swap', () -> edit(SWAP_DIR) },
   { 'vimrc', () -> edit(path.join(DOTS, 'nvim/lua')) },
 
-  -- ---------------------------------------------------------------------------
   -- Plugins
-  --
   -- NOTE: Neovim requires commands for multiline printing...
   -- https://github.com/neovim/neovim/issues/5067
-  -- ---------------------------------------------------------------------------
-
   { 'clean (plugins)', () -> vim.cmd('lua require("utils.plugins").clean()') },
   { 'update (plugins)', () -> vim.cmd('lua require("utils.plugins").update()') },
+}
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
+
+return () -> {
+  local actions = {}
+  table.merge(actions, DEFAULT_ACTIONS, generators.favorites())
+  return actions
 }

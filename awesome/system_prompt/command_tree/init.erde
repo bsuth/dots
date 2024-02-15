@@ -1,10 +1,19 @@
 return {
   description = 'System Prompt',
   require('system_prompt.command_tree.bluetooth'),
-  require('system_prompt.command_tree.brightness'),
+  {
+    label = 'brightness',
+    type = 'view',
+    description = require('system_prompt.command_tree_descriptions.brightness'),
+    view = require('system_prompt.command_tree_views.brightness_gui'),
+  },
   require('system_prompt.command_tree.notifications'),
   require('system_prompt.command_tree.spawn'),
   require('system_prompt.command_tree.system'),
-  require('system_prompt.command_tree.volume'),
+  {
+    label = 'volume',
+    type = 'view',
+    view = require('system_prompt.command_tree_views.volume_gui'),
+  },
   require('system_prompt.command_tree.wifi'),
 }

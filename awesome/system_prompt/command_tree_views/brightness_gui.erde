@@ -21,6 +21,8 @@ function brightness_gui_view:_init() {
   self._slider:subscribe('down', () -> { models.brightness.percent -= 5 })
   self._slider:subscribe('page_up', () -> { models.brightness.percent += 8 })
   self._slider:subscribe('page_down', () -> { models.brightness.percent -= 8 })
+  self._slider:subscribe('min', () -> { models.brightness.percent = 0 })
+  self._slider:subscribe('max', () -> { models.brightness.percent = 100 })
 
   self.root_widget = wibox.widget({
     self._slider.root_widget,

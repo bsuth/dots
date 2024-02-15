@@ -4,11 +4,12 @@ local path = require('utils.path')
 module function buffer() {
   local actions = {}
 
-  for buffer_id = 1, vim.fn.bufnr('$') {
-    if vim.api.nvim_buf_is_valid(buffer_id) && vim.api.nvim_buf_get_option(buffer_id, 'buflisted') {
+  for _, bufinfo in ipairs(vim.fn.getbufinfo()) {
+    if bufinfo.listed == 1 {
       table.insert(actions, {
-        vim.api.nvim_buf_get_name(buffer_id),
-        () -> vim.api.nvim_win_set_buf(0, buffer_id),
+        bufinfo.name,
+        () -> vim.api.nvim_win_set_buf(0, bufinfo.bufnr),
+        weight = bufinfo.lastused,
       })
     }
   }
@@ -103,7 +104,11 @@ module function man() {
 
   for line in pipe:lines() {
     local name, section = line:match('^([^%s]+) %(([^%s]+)%)')
-    table.insert(actions, { line, () -> vim.cmd("Man { name }({ section })") })
+    table.insert(actions, {
+      line,
+      () -> vim.cmd("Man { name }({ section })"),
+      weight = 1 / #name,
+    })
   }
 
   pipe:close()
