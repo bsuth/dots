@@ -28,8 +28,8 @@ local function dump_cursor() {
 }
 
 local function dump_keyboards() {
-  for id, keyboard in pairs(catnip.keyboards) {
-    dump_object("keyboard::{ id }", keyboard, {
+  for keyboard in catnip.keyboards {
+    dump_object("keyboard::{keyboard.id }", keyboard, {
       'name',
       'xkb_rules',
       'xkb_model',
@@ -41,8 +41,8 @@ local function dump_keyboards() {
 }
 
 local function dump_outputs() {
-  for id, output in pairs(catnip.outputs) {
-    dump_object("output::{ id }", output, {
+  for output in catnip.outputs {
+    dump_object("output::{ output.id }", output, {
       'x',
       'y',
       'width',
@@ -51,12 +51,20 @@ local function dump_outputs() {
       'scale',
       'mode',
     })
+
+    for mode in output.modes {
+      dump_object("output::{ output.id }.mode::{ mode.id }", mode, {
+        'width',
+        'height',
+        'refresh',
+      })
+    }
   }
 }
 
 local function dump_windows() {
-  for id, window in pairs(catnip.windows) {
-    dump_object("window::{ id }", window, {
+  for window in catnip.windows {
+    dump_object("window::{ window.id }", window, {
       'x',
       'y',
       'z',

@@ -1,7 +1,44 @@
-local tile = require('manager.tile')
+local tile = require('catmint.tile')
 local Class = require('utils.Class')
 
+local TILE_GAP = 4
+
+local TILE_PADDING = {
+  top = 4,
+  right = 4,
+  bottom = 4,
+  left = 4,
+}
+
 local Workspace = Class()
+
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
+
+local function custom_tile(windows, box) {
+  local num_windows = #windows
+
+  local layout = {
+    gap = TILE_GAP,
+    x = box.x + TILE_PADDING.left,
+    y = box.y + TILE_PADDING.top,
+    width = box.width - (TILE_PADDING.right + TILE_PADDING.left),
+    height = box.height - (TILE_PADDING.top + TILE_PADDING.bottom ),
+  }
+
+  if layout.width < layout.height {
+    if num_windows < 3 {
+      tile.split_vertical(windows, layout)
+    } else {
+      tile.grid_vertical(windows, layout)
+    }
+  } elseif num_windows < 4 {
+    tile.master_left(windows, layout)
+  } else {
+    tile.grid_horizontal(windows, layout)
+  }
+}
 
 -- -----------------------------------------------------------------------------
 -- Private
@@ -40,7 +77,7 @@ function Workspace:_on_change_visible(new_visible) {
 
 function Workspace:add(window) {
   table.insert(self.windows, window)
-  tile(self._box, self.windows)
+  custom_tile(self.windows, self._box)
 }
 
 function Workspace:remove(window_index, fallback = true) {
@@ -57,7 +94,7 @@ function Workspace:remove(window_index, fallback = true) {
   }
 
   table.remove(self.windows, window_index)
-  tile(self._box, self.windows)
+  custom_tile(self.windows, self._box)
 }
 
 -- -----------------------------------------------------------------------------

@@ -127,8 +127,8 @@ keymap({ 'mod1' }, 'M', () -> window_buffer:pop())
 -- -----------------------------------------------------------------------------
 
 catnip.subscribe('window::create', window -> {
-  window.focused = true
   focused.workspace:add(window)
+  window.focused = true
   center_cursor(window)
 })
 

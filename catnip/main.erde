@@ -26,16 +26,3 @@ timer:start(1000, 0, () -> {
 catnip.subscribe('tick', () -> {
   uv.run('nowait')
 })
-
--- -----------------------------------------------------------------------------
--- Init Events
--- -----------------------------------------------------------------------------
-
-for _, keyboard in pairs(catnip.keyboards) { catnip.publish('keyboard::init', keyboard) }
-catnip.subscribe('keyboard::init', keyboard -> catnip.publish('keyboard::init', keyboard))
-
-for _, output in pairs(catnip.outputs) { catnip.publish('output::init', output) }
-catnip.subscribe('output::init', output -> catnip.publish('output::init', output))
-
-for _, window in pairs(catnip.windows) { catnip.publish('window::init', window) }
-catnip.subscribe('window::init', window -> catnip.publish('window::init', window))

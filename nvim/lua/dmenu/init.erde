@@ -2,7 +2,8 @@ local get_actions_root = require('dmenu.actions')
 local { nvim_buf_keymap, nvim_feed_termcodes } = require('utils.nvim')
 local onedark = require('utils.onedark')
 
-local DMENU_MAX_WINDOW_HEIGHT = 12
+local DMENU_MIN_WINDOW_HEIGHT = 4
+local DMENU_MAX_WINDOW_HEIGHT = 16
 
 local NAMESPACE_ID = vim.api.nvim_create_namespace('')
 vim.api.nvim_set_hl(NAMESPACE_ID, 'Ellipses', { fg = onedark.grey })
@@ -23,6 +24,7 @@ dmenu.actions = {}
 dmenu.filtered_actions = {}
 dmenu.num_filtered_actions = 0
 
+dmenu.height = 0
 dmenu.has_overflow = false
 dmenu.num_visible_actions = 0
 
@@ -87,11 +89,19 @@ local function update_filter() {
 
     table.sort(dmenu.filtered_actions, (a, b) -> a.weight < b.weight)
   }
+}
 
-  if 1 + dmenu.num_filtered_actions > DMENU_MAX_WINDOW_HEIGHT {
+local function update_height() {
+  local max_height = math.clamp(
+    math.floor(0.4 * vim.api.nvim_win_get_height(dmenu.restore_window)),
+    DMENU_MIN_WINDOW_HEIGHT,
+    DMENU_MAX_WINDOW_HEIGHT,
+ )
+
+  if 1 + dmenu.num_filtered_actions > max_height {
     dmenu.has_overflow = true
-    dmenu.num_visible_actions = DMENU_MAX_WINDOW_HEIGHT - 2
-    vim.api.nvim_win_set_height(dmenu.window, DMENU_MAX_WINDOW_HEIGHT)
+    dmenu.num_visible_actions = max_height - 2
+    vim.api.nvim_win_set_height(dmenu.window, max_height)
   } else {
     dmenu.has_overflow = false
     dmenu.num_visible_actions = dmenu.num_filtered_actions
@@ -173,6 +183,7 @@ local function select_action_index(index) {
     -- Manually trigger updates here, since usually we ignore buffer updates if
     -- there is a dynamic_generator
     update_filter()
+    update_height()
     update_buffer_lines()
     update_highlight()
   } elseif action_type == 'generator' {
@@ -206,6 +217,7 @@ local function start() {
       } elseif !dmenu.dynamic_generator {
         dmenu.focused_offset = 0
         update_filter()
+        update_height()
         update_buffer_lines()
         update_highlight()
       }
@@ -249,6 +261,7 @@ local function start() {
   nvim_buf_keymap(dmenu.buffer, 'i', '<cr>', () -> {
     if dmenu.dynamic_generator {
       update_filter()
+      update_height()
       update_buffer_lines()
     } elseif dmenu.num_filtered_actions > 0 {
       select_action_index(dmenu.num_filtered_actions - dmenu.focused_offset)
@@ -280,16 +293,23 @@ local function start() {
   })
 
   dmenu.restore_window = vim.api.nvim_get_current_win()
-  vim.cmd('botright split')
-  dmenu.window = vim.api.nvim_get_current_win()
-  vim.api.nvim_win_set_buf(dmenu.window, dmenu.buffer)
-  vim.api.nvim_win_set_hl_ns(dmenu.window, NAMESPACE_ID) -- Must be called after the buffer is set!
+  dmenu.window = vim.api.nvim_open_win(dmenu.buffer, true, {
+    relative = 'win',
+    anchor = 'SW',
+    border = { '', { '-', 'WinSeparator' }, '', '', '', '', '', '' },
+    col = 0,
+    width = vim.api.nvim_win_get_width(dmenu.restore_window),
+    row = vim.api.nvim_win_get_height(dmenu.restore_window),
+    height = DMENU_MAX_WINDOW_HEIGHT,
+  })
 
+  vim.api.nvim_win_set_hl_ns(dmenu.window, NAMESPACE_ID) -- Must be called after the buffer is set!
   vim.cmd('startinsert')
 
   -- Wait until the next tick so that we can properly detect insert mode.
   vim.schedule(() -> {
     update_filter()
+    update_height()
     update_buffer_lines()
     update_highlight()
   })
@@ -313,6 +333,28 @@ vim.keymap.set('n', '<m-space>', toggle)
 -- -----------------------------------------------------------------------------
 -- Auto Commands
 -- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('WinResized', {
+  group = 'bsuth',
+  callback = window -> {
+    if vim.api.nvim_get_current_win() != dmenu.window {
+      return
+    }
+
+    if !table.has(vim.api.nvim_get_vvar('event').windows, dmenu.restore_window) {
+      return
+    }
+
+    update_height()
+    update_buffer_lines()
+    update_highlight()
+
+    local new_width = vim.api.nvim_win_get_width(dmenu.restore_window)
+    if new_width != vim.api.nvim_win_get_width(dmenu.window) {
+      vim.api.nvim_win_set_config(dmenu.window, { width = new_width })
+    }
+  },
+})
 
 vim.api.nvim_create_autocmd('WinLeave', {
   group = 'bsuth',

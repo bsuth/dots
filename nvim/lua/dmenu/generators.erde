@@ -17,10 +17,9 @@ module function buffer() {
   return actions
 }
 
-module function directory() {
-  local cwd = vim.fn.getcwd()
+module function directory(cwd = vim.fn.getcwd()) {
   local actions = {}
-  local pipe = io.popen('fd --type d .', 'r')
+  local pipe = io.popen("fd --base-directory { cwd } --type d .", 'r')
 
   for line in pipe:lines() {
     table.insert(actions, { line, () -> vim.cmd("edit { path.join(cwd, line) }") })
@@ -47,10 +46,9 @@ module function favorites() {
   return actions
 }
 
-module function file() {
-  local cwd = vim.fn.getcwd()
+module function file(cwd = vim.fn.getcwd()) {
   local actions = {}
-  local pipe = io.popen('fd --type f .', 'r')
+  local pipe = io.popen("fd --base-directory { cwd } --type f .", 'r')
 
   for line in pipe:lines() {
     table.insert(actions, { line, () -> vim.cmd("edit { path.join(cwd, line) }") })
@@ -60,12 +58,13 @@ module function file() {
   return actions
 }
 
-module function grep(text) {
-  local cwd = vim.fn.getcwd()
+module function grep(text, cwd = vim.fn.getcwd()) {
   local actions = {}
 
   if text != '' {
-    local pipe = io.popen("rg --line-number { text }", 'r')
+    -- NOTE: Use `cd` over `rg PATTERN PATH` argument since `cd` will preserve
+    -- relative paths in `rg` output.
+    local pipe = io.popen([[cd { cwd }; rg --fixed-strings --line-number "{ text:gsub('"', '\\"') }"]], 'r')
 
     for line in pipe:lines() {
       local filepath, row, text = line:match('^([^:]+):([0-9]+):%s*(.*)$')
@@ -89,7 +88,8 @@ module function help() {
 
     for line in file:lines() {
       local [ name ] = line:split()
-      table.insert(actions, { name, () -> vim.cmd("tab help { name }") })
+      local callback = () -> vim.cmd("enew | set buftype=help | help { name }")
+      table.insert(actions, { name, callback })
     }
 
     file:close()
@@ -106,7 +106,7 @@ module function man() {
     local name, section = line:match('^([^%s]+) %(([^%s]+)%)')
     table.insert(actions, {
       line,
-      () -> vim.cmd("Man { name }({ section })"),
+      () -> vim.cmd("enew | set filetype=man | Man { name }({ section })"),
       weight = 1 / #name,
     })
   }

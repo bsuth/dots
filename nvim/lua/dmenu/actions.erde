@@ -38,7 +38,6 @@ local DEFAULT_ACTIONS = {
   { 'man', generators.man, 'generator' },
 
   -- Quicklinks
-  { 'git', () -> edit(get_git_root()) },
   { 'home', () -> edit(HOME) },
   { 'plugins', () -> edit(PLUGINS_DIR) },
   { 'root', () -> edit('/') },
@@ -58,6 +57,19 @@ local DEFAULT_ACTIONS = {
 
 return () -> {
   local actions = {}
-  table.merge(actions, DEFAULT_ACTIONS, generators.favorites())
+
+  table.merge(actions, DEFAULT_ACTIONS)
+  table.merge(actions, generators.favorites())
+
+  local git_root = get_git_root()
+  if git_root != nil {
+    table.merge(actions, {
+      { 'project', () -> edit(git_root) },
+      { 'directories (project)', () -> generators.directory(git_root), 'generator' },
+      { 'files (project)', () -> generators.file(git_root), 'generator' },
+      { 'grep (project)', text -> generators.grep(text, git_root), 'dynamic' },
+    })
+  }
+
   return actions
 }

@@ -72,18 +72,10 @@ local LSP_SERVERS = {
   clangd = {},
   cssls = {},
   eslint = {},
-  gopls = {},
-  graphql = {},
   jsonls = {},
+  lua_ls = {},
   elixirls = {
     cmd = { path.join(HOME, '.local/share/nvim/mason/bin/elixir-ls') },
-  },
-  stylelint_lsp = {
-    settings = {
-      stylelintplus = {
-        autoFixOnFormat = true,
-      }
-    },
   },
   tailwindcss = {},
   tsserver = {},

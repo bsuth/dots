@@ -4,6 +4,7 @@ table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'f
 table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'filetype') == 'man')
 table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'buftype') == 'terminal')
 table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_option(buffer, 'buftype') == 'prompt')
+table.insert(TRACK_CWD_FILTERS, buffer -> vim.api.nvim_buf_get_name(buffer):match('^/tmp/nvim.bsuth'))
 
 -- -----------------------------------------------------------------------------
 -- Variables

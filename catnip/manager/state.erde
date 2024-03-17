@@ -8,14 +8,6 @@ local { is_point_in_box } = require('utils.box')
 
 module desktops = {}
 
-catnip.subscribe('output::init', output -> {
-  desktops[output.id] = Desktop(output)
-})
-
-catnip.subscribe('output::destroy', output -> {
-  desktops[output.id] = nil
-})
-
 -- -----------------------------------------------------------------------------
 -- Focused State
 -- -----------------------------------------------------------------------------
@@ -48,8 +40,18 @@ local function update_focused_state() {
   }
 }
 
-update_focused_state()
 catnip.subscribe('window::property::focused', update_focused_state)
+
+catnip.subscribe('output::create', output -> {
+  desktops[output.id] = Desktop(output)
+  if focused.window == nil {
+    update_focused_state()
+  }
+})
+
+catnip.subscribe('output::destroy', output -> {
+  desktops[output.id] = nil
+})
 
 -- -----------------------------------------------------------------------------
 -- Window Buffer
@@ -57,7 +59,7 @@ catnip.subscribe('window::property::focused', update_focused_state)
 
 module window_buffer = {}
 
-for _, window in pairs(catnip.windows) {
+for window in catnip.windows {
   -- Save all windows in the window buffer by default
   -- TODO: save / restore windows to their respective workspace
   window.visible = false
@@ -65,23 +67,15 @@ for _, window in pairs(catnip.windows) {
 }
 
 function window_buffer:push() {
-  if focused.window == nil {
+  local window, window_index = focused.window, focused.window_index
+
+  if window == nil {
     return
   }
 
-  local num_windows = #focused.workspace.windows
-
-  if num_windows > 1 {
-    if focused.window_index < num_windows {
-      focused.workspace.windows[focused.window_index + 1].focused = true
-    } else {
-      focused.workspace.windows[focused.window_index - 1].focused = true
-    }
-  }
-
-  focused.workspace:remove(focused.window_index)
-  table.insert(window_buffer, focused.window)
-  focused.window.visible = false
+  focused.workspace:remove(window_index)
+  table.insert(window_buffer, window)
+  window.visible = false
 }
 
 function window_buffer:pop() {
