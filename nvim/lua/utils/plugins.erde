@@ -28,7 +28,8 @@ for _, plugin_dir in ipairs(vim.fn.readdir(PLUGINS_DIR)) {
 -- -----------------------------------------------------------------------------
 
 module function use(plugin_name, config) {
-  local plugin_path = path.join(PLUGINS_DIR, path.basename(plugin_name))
+  local plugin_dir = (config && config.dir) || path.basename(plugin_name)
+  local plugin_path = path.join(PLUGINS_DIR, plugin_dir)
   local plugin = table.find(PLUGINS, plugin -> plugin.path == plugin_path)
 
   if plugin != nil {
@@ -38,7 +39,7 @@ module function use(plugin_name, config) {
   }
 
   local command = (config && config.symlink)
-    && "ln -sn { plugin_name } { plugin_path }"
+    && "ln -sn { plugin_dir } { plugin_path }"
     || "git clone --depth 1 https://github.com/{ plugin_name }.git { plugin_path }"
 
   print(command)
@@ -97,16 +98,12 @@ module function clean() {
   }
 
   for _, plugin in ipairs(unused_plugins) {
-    print(path.basename(plugin.path))
-  }
+    local basename = path.basename(plugin.path)
+    local input = vim.fn.input("remove { basename }?: "):lower()
 
-  repeat {
-    local input = vim.fn.input('remove plugins (y/n)?: ')
-    if input == 'y' {
-      PLUGINS = used_plugins
-      for _, plugin in ipairs(unused_plugins) {
-        vim.fn.system("rm -rf { plugin.path }")
-      }
+    if input == 'y' || input == 'yes' {
+      vim.fn.system("rm -rf { plugin.path }")
+      table.clear(PLUGINS, plugin)
     }
-  } until input == 'y' || input == 'n'
+  }
 }

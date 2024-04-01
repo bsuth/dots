@@ -16,13 +16,6 @@ keymap({ 'mod1', 'ctrl' }, 'q', catnip.quit)
 -- LibUV
 -- -----------------------------------------------------------------------------
 
-local timer = uv.new_timer()
-
-timer:start(1000, 0, () -> {
-  print("timeout!")
-  timer:close()
-})
-
 catnip.subscribe('tick', () -> {
   uv.run('nowait')
 })

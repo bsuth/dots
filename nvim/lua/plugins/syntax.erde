@@ -9,12 +9,12 @@ local plugins = require('utils.plugins')
 plugins.use('navarasu/onedark.nvim')
 
 local onedark = require('onedark')
+local palette = require('onedark.palette').warmer
 
 onedark.setup({ style = 'warmer' })
 onedark.load()
 
-vim.api.nvim_set_hl(0, 'FloatBorder', { bg = '#232326', fg = '#3F92DE' })
-vim.api.nvim_set_hl(0, 'NormalFloat', { bg = '#232326' })
+vim.api.nvim_set_hl(0, 'NormalFloat', { bg = palette.bg0 })
 
 -- -----------------------------------------------------------------------------
 -- Treesitter
