@@ -1,4 +1,19 @@
-local erde = require('erde')
-erde.load()
-local ok, result = xpcall(function() require('main') end, erde.rewrite)
-if not ok then error(result) end
+local uv = require('luv')
+local catnip = require('catnip')
+local keymap = require('keymap')
+
+require('canvas')
+require('dump')
+require('wallpaper')
+require('bar')
+
+keymap({ 'mod1', 'ctrl' }, 'r', catnip.reload)
+keymap({ 'mod1', 'ctrl' }, 'q', catnip.quit)
+
+-- -----------------------------------------------------------------------------
+-- LibUV
+-- -----------------------------------------------------------------------------
+
+catnip.subscribe('tick', function()
+  uv.run('nowait')
+end)

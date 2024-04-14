@@ -75,7 +75,7 @@ local function load(name) {
   require(name)
 }
 
-load('dmenu')
+load('command_tree')
 
 load('modules.cwd')
 load('modules.emacs')

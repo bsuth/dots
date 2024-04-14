@@ -60,6 +60,14 @@ cmp.setup({
 })
 
 -- -----------------------------------------------------------------------------
+-- Neodev
+-- -----------------------------------------------------------------------------
+
+-- IMPORTANT: make sure to setup neodev BEFORE lspconfig
+plugins.use('folke/neodev.nvim')
+require("neodev").setup({})
+
+-- -----------------------------------------------------------------------------
 -- LSP Config
 -- -----------------------------------------------------------------------------
 
@@ -73,7 +81,6 @@ local LSP_SERVERS = {
   cssls = {},
   eslint = {},
   jsonls = {},
-  lua_ls = {},
   elixirls = {
     cmd = { path.join(HOME, '.local/share/nvim/mason/bin/elixir-ls') },
   },
@@ -87,6 +94,15 @@ local LSP_SERVERS = {
           unknownAtRules = 'ignore',
         },
       }
+    },
+  },
+  lua_ls = {
+    Lua = {
+      format = {
+        enable = true,
+        defaultConfig = {
+        },
+      },
     },
   },
 }

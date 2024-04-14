@@ -1,4 +1,4 @@
-local tile = require('catmint.tile')
+local tile = require('tile')
 local Class = require('utils.Class')
 
 local TILE_GAP = 4

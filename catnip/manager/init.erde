@@ -59,21 +59,6 @@ local function get_relative_state(direction) {
   }
 }
 
-local function activate_relative(direction) {
-  local relative_state = get_relative_state(direction)
-
-  if relative_state == nil {
-    return
-  }
-
-  if relative_state.window != nil {
-    relative_state.window.focused = true
-    center_cursor(relative_state.window)
-  } else {
-    center_cursor(relative_state.desktop)
-  }
-}
-
 local function move_active_window(direction) {
   if focused.window == nil {
     return
@@ -108,11 +93,6 @@ keymap({ 'mod1' }, 't', () -> focused.desktop:push())
 keymap({ 'mod1' }, 'w', () -> focused.desktop:pop())
 keymap({ 'mod1' }, 'Tab', () -> focused.desktop:cycle())
 keymap({ 'mod1', 'shift' }, 'ISO_Left_Tab', () -> focused.desktop:cycle(true))
-
-keymap({ 'mod1' }, 'h', () -> activate_relative('left'))
-keymap({ 'mod1' }, 'j', () -> activate_relative('down'))
-keymap({ 'mod1' }, 'k', () -> activate_relative('up'))
-keymap({ 'mod1' }, 'l', () -> activate_relative('right'))
 
 keymap({ 'mod1' }, 'H', () -> move_active_window('left'))
 keymap({ 'mod1' }, 'J', () -> move_active_window('down'))
