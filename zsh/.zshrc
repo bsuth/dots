@@ -98,7 +98,7 @@ SPACESHIP_PROMPT_ORDER=(
 
 function on_cd() {
   if [[ ! -z $NVIM ]]; then
-    nvim --server $NVIM --remote-send "<c-\\><c-n>:cd $(pwd) | lua save_buffer_cwd()<cr>i"
+    nvim --server $NVIM --remote-send "<c-\\><c-n>:cd $(pwd) | lua SAVE_BUFFER_CWD()<cr>i"
   fi
 }
 

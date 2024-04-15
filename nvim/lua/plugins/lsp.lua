@@ -1,4 +1,4 @@
-local { HOME } = require('constants')
+local C = require('constants')
 local path = require('utils.path')
 local plugins = require('utils.plugins')
 
@@ -9,13 +9,13 @@ local plugins = require('utils.plugins')
 vim.keymap.set('n', '<leader>lsp', ':silent :LspRestart<cr>')
 vim.keymap.set('n', "''", vim.lsp.buf.hover)
 vim.keymap.set('n', "'o", vim.diagnostic.open_float) -- o(pen)
-vim.keymap.set('n', "'r", vim.lsp.buf.rename) -- r(ename)
-vim.keymap.set('n', "'d", vim.lsp.buf.definition) -- d(efinition)
-vim.keymap.set('n', "'p", vim.diagnostic.goto_prev) -- p(rev)
-vim.keymap.set('n', "'n", vim.diagnostic.goto_next) -- n(ext)
+vim.keymap.set('n', "'r", vim.lsp.buf.rename)        -- r(ename)
+vim.keymap.set('n', "'d", vim.lsp.buf.definition)    -- d(efinition)
+vim.keymap.set('n', "'p", vim.diagnostic.goto_prev)  -- p(rev)
+vim.keymap.set('n', "'n", vim.diagnostic.goto_next)  -- n(ext)
 vim.keymap.set('n', "'l", vim.diagnostic.setloclist) -- l(ist)
-vim.keymap.set('n', "'u", vim.lsp.buf.references) -- u(sage)
-vim.keymap.set('n', "'a", vim.lsp.buf.code_action) -- a(ction)
+vim.keymap.set('n', "'u", vim.lsp.buf.references)    -- u(sage)
+vim.keymap.set('n', "'a", vim.lsp.buf.code_action)   -- a(ction)
 
 -- -----------------------------------------------------------------------------
 -- Mason (Language Servers)
@@ -82,12 +82,27 @@ local LSP_SERVERS = {
   eslint = {},
   jsonls = {},
   elixirls = {
-    cmd = { path.join(HOME, '.local/share/nvim/mason/bin/elixir-ls') },
+    cmd = { path.join(C.HOME, '.local/share/nvim/mason/bin/elixir-ls') },
   },
   tailwindcss = {},
-  tsserver = {},
+  tsserver = {
+    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+    init_options = {
+      plugins = {
+        {
+          -- https://github.com/vuejs/language-tools?tab=readme-ov-file#hybrid-mode-configuration-requires-vuelanguage-server-version-200
+          name = '@vue/typescript-plugin',
+          languages = { 'vue' },
+          location = table.concat({
+            require('mason-registry').get_package('vue-language-server'):get_install_path(),
+            '/node_modules/@vue/language-server',
+          }),
+        },
+      },
+    },
+  },
   volar = {
-    filetypes = { 'vue', 'typescript' },
+    filetypes = { 'vue' },
     settings = {
       scss = {
         lint = {
@@ -107,38 +122,8 @@ local LSP_SERVERS = {
   },
 }
 
-for server, config in pairs(LSP_SERVERS) {
-  local capabilities = cmp_nvim_lsp.default_capabilities( vim.lsp.protocol.make_client_capabilities())
+for server, config in pairs(LSP_SERVERS) do
+  local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
   capabilities.textDocument.completion.completionItem.snippetSupport = false
   lspconfig[server].setup(vim.tbl_deep_extend('force', { capabilities = capabilities }, config))
-}
-
--- -----------------------------------------------------------------------------
--- Volar Takeover Mode
---
--- https://vuejs.org/guide/typescript/overview.html#volar-takeover-mode
--- -----------------------------------------------------------------------------
-
-local volar_client = nil
-local tsserver_client = nil
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = 'bsuth',
-  callback = { data } -> {
-    local client = vim.lsp.get_client_by_id(data.client_id)
-
-    if client.name == "tsserver" {
-      if volar_client {
-        client:stop()
-      } else {
-        tsserver_client = client
-      }
-    } elseif client.name == "volar" {
-      volar_client = client
-
-      if tsserver_client {
-        tsserver_client:stop()
-      }
-    }
-  },
-})
+end

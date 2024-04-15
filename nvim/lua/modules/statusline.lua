@@ -7,21 +7,21 @@ local onedark = require('utils.onedark')
 local highlight_name_counter = 1
 local highlight_groups = {}
 
-local function highlight(config) {
-  local highlight_name = "bsuth_statusline_highlight_{ highlight_name_counter }"
-  highlight_name_counter += 1
+local function highlight(config)
+  local highlight_name = 'bsuth_statusline_highlight_' .. highlight_name_counter
+  highlight_name_counter = highlight_name_counter + 1
   highlight_groups[highlight_name] = config
   return highlight_name
-}
+end
 
 vim.api.nvim_create_autocmd('SourcePost', {
   group = 'bsuth',
-  callback = () -> {
-    for name, config in pairs(highlight_groups) {
+  callback = function()
+    for name, config in pairs(highlight_groups) do
       -- need to wait until VimEnter to setup our custom highlights
       vim.api.nvim_set_hl(0, name, config)
-    }
-  },
+    end
+  end,
 })
 
 -- -----------------------------------------------------------------------------
@@ -106,19 +106,19 @@ local MODE_CONFIG = {
   },
 }
 
-local MODE_CONFIG_LOOKUP = {}; do {
-  for _, config in pairs(MODE_CONFIG) {
-    for _, mode in ipairs(config.modes) {
-      MODE_CONFIG_LOOKUP[mode] = config
-    }
-  }
-}
+local MODE_CONFIG_LOOKUP = {}
 
-local function statusline_mode() {
+for _, config in pairs(MODE_CONFIG) do
+  for _, mode in ipairs(config.modes) do
+    MODE_CONFIG_LOOKUP[mode] = config
+  end
+end
+
+local function statusline_mode()
   local mode = vim.api.nvim_get_mode().mode
   local config = MODE_CONFIG_LOOKUP[mode]
-  return "%#{ config.highlight }# { config.label } %#Normal#"
-}
+  return ("%%#%s# %s %%#Normal#"):format(config.highlight, config.label)
+end
 
 -- -----------------------------------------------------------------------------
 -- Buffer State
@@ -127,29 +127,36 @@ local function statusline_mode() {
 local BUFFER_STATE_CONFIG = {
   {
     label = '[-]',
-    qualifier = () -> !vim.api.nvim_buf_get_option(0, 'modifiable'),
     highlight = highlight({ fg = onedark.red, bold = true }),
+    qualifier = function()
+      return not vim.api.nvim_buf_get_option(0, 'modifiable')
+    end,
   },
   {
     label = '[RO]',
-    qualifier = () -> vim.api.nvim_buf_get_option(0, 'readonly'),
     highlight = highlight({ fg = onedark.yellow, bold = true }),
+    qualifier = function()
+      return vim.api.nvim_buf_get_option(0, 'readonly')
+    end,
   },
   {
     label = '[+]',
-    qualifier = () -> vim.api.nvim_buf_get_option(0, 'modified'),
     highlight = highlight({ fg = onedark.blue, bold = true }),
+    qualifier = function()
+      return vim.api.nvim_buf_get_option(0, 'modified')
+    end,
   },
 }
 
-local function statusline_buffer_state() {
-  for _, config in ipairs(BUFFER_STATE_CONFIG) {
-    if config.qualifier() {
-      return "%#{ config.highlight }# { config.label } %#Normal#"
-    }
-  }
+local function statusline_buffer_state()
+  for _, config in ipairs(BUFFER_STATE_CONFIG) do
+    if config.qualifier() then
+      return ("%%#%s# %s %%#Normal#"):format(config.highlight, config.label)
+    end
+  end
+
   return ''
-}
+end
 
 -- -----------------------------------------------------------------------------
 -- LSP
@@ -174,18 +181,22 @@ local LSP_CONFIG = {
   },
 }
 
-local function statusline_lsp() {
+local function statusline_lsp()
   local statusline = {}
 
-  for _, config in ipairs(LSP_CONFIG) {
+  for _, config in ipairs(LSP_CONFIG) do
     local count = #vim.diagnostic.get(0, { severity = config.severity })
-    if count > 0 {
-      table.insert(statusline, "%#{ config.highlight }#[{ count }]%#Normal#")
-    }
-  }
 
-  return " { table.concat(statusline, ' ') } "
-}
+    if count > 0 then
+      table.insert(statusline, ("%%#%s#[%d]%%#Normal#"):format(
+        config.highlight,
+        count
+      ))
+    end
+  end
+
+  return ' ' .. table.concat(statusline, ' ') .. ' '
+end
 
 -- -----------------------------------------------------------------------------
 -- Filetype
@@ -198,20 +209,24 @@ local FILETYPE_HIGHLIGHT = highlight({
 })
 
 local FILETYPE_GETTERS = {
-  () -> vim.api.nvim_buf_get_option(0, 'filetype'),
-  () -> vim.api.nvim_buf_get_option(0, 'buftype'),
-  () -> vim.api.nvim_buf_get_option(0, 'syntax'),
-  () -> '???',
+  function() return vim.api.nvim_buf_get_option(0, 'filetype') end,
+  function() return vim.api.nvim_buf_get_option(0, 'buftype') end,
+  function() return vim.api.nvim_buf_get_option(0, 'syntax') end,
+  function() return '???' end,
 }
 
-local function statusline_filetype() {
-  for _, filetype_getter in ipairs(FILETYPE_GETTERS) {
+local function statusline_filetype()
+  for _, filetype_getter in ipairs(FILETYPE_GETTERS) do
     local filetype = filetype_getter()
-    if filetype != '' {
-      return "%#{ FILETYPE_HIGHLIGHT }# { filetype:upper() } %#Normal#"
-    }
-  }
-}
+
+    if filetype ~= '' then
+      return ("%%#%s# %s %%#Normal#"):format(
+        FILETYPE_HIGHLIGHT,
+        string.upper(filetype)
+      )
+    end
+  end
+end
 
 -- -----------------------------------------------------------------------------
 -- Cursor
@@ -223,15 +238,15 @@ local CURSOR_HIGHLIGHT = highlight({
   bold = true,
 })
 
-local function statusline_cursor() {
-  return "%#{ CURSOR_HIGHLIGHT }# %l/%L %#Normal#"
-}
+local function statusline_cursor()
+  return ("%%#%s# %%l/%%L %%#Normal#"):format(CURSOR_HIGHLIGHT)
+end
 
 -- -----------------------------------------------------------------------------
 -- Statusline
 -- -----------------------------------------------------------------------------
 
-global function statusline() {
+function STATUSLINE()
   return table.concat({
     statusline_mode(),
     ' %F',
@@ -241,6 +256,6 @@ global function statusline() {
     statusline_cursor(),
     statusline_filetype(),
   })
-}
+end
 
-vim.opt.statusline = "%!v:lua.statusline()"
+vim.opt.statusline = "%!v:lua.STATUSLINE()"

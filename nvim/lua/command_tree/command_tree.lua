@@ -191,6 +191,16 @@ function CommandTree:close()
   self.window = -1
 end
 
+function CommandTree:destroy()
+  if vim.api.nvim_win_is_valid(self.window) then
+    vim.api.nvim_win_close(self.window, true)
+    vim.api.nvim_buf_delete(self.buffer, {})
+  end
+
+  self.window = -1
+  self.buffer = -1
+end
+
 -- -----------------------------------------------------------------------------
 -- Return
 -- -----------------------------------------------------------------------------

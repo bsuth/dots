@@ -1,22 +1,95 @@
--- When resolving modules, neovim looks for 'lua/?.lua;lua/?/init.lua' for all
--- paths in `runtimepath`. However, since package managers often manipulate this
--- value at runtime, neovim opts to provide a custom package loader instead of
--- manipulating package.path in order to always get the correct `runtimepath`
--- value _at require time_.
---
--- This causes some problems (such as erde not being able to find our neovim
--- modules), so we adjust package.path for our neovim modules manually.
---
--- @see https://github.com/neovim/neovim/blob/master/runtime/lua/vim/_init_packages.lua
-local nvim_package_path = os.getenv('DOTS') .. '/nvim/lua'
+-- -----------------------------------------------------------------------------
+-- Settings
+-- -----------------------------------------------------------------------------
 
-if not package.path:find(nvim_package_path) then
-  package.path = ('%s/?.lua;%s/?/init.lua;%s'):format(nvim_package_path, nvim_package_path, package.path)
+-- core
+vim.g.mapleader = ' '
+vim.opt.clipboard = 'unnamedplus'
+vim.api.nvim_create_augroup('bsuth', {})
+
+-- casing
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+
+-- splitting
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
+-- tabs
+vim.opt.tabstop = 2
+vim.opt.softtabstop = 2
+vim.opt.shiftwidth = 2
+vim.opt.expandtab = true
+
+-- interface
+vim.opt.termguicolors = true
+vim.opt.number = false
+vim.opt.wrap = false
+vim.opt.signcolumn = 'no'
+vim.opt.showmode = false
+vim.opt.laststatus = 3
+vim.opt.colorcolumn = '80'
+vim.cmd('highlight ColorColumn guibg=#585858')
+
+-- performance
+vim.g.matchparen_timeout = 10
+vim.opt.synmaxcol = 300
+vim.opt.updatetime = 300
+vim.opt.scrollback = 100000
+
+-- formating
+vim.opt.commentstring = '// %s'
+vim.opt.formatoptions = 'jcroql'
+vim.api.nvim_create_autocmd('FileType', {
+  group = 'bsuth',
+  pattern = { 'c', 'cpp' },
+  -- override comment string for c / cpp (uses `/* ... */` by default)
+  command = 'setlocal commentstring=//\\ %s',
+})
+
+-- -----------------------------------------------------------------------------
+-- Mappings
+-- -----------------------------------------------------------------------------
+
+vim.keymap.set('n', '<c-s>', function()
+  vim.cmd('update')
+end)
+
+vim.keymap.set('n', '<c-q>', function()
+  if vim.fn.tabpagenr('$') + vim.fn.winnr('$') > 2 then
+    vim.cmd('quit')
+  end
+end)
+
+vim.keymap.set('n', '_', function()
+  vim.cmd('nohlsearch')
+end)
+
+-- remove annoying defaults
+vim.keymap.set('n', 'K', function() end)     -- open manual
+vim.keymap.set('n', '<c-z>', function() end) -- background neovim
+
+-- -----------------------------------------------------------------------------
+-- Plugins / Modules
+-- -----------------------------------------------------------------------------
+
+local function load(name)
+  package.loaded[name] = nil -- unset to force reloading
+  require(name)
 end
 
-local erde = require('erde')
-erde.load()
+load('command_tree')
 
-package.loaded.rc = nil -- force reload rc
-local ok, result = xpcall(function() require('rc') end, erde.rewrite)
-if not ok then error(result) end
+load('modules.cwd')
+load('modules.emacs')
+load('modules.format')
+load('modules.statusline')
+load('modules.surroundjump')
+load('modules.tabs')
+load('modules.terminal')
+load('modules.windows')
+
+load('plugins.dirvish')
+load('plugins.lsp')
+load('plugins.syntax')
+load('plugins.utility')

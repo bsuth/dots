@@ -188,12 +188,10 @@ return {
   label = '[CT]',
   type = 'tree',
   callback = function()
-    local commands = {}
-
-    table.merge(commands, DEFAULT_COMMANDS)
-    table.merge(commands, generators.favorites())
-    table.merge(commands, get_project_commands())
-
-    return commands
+    return table.merge(
+      DEFAULT_COMMANDS,
+      generators.favorites(),
+      get_project_commands()
+    )
   end,
 }

@@ -30,7 +30,12 @@ vim.keymap.set('n', '<m-space>', toggle)
 vim.api.nvim_create_autocmd('WinClosed', {
   group = 'bsuth',
   callback = function()
-    -- TODO: cleanup command tree
+    for window, command_tree in pairs(command_trees) do
+      if not vim.api.nvim_win_is_valid(window) then
+        command_tree:destroy()
+        command_trees[window] = nil
+      end
+    end
   end,
 })
 

@@ -1,4 +1,4 @@
-local { edit } = require('utils.edit')
+local edit = require('utils.edit')
 local plugins = require('utils.plugins')
 
 plugins.use('justinmk/vim-dirvish')
@@ -25,17 +25,17 @@ local XDG_OPEN_COMMANDS = {
 -- Helpers
 -- -----------------------------------------------------------------------------
 
-local function xdg_open() {
+local function xdg_open()
   local file = vim.api.nvim_get_current_line()
   local extension = vim.fn.fnamemodify(file, ':e')
   local xdg_open_command = XDG_OPEN_COMMANDS[extension]
 
-  if xdg_open_command != nil {
-    vim.fn.jobstart([[{ xdg_open_command } "{ file }" & disown]])
-  } else {
+  if xdg_open_command ~= nil then
+    vim.fn.jobstart(('%s "%s" & disown'):format(xdg_open_command, file))
+  else
     edit(file)
-  }
-}
+  end
+end
 
 -- -----------------------------------------------------------------------------
 -- Autocommands
@@ -44,14 +44,16 @@ local function xdg_open() {
 vim.api.nvim_create_autocmd('FileType', {
   group = 'bsuth',
   pattern = 'dirvish',
-  callback = () -> vim.keymap.set('n', '<cr>', xdg_open, { buffer = true }),
+  callback = function()
+    vim.keymap.set('n', '<cr>', xdg_open, { buffer = true })
+  end,
 })
 
 vim.api.nvim_create_autocmd('BufEnter', {
   group = 'bsuth',
-  callback = () -> {
-    if vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' {
+  callback = function()
+    if vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' then
       vim.cmd('Dirvish') -- refresh
-    }
-  },
+    end
+  end,
 })
