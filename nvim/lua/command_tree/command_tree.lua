@@ -18,29 +18,35 @@ local CommandTree = {}
 -- -----------------------------------------------------------------------------
 
 function CommandTree:refresh()
-  self.raw_commands = self.path[#self.path].callback()
+  local head = self.path[#self.path]
+  self.raw_commands = head.callback()
 
-  vim.api.nvim_buf_set_name(
-    self.buffer,
-    table.concat(table.map(self.path, function(command)
-      return command.label
-    end), '.')
-  )
-
-  self.ignore_next_mode_changes = self.ignore_next_mode_changes + 1
-  vim.cmd('startinsert!')
+  if vim.api.nvim_get_mode().mode ~= 'i' then
+    self.ignore_next_mode_changes = self.ignore_next_mode_changes + 1
+    vim.cmd('startinsert!')
+  end
 
   vim.schedule(function() -- use `vim.schedule` to properly detect insert mode
     vim.api.nvim_buf_set_lines(self.buffer, -2, -1, false, { '' })
+
+    -- Manually trigger the first dynamic filter, since we do not filter
+    -- automatically on buffer change for dynamic commands.
+    if head.dynamic then self:filter() end
   end)
 end
 
 function CommandTree:filter()
   local text = string.trim(vim.api.nvim_buf_get_lines(self.buffer, -2, -1, false)[1])
+  local head = self.path[#self.path]
 
-  if text:match('^%s*$') then
+  if text == '' then
     self.commands = self.raw_commands
-    self.num_commands = #self.raw_commands
+    self.num_commands = #self.commands
+    self:render()
+    return
+  elseif head.dynamic then
+    self.commands = head.callback(text)
+    self.num_commands = #self.commands
     self:render()
     return
   end
@@ -49,13 +55,9 @@ function CommandTree:filter()
   self.num_commands = 0
 
   local tokens = table.map(string.split(text), function(token)
-    local is_valid_pattern = pcall(function()
-      token:match(token)
-    end)
-
     return {
       raw = token,
-      pattern = is_valid_pattern and token or string.escape(token),
+      pattern = string.escape(token),
       case_sensitive = token:find('[A-Z]'),
     }
   end)
@@ -125,7 +127,7 @@ function CommandTree:highlight()
     return
   end
 
-  if self.num_commands > 0 then
+  if not self.path[#self.path].dynamic and self.num_commands > 0 then
     -- -1 for prompt
     -- -1 since `nvim_buf_add_highlight` is 0-index
     local focused_row = vim.api.nvim_buf_line_count(self.buffer) - self.focused_index - 1
@@ -148,23 +150,26 @@ function CommandTree:focus(index)
   self:highlight()
 end
 
-function CommandTree:select(index)
+function CommandTree:select(index, persist)
   local command = self.commands[index]
 
   if command == nil then
     return
   end
 
-  if command.type == 'tree' then
+  if command.subtree then
     table.insert(self.path, command)
     self:refresh()
-  elseif command.type == 'persist' then
+    return
+  end
+
+  if persist then
     vim.api.nvim_set_current_win(self.restore_window)
-    command.callback()
   else
     self:close()
-    command.callback()
   end
+
+  command.callback()
 end
 
 function CommandTree:open()
@@ -221,7 +226,9 @@ return function(restore_window)
     ignore_next_mode_changes = 0,
   }, { __index = CommandTree })
 
+  vim.api.nvim_buf_set_option(command_tree.buffer, 'bufhidden', 'hide')
   vim.api.nvim_buf_set_option(command_tree.buffer, 'buftype', 'prompt')
+  vim.api.nvim_buf_set_option(command_tree.buffer, 'buflisted', false)
   vim.api.nvim_buf_set_option(command_tree.buffer, 'swapfile', false)
   vim.fn.prompt_setprompt(command_tree.buffer, '')
 
@@ -241,12 +248,27 @@ return function(restore_window)
   end)
 
   nvim_buf_keymap(command_tree.buffer, 'i', '<cr>', function()
-    command_tree:select(command_tree.focused_index)
+    if command_tree.path[#command_tree.path].dynamic then
+      command_tree:filter()
+    else
+      command_tree:select(command_tree.focused_index)
+    end
   end)
 
   nvim_buf_keymap(command_tree.buffer, 'n', '<cr>', function()
     local buffer_line = vim.api.nvim_win_get_cursor(command_tree.window)[1]
     command_tree:select(command_tree.num_commands - buffer_line + 1)
+  end)
+
+  nvim_buf_keymap(command_tree.buffer, 'i', '<m-cr>', function()
+    if not command_tree.path[#command_tree.path].dynamic then
+      command_tree:select(command_tree.focused_index, true)
+    end
+  end)
+
+  nvim_buf_keymap(command_tree.buffer, 'n', '<m-cr>', function()
+    local buffer_line = vim.api.nvim_win_get_cursor(command_tree.window)[1]
+    command_tree:select(command_tree.num_commands - buffer_line + 1, true)
   end)
 
   nvim_buf_keymap(command_tree.buffer, 'n', '<esc>', function()
@@ -263,7 +285,7 @@ return function(restore_window)
       vim.schedule(function() -- use `vim.schedule` to update only after `textlock` is removed
         if command_tree.ignore_next_buffer_changes > 0 then
           command_tree.ignore_next_buffer_changes = command_tree.ignore_next_buffer_changes - 1
-        else
+        elseif not command_tree.path[#command_tree.path].dynamic then
           command_tree.focused_index = 1
           command_tree:filter()
         end

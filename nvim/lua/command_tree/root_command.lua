@@ -48,32 +48,33 @@ local DEFAULT_COMMANDS = {
 
   {
     label = 'buffers',
-    type = 'tree',
+    subtree = true,
     callback = generators.buffer,
   },
   {
     label = 'directories',
-    type = 'tree',
+    subtree = true,
     callback = generators.directory,
   },
   {
     label = 'files',
-    type = 'tree',
+    subtree = true,
     callback = generators.file,
   },
   {
     label = 'grep',
-    type = 'dynamic_tree',
+    subtree = true,
+    dynamic = true,
     callback = generators.grep,
   },
   {
     label = 'help',
-    type = 'tree',
+    subtree = true,
     callback = generators.help,
   },
   {
     label = 'man',
-    type = 'tree',
+    subtree = true,
     callback = generators.man,
   },
 
@@ -157,22 +158,23 @@ local function get_project_commands()
       end,
     },
     {
-      label = 'directories (project)',
-      type = 'tree',
+      label = 'project.directories',
+      subtree = true,
       callback = function()
         return generators.directory(project_root)
       end,
     },
     {
-      label = 'files (project)',
-      type = 'tree',
+      label = 'project.files',
+      subtree = true,
       callback = function()
         return generators.file(project_root)
       end,
     },
     {
-      label = 'grep (project)',
-      type = 'dynamic_tree',
+      label = 'project.grep',
+      subtree = true,
+      dynamic = true,
       callback = function(text)
         return generators.grep(text, project_root)
       end,
@@ -185,8 +187,6 @@ end
 -- -----------------------------------------------------------------------------
 
 return {
-  label = '[CT]',
-  type = 'tree',
   callback = function()
     return table.merge(
       DEFAULT_COMMANDS,

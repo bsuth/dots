@@ -19,6 +19,7 @@ local function toggle()
     command_trees[window] = create_command_tree(window)
   elseif vim.api.nvim_win_is_valid(command_tree.window) then
     vim.api.nvim_set_current_win(command_tree.window)
+    vim.cmd('startinsert!')
   else
     command_trees[window]:open()
   end
@@ -29,12 +30,11 @@ vim.keymap.set('n', '<m-space>', toggle)
 
 vim.api.nvim_create_autocmd('WinClosed', {
   group = 'bsuth',
-  callback = function()
-    for window, command_tree in pairs(command_trees) do
-      if not vim.api.nvim_win_is_valid(window) then
-        command_tree:destroy()
-        command_trees[window] = nil
-      end
+  callback = function(params)
+    local window = tonumber(params.match)
+    if window and command_trees[window] ~= nil then
+      command_trees[window]:destroy()
+      command_trees[window] = nil
     end
   end,
 })
@@ -43,10 +43,10 @@ vim.api.nvim_create_autocmd('WinResized', {
   group = 'bsuth',
   callback = function()
     for window, command_tree in pairs(command_trees) do
-      if command_tree.window ~= -1 and table.has(vim.api.nvim_get_vvar('event').windows, window) then
+      if table.has(vim.api.nvim_get_vvar('event').windows, window) and command_tree.window ~= -1 then
         command_tree:render()
         vim.api.nvim_win_set_config(command_tree.window, {
-          width = vim.api.nvim_win_get_width(command_tree.window),
+          width = vim.api.nvim_win_get_width(window),
         })
       end
     end

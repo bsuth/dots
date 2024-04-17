@@ -1,4 +1,5 @@
 local path = require('utils.path')
+local string = require('utils.stdlib').string
 
 local M = {}
 
@@ -97,6 +98,7 @@ function M.file(cwd)
 end
 
 function M.grep(text, cwd)
+  text = text or ''
   cwd = cwd or vim.fn.getcwd()
 
   local commands = {}
@@ -132,7 +134,7 @@ function M.help()
     local file = assert(io.open(filepath, 'r'))
 
     for line in file:lines() do
-      local name = line:split()[1]
+      local name = string.split(line)[1]
 
       table.insert(commands, {
         label = name,
