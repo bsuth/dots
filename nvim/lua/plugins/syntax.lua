@@ -33,6 +33,7 @@ treesitter_configs.setup({
   ensure_installed = {
     'bash',
     'c',
+    'cpp',
     'css',
     'dockerfile',
     'elixir',

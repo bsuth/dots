@@ -1,46 +1,62 @@
 local catnip = require('catnip')
-local table = require('utils.stdlib').table
+local table = require('extern.stdlib').table
+local onedark = require('utils.onedark')
 
 local wallpapers = {}
 
-local wallpaper_svg = catnip.svg('wallpaper.svg')
+local COLORS = {
+  radius = 20,
+  spacing = 24,
+  onedark.red,
+  onedark.yellow,
+  onedark.green,
+  onedark.cyan,
+  onedark.blue,
+  onedark.magenta,
+}
 
-local function render_wallpaper_canvas(wallpaper)
-  wallpaper.canvas:clear()
-  wallpaper.canvas:svg(wallpaper_svg, {
-    x = wallpaper.output.x,
-    y = wallpaper.output.y,
-    width = wallpaper.output.width,
-    height = wallpaper.output.height,
+-- TODO: handle mirrored outputs
+catnip.subscribe('output::create', function(output)
+  local canvas = catnip.canvas({
+    x = output.x,
+    y = output.y,
+    width = output.width,
+    height = output.height,
   })
-end
 
-local function create_wallpaper(output)
-  local wallpaper = {
+  -- Ensure the wallpaper is in the back
+  canvas.z = 0
+
+  canvas:rectangle({
+    x = 0,
+    y = 0,
+    width = canvas.width,
+    height = canvas.height,
+    fill_color = onedark.dark_gray,
+  })
+
+  local color_row_width = (#COLORS - 1) * COLORS.spacing + 2 * COLORS.radius
+  local color_row_x = (canvas.width - color_row_width) / 2
+
+  for i, color in ipairs(COLORS) do
+    local x = color_row_x + (i - 1) * COLORS.spacing
+    local y = canvas.height / 2 - COLORS.radius
+
+    canvas:path({
+      fill_color = color,
+      { 'move', x,             y },
+      { 'arc',  COLORS.radius, 0, 2 * math.pi },
+    })
+  end
+
+  table.insert(wallpapers, {
     output = output,
-    canvas = catnip.canvas({
-      x = output.x,
-      y = output.y,
-      width = output.width,
-      height = output.height,
-    }),
-  }
-
-  -- TODO: ensure the wallpaper is always in the back
-  render_wallpaper_canvas(wallpaper)
-  table.insert(wallpapers, wallpaper)
-end
+    canvas = canvas,
+  })
+end)
 
 catnip.subscribe('output::destroy', function(output)
   table.clear(wallpapers, function(wallpaper)
     return wallpaper.output ~= output
   end)
 end)
-
-do
-  catnip.subscribe('output::create', create_wallpaper)
-
-  for output in catnip.outputs do
-    create_wallpaper(output)
-  end
-end

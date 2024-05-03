@@ -1,62 +1,7 @@
-local M = {
-  coroutine = {},
-  debug = {},
-  io = {},
-  math = {},
-  os = {},
-  package = {},
-  string = {},
-  table = {},
-}
+local M = {}
 
 -- -----------------------------------------------------------------------------
--- Load / Unload
--- -----------------------------------------------------------------------------
-
-function M.load()
-  for key, value in pairs(M) do
-    local value_type = type(value)
-
-    if value_type == 'function' then
-      if key ~= 'load' and key ~= 'unload' then
-        _G[key] = value
-      end
-    elseif value_type == 'table' then
-      local library = _G[key]
-
-      if type(library) == 'table' then
-        for subkey, subvalue in pairs(value) do
-          library[subkey] = subvalue
-        end
-      end
-    end
-  end
-end
-
-function M.unload()
-  for key, value in pairs(M) do
-    local value_type = type(value)
-
-    if value_type == 'function' then
-      if _G[key] == value then -- only remove values we injected
-        _G[key] = nil
-      end
-    elseif value_type == 'table' then
-      local library = _G[key]
-
-      if type(library) == 'table' then
-        for subkey, subvalue in pairs(value) do
-          if library[subkey] == subvalue then -- only remove values we injected
-            library[subkey] = nil
-          end
-        end
-      end
-    end
-  end
-end
-
--- -----------------------------------------------------------------------------
--- Globals
+-- Top Level
 -- -----------------------------------------------------------------------------
 
 local function _kpairs_iter(a, i)
@@ -69,13 +14,25 @@ local function _kpairs_iter(a, i)
   return key, value
 end
 
+--- @generic V
+--- @param t table<string, V>
+--- @return fun(a: { [string]: V }, i?: string): string, V
+--- @return V
+--- @return nil
 function M.kpairs(t)
   return _kpairs_iter, t, nil
 end
 
+--- @param a unknown
+--- @param b unknown
+--- @return boolean
 function M.compare(a, b)
   if type(a) ~= 'table' or type(b) ~= 'table' then
     return a == b
+  end
+
+  if a == b then
+    return true
   end
 
   for key in pairs(a) do
@@ -90,8 +47,8 @@ function M.compare(a, b)
     end
   end
 
-  for key, value in pairs(a) do
-    if not M.compare(value, b[key]) then
+  for key in pairs(a) do
+    if not M.compare(a[key], b[key]) then
       return false
     end
   end
@@ -103,19 +60,26 @@ end
 -- Coroutine
 -- -----------------------------------------------------------------------------
 
--- EMPTY
+--- @class coroutine: coroutinelib
+local coroutine = setmetatable({}, { __index = coroutine })
 
 -- -----------------------------------------------------------------------------
 -- Debug
 -- -----------------------------------------------------------------------------
 
--- EMPTY
+--- @class debug: debuglib
+local debug = setmetatable({}, { __index = debug })
 
 -- -----------------------------------------------------------------------------
 -- IO
 -- -----------------------------------------------------------------------------
 
-function M.io.exists(path)
+--- @class io: iolib
+local io = setmetatable({}, { __index = io })
+
+--- @param path string
+--- @return boolean
+function io.exists(path)
   local file = io.open(path, 'r')
 
   if file == nil then
@@ -127,14 +91,18 @@ function M.io.exists(path)
   return true
 end
 
-function M.io.readfile(path)
+--- @param path string
+--- @return string
+function io.readfile(path)
   local file = assert(io.open(path, 'r'))
   local content = assert(file:read('*a'))
   file:close()
   return content
 end
 
-function M.io.writefile(path, content)
+--- @param path string
+--- @param content string
+function io.writefile(path, content)
   local file = assert(io.open(path, 'w'))
   assert(file:write(content))
   file:close()
@@ -144,11 +112,20 @@ end
 -- Math
 -- -----------------------------------------------------------------------------
 
-function M.math.clamp(x, min, max)
+--- @class math: mathlib
+local math = setmetatable({}, { __index = math })
+
+--- @param x number
+--- @param min number
+--- @param max number
+--- @return number
+function math.clamp(x, min, max)
   return math.min(math.max(x, min), max)
 end
 
-function M.math.round(x)
+--- @param x number
+--- @return number
+function math.round(x)
   if x < 0 then
     return math.ceil(x - 0.5)
   else
@@ -160,7 +137,12 @@ end
 -- OS
 -- -----------------------------------------------------------------------------
 
-function M.os.capture(cmd)
+--- @class os: oslib
+local os = setmetatable({}, { __index = os })
+
+--- @param cmd string
+--- @return string
+function os.capture(cmd)
   local file = assert(io.popen(cmd, 'r'))
   local stdout = assert(file:read('*a'))
   file:close()
@@ -172,10 +154,15 @@ end
 -- -----------------------------------------------------------------------------
 
 -- EMPTY
+--- @class package: packagelib
+local package = setmetatable({}, { __index = package })
 
 -- -----------------------------------------------------------------------------
 -- String
 -- -----------------------------------------------------------------------------
+
+--- @class string: stringlib
+local string = setmetatable({}, { __index = string })
 
 local function _string_chars_iter(a, i)
   i = i + 1
@@ -185,16 +172,25 @@ local function _string_chars_iter(a, i)
   end
 end
 
-function M.string.chars(s)
+--- @param s string
+--- @return fun(a: string, i?: number): number, string
+--- @return string
+--- @return number
+function string.chars(s)
   return _string_chars_iter, s, 0
 end
 
-function M.string.escape(s)
+--- @param s string
+--- @return string
+function string.escape(s)
   -- Wrap in parentheses to ensure we return only 1 value.
   return (s:gsub('[().%%+%-*?[^$]', '%%%1'))
 end
 
-function M.string.split(s, separator)
+--- @param s string
+--- @param separator? string
+--- @return string[]
+function string.split(s, separator)
   separator = separator or '%s+'
 
   local result = {}
@@ -210,7 +206,10 @@ function M.string.split(s, separator)
   return result
 end
 
-function M.string.trim(s, pattern)
+--- @param s string
+--- @param pattern? string
+--- @return string
+function string.trim(s, pattern)
   pattern = pattern or '%s+'
   -- Wrap in parentheses to ensure we return only 1 value.
   return (s:gsub('^' .. pattern, ''):gsub(pattern .. '$', ''))
@@ -220,13 +219,20 @@ end
 -- Table
 -- -----------------------------------------------------------------------------
 
+--- @class table: tablelib
+local table = setmetatable({}, { __index = table })
+
 -- Polyfill `table.pack` and `table.unpack`
 if _VERSION == 'Lua 5.1' then
-  M.table.pack = function(...) return { n = select('#', ...), ... } end
-  M.table.unpack = unpack
+  --- @diagnostic disable-next-line: duplicate-set-field
+  table.pack = function(...) return { n = select('#', ...), ... } end
+  --- @diagnostic disable-next-line: deprecated
+  table.unpack = unpack
 end
 
-function M.table.assign(t, ...)
+--- @param t table
+--- @param ... table
+function table.assign(t, ...)
   for _, _t in pairs({ ... }) do
     for key, value in pairs(_t) do
       if type(key) == 'number' then
@@ -238,38 +244,44 @@ function M.table.assign(t, ...)
   end
 end
 
-function M.table.clear(t, callback)
-  if type(callback) == 'function' then
+--- @generic K, V
+--- @param t table<K, V>
+--- @param condition V | fun(value: V, key: K): boolean
+function table.clear(t, condition)
+  if type(condition) == 'function' then
     for key, value in M.kpairs(t) do
-      if callback(value, key) then
+      if condition(value, key) then
         t[key] = nil
       end
     end
 
     for i = #t, 1, -1 do
-      if callback(t[i], i) then
+      if condition(t[i], i) then
         table.remove(t, i)
       end
     end
   else
     for key, value in M.kpairs(t) do
-      if value == callback then
+      if value == condition then
         t[key] = nil
       end
     end
 
     for i = #t, 1, -1 do
-      if t[i] == callback then
+      if t[i] == condition then
         table.remove(t, i)
       end
     end
   end
 end
 
-function M.table.collect(...)
+--- @param iterator fun(): unknown, unknown | nil
+--- @param ... unknown
+--- @return table
+function table.collect(iterator, ...)
   local result = {}
 
-  for key, value in ... do
+  for key, value in iterator, ... do
     if value == nil then
       table.insert(result, key)
     else
@@ -280,12 +292,15 @@ function M.table.collect(...)
   return result
 end
 
-function M.table.deepcopy(t)
+--- @generic K, V
+--- @param t table<K, V>
+--- @return table<K, V>
+function table.deepcopy(t)
   local result = {}
 
   for key, value in pairs(t) do
     if type(value) == 'table' then
-      result[key] = M.table.deepcopy(value)
+      result[key] = table.deepcopy(value)
     else
       result[key] = value
     end
@@ -294,7 +309,11 @@ function M.table.deepcopy(t)
   return result
 end
 
-function M.table.filter(t, callback)
+--- @generic K, V
+--- @param t table<K, V>
+--- @param callback fun(value: V, key: K): boolean
+--- @return table<K, V>
+function table.filter(t, callback)
   local result = {}
 
   for key, value in pairs(t) do
@@ -310,28 +329,40 @@ function M.table.filter(t, callback)
   return result
 end
 
-function M.table.find(t, callback)
-  if type(callback) == 'function' then
+--- @generic K, V
+--- @param t table<K, V>
+--- @param condition V | fun(value: V, key: K): boolean
+--- @return V | nil
+--- @return K | nil
+function table.find(t, condition)
+  if type(condition) == 'function' then
     for key, value in pairs(t) do
-      if callback(value, key) then
+      if condition(value, key) then
         return value, key
       end
     end
   else
     for key, value in pairs(t) do
-      if value == callback then
+      if value == condition then
         return value, key
       end
     end
   end
 end
 
-function M.table.has(t, callback)
-  local _, key = M.table.find(t, callback)
+--- @generic K, V
+--- @param t table<K, V>
+--- @param condition V | fun(value: V, key: K): boolean
+--- @return boolean
+function table.has(t, condition)
+  local _, key = table.find(t, condition)
   return key ~= nil
 end
 
-function M.table.keys(t)
+--- @generic K
+--- @param t table<K>
+--- @return K[]
+function table.keys(t)
   local result = {}
 
   for key in pairs(t) do
@@ -341,7 +372,11 @@ function M.table.keys(t)
   return result
 end
 
-function M.table.map(t, callback)
+--- @generic K, V, nK, nV
+--- @param t table<K, V>
+--- @param callback fun(value: V, key: K): unknown, unknown | nil
+--- @return table
+function table.map(t, callback)
   local result = {}
 
   for key, value in pairs(t) do
@@ -359,13 +394,20 @@ function M.table.map(t, callback)
   return result
 end
 
-function M.table.merge(...)
+--- @param ... table
+--- @return table
+function table.merge(...)
   local result = {}
-  M.table.assign(result, ...)
+  table.assign(result, ...)
   return result
 end
 
-function M.table.reduce(t, initial, callback)
+--- @generic K, V, I, R
+--- @param t table<K, V>
+--- @param initial I
+--- @param callback fun(result: I | R, value: V, key: K): R
+--- @return I | R
+function table.reduce(t, initial, callback)
   local result = initial
 
   for key, value in pairs(t) do
@@ -375,7 +417,8 @@ function M.table.reduce(t, initial, callback)
   return result
 end
 
-function M.table.reverse(t)
+--- @param t table
+function table.reverse(t)
   local len = #t
 
   for i = 1, math.floor(len / 2) do
@@ -383,7 +426,10 @@ function M.table.reverse(t)
   end
 end
 
-function M.table.shallowcopy(t)
+--- @generic K, V
+--- @param t table<K, V>
+--- @return table<K, V>
+function table.shallowcopy(t)
   local result = {}
 
   for key, value in pairs(t) do
@@ -393,7 +439,10 @@ function M.table.shallowcopy(t)
   return result
 end
 
-function M.table.slice(t, i, j)
+--- @generic V
+--- @param t V[]
+--- @return V[]
+function table.slice(t, i, j)
   local len = #t
 
   i = i or 1
@@ -404,14 +453,17 @@ function M.table.slice(t, i, j)
   if i < 0 then i = i + len + 1 end
   if j < 0 then j = j + len + 1 end
 
-  for k = math.max(i, 0), math.min(j, len) do
+  for k = math.max(i, 1), math.min(j, len) do
     table.insert(result, t[k])
   end
 
   return result
 end
 
-function M.table.values(t)
+--- @generic K, V
+--- @param t table<K, V>
+--- @return V[]
+function table.values(t)
   local result = {}
 
   for _, value in pairs(t) do
@@ -422,23 +474,19 @@ function M.table.values(t)
 end
 
 -- -----------------------------------------------------------------------------
--- Library Metatables
---
--- Set library metatables. We must do this at the end, since our libraries will
--- effectively be frozen once the `__newindex` metamethod is set.
--- -----------------------------------------------------------------------------
-
-setmetatable(M.coroutine, { __index = coroutine, __newindex = coroutine })
-setmetatable(M.debug, { __index = debug, __newindex = debug })
-setmetatable(M.io, { __index = io, __newindex = io })
-setmetatable(M.math, { __index = math, __newindex = math })
-setmetatable(M.os, { __index = os, __newindex = os })
-setmetatable(M.package, { __index = package, __newindex = package })
-setmetatable(M.string, { __index = string, __newindex = string })
-setmetatable(M.table, { __index = table, __newindex = table })
-
--- -----------------------------------------------------------------------------
 -- Return
+--
+-- Note: Libraries are declared as standalone tables and then injected here in
+-- order to get proper `@class` annotations from LuaCATS.
 -- -----------------------------------------------------------------------------
+
+M.coroutine = coroutine
+M.debug = debug
+M.io = io
+M.math = math
+M.os = os
+M.package = package
+M.string = string
+M.table = table
 
 return M

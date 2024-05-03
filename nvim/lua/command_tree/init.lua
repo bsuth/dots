@@ -32,9 +32,16 @@ vim.api.nvim_create_autocmd('WinClosed', {
   group = 'bsuth',
   callback = function(params)
     local window = tonumber(params.match)
+
     if window and command_trees[window] ~= nil then
       command_trees[window]:destroy()
       command_trees[window] = nil
+    end
+
+    for _, command_tree in pairs(command_trees) do
+      if window == command_tree.window then
+        command_tree:close()
+      end
     end
   end,
 })

@@ -30,7 +30,7 @@ vim.api.nvim_create_autocmd('BufModifiedSet', {
 local function has_ancestor(filenames)
   local dir = path.lead(path.dirname(vim.api.nvim_buf_get_name(0)))
 
-  while dir:match("^{ HOME }") do
+  while dir:match('^' .. C.HOME) do
     for _, filename in ipairs(filenames) do
       if io.exists(path.join(dir, filename)) then
         return true
@@ -111,7 +111,7 @@ vim.api.nvim_create_autocmd('BufWritePost', {
   pattern = C.C_PATTERNS,
   callback = function()
     if has_ancestor({ '.clang-format' }) then
-      format_sync("clang-format { vim.api.nvim_buf_get_name(0) }")
+      format_sync('clang-format ' .. vim.api.nvim_buf_get_name(0))
     end
   end,
 })

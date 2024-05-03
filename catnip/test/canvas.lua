@@ -4,10 +4,9 @@ local keymap = require('keymap')
 local canvas = catnip.canvas({ width = 500, height = 700 })
 local alternate = false
 
-local test_png = catnip.png('test.png')
-local test_svg = catnip.svg('test.svg', {
-  stylesheet = alternate and 'path { stroke: red }' or 'path { fill: blue }',
-})
+local test_png = catnip.png('test/test.png')
+local test_svg = catnip.svg('test/test.svg')
+test_svg:apply('path { stroke: red }')
 
 keymap({ 'ctrl' }, 't', function()
   canvas:clear()

@@ -1,13 +1,13 @@
---- @module 'catnip'
+---@module 'extern.catnip'
 
---- @class CatmintTileSpace
---- @field x number
---- @field y number
---- @field width number
---- @field height number
---- @field gap number
+---@class CatmintTileSpace
+---@field x number
+---@field y number
+---@field width number
+---@field height number
+---@field gap number
 
---- @type table<string, fun(windows: CatnipWindow[], space: CatmintTileSpace)>
+---@type table<string, fun(windows: CatnipWindow[], space: CatmintTileSpace)>
 local M = {}
 
 -- Stretches all windows to fill the entire tile space. If there is more than 1
@@ -25,8 +25,10 @@ local M = {}
 -- -------------------------
 function M.max(windows, space)
   for _, window in ipairs(windows) do
-    window:move(space.x, space.y)
-    window:resize(space.width, space.height)
+    window.x = space.x
+    window.y = space.y
+    window.width = space.width
+    window.height = space.height
   end
 end
 
@@ -48,8 +50,10 @@ function M.split_horizontal(windows, space)
   local window_width = (space.width - total_gap) / num_windows
 
   for i, window in ipairs(windows) do
-    window:move(space.x + (i - 1) * (window_width + space.gap), space.y)
-    window:resize(window_width, space.height)
+    window.x = space.x + (i - 1) * (window_width + space.gap)
+    window.y = space.y
+    window.width = window_width
+    window.height = space.height
   end
 end
 
@@ -72,8 +76,10 @@ function M.split_vertical(windows, space)
   local window_height = (space.height - total_gap) / num_windows
 
   for i, window in ipairs(windows) do
-    window:move(space.x, space.y + (i - 1) * (window_height + space.gap))
-    window:resize(space.width, window_height)
+    window.x = space.x
+    window.y = space.y + (i - 1) * (window_height + space.gap)
+    window.width = space.width
+    window.height = window_height
   end
 end
 
