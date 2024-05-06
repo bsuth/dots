@@ -79,11 +79,10 @@ local cmp_nvim_lsp = require('cmp_nvim_lsp')
 local LSP_SERVERS = {
   clangd = {},
   cssls = {},
+  elixirls = { cmd = { path.join(C.HOME, '.local/share/nvim/mason/bin/elixir-ls') } },
   eslint = {},
   jsonls = {},
-  elixirls = {
-    cmd = { path.join(C.HOME, '.local/share/nvim/mason/bin/elixir-ls') },
-  },
+  lua_ls = {},
   tailwindcss = {},
   tsserver = {},
   volar = {
@@ -94,15 +93,6 @@ local LSP_SERVERS = {
           unknownAtRules = 'ignore',
         },
       }
-    },
-  },
-  lua_ls = {
-    Lua = {
-      format = {
-        enable = true,
-        defaultConfig = {
-        },
-      },
     },
   },
 }
