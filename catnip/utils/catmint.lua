@@ -6,8 +6,8 @@ local M = {}
 --- Directions
 --- ----------------------------------------------------------------------------
 
----@param source { x: number, y: number, width: number | nil, height: number | nil}
----@param target { x: number, y: number, width: number | nil, height: number | nil}
+---@param source { x: number, y: number, width: number | nil, height: number | nil }
+---@param target { x: number, y: number, width: number | nil, height: number | nil }
 ---@param direction 'left' | 'right' | 'up' | 'down'
 ---@return boolean
 function M.is_in_direction(source, target, direction)
@@ -40,8 +40,8 @@ function M.is_in_direction(source, target, direction)
   end
 end
 
----@param source { x: number, y: number, width: number | nil, height: number | nil}
----@param target { x: number, y: number, width: number | nil, height: number | nil}
+---@param source { x: number, y: number, width: number | nil, height: number | nil }
+---@param target { x: number, y: number, width: number | nil, height: number | nil }
 ---@param direction 'left' | 'right' | 'up' | 'down'
 ---@return number
 function M.get_distance_in_direction(source, target, direction)
@@ -86,6 +86,12 @@ function M.get_cursor_outputs()
   return cursor_outputs
 end
 
+---@param box { x: number, y: number, width: number, height: number }
+function M.center_cursor(box)
+  catnip.cursor.x = box.x + box.width / 2
+  catnip.cursor.y = box.y + box.height / 2
+end
+
 --- ----------------------------------------------------------------------------
 --- Outputs
 --- ----------------------------------------------------------------------------
@@ -106,7 +112,7 @@ function M.get_output_windows(output)
   return output_windows, num_output_windows
 end
 
----@param source { x: number, y: number, width: number | nil, height: number | nil}
+---@param source { x: number, y: number, width: number | nil, height: number | nil }
 ---@param direction 'left' | 'right' | 'up' | 'down'
 ---@return CatnipOutput | nil
 function M.get_output_in_direction(source, direction)
@@ -200,7 +206,7 @@ function M.get_window_outputs(window)
   return window_outputs
 end
 
----@param source { x: number, y: number, width: number | nil, height: number | nil}
+---@param source { x: number, y: number, width: number | nil, height: number | nil }
 ---@param direction 'left' | 'right' | 'up' | 'down'
 ---@return CatnipWindow | nil
 function M.get_window_in_direction(source, direction)

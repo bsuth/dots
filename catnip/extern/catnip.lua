@@ -2,8 +2,7 @@
 
 ---@alias CatnipResourceList<T> { [number]: T } | fun(): T
 
----@class (exact) CatnipResource
----@field id number
+---@class CatnipResource
 ---@field data table
 ---@field subscribe fun(self: self, event: string, callback: fun(...)): fun(...)
 ---@field unsubscribe fun(self: self, event: string, callback: fun(...))
@@ -11,9 +10,9 @@
 
 ---@class (exact) Catnip
 ---@field cursor CatnipCursor
----@field keyboards CatnipResourceList<CatnipKeyboard>
 ---@field outputs CatnipResourceList<CatnipOutput>
 ---@field windows CatnipResourceList<CatnipWindow>
+---@field keyboards CatnipResourceList<CatnipKeyboard>
 ---@field canvas fun(params: table): CatnipCanvas
 ---@field png fun(path: string): CatnipPng
 ---@field svg fun(document: string): CatnipSvg
@@ -39,6 +38,7 @@
 ---@field visible boolean
 ---@field path fun(self: CatnipCanvas, path: CatnipCanvasPath)
 ---@field rectangle fun(self: CatnipCanvas, path: CatnipCanvasRectangle)
+---@field circle fun(self: CatnipCanvas, path: CatnipCanvasCircle)
 ---@field text fun(self: CatnipCanvas, text: string, options: CatnipCanvasTextOptions?)
 ---@field png fun(self: CatnipCanvas, png: CatnipPng, options: CatnipCanvasPngOptions?)
 ---@field svg fun(self: CatnipCanvas, svg: CatnipSvg, options: CatnipCanvasSvgOptions?)
@@ -71,6 +71,16 @@
 ---@field radius_top_right number?
 ---@field radius_bottom_right number?
 ---@field radius_bottom_left number?
+---@field fill_color number?
+---@field fill_opacity number?
+---@field stroke_color number?
+---@field stroke_opacity number?
+---@field stroke_size number?
+
+---@class CatnipCanvasCircle
+---@field x number?
+---@field y number?
+---@field radius number?
 ---@field fill_color number?
 ---@field fill_opacity number?
 ---@field stroke_color number?
@@ -113,6 +123,7 @@
 ---@field theme string
 
 ---@class (exact) CatnipKeyboard: CatnipResource
+---@field id number
 ---@field name string
 ---@field xkb_rules string?
 ---@field xkb_model string?
@@ -121,6 +132,7 @@
 ---@field xkb_options string?
 
 ---@class (exact) CatnipOutput: CatnipResource
+---@field id number
 ---@field x number
 ---@field y number
 ---@field width number
@@ -136,6 +148,7 @@
 ---@field refresh number
 
 ---@class (exact) CatnipWindow: CatnipResource
+---@field id number
 ---@field x number
 ---@field y number
 ---@field z number

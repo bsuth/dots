@@ -4,8 +4,6 @@ local catmint = require('utils.catmint')
 local keymap = require('keymap')
 
 require('desktop')
-require('wallpaper')
-require('bar')
 
 catnip.subscribe('tick', function()
   uv.run('nowait')
