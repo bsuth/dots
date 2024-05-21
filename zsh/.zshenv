@@ -84,10 +84,3 @@ function erdedev() {
   alias erde5.3="lua5.3 $ERDE_ROOT/erde/cli.lua"
   alias erde5.4="lua5.4 $ERDE_ROOT/erde/cli.lua"
 }
-
-export LUI_ROOT="$HOME/repos/lui"
-export LUA_PATH="$LUI_ROOT/?.lua;$LUI_ROOT/?/init.lua;$LUA_PATH"
-export LUA_PATH_5_2="$LUI_ROOT/?.lua;$LUI_ROOT/?/init.lua;$LUA_PATH_5_2"
-export LUA_PATH_5_3="$LUI_ROOT/?.lua;$LUI_ROOT/?/init.lua;$LUA_PATH_5_3"
-export LUA_PATH_5_4="$LUI_ROOT/?.lua;$LUI_ROOT/?/init.lua;$LUA_PATH_5_4"
-export PATH="$LUI_ROOT/bin:$PATH"

@@ -1,5 +1,5 @@
 local catnip = require('catnip')
-local keymap = require('keymap')
+local key = require('key')
 local Workspace = require('desktop.workspace')
 local catmint = require('utils.catmint')
 
@@ -48,7 +48,7 @@ local function get_workspace_in_direction(source, direction)
   local output = catmint.get_output_in_direction(source, direction)
   if output == nil then return end
   local workspace = output.data.workspace
-  return workspace.mirror ~= nil and workspace.mirror or workspace
+  return workspace.mirrored_workspace ~= nil and workspace.mirrored_workspace or workspace
 end
 
 ---@param direction 'left' | 'right' | 'up' | 'down'
@@ -120,26 +120,26 @@ end
 -- Keymaps
 -- -----------------------------------------------------------------------------
 
-keymap({ 'mod1' }, 'h', function() focus_in_direction('left') end)
-keymap({ 'mod1' }, 'j', function() focus_in_direction('down') end)
-keymap({ 'mod1' }, 'k', function() focus_in_direction('up') end)
-keymap({ 'mod1' }, 'l', function() focus_in_direction('right') end)
+key.release({ 'mod1' }, 'h', function() focus_in_direction('left') end)
+key.release({ 'mod1' }, 'j', function() focus_in_direction('down') end)
+key.release({ 'mod1' }, 'k', function() focus_in_direction('up') end)
+key.release({ 'mod1' }, 'l', function() focus_in_direction('right') end)
 
-keymap({ 'mod1' }, 'H', function() move_in_direction('left') end)
-keymap({ 'mod1' }, 'J', function() move_in_direction('down') end)
-keymap({ 'mod1' }, 'K', function() move_in_direction('up') end)
-keymap({ 'mod1' }, 'L', function() move_in_direction('right') end)
+key.release({ 'mod1' }, 'H', function() move_in_direction('left') end)
+key.release({ 'mod1' }, 'J', function() move_in_direction('down') end)
+key.release({ 'mod1' }, 'K', function() move_in_direction('up') end)
+key.release({ 'mod1' }, 'L', function() move_in_direction('right') end)
 
-keymap({ 'mod1', 'ctrl' }, 'H', function() swap_in_direction('left') end)
-keymap({ 'mod1', 'ctrl' }, 'J', function() swap_in_direction('down') end)
-keymap({ 'mod1', 'ctrl' }, 'K', function() swap_in_direction('up') end)
-keymap({ 'mod1', 'ctrl' }, 'L', function() swap_in_direction('right') end)
+key.release({ 'mod1', 'ctrl' }, 'H', function() swap_in_direction('left') end)
+key.release({ 'mod1', 'ctrl' }, 'J', function() swap_in_direction('down') end)
+key.release({ 'mod1', 'ctrl' }, 'K', function() swap_in_direction('up') end)
+key.release({ 'mod1', 'ctrl' }, 'L', function() swap_in_direction('right') end)
 
-keymap({ 'mod1' }, 'Tab', function() cycle_focused_workspace('forwards') end)
-keymap({ 'mod1', 'shift' }, 'ISO_Left_Tab', function() cycle_focused_workspace('backwards') end)
+key.release({ 'mod1' }, 'Tab', function() cycle_focused_workspace('forwards') end)
+key.release({ 'mod1' }, 'ISO_Left_Tab', function() cycle_focused_workspace('backwards') end)
 
-keymap({ 'mod1' }, '>', function() shift_focused_workspace('forwards') end)
-keymap({ 'mod1' }, '<', function() shift_focused_workspace('backwards') end)
+key.release({ 'mod1' }, '>', function() shift_focused_workspace('forwards') end)
+key.release({ 'mod1' }, '<', function() shift_focused_workspace('backwards') end)
 
 -- -----------------------------------------------------------------------------
 -- Subscriptions

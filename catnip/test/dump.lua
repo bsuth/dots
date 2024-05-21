@@ -1,5 +1,5 @@
 local catnip = require('catnip')
-local keymap = require('keymap')
+local key = require('key')
 
 local function dump_object(name, object, fields)
   print(name .. ' {')
@@ -78,9 +78,10 @@ local function dump_windows()
   end
 end
 
-keymap({ 'mod1' }, 'd', function()
+key.release({ 'mod1' }, 'd', function()
   dump_cursor()
   dump_keyboards()
   dump_outputs()
   dump_windows()
 end)
+

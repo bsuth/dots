@@ -1,5 +1,4 @@
 local catnip = require('catnip')
-local keymap = require('keymap')
 local catmint = require('utils.catmint')
 local onedark = require('utils.onedark')
 local table = require('extern.stdlib').table
@@ -57,7 +56,5 @@ function console:toggle()
 
   console:render()
 end
-
-keymap({ 'mod1' }, 'c', function() console:toggle() end)
 
 return console
