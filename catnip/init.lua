@@ -2,23 +2,28 @@ local uv = require('luv')
 local catnip = require('catnip')
 local key = require('key')
 local glib = require('ffi.glib')
-local dbus = require('lib.dbus')
 
 require('desktop')
 
 key.release({ 'mod1' }, 'c', function() require('keylog'):toggle() end)
 
+-- -----------------------------------------------------------------------------
+-- Main Loop Integrations
+-- -----------------------------------------------------------------------------
+
+local function g_main_iteration()
+  glib.g_main_context_iteration(nil, false)
+end
+
+-- Force prevent JIT compiling, since the LuaJIT interpreter cannot detect that
+-- `g_main_context_iteration` may call back into Lua (since it only occasionally
+-- calls back into Lua). See http://luajit.org/ext_ffi_semantics.html#callback
+-- for details.
+jit.off(g_main_iteration)
+
 catnip.subscribe('tick', function()
   uv.run('nowait')
-
-  -- TODO: For some reason, `g_main_context_iteration` must be wrapped as the
-  -- return of a newly created IIFE, otherwise LuaJIT throws with
-  -- `PANIC: unprotected error in call to Lua API (bad callback)`.
-  --
-  -- Possibly helpful: http://luajit.org/ext_ffi_semantics.html#callback
-  -- Need to prevent something from being JIT compiled?
-  local iterate = function() return glib.g_main_context_iteration(nil, false) end
-  iterate()
+  g_main_iteration()
 end)
 
 -- -----------------------------------------------------------------------------
@@ -44,7 +49,3 @@ end)
 -- -----------------------------------------------------------------------------
 -- Test
 -- -----------------------------------------------------------------------------
-
-dbus.system:subscribe({}, function(signal)
-  print(require('inspect')(signal))
-end)

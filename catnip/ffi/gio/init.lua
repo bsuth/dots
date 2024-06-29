@@ -1,5 +1,6 @@
 local ffi = require("ffi")
 
+require('ffi.gobject')
 require('ffi.gio.gio_types')
 require('ffi.gio.gio_enums')
 require('ffi.gio.g_dbus_connection')

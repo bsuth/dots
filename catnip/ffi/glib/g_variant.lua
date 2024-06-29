@@ -22,6 +22,7 @@ GVariant* g_variant_new_uint32(guint32 value);
 GVariant* g_variant_new_uint64(guint64 value);
 
 GVariant* g_variant_ref(GVariant *value);
+GVariant* g_variant_ref_sink(GVariant* value);
 void g_variant_unref(GVariant *value);
 gboolean g_variant_is_floating(GVariant *value);
 

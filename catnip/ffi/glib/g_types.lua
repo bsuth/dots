@@ -47,13 +47,6 @@ typedef signed long gintptr;
 typedef unsigned long guintptr;
 ]])
 
--- https://docs.gtk.org/glib/index.html#classes
-
-ffi.cdef([[
-  typedef struct {} GError;
-  typedef struct {} GObject;
-]])
-
 -- https://docs.gtk.org/glib/index.html#callbacks
 -- /usr/include/glib-2.0/glib/gtypes.h
 

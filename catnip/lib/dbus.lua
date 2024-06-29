@@ -3,7 +3,14 @@ local glib = require('ffi.glib')
 local gio = require('ffi.gio')
 local g_variant = require('lib.g_variant')
 
+local M = {}
+
+-- -----------------------------------------------------------------------------
+-- Types
+-- -----------------------------------------------------------------------------
+
 ---@class DBusCallArgs
+---@field connection ffi.cdata*
 ---@field bus_name string
 ---@field object_path string
 ---@field interface_name string
@@ -15,10 +22,11 @@ local g_variant = require('lib.g_variant')
 ---@field timeout? number
 
 ---@class DBusSubscriptionArgs
----@field sender? string
----@field member? string
+---@field connection ffi.cdata*
 ---@field object_path? string
 ---@field interface_name? string
+---@field signal_name? string
+---@field sender_name? string
 ---@field arg0? string
 ---@field flags? number
 ---@field timeout? number
@@ -31,17 +39,12 @@ local g_variant = require('lib.g_variant')
 ---@field parameters any
 
 -- -----------------------------------------------------------------------------
--- DBus
+-- API
 -- -----------------------------------------------------------------------------
 
-local DBus = {}
-local DBusMT = { __index = DBus }
-
 ---@param args DBusCallArgs
----@return fun(callback: fun(result: any))
-function DBus:call(args)
-  local callback ---@type fun(result: any) | nil
-
+---@param callback? fun(result: any)
+function M.call(args, callback)
   local parameters_g_variant = (args.parameters_type ~= nil and args.parameters ~= nil)
       and g_variant.from_lua(args.parameters_type, args.parameters)
       or nil
@@ -51,21 +54,23 @@ function DBus:call(args)
       or nil
 
   local g_async_ready_callback = function(_, result, _)
-    if callback ~= nil then
-      local variant = gio.g_dbus_connection_call_finish(self.connection, result, nil)
-      local lua_variant = nil
-
-      if variant ~= nil then
-        lua_variant = g_variant.to_lua(variant)
-        glib.g_variant_unref(variant)
-      end
-
-      callback(lua_variant)
+    if callback == nil then
+      return
     end
+
+    local variant = gio.g_dbus_connection_call_finish(args.connection, result, nil)
+    local lua_variant = nil
+
+    if variant ~= nil then
+      lua_variant = g_variant.to_lua(variant)
+      glib.g_variant_unref(variant)
+    end
+
+    callback(lua_variant)
   end
 
   gio.g_dbus_connection_call(
-    self.connection,
+    args.connection,
     args.bus_name,
     args.object_path,
     args.interface_name,
@@ -78,15 +83,11 @@ function DBus:call(args)
     g_async_ready_callback,
     nil
   )
-
-  return function(new_callback)
-    callback = new_callback
-  end
 end
 
 ---@param args DBusCallArgs
 ---@return any
-function DBus:call_sync(args)
+function M.call_sync(args)
   local parameters_g_variant = (args.parameters_type ~= nil and args.parameters ~= nil)
       and g_variant.from_lua(args.parameters_type, args.parameters)
       or nil
@@ -96,7 +97,7 @@ function DBus:call_sync(args)
       or nil
 
   local variant = gio.g_dbus_connection_call_sync(
-    self.connection,
+    args.connection,
     args.bus_name,
     args.object_path,
     args.interface_name,
@@ -122,7 +123,7 @@ end
 ---@param args DBusSubscriptionArgs
 ---@param callback fun(signal: DBusSignal)
 ---@return number
-function DBus:subscribe(args, callback)
+function M.subscribe(args, callback)
   local g_dbus_signal_callback = function(_, sender_name, object_path, interface_name, signal_name, parameters, _)
     local signal = {
       sender_name = ffi.string(sender_name),
@@ -140,10 +141,10 @@ function DBus:subscribe(args, callback)
   end
 
   return gio.g_dbus_connection_signal_subscribe(
-    self.connection,
-    args.sender,
+    args.connection,
+    args.sender_name,
     args.interface_name,
-    args.member,
+    args.signal_name,
     args.object_path,
     args.arg0,
     args.flags or gio.G_DBUS_SIGNAL_FLAGS_NONE, -- TODO: transform?
@@ -155,7 +156,7 @@ end
 
 ---@param connection ffi.cdata*
 ---@param subscription_id number
-function DBus:unsubscribe(connection, subscription_id)
+function M.unsubscribe(connection, subscription_id)
   gio.g_dbus_connection_signal_unsubscribe(connection, subscription_id)
 end
 
@@ -163,15 +164,4 @@ end
 -- Return
 -- -----------------------------------------------------------------------------
 
-local system_bus = setmetatable({
-  connection = gio.g_bus_get_sync(gio.G_BUS_TYPE_SYSTEM, nil, nil)
-}, DBusMT)
-
-local session_bus = setmetatable({
-  connection = gio.g_bus_get_sync(gio.G_BUS_TYPE_SESSION, nil, nil)
-}, DBusMT)
-
-return {
-  system = system_bus,
-  session = session_bus,
-}
+return M
