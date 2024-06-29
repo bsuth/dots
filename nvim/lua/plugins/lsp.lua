@@ -76,17 +76,38 @@ plugins.use('neovim/nvim-lspconfig')
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
+local mason_registry = require('mason-registry')
+
 local LSP_SERVERS = {
   clangd = {},
   cssls = {},
   elixirls = { cmd = { path.join(C.HOME, '.local/share/nvim/mason/bin/elixir-ls') } },
   eslint = {},
   jsonls = {},
-  lua_ls = {},
+  lua_ls = {
+    settings = {
+      Lua = {
+        runtime = {
+          version = 'LuaJIT',
+        },
+      },
+    },
+  },
   tailwindcss = {},
-  tsserver = {},
+  tsserver = {
+    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+    init_options = {
+      plugins = {
+        {
+          name = '@vue/typescript-plugin',
+          languages = { 'vue' },
+          location = mason_registry.get_package('vue-language-server'):get_install_path() ..
+              '/node_modules/@vue/language-server',
+        },
+      },
+    },
+  },
   volar = {
-    filetypes = { 'vue', 'typescript' },
     settings = {
       scss = {
         lint = {
@@ -102,33 +123,3 @@ for server, config in pairs(LSP_SERVERS) do
   capabilities.textDocument.completion.completionItem.snippetSupport = false
   lspconfig[server].setup(vim.tbl_deep_extend('force', { capabilities = capabilities }, config))
 end
-
--- -----------------------------------------------------------------------------
--- Volar Takeover Mode
---
--- https://vuejs.org/guide/typescript/overview.html#volar-takeover-mode
--- -----------------------------------------------------------------------------
-
-local volar_client = nil
-local tsserver_client = nil
-
-vim.api.nvim_create_autocmd('LspAttach', {
-  group = 'bsuth',
-  callback = function(params)
-    local client = vim.lsp.get_client_by_id(params.data.client_id)
-
-    if client.name == "tsserver" then
-      if volar_client then
-        client:stop()
-      else
-        tsserver_client = client
-      end
-    elseif client.name == "volar" then
-      volar_client = client
-
-      if tsserver_client then
-        tsserver_client:stop()
-      end
-    end
-  end,
-})

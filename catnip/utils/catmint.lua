@@ -158,15 +158,6 @@ end
 --- Windows
 --- ----------------------------------------------------------------------------
 
----@return CatnipWindow | nil
-function M.get_focused_window()
-  for window in catnip.windows do
-    if window.focused then
-      return window
-    end
-  end
-end
-
 ---@return CatnipWindow[]
 function M.get_visible_windows()
   local visible_windows = {}

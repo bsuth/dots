@@ -4,10 +4,6 @@ local key = require('key')
 local canvas = catnip.canvas({ width = 500, height = 700 })
 local alternate = false
 
-local test_png = catnip.png('test/test.png')
-local test_svg = catnip.svg('test/test.svg')
-test_svg:apply('path { stroke: red }')
-
 key.release({ 'ctrl' }, 't', function()
   canvas:clear()
   canvas.z = 99
@@ -17,15 +13,21 @@ key.release({ 'ctrl' }, 't', function()
   local secondary = alternate and 0xff0000 or 0x00ff00
 
   canvas:path({
+    x = 10,
+    y = 400,
+    close = true,
     stroke_color = primary,
-    { 'move', 10,  400 },
     { 'line', 200, 0 },
     { 'line', 0,   20 },
-    { 'close' },
-    { 'move', 0,   50 },
+  })
+
+  canvas:path({
+    x = 10,
+    y = 450,
+    close = true,
+    stroke_color = primary,
     { 'line', 200, 0 },
     { 'line', 0,   20 },
-    { 'close' },
   })
 
   canvas:rectangle({
@@ -73,15 +75,17 @@ key.release({ 'ctrl' }, 't', function()
     color = 0x000000,
     weight = 800,
     valign = 'center',
+    size = 50,
   })
 
-  canvas:svg(test_svg, {
+  canvas:svg('test/test.svg', {
     x = 20,
     y = 500,
     width = 50,
+    styles = alternate and 'path { stroke: red }' or 'path { stroke: blue }',
   })
 
-  canvas:png(test_png, {
+  canvas:png('test/test.png', {
     x = 200,
     y = 200,
     height = 200,

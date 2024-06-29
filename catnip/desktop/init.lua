@@ -18,10 +18,17 @@ end
 
 ---@return Workspace | nil
 local function get_focused_workspace()
+  local focused_window = catnip.focused
+
+  if focused_window == nil then
+    return nil
+  end
+
   for output in catnip.outputs do
     local workspace = output.data.workspace ---@type Workspace
+
     for _, window in ipairs(workspace) do
-      if window.focused then
+      if window == focused_window then
         return workspace
       end
     end

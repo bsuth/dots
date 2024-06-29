@@ -39,9 +39,11 @@ function Wallpaper:render()
   local x = (self.canvas.width - width) / 2
 
   for i, color in ipairs(WALLPAPER_CIRCLES) do
-    self.canvas:circle({
+    self.canvas:rectangle({
       x = x + (i - 1) * WALLPAPER_CIRCLES.spacing,
       y = self.canvas.height / 2 - WALLPAPER_CIRCLES.radius,
+      width = 2 * WALLPAPER_CIRCLES.radius,
+      height = 2 * WALLPAPER_CIRCLES.radius,
       radius = WALLPAPER_CIRCLES.radius,
       fill_color = color,
     })

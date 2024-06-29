@@ -66,7 +66,7 @@ function M.release(modifiers, key, callback)
   table.insert(key_release_callbacks[code], callback)
 end
 
-catnip.subscribe('keyboard::key::press', function(_, event)
+catnip.subscribe('keyboard::keypress', function(_, event)
   local code = get_key_event_code(event)
 
   event.prevent_notify = key_press_callbacks[code] ~= nil or key_release_callbacks[code] ~= nil
@@ -78,7 +78,7 @@ catnip.subscribe('keyboard::key::press', function(_, event)
   end
 end)
 
-catnip.subscribe('keyboard::key::release', function(_, event)
+catnip.subscribe('keyboard::keyrelease', function(_, event)
   local code = get_key_event_code(event)
 
   event.prevent_notify = key_press_callbacks[code] ~= nil or key_release_callbacks[code] ~= nil

@@ -1,4 +1,5 @@
 local C = require('constants')
+local catnip = require('catnip')
 local WorkspaceBar = require('desktop.bar')
 local WorkspaceWallpaper = require('desktop.wallpaper')
 local catmint = require('utils.catmint')
@@ -83,7 +84,7 @@ function Workspace:focus()
   local active_window = self:get_active_window()
 
   if active_window ~= nil then
-    active_window.focused = true
+    catnip.focused = active_window
   end
 
   catmint.center_cursor(self.output)

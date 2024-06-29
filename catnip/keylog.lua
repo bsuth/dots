@@ -74,12 +74,12 @@ local function serialize_key_event(event)
   return table.concat(parts, " ")
 end
 
-catnip.subscribe('keyboard::key::press', function(_, event)
+catnip.subscribe('keyboard::keypress', function(_, event)
   keylog.press = serialize_key_event(event)
   keylog:render()
 end)
 
-catnip.subscribe('keyboard::key::release', function(_, event)
+catnip.subscribe('keyboard::keyrelease', function(_, event)
   keylog.release = serialize_key_event(event)
   keylog:render()
 end)
