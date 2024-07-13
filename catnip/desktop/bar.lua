@@ -1,6 +1,6 @@
 local C = require('constants')
 local catnip = require('catnip')
-local onedark = require('utils.onedark')
+local onedark = require('lib.onedark')
 
 -- TODO: rename
 -- TODO: "background" windows

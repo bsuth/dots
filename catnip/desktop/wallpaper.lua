@@ -1,5 +1,5 @@
 local catnip = require('catnip')
-local onedark = require('utils.onedark')
+local onedark = require('lib.onedark')
 
 ---@class WorkspaceWallpaperFields
 ---@field workspace Workspace

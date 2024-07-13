@@ -8,16 +8,17 @@ local upower = require('ffi.upower')
 
 ---@class Battery
 ---@field percent number
----@field state 'charging' | 'discharging' | 'unknown'
+---@field status 'unknown' | 'charging' | 'discharging'
 local battery = {
   percent = -1,
-  state = 'unknown',
+  status = 'unknown',
 }
 
 -- -----------------------------------------------------------------------------
 -- Helpers
 -- -----------------------------------------------------------------------------
 
+---@param state number
 local function update_state(state)
   local is_charging = (
     state == upower.UP_DEVICE_STATE_PENDING_CHARGE or
@@ -31,11 +32,17 @@ local function update_state(state)
   )
 
   if is_charging then
-    battery.state = 'charging'
+    battery.status = 'charging'
   elseif is_discharging then
-    battery.state = 'discharging'
+    battery.status = 'discharging'
   else
-    battery.state = 'unknown'
+    battery.status = 'unknown'
+  end
+
+  -- The percent reported by upower doesn't usually ever actually reach 100%,
+  -- so we set it manually here if we know the device is fully charged.
+  if state == upower.UP_DEVICE_STATE_FULLY_CHARGED then
+    battery.percent = 100
   end
 end
 

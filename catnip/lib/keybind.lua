@@ -1,11 +1,19 @@
 local catnip = require('catnip')
 
----@alias Modifier "ctrl" | "mod1" | "mod2" | "mod3" | "mod4" | "mod5"
-
 local M = {}
 
 local key_press_callbacks = {} ---@type table<string, fun()[]>
 local key_release_callbacks = {} ---@type table<string, fun()[]>
+
+-- -----------------------------------------------------------------------------
+-- Types
+-- -----------------------------------------------------------------------------
+
+---@alias Modifier "ctrl" | "mod1" | "mod2" | "mod3" | "mod4" | "mod5"
+
+-- -----------------------------------------------------------------------------
+-- Helpers
+-- -----------------------------------------------------------------------------
 
 ---@param modifiers Modifier[]
 ---@param key string
@@ -48,6 +56,10 @@ local function get_key_event_code(event)
   })
 end
 
+-- -----------------------------------------------------------------------------
+-- API
+-- -----------------------------------------------------------------------------
+
 ---@param modifiers Modifier[]
 ---@param key string
 ---@param callback fun()
@@ -65,6 +77,10 @@ function M.release(modifiers, key, callback)
   key_release_callbacks[code] = key_release_callbacks[code] or {}
   table.insert(key_release_callbacks[code], callback)
 end
+
+-- -----------------------------------------------------------------------------
+-- Setup
+-- -----------------------------------------------------------------------------
 
 catnip.subscribe('keyboard::keypress', function(_, event)
   local code = get_key_event_code(event)
@@ -89,5 +105,9 @@ catnip.subscribe('keyboard::keyrelease', function(_, event)
     end
   end
 end)
+
+-- -----------------------------------------------------------------------------
+-- Return
+-- -----------------------------------------------------------------------------
 
 return M

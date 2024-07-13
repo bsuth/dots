@@ -1,6 +1,6 @@
 local catnip = require('catnip')
-local catmint = require('utils.catmint')
-local onedark = require('utils.onedark')
+local cursor_utils = require('lib.cursor_utils')
+local onedark = require('lib.onedark')
 
 local keylog = {
   press = "",
@@ -43,7 +43,7 @@ function keylog:toggle()
     return
   end
 
-  local cursor_output = catmint.get_cursor_outputs()[1]
+  local cursor_output = cursor_utils.get_cursor_outputs()[1]
   if cursor_output == nil then return end
 
   keylog.canvas.x = cursor_output.x

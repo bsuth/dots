@@ -58,15 +58,15 @@ function M.call(args, callback)
       return
     end
 
-    local variant = gio.g_dbus_connection_call_finish(args.connection, result, nil)
-    local lua_variant = nil
+    local reply_g_variant = gio.g_dbus_connection_call_finish(args.connection, result, nil)
+    local reply_lua = nil
 
-    if variant ~= nil then
-      lua_variant = g_variant.to_lua(variant)
-      glib.g_variant_unref(variant)
+    if reply_g_variant ~= nil then
+      reply_lua = g_variant.to_lua(reply_g_variant)
+      glib.g_variant_unref(reply_g_variant)
     end
 
-    callback(lua_variant)
+    callback(reply_lua)
   end
 
   gio.g_dbus_connection_call(
@@ -96,7 +96,7 @@ function M.call_sync(args)
       and ffi.gc(glib.g_variant_type_new(args.reply_type), glib.g_variant_type_free)
       or nil
 
-  local variant = gio.g_dbus_connection_call_sync(
+  local reply_g_variant = gio.g_dbus_connection_call_sync(
     args.connection,
     args.bus_name,
     args.object_path,
@@ -110,14 +110,14 @@ function M.call_sync(args)
     nil
   )
 
-  local lua_variant = nil
+  local reply_lua = nil
 
-  if variant ~= nil then
-    lua_variant = g_variant.to_lua(variant)
-    glib.g_variant_unref(variant)
+  if reply_g_variant ~= nil then
+    reply_lua = g_variant.to_lua(reply_g_variant)
+    glib.g_variant_unref(reply_g_variant)
   end
 
-  return lua_variant
+  return reply_lua
 end
 
 ---@param args DBusSubscriptionArgs

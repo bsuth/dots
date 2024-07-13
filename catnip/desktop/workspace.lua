@@ -1,8 +1,8 @@
 local C = require('constants')
 local catnip = require('catnip')
+local cursor_utils = require('lib.cursor_utils')
 local WorkspaceBar = require('desktop.bar')
 local WorkspaceWallpaper = require('desktop.wallpaper')
-local catmint = require('utils.catmint')
 
 ---@class WorkspaceFields
 ---@field output CatnipOutput
@@ -87,7 +87,7 @@ function Workspace:focus()
     catnip.focused = active_window
   end
 
-  catmint.center_cursor(self.output)
+  cursor_utils.center_cursor(self.output)
 end
 
 ---@param self Workspace

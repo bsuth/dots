@@ -1,10 +1,10 @@
 local catnip = require('catnip')
-local key = require('key')
+local keybind = require('lib.keybind')
 
 local canvas = catnip.canvas({ width = 500, height = 700 })
 local alternate = false
 
-key.release({ 'ctrl' }, 't', function()
+keybind.release({ 'ctrl' }, 't', function()
   canvas:clear()
   canvas.z = 99
   alternate = not alternate

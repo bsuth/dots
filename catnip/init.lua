@@ -1,11 +1,10 @@
 local uv = require('luv')
 local catnip = require('catnip')
-local key = require('key')
 local glib = require('ffi.glib')
+local keybind = require('lib.keybind')
+local watch = require('lib.watch')
 
 require('desktop')
-
-key.release({ 'mod1' }, 'c', function() require('keylog'):toggle() end)
 
 -- -----------------------------------------------------------------------------
 -- Main Loop Integrations
@@ -30,10 +29,10 @@ end)
 -- System
 -- -----------------------------------------------------------------------------
 
-key.release({ 'mod1', 'ctrl' }, 'r', catnip.reload)
-key.release({ 'mod1', 'ctrl' }, 'q', catnip.quit)
+keybind.release({ 'mod1', 'ctrl' }, 'r', catnip.reload)
+keybind.release({ 'mod1', 'ctrl' }, 'q', catnip.quit)
 
-key.release({ 'mod1' }, 'q', function()
+keybind.release({ 'mod1' }, 'q', function()
   if catnip.focused == nil then return end
   catnip.focused:destroy()
 end)
@@ -42,10 +41,28 @@ end)
 -- Spawn
 -- -----------------------------------------------------------------------------
 
-key.release({ 'mod1' }, 'space', function()
+keybind.release({ 'mod1' }, 'space', function()
   os.execute('foot & disown')
 end)
 
 -- -----------------------------------------------------------------------------
 -- Test
 -- -----------------------------------------------------------------------------
+
+require('models.battery')
+require('models.bluetooth')
+
+local watch_test_counter = 88
+
+keybind.release({ 'mod1' }, 'i', function()
+  watch_test_counter = watch_test_counter + 1
+end)
+
+watch(
+  function()
+    return watch_test_counter
+  end,
+  function(new_watch_test_counter)
+    print(new_watch_test_counter)
+  end
+)
