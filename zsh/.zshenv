@@ -63,7 +63,7 @@ export LUA_PATH_5_2="$GENERATED_LUA_PATH"
 export LUA_CPATH_5_2="$GENERATED_LUA_CPATH"
 
 _generate_lua_path_ "5.1"
-export LUA_PATH="$GENERATED_LUA_PATH"
+export LUA_PATH="$GENERATED_LUA_PATH;/usr/share/luajit-2.1/?.lua"
 export LUA_CPATH="$GENERATED_LUA_CPATH"
 
 # ------------------------------------------------------------------------------

@@ -102,7 +102,14 @@ function on_cd() {
   fi
 }
 
+function on_exit() {
+  if [[ ! -z $NVIM ]]; then
+    nvim --server $NVIM --remote-send "<c-\\><c-n>:lua RESTORE_TERM_WINDOW_BUFFER(); print(' ')<cr>i"
+  fi
+}
+
 chpwd_functions=(${chpwd_functions[@]} "on_cd")
+zshexit_functions=(${zshexit_functions[@]} "on_exit")
 
 # ------------------------------------------------------------------------------
 # Alias / Functions

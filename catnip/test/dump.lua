@@ -8,9 +8,9 @@ local function dump_object(name, object, fields)
     local value = object[field]
 
     if type(value) == 'string' then
-      print('  { field } = \"{ value }\",')
+      print(('  %s = \"%s\",'):format(field, value))
     else
-      print('  { field } = { value },')
+      print(('  %s = %s,'):format(field, tostring(value)))
     end
   end
 

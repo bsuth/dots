@@ -108,7 +108,7 @@ function CommandTree:render()
 
   -- Unset the `modified` status of the buffer after updating it, so we can
   -- close it without throwing a "No write since last change" error.
-  vim.api.nvim_buf_set_option(self.buffer, 'modified', false)
+  vim.api.nvim_set_option_value('modified', false, { buf = self.buffer })
 
   if mode == 'i' then
     -- Neovim likes to scroll the window when updating the buffer content in
@@ -226,10 +226,10 @@ return function(restore_window)
     ignore_next_mode_changes = 0,
   }, { __index = CommandTree })
 
-  vim.api.nvim_buf_set_option(command_tree.buffer, 'bufhidden', 'hide')
-  vim.api.nvim_buf_set_option(command_tree.buffer, 'buftype', 'prompt')
-  vim.api.nvim_buf_set_option(command_tree.buffer, 'buflisted', false)
-  vim.api.nvim_buf_set_option(command_tree.buffer, 'swapfile', false)
+  vim.api.nvim_set_option_value('bufhidden', 'hide', { buf = command_tree.buffer })
+  vim.api.nvim_set_option_value('buftype', 'prompt', { buf = command_tree.buffer })
+  vim.api.nvim_set_option_value('buflisted', false, { buf = command_tree.buffer })
+  vim.api.nvim_set_option_value('swapfile', false, { buf = command_tree.buffer })
   vim.fn.prompt_setprompt(command_tree.buffer, '')
 
   local focus_previous = function() command_tree:focus(command_tree.focused_index - 1) end

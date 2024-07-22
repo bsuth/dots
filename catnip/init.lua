@@ -3,8 +3,10 @@ local catnip = require('catnip')
 local glib = require('ffi.glib')
 local keybind = require('lib.keybind')
 local watch = require('lib.watch')
+local system_prompt = require('system_prompt')
 
 require('desktop')
+require('test.canvas')
 
 -- -----------------------------------------------------------------------------
 -- Main Loop Integrations
@@ -31,6 +33,10 @@ end)
 
 keybind.release({ 'mod1', 'ctrl' }, 'r', catnip.reload)
 keybind.release({ 'mod1', 'ctrl' }, 'q', catnip.quit)
+
+keybind.release({ 'mod1' }, ';', function()
+  system_prompt:toggle()
+end)
 
 keybind.release({ 'mod1' }, 'q', function()
   if catnip.focused == nil then return end

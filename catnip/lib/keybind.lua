@@ -79,7 +79,7 @@ function M.release(modifiers, key, callback)
 end
 
 -- -----------------------------------------------------------------------------
--- Setup
+-- Subscriptions
 -- -----------------------------------------------------------------------------
 
 catnip.subscribe('keyboard::keypress', function(_, event)

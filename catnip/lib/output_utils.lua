@@ -1,5 +1,6 @@
 local catnip = require('catnip')
 local geometry = require('lib.geometry')
+local cursor_utils = require('lib.cursor_utils')
 local window_utils = require('lib.window_utils')
 
 local M = {}
@@ -7,6 +8,19 @@ local M = {}
 --- ----------------------------------------------------------------------------
 --- API
 --- ----------------------------------------------------------------------------
+
+---@return CatnipOutput | nil
+function M.get_focused_output()
+  if catnip.focused ~= nil then
+    for output in catnip.outputs do
+      if window_utils.is_window_in_output(catnip.focused, output) then
+        return output
+      end
+    end
+  end
+
+  return cursor_utils.get_cursor_outputs()[1]
+end
 
 ---@param output CatnipOutput
 ---@return CatnipWindow[], number
