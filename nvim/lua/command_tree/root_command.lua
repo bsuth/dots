@@ -202,7 +202,6 @@ local function get_make_commands()
   local make_root = get_make_root()
 
   if make_root == nil then
-    print('blah')
     return {}
   end
 
@@ -216,13 +215,11 @@ local function get_make_commands()
   local subcommands = {}
   local pipe = assert(io.popen(cmd, 'r'))
 
-  print('bah', cmd)
   for line in pipe:lines() do
-    print('boo', line)
     table.insert(subcommands, {
       label = line,
       callback = function()
-        vim.cmd(('silent exec "!make %s"'):format(line))
+        vim.cmd(('silent exec "!make --directory %s %s"'):format(make_root, line))
       end,
     })
   end
