@@ -1,13 +1,8 @@
-local C = require('constants')
 local catnip = require('catnip')
 local cursor_utils = require('lib.cursor_utils')
-local WorkspaceBar = require('desktop.bar')
-local WorkspaceWallpaper = require('desktop.wallpaper')
 
 ---@class WorkspaceFields
 ---@field output CatnipOutput
----@field bar WorkspaceBar
----@field wallpaper WorkspaceWallpaper
 ---@field mirrored_workspace Workspace | nil
 ---@field refresh_subscription fun() | nil
 
@@ -42,8 +37,6 @@ function Workspace:insert(window, index)
     table.insert(self, window)
     self:activate(#self)
   end
-
-  self:render()
 end
 
 ---@param self Workspace
@@ -52,7 +45,6 @@ end
 function Workspace:remove(index)
   ---@type CatnipWindow | nil
   local window = table.remove(self, index)
-  self:render()
   return window
 end
 
@@ -63,20 +55,15 @@ function Workspace:activate(index)
     if i ~= index then
       window.visible = false
     else
-      local num_windows = #self
-      local bar_height = num_windows > 1 and C.BAR_HEIGHT or 0
-
       window.x = self.output.x
-      window.y = self.output.y + bar_height
+      window.y = self.output.y
       window.width = self.output.width
-      window.height = self.output.height - bar_height
+      window.height = self.output.height
 
       -- Resize the window before showing it to avoid flickering
       window.visible = true
     end
   end
-
-  self:render()
 end
 
 ---@param self Workspace
@@ -105,7 +92,6 @@ function Workspace:cycle(direction)
 
   self:activate(new_active_window_index)
   self:focus()
-  self:render()
 end
 
 ---@param self Workspace
@@ -123,8 +109,6 @@ function Workspace:shift(direction)
 
   self[active_window_index] = self[new_active_window_index]
   self[new_active_window_index] = active_window
-
-  self:render()
 end
 
 ---@param self Workspace
@@ -138,8 +122,6 @@ function Workspace:mirror(target)
       table.insert(target, num_target_windows, self[i])
       table.remove(self, i)
     end
-
-    target:render()
   end
 
   if target ~= nil then
@@ -150,26 +132,11 @@ function Workspace:mirror(target)
   end
 
   self.mirrored_workspace = target
-  self.wallpaper.canvas.visible = target == nil
-
-  self:render()
-end
-
----@param self Workspace
-function Workspace:render()
-  if self.mirrored_workspace ~= nil or #self < 2 then
-    self.bar.canvas.visible = false
-  else
-    self.bar.canvas.visible = true
-    self.bar:render()
-  end
 end
 
 ---@param output CatnipOutput
 ---@return Workspace
 return function(output)
   local workspace = { output = output }
-  workspace.bar = WorkspaceBar(workspace)
-  workspace.wallpaper = WorkspaceWallpaper(workspace)
   return setmetatable(workspace, WorkspaceMT)
 end

@@ -49,6 +49,13 @@ end
 function M.favorites()
   local commands = {}
 
+  table.insert(commands, {
+    label = '~/Downloads/todo.md',
+    callback = function()
+      vim.cmd('edit ~/Downloads/todo.md')
+    end,
+  })
+
   for _, directory in ipairs({ '~/dots', '~/repos', '~/extern' }) do
     table.insert(commands, {
       label = directory,

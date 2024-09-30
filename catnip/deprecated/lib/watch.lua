@@ -2,7 +2,6 @@ local catnip = require('catnip')
 
 local watchers = {}
 local num_watchers = 0
-local tick_subscription
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -57,7 +56,7 @@ return function(get_watched_values, on_change)
   num_watchers = num_watchers + 1
 
   if num_watchers == 1 then
-    tick_subscription = catnip.on('tick', flush_watchers)
+    catnip.subscribe('tick', flush_watchers)
   end
 
   return function()
@@ -65,7 +64,7 @@ return function(get_watched_values, on_change)
     num_watchers = num_watchers - 1
 
     if num_watchers == 0 then
-      tick_subscription()
+      catnip.unsubscribe('tick', flush_watchers)
     end
   end
 end

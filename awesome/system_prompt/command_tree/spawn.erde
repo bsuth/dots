@@ -28,6 +28,11 @@ return {
     callback = () -> awful.spawn('gimp'),
   },
   {
+    label = 'godot',
+    type = 'once',
+    callback = () -> awful.spawn('godot'),
+  },
+  {
     label = 'gpick',
     type = 'once',
     callback = () -> awful.spawn.with_shell("gpick -s -o | tr -d '\\n' | xclip -sel c"),

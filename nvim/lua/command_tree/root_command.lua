@@ -183,6 +183,66 @@ local function get_project_commands()
 end
 
 -- -----------------------------------------------------------------------------
+-- Make Commands
+-- -----------------------------------------------------------------------------
+
+local function get_make_root(dir)
+  dir = dir or path.lead(vim.fn.getcwd())
+
+  while dir:match('^' .. C.HOME .. '/.+') do
+    if io.exists(path.join(dir, 'Makefile')) then
+      return dir
+    else
+      dir = path.lead(path.dirname(dir))
+    end
+  end
+end
+
+local function get_make_commands()
+  local make_root = get_make_root()
+
+  if make_root == nil then
+    print('blah')
+    return {}
+  end
+
+  local cmd = table.concat({
+    ('make --directory "%s" --dry-run --print-data-base'):format(make_root),
+    'grep ".PHONY\\s*:"',
+    'sed -E "s/.PHONY\\s*:\\s*(.*)/\\1/"',
+    'tr " " "\\n"',
+  }, ' | ')
+
+  local subcommands = {}
+  local pipe = assert(io.popen(cmd, 'r'))
+
+  print('bah', cmd)
+  for line in pipe:lines() do
+    print('boo', line)
+    table.insert(subcommands, {
+      label = line,
+      callback = function()
+        vim.cmd(('silent exec "!make %s"'):format(line))
+      end,
+    })
+  end
+
+  if #subcommands == 0 then
+    return {}
+  end
+
+  return {
+    {
+      label = 'make',
+      subtree = true,
+      callback = function()
+        return subcommands
+      end,
+    },
+  }
+end
+
+-- -----------------------------------------------------------------------------
 -- Return
 -- -----------------------------------------------------------------------------
 
@@ -191,7 +251,8 @@ return {
     return table.merge(
       DEFAULT_COMMANDS,
       generators.favorites(),
-      get_project_commands()
+      get_project_commands(),
+      get_make_commands()
     )
   end,
 }

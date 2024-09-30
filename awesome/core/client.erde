@@ -32,7 +32,7 @@ ruled.client.append_rules({
   },
   {
     rule_any = {
-      type = { 'dialog' },
+      type = { 'dialog', 'utility' },
       name = { 'Event Tester' }, -- xev
       role = { 'pop-up' },
     },

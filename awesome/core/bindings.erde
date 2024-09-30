@@ -210,6 +210,7 @@ module global_keys = {
   }),
 
   awful.key({ 'Mod4' }, 'space', () -> {
+    -- awful.spawn('tabbed -c -r 2 st -w "" -e nvim -c ":Dirvish"')
     awful.spawn('st -e nvim -c ":Dirvish"')
   }),
   awful.key({ 'Mod4', 'Shift' }, 'space', () -> {

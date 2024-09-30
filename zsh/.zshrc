@@ -103,7 +103,7 @@ function on_cd() {
 }
 
 function on_exit() {
-  if [[ ! -z $NVIM ]]; then
+  if [[ ! -z $NVIM ]] && [[ $- == *i* ]]; then
     nvim --server $NVIM --remote-send "<c-\\><c-n>:lua RESTORE_TERM_WINDOW_BUFFER(); print(' ')<cr>i"
   fi
 }

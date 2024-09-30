@@ -1,5 +1,4 @@
 local C = require('constants')
-local edit = require('utils.edit')
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -19,7 +18,9 @@ function RESTORE_TERM_WINDOW_BUFFER()
     return
   end
 
-  edit(vim.fn.getcwd())
+  -- Neovim tries to provide a backup buffer for us, which will replace any
+  -- buffer we try to set now so we wait until the next tick.
+  vim.schedule(function() vim.cmd('edit ' .. vim.fn.getcwd()) end)
 end
 
 -- -----------------------------------------------------------------------------

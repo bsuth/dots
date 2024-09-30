@@ -1,8 +1,10 @@
 local catnip = require('catnip')
-local keybind = require('lib.keybind')
 local cursor_utils = require('lib.cursor_utils')
 local output_utils = require('lib.output_utils')
 local Workspace = require('desktop.workspace')
+
+--- @type table<CatnipOutput, Workspace>
+local workspaces = setmetatable({}, { __mode = 'k' })
 
 -- -----------------------------------------------------------------------------
 -- Helpers
@@ -12,7 +14,7 @@ local Workspace = require('desktop.workspace')
 local function get_cursor_workspace()
   for output in catnip.outputs do
     if cursor_utils.is_cursor_in_output(output) then
-      return output.data.workspace
+      return workspaces[output]
     end
   end
 end
@@ -26,7 +28,7 @@ local function get_focused_workspace()
   end
 
   for output in catnip.outputs do
-    local workspace = output.data.workspace ---@type Workspace
+    local workspace = workspaces[output] ---@type Workspace
 
     for _, window in ipairs(workspace) do
       if window == focused_window then
@@ -40,7 +42,8 @@ end
 ---@return Workspace | nil, number | nil
 local function get_window_workspace(window)
   for output in catnip.outputs do
-    local workspace = output.data.workspace ---@type Workspace
+    local workspace = workspaces[output] ---@type Workspace
+
     for i, workspace_window in ipairs(workspace) do
       if workspace_window == window then
         return workspace, i
@@ -55,7 +58,7 @@ end
 local function get_workspace_in_direction(source, direction)
   local output = output_utils.get_output_in_direction(source, direction)
   if output == nil then return end
-  local workspace = output.data.workspace
+  local workspace = workspaces[output]
   return workspace.mirrored_workspace ~= nil and workspace.mirrored_workspace or workspace
 end
 
@@ -128,43 +131,43 @@ end
 -- Keymaps
 -- -----------------------------------------------------------------------------
 
-keybind.release({ 'mod1' }, 'h', function() focus_in_direction('left') end)
-keybind.release({ 'mod1' }, 'j', function() focus_in_direction('down') end)
-keybind.release({ 'mod1' }, 'k', function() focus_in_direction('up') end)
-keybind.release({ 'mod1' }, 'l', function() focus_in_direction('right') end)
+catnip.bind({ 'mod1' }, 'h', function() focus_in_direction('left') end)
+catnip.bind({ 'mod1' }, 'j', function() focus_in_direction('down') end)
+catnip.bind({ 'mod1' }, 'k', function() focus_in_direction('up') end)
+catnip.bind({ 'mod1' }, 'l', function() focus_in_direction('right') end)
 
-keybind.release({ 'mod1' }, 'H', function() move_in_direction('left') end)
-keybind.release({ 'mod1' }, 'J', function() move_in_direction('down') end)
-keybind.release({ 'mod1' }, 'K', function() move_in_direction('up') end)
-keybind.release({ 'mod1' }, 'L', function() move_in_direction('right') end)
+catnip.bind({ 'mod1' }, 'H', function() move_in_direction('left') end)
+catnip.bind({ 'mod1' }, 'J', function() move_in_direction('down') end)
+catnip.bind({ 'mod1' }, 'K', function() move_in_direction('up') end)
+catnip.bind({ 'mod1' }, 'L', function() move_in_direction('right') end)
 
-keybind.release({ 'mod1', 'ctrl' }, 'H', function() swap_in_direction('left') end)
-keybind.release({ 'mod1', 'ctrl' }, 'J', function() swap_in_direction('down') end)
-keybind.release({ 'mod1', 'ctrl' }, 'K', function() swap_in_direction('up') end)
-keybind.release({ 'mod1', 'ctrl' }, 'L', function() swap_in_direction('right') end)
+catnip.bind({ 'mod1', 'ctrl' }, 'H', function() swap_in_direction('left') end)
+catnip.bind({ 'mod1', 'ctrl' }, 'J', function() swap_in_direction('down') end)
+catnip.bind({ 'mod1', 'ctrl' }, 'K', function() swap_in_direction('up') end)
+catnip.bind({ 'mod1', 'ctrl' }, 'L', function() swap_in_direction('right') end)
 
-keybind.release({ 'mod1' }, 'Tab', function() cycle_focused_workspace('forwards') end)
-keybind.release({ 'mod1' }, 'ISO_Left_Tab', function() cycle_focused_workspace('backwards') end)
+catnip.bind({ 'mod1' }, 'Tab', function() cycle_focused_workspace('forwards') end)
+catnip.bind({ 'mod1' }, 'ISO_Left_Tab', function() cycle_focused_workspace('backwards') end)
 
-keybind.release({ 'mod1' }, '>', function() shift_focused_workspace('forwards') end)
-keybind.release({ 'mod1' }, '<', function() shift_focused_workspace('backwards') end)
+catnip.bind({ 'mod1' }, '>', function() shift_focused_workspace('forwards') end)
+catnip.bind({ 'mod1' }, '<', function() shift_focused_workspace('backwards') end)
 
 -- -----------------------------------------------------------------------------
 -- Subscriptions
 -- -----------------------------------------------------------------------------
 
-catnip.subscribe('output::create', function(output)
-  output.data.workspace = Workspace(output)
+catnip.outputs:on('create', function(output)
+  workspaces[output] = Workspace(output)
 end)
 
-catnip.subscribe('window::create', function(window)
+catnip.windows:on('create', function(window)
   local cursor_workspace = get_cursor_workspace()
   if cursor_workspace == nil then return end
   cursor_workspace:insert(window)
   cursor_workspace:focus()
 end)
 
-catnip.subscribe('window::destroy', function(window)
+catnip.windows:on('destroy', function(window)
   local workspace, window_index = get_window_workspace(window)
   if workspace == nil or window_index == nil then return end
   workspace:remove(window_index)

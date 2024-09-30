@@ -1,7 +1,6 @@
 local C = require('constants')
 local path = require('utils.path')
 local io = require('utils.stdlib').io
-local string = require('utils.stdlib').string
 local table = require('utils.stdlib').table
 
 -- -----------------------------------------------------------------------------
@@ -46,7 +45,7 @@ local function format_sync(command)
   local stdout = vim.fn.system(command)
 
   if vim.v.shell_error == 0 then
-    local trimmed_stdout = vim.lsp.util.trim_empty_lines(string.split(stdout, '\n'))
+    local trimmed_stdout = vim.split(stdout, '\n', { trimempty = true })
 
     if #trimmed_stdout > 0 then
       vim.api.nvim_buf_set_lines(buffer, 0, -1, false, trimmed_stdout)
@@ -54,7 +53,7 @@ local function format_sync(command)
 
       -- Sometimes diagnostics seem to disappear after editing, so manually
       -- refresh here.
-      vim.diagnostic.enable(buffer)
+      vim.diagnostic.enable(true, { bufnr = buffer })
     end
   end
 end
@@ -65,14 +64,15 @@ local function format_async(command)
   local job_id = vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_stdout = function(_, stdout)
-      local trimmed_stdout = vim.lsp.util.trim_empty_lines(stdout)
+      local trimmed_stdout = vim.split(stdout, '\n', { trimempty = true })
+
       if #trimmed_stdout > 0 then
         vim.api.nvim_buf_set_lines(buffer, 0, -1, false, trimmed_stdout)
         vim.cmd('noautocmd write')
 
         -- Sometimes diagnostics seem to disappear after editing, so manually
         -- refresh here.
-        vim.diagnostic.enable(buffer)
+        vim.diagnostic.enable(true, { bufnr = buffer })
       end
     end,
     on_exit = function(job_id)
