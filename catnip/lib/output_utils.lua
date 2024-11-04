@@ -44,14 +44,21 @@ end
 function M.get_output_in_direction(source, direction)
   local closest_output = nil
   local closest_output_distance = math.huge
+  local closest_output_y = math.huge
 
   for output in catnip.outputs do
-    if M.is_in_direction(source, output, direction) then
+    if geometry.is_in_direction(source, output, direction) then
       local distance = geometry.get_distance_in_direction(source, output, direction)
 
-      if distance < closest_output_distance then
+      local is_closest_output = (
+        distance < closest_output_distance or
+        (distance == closest_output_distance and output.y < closest_output_y)
+      )
+
+      if is_closest_output then
         closest_output = output
         closest_output_distance = distance
+        closest_output_y = output.y
       end
     end
   end

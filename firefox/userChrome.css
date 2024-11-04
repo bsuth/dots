@@ -4,6 +4,10 @@
   display: none;
 }
 
+#titlebar {
+  background-color: var(--toolbar-bgcolor) !important;
+}
+
 #nav-bar {
   margin-top: -40px;
   z-index: -1;

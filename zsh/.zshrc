@@ -58,58 +58,60 @@ SPACESHIP_PROMPT_ORDER=(
   dir           # Current directory section
   host          # Hostname section
   git           # Git section (git_branch + git_status)
-  # hg            # Mercurial section (hg_branch  + hg_status)
   package       # Package version
-  # gradle        # Gradle section
-  # maven         # Maven section
   node          # Node.js section
-  # ruby          # Ruby section
-  # elixir        # Elixir section
-  # xcode         # Xcode section
-  # swift         # Swift section
   golang        # Go section
-  # php           # PHP section
-  # rust          # Rust section
-  # haskell       # Haskell Stack section
-  # julia         # Julia section
-  # docker        # Docker section
-  # aws           # Amazon Web Services section
-  # gcloud        # Google Cloud Platform section
-  # venv          # virtualenv section
-  # conda         # conda virtualenv section
-  # pyenv         # Pyenv section
-  # dotnet        # .NET section
-  # ember         # Ember.js section
-  # kubectl       # Kubectl context section
-  # terraform     # Terraform workspace section
-  # ibmcloud      # IBM Cloud section
+  venv          # virtualenv section
   exec_time     # Execution time
   line_sep      # Line break
-  # battery       # Battery level and status
-  # vi_mode       # Vi-mode indicator
   jobs          # Background jobs indicator
   exit_code     # Exit code section
   char          # Prompt character
 )
 
 # ------------------------------------------------------------------------------
-# Hooks
+# Auto venv
 # ------------------------------------------------------------------------------
 
-function on_cd() {
+function auto_venv() {
+  DIR=$(pwd)
+
+  while [[ $DIR =~ ^$HOME/ ]]; do
+    if [[ -f $DIR/.venv/bin/activate ]]; then
+      source $DIR/.venv/bin/activate
+      return
+    fi
+
+    DIR=$(dirname $DIR)
+  done
+
+  if command -v deactivate 2>&1 >/dev/null; then
+    deactivate
+  fi
+}
+
+auto_venv
+
+chpwd_functions=(${chpwd_functions[@]} "auto_venv")
+
+# ------------------------------------------------------------------------------
+# Nvim Hooks
+# ------------------------------------------------------------------------------
+
+function nvim_on_cd() {
   if [[ ! -z $NVIM ]]; then
     nvim --server $NVIM --remote-send "<c-\\><c-n>:cd $(pwd) | lua SAVE_BUFFER_CWD()<cr>i"
   fi
 }
 
-function on_exit() {
+function nvim_on_exit() {
   if [[ ! -z $NVIM ]] && [[ $- == *i* ]]; then
     nvim --server $NVIM --remote-send "<c-\\><c-n>:lua RESTORE_TERM_WINDOW_BUFFER(); print(' ')<cr>i"
   fi
 }
 
-chpwd_functions=(${chpwd_functions[@]} "on_cd")
-zshexit_functions=(${zshexit_functions[@]} "on_exit")
+chpwd_functions=(${chpwd_functions[@]} "nvim_on_cd")
+zshexit_functions=(${zshexit_functions[@]} "nvim_on_exit")
 
 # ------------------------------------------------------------------------------
 # Alias / Functions

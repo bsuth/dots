@@ -52,21 +52,21 @@ end
 function M.get_window_in_direction(source, direction)
   local closest_window = nil
   local closest_window_distance = math.huge
-  local closest_window_z = math.huge
+  local closest_window_y = math.huge
 
   for window in catnip.windows do
-    if M.is_in_direction(source, window, direction) then
+    if geometry.is_in_direction(source, window, direction) then
       local distance = geometry.get_distance_in_direction(source, window, direction)
 
       local is_closest_window = (
         distance < closest_window_distance or
-        (distance == closest_window_distance and window.z > closest_window_z)
+        (distance == closest_window_distance and window.y < closest_window_y)
       )
 
       if is_closest_window then
         closest_window = window
         closest_window_distance = distance
-        closest_window_z = window.z
+        closest_window_y = window.y
       end
     end
   end

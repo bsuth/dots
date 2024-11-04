@@ -93,6 +93,21 @@ local LSP_SERVERS = {
       },
     },
   },
+  pylsp = {
+    settings = {
+      pylsp = {
+        plugins = {
+          pylsp_mypy = { enabled = true },
+          rope = { enabled = true },
+          ruff = {
+            enabled = true,
+            extendSelect = { 'I' },
+            format = { 'I' },
+          },
+        },
+      },
+    },
+  },
   tailwindcss = {},
   tsserver = {
     filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },

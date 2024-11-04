@@ -1,7 +1,7 @@
 local catnip = require('catnip')
 local uv = require('luv')
 
-require('desktop')
+require('window_manager')
 require('widget')
 
 -- -----------------------------------------------------------------------------

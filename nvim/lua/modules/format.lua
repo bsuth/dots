@@ -40,8 +40,7 @@ local function has_ancestor(filenames)
   end
 end
 
-local function format_sync(command)
-  local buffer = vim.api.nvim_get_current_buf()
+local function format_sync(buffer, command)
   local stdout = vim.fn.system(command)
 
   if vim.v.shell_error == 0 then
@@ -49,7 +48,7 @@ local function format_sync(command)
 
     if #trimmed_stdout > 0 then
       vim.api.nvim_buf_set_lines(buffer, 0, -1, false, trimmed_stdout)
-      vim.cmd('noautocmd write')
+      vim.cmd('noautocmd update')
 
       -- Sometimes diagnostics seem to disappear after editing, so manually
       -- refresh here.
@@ -58,9 +57,7 @@ local function format_sync(command)
   end
 end
 
-local function format_async(command)
-  local buffer = vim.api.nvim_get_current_buf()
-
+local function format_async(buffer, command)
   local job_id = vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_stdout = function(_, stdout)
@@ -68,7 +65,7 @@ local function format_async(command)
 
       if #trimmed_stdout > 0 then
         vim.api.nvim_buf_set_lines(buffer, 0, -1, false, trimmed_stdout)
-        vim.cmd('noautocmd write')
+        vim.cmd('noautocmd update')
 
         -- Sometimes diagnostics seem to disappear after editing, so manually
         -- refresh here.
@@ -91,13 +88,13 @@ end
 
 vim.api.nvim_create_autocmd('BufWritePre', {
   group = 'bsuth',
-  callback = function()
+  callback = function(args)
     local cursor = vim.api.nvim_win_get_cursor(0)
 
     vim.cmd([[keepjumps keeppatterns %s/\s\+$//e]])                   -- trailing whitespace
     vim.cmd([[keepjumps keeppatterns silent! 0;/^\%(\n*.\)\@!/,$d_]]) -- trailing newlines
 
-    cursor[1] = math.min(cursor[1], vim.api.nvim_buf_line_count(0))
+    cursor[1] = math.min(cursor[1], vim.api.nvim_buf_line_count(args.buf))
     vim.api.nvim_win_set_cursor(0, cursor)
   end,
 })
@@ -108,10 +105,10 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 
 vim.api.nvim_create_autocmd('BufWritePost', {
   group = 'bsuth',
-  pattern = C.C_PATTERNS,
-  callback = function()
+  pattern = { '*.c', '*.h' },
+  callback = function(args)
     if has_ancestor({ '.clang-format' }) then
-      format_sync('clang-format ' .. vim.api.nvim_buf_get_name(0))
+      format_sync(args.buf, 'clang-format ' .. vim.api.nvim_buf_get_name(args.buf))
     end
   end,
 })
@@ -123,8 +120,12 @@ vim.api.nvim_create_autocmd('BufWritePost', {
 vim.api.nvim_create_autocmd('BufWritePre', {
   group = 'bsuth',
   pattern = { '*.lua' },
-  callback = function()
+  callback = function(args)
     vim.lsp.buf.format()
+
+    -- Sometimes diagnostics seem to disappear after editing, so manually
+    -- refresh here.
+    vim.diagnostic.enable(true, { bufnr = args.buf })
   end,
 })
 
@@ -134,7 +135,7 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 
 vim.api.nvim_create_autocmd('BufWritePre', {
   group = 'bsuth',
-  pattern = C.JS_PATTERNS,
+  pattern = { '*.js', '*.mjs', '*.jsx', '*.ts', '*.tsx', '*.vue' },
   callback = function()
     if vim.fn.exists(':EslintFixAll') ~= 0 then
       vim.cmd('EslintFixAll')
@@ -145,12 +146,6 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 -- -----------------------------------------------------------------------------
 -- Prettier
 -- -----------------------------------------------------------------------------
-
-local prettier_patterns = table.merge(
-  C.CSS_PATTERNS,
-  C.HTML_PATTERNS,
-  C.JSON_PATTERNS
-)
 
 -- https://prettier.io/docs/en/configuration.html
 local prettier_configs = {
@@ -170,10 +165,10 @@ local prettier_configs = {
 
 vim.api.nvim_create_autocmd('BufWritePost', {
   group = 'bsuth',
-  pattern = prettier_patterns,
-  callback = function()
+  pattern = { '*.css', '*.scss', '*.less', '*.html', '*.json', '*.cjson' },
+  callback = function(args)
     if has_ancestor(prettier_configs) then
-      format_async('npx prettier ' .. vim.api.nvim_buf_get_name(0))
+      format_async(args.buf, 'npx prettier ' .. vim.api.nvim_buf_get_name(args.buf))
     end
   end,
 })

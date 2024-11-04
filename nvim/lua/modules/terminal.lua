@@ -37,7 +37,7 @@ vim.keymap.set('t', '<esc>', '<c-\\><c-n>')
 
 vim.api.nvim_create_autocmd('TermOpen', {
   group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
+  pattern = { 'term://*' },
   callback = function()
     vim.wo.number = false
     vim.wo.wrap = true

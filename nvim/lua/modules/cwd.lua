@@ -46,7 +46,6 @@ end)
 
 vim.api.nvim_create_autocmd('TermOpen', {
   group = 'bsuth',
-  pattern = C.TERM_PATTERNS,
   callback = SAVE_BUFFER_CWD,
 })
 

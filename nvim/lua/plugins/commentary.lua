@@ -1,9 +1,10 @@
-local C = require('constants')
-local path = require('utils.path')
 local plugins = require('utils.plugins')
 
+plugins.use('tpope/vim-commentary')
+
 -- -----------------------------------------------------------------------------
--- Erde
+-- Mappings
 -- -----------------------------------------------------------------------------
 
-plugins.use(path.join(C.HOME, 'repos/vim-erde'), { symlink = true })
+vim.keymap.set('n', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
+vim.keymap.set('v', '<c-_>', ':Commentary<cr>') -- <c-_> is secretly <c-/>
