@@ -1,5 +1,4 @@
 local catnip = require('catnip')
-local uv = require('luv')
 
 require('window_manager')
 require('widget')
@@ -8,9 +7,9 @@ require('widget')
 -- Main Loop
 -- -----------------------------------------------------------------------------
 
-catnip.on('tick', function()
-  uv.run('nowait')
-end)
+-- catnip.on('tick', function()
+--   require('luv').run('nowait')
+-- end)
 
 -- -----------------------------------------------------------------------------
 -- System

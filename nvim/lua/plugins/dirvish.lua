@@ -1,5 +1,5 @@
-local edit = require('utils.edit')
-local plugins = require('utils.plugins')
+local edit = require('lib.edit')
+local plugins = require('lib.plugins')
 
 plugins.use('justinmk/vim-dirvish')
 

@@ -1,4 +1,4 @@
-local onedark = require('utils.onedark')
+local onedark = require('lib.onedark')
 
 -- -----------------------------------------------------------------------------
 -- Highlight

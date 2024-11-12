@@ -1,4 +1,4 @@
-local nvim_get_line_column = require('utils.nvim').nvim_get_line_column
+local nvim_get_line_column = require('lib.nvim').nvim_get_line_column
 
 -- -----------------------------------------------------------------------------
 -- Variables

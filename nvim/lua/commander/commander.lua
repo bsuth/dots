@@ -1,9 +1,9 @@
-local root_command = require('command_tree.root_command')
-local nvim_buf_keymap = require('utils.nvim').nvim_buf_keymap
-local nvim_feed_termcodes = require('utils.nvim').nvim_feed_termcodes
-local string = require('utils.stdlib').string
-local table = require('utils.stdlib').table
-local onedark = require('utils.onedark')
+local root_commands = require('commander.commands')
+local nvim_buf_keymap = require('lib.nvim').nvim_buf_keymap
+local nvim_feed_termcodes = require('lib.nvim').nvim_feed_termcodes
+local string = require('lib.stdlib').string
+local table = require('lib.stdlib').table
+local onedark = require('lib.onedark')
 
 local MAX_WINDOW_HEIGHT = 16
 
@@ -11,15 +11,15 @@ local NAMESPACE_ID = vim.api.nvim_create_namespace('')
 vim.api.nvim_set_hl(NAMESPACE_ID, 'OverflowEllipses', { fg = onedark.grey })
 vim.api.nvim_set_hl(NAMESPACE_ID, 'FocusedIndex', { fg = onedark.cyan })
 
-local CommandTree = {}
+local Commander = {}
 
 -- -----------------------------------------------------------------------------
 -- Methods
 -- -----------------------------------------------------------------------------
 
-function CommandTree:refresh()
+function Commander:refresh()
   local head = self.path[#self.path]
-  self.raw_commands = head.callback()
+  self.raw_commands = head.generator()
 
   if vim.api.nvim_get_mode().mode ~= 'i' then
     self.ignore_next_mode_changes = self.ignore_next_mode_changes + 1
@@ -29,13 +29,15 @@ function CommandTree:refresh()
   vim.schedule(function() -- use `vim.schedule` to properly detect insert mode
     vim.api.nvim_buf_set_lines(self.buffer, -2, -1, false, { '' })
 
-    -- Manually trigger the first dynamic filter, since we do not filter
-    -- automatically on buffer change for dynamic commands.
-    if head.dynamic then self:filter() end
+    -- Manually trigger the first lazy filter, since we do not filter
+    -- automatically on buffer change for lazy commands.
+    if head.lazy then
+      self:filter()
+    end
   end)
 end
 
-function CommandTree:filter()
+function Commander:filter()
   local text = string.trim(vim.api.nvim_buf_get_lines(self.buffer, -2, -1, false)[1])
   local head = self.path[#self.path]
 
@@ -44,8 +46,8 @@ function CommandTree:filter()
     self.num_commands = #self.commands
     self:render()
     return
-  elseif head.dynamic then
-    self.commands = head.callback(text)
+  elseif head.lazy then
+    self.commands = head.generator(text)
     self.num_commands = #self.commands
     self:render()
     return
@@ -79,10 +81,10 @@ function CommandTree:filter()
   self:render()
 end
 
-function CommandTree:render()
+function Commander:render()
   local window_height = math.min(
     self.num_commands + 1, -- + 1 for prompt
-    math.floor(0.4 * vim.api.nvim_win_get_height(self.restore_window)),
+    math.floor(0.4 * vim.api.nvim_win_get_height(self.parent_window)),
     MAX_WINDOW_HEIGHT
   )
 
@@ -120,14 +122,14 @@ function CommandTree:render()
   self:highlight()
 end
 
-function CommandTree:highlight()
+function Commander:highlight()
   vim.api.nvim_buf_clear_namespace(self.buffer, NAMESPACE_ID, 0, -1)
 
   if vim.api.nvim_get_mode().mode ~= 'i' then
     return
   end
 
-  if not self.path[#self.path].dynamic and self.num_commands > 0 then
+  if not self.path[#self.path].lazy and self.num_commands > 0 then
     -- -1 for prompt
     -- -1 since `nvim_buf_add_highlight` is 0-index
     local focused_row = vim.api.nvim_buf_line_count(self.buffer) - self.focused_index - 1
@@ -142,7 +144,7 @@ function CommandTree:highlight()
   end
 end
 
-function CommandTree:focus(index)
+function Commander:focus(index)
   local window_height = vim.api.nvim_win_get_height(self.window)
   local has_overflow = self.num_commands + 1 > window_height
   local num_focusable_commands = has_overflow and window_height - 2 or self.num_commands
@@ -150,53 +152,53 @@ function CommandTree:focus(index)
   self:highlight()
 end
 
-function CommandTree:select(index, persist)
+function Commander:select(index, persist)
   local command = self.commands[index]
 
   if command == nil then
     return
   end
 
-  if command.subtree then
-    table.insert(self.path, command)
-    self:refresh()
-    return
-  end
+  -- Restore the parent window before calling our callback function, just in
+  -- case it expects the current window to be the parent.
+  vim.api.nvim_set_current_win(self.parent_window)
 
-  if persist then
-    vim.api.nvim_set_current_win(self.restore_window)
-  else
+  local subtree = command.callback()
+
+  if subtree ~= nil then
+    vim.api.nvim_set_current_win(self.window)
+    table.insert(self.path, subtree)
+    self:refresh()
+  elseif not persist then
     self:close()
   end
-
-  command.callback()
 end
 
-function CommandTree:open()
-  self.path = { root_command }
+function Commander:open()
+  self.path = { root_commands }
   self:refresh()
 
   self.window = vim.api.nvim_open_win(self.buffer, true, {
     relative = 'win',
-    win = self.restore_window,
+    win = self.parent_window,
     anchor = 'SW',
     border = { '', { '-', 'WinSeparator' }, '', '', '', '', '', '' },
     col = 0,
-    row = vim.api.nvim_win_get_height(self.restore_window),
-    width = vim.api.nvim_win_get_width(self.restore_window),
+    row = vim.api.nvim_win_get_height(self.parent_window),
+    width = vim.api.nvim_win_get_width(self.parent_window),
     height = MAX_WINDOW_HEIGHT,
   })
 
   vim.api.nvim_win_set_hl_ns(self.window, NAMESPACE_ID)
 end
 
-function CommandTree:close()
-  vim.api.nvim_set_current_win(self.restore_window)
+function Commander:close()
+  vim.api.nvim_set_current_win(self.parent_window)
   vim.api.nvim_win_hide(self.window)
   self.window = -1
 end
 
-function CommandTree:destroy()
+function Commander:destroy()
   if vim.api.nvim_win_is_valid(self.window) then
     vim.api.nvim_win_close(self.window, true)
     vim.api.nvim_buf_delete(self.buffer, {})
@@ -210,13 +212,13 @@ end
 -- Return
 -- -----------------------------------------------------------------------------
 
-return function(restore_window)
-  local command_tree = setmetatable({
+return function(parent_window)
+  local commander = setmetatable({
     buffer = vim.api.nvim_create_buf(false, false),
     window = -1,
-    restore_window = restore_window,
+    parent_window = parent_window,
 
-    path = { root_command },
+    path = { root_commands },
     raw_commands = {},
     commands = {},
     num_commands = 0,
@@ -224,70 +226,71 @@ return function(restore_window)
 
     ignore_next_buffer_changes = 0,
     ignore_next_mode_changes = 0,
-  }, { __index = CommandTree })
+  }, { __index = Commander })
 
-  vim.api.nvim_set_option_value('bufhidden', 'hide', { buf = command_tree.buffer })
-  vim.api.nvim_set_option_value('buftype', 'prompt', { buf = command_tree.buffer })
-  vim.api.nvim_set_option_value('buflisted', false, { buf = command_tree.buffer })
-  vim.api.nvim_set_option_value('swapfile', false, { buf = command_tree.buffer })
-  vim.fn.prompt_setprompt(command_tree.buffer, '')
+  vim.api.nvim_set_option_value('bufhidden', 'hide', { buf = commander.buffer })
+  vim.api.nvim_set_option_value('buftype', 'prompt', { buf = commander.buffer })
+  vim.api.nvim_set_option_value('buflisted', false, { buf = commander.buffer })
+  vim.api.nvim_set_option_value('swapfile', false, { buf = commander.buffer })
+  vim.api.nvim_buf_set_name(commander.buffer, "[Commander]")
+  vim.fn.prompt_setprompt(commander.buffer, '')
 
-  local focus_previous = function() command_tree:focus(command_tree.focused_index - 1) end
-  local focus_next = function() command_tree:focus(command_tree.focused_index + 1) end
+  local focus_previous = function() commander:focus(commander.focused_index - 1) end
+  local focus_next = function() commander:focus(commander.focused_index + 1) end
 
   -- Reverse directions to match bottom prompt
-  nvim_buf_keymap(command_tree.buffer, 'i', '<S-Tab>', focus_previous)
-  nvim_buf_keymap(command_tree.buffer, 'i', '<down>', focus_previous)
-  nvim_buf_keymap(command_tree.buffer, 'i', '<c-n>', focus_previous)
-  nvim_buf_keymap(command_tree.buffer, 'i', '<Tab>', focus_next)
-  nvim_buf_keymap(command_tree.buffer, 'i', '<up>', focus_next)
-  nvim_buf_keymap(command_tree.buffer, 'i', '<c-p>', focus_next)
+  nvim_buf_keymap(commander.buffer, 'i', '<S-Tab>', focus_previous)
+  nvim_buf_keymap(commander.buffer, 'i', '<down>', focus_previous)
+  nvim_buf_keymap(commander.buffer, 'i', '<c-n>', focus_previous)
+  nvim_buf_keymap(commander.buffer, 'i', '<Tab>', focus_next)
+  nvim_buf_keymap(commander.buffer, 'i', '<up>', focus_next)
+  nvim_buf_keymap(commander.buffer, 'i', '<c-p>', focus_next)
 
-  nvim_buf_keymap(command_tree.buffer, 'n', 'i', function()
+  nvim_buf_keymap(commander.buffer, 'n', 'i', function()
     vim.cmd('startinsert!')
   end)
 
-  nvim_buf_keymap(command_tree.buffer, 'i', '<cr>', function()
-    if command_tree.path[#command_tree.path].dynamic then
-      command_tree:filter()
+  nvim_buf_keymap(commander.buffer, 'i', '<cr>', function()
+    if commander.path[#commander.path].lazy then
+      commander:filter()
     else
-      command_tree:select(command_tree.focused_index)
+      commander:select(commander.focused_index)
     end
   end)
 
-  nvim_buf_keymap(command_tree.buffer, 'n', '<cr>', function()
-    local buffer_line = vim.api.nvim_win_get_cursor(command_tree.window)[1]
-    command_tree:select(command_tree.num_commands - buffer_line + 1)
+  nvim_buf_keymap(commander.buffer, 'n', '<cr>', function()
+    local buffer_line = vim.api.nvim_win_get_cursor(commander.window)[1]
+    commander:select(commander.num_commands - buffer_line + 1)
   end)
 
-  nvim_buf_keymap(command_tree.buffer, 'i', '<m-cr>', function()
-    if not command_tree.path[#command_tree.path].dynamic then
-      command_tree:select(command_tree.focused_index, true)
+  nvim_buf_keymap(commander.buffer, 'i', '<m-cr>', function()
+    if not commander.path[#commander.path].lazy then
+      commander:select(commander.focused_index, true)
     end
   end)
 
-  nvim_buf_keymap(command_tree.buffer, 'n', '<m-cr>', function()
-    local buffer_line = vim.api.nvim_win_get_cursor(command_tree.window)[1]
-    command_tree:select(command_tree.num_commands - buffer_line + 1, true)
+  nvim_buf_keymap(commander.buffer, 'n', '<m-cr>', function()
+    local buffer_line = vim.api.nvim_win_get_cursor(commander.window)[1]
+    commander:select(commander.num_commands - buffer_line + 1, true)
   end)
 
-  nvim_buf_keymap(command_tree.buffer, 'n', '<esc>', function()
-    if #command_tree.path == 1 then
-      command_tree:close()
+  nvim_buf_keymap(commander.buffer, 'n', '<esc>', function()
+    if #commander.path == 1 then
+      commander:close()
     else
-      table.remove(command_tree.path)
-      command_tree:refresh()
+      table.remove(commander.path)
+      commander:refresh()
     end
   end)
 
-  vim.api.nvim_buf_attach(command_tree.buffer, false, {
+  vim.api.nvim_buf_attach(commander.buffer, false, {
     on_lines = function()
       vim.schedule(function() -- use `vim.schedule` to update only after `textlock` is removed
-        if command_tree.ignore_next_buffer_changes > 0 then
-          command_tree.ignore_next_buffer_changes = command_tree.ignore_next_buffer_changes - 1
-        elseif not command_tree.path[#command_tree.path].dynamic then
-          command_tree.focused_index = 1
-          command_tree:filter()
+        if commander.ignore_next_buffer_changes > 0 then
+          commander.ignore_next_buffer_changes = commander.ignore_next_buffer_changes - 1
+        elseif not commander.path[#commander.path].lazy then
+          commander.focused_index = 1
+          commander:filter()
         end
       end)
     end,
@@ -295,16 +298,15 @@ return function(restore_window)
 
   vim.api.nvim_create_autocmd('ModeChanged', {
     group = 'bsuth',
-    buffer = command_tree.buffer,
+    buffer = commander.buffer,
     callback = function()
-      if command_tree.ignore_next_mode_changes > 0 then
-        command_tree.ignore_next_mode_changes = command_tree.ignore_next_mode_changes - 1
+      if commander.ignore_next_mode_changes > 0 then
+        commander.ignore_next_mode_changes = commander.ignore_next_mode_changes - 1
       else
-        command_tree:render()
+        commander:render()
       end
     end,
   })
 
-  command_tree:open()
-  return command_tree
+  return commander
 end

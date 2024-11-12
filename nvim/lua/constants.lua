@@ -1,4 +1,4 @@
-local path = require('utils.path')
+local path = require('lib.path')
 
 local M = {}
 

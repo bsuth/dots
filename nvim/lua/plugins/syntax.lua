@@ -1,6 +1,6 @@
 local C = require('constants')
-local path = require('utils.path')
-local plugins = require('utils.plugins')
+local path = require('lib.path')
+local plugins = require('lib.plugins')
 
 -- -----------------------------------------------------------------------------
 -- Erde

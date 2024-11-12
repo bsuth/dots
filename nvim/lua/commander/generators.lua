@@ -1,9 +1,9 @@
-local path = require('utils.path')
-local string = require('utils.stdlib').string
+local path = require('lib.path')
+local string = require('lib.stdlib').string
 
 local M = {}
 
-function M.buffer()
+function M.buffers()
   local commands = {}
 
   for _, bufinfo in ipairs(vim.fn.getbufinfo()) do
@@ -25,7 +25,7 @@ function M.buffer()
   return commands
 end
 
-function M.directory(cwd)
+function M.directories(cwd)
   cwd = cwd or vim.fn.getcwd()
 
   local commands = {}
@@ -83,7 +83,7 @@ function M.favorites()
   return commands
 end
 
-function M.file(cwd)
+function M.files(cwd)
   cwd = cwd or vim.fn.getcwd()
 
   local commands = {}

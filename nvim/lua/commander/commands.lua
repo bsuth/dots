@@ -1,9 +1,9 @@
 local C = require('constants')
-local generators = require('command_tree.generators')
-local path = require('utils.path')
-local io = require('utils.stdlib').io
-local table = require('utils.stdlib').table
-local sudo = require('utils.sudo')
+local generators = require('commander.generators')
+local path = require('lib.path')
+local io = require('lib.stdlib').io
+local table = require('lib.stdlib').table
+local sudo = require('lib.sudo')
 
 -- -----------------------------------------------------------------------------
 -- Default Commands
@@ -49,33 +49,61 @@ local DEFAULT_COMMANDS = {
   {
     label = 'buffers',
     subtree = true,
-    callback = generators.buffer,
+    callback = function()
+      return { generator = generators.buffers }
+    end,
   },
   {
     label = 'directories',
     subtree = true,
-    callback = generators.directory,
+    callback = function()
+      local cwd = vim.fn.getcwd()
+
+      local function cwd_directories(text)
+        return generators.directories(cwd)
+      end
+
+      return { generator = cwd_directories }
+    end,
   },
   {
     label = 'files',
     subtree = true,
-    callback = generators.file,
+    callback = function()
+      local cwd = vim.fn.getcwd()
+
+      local function cwd_files(text)
+        return generators.files(cwd)
+      end
+
+      return { generator = cwd_files }
+    end,
   },
   {
     label = 'grep',
-    subtree = true,
-    dynamic = true,
-    callback = generators.grep,
+    callback = function()
+      local cwd = vim.fn.getcwd()
+
+      local function cwd_grep(text)
+        return generators.grep(text, cwd)
+      end
+
+      return { generator = cwd_grep, lazy = true }
+    end,
   },
   {
     label = 'help',
     subtree = true,
-    callback = generators.help,
+    callback = function()
+      return { generator = generators.help }
+    end,
   },
   {
     label = 'man',
     subtree = true,
-    callback = generators.man,
+    callback = function()
+      return { generator = generators.man }
+    end,
   },
 
   -- ---------------------------------------------------------------------------
@@ -86,12 +114,6 @@ local DEFAULT_COMMANDS = {
     label = 'home',
     callback = function()
       vim.cmd('edit ' .. C.HOME)
-    end,
-  },
-  {
-    label = 'plugins',
-    callback = function()
-      vim.cmd('edit ' .. C.PLUGINS_DIR)
     end,
   },
   {
@@ -112,17 +134,23 @@ local DEFAULT_COMMANDS = {
   -- ---------------------------------------------------------------------------
 
   {
-    label = 'clean (plugins)',
+    label = 'plugins.root',
     callback = function()
-      -- NOTE: Neovim requires commands for multiline printing...
-      -- https://github.com/neovim/neovim/issues/5067
-      vim.cmd('lua require("utils.plugins").clean()')
+      vim.cmd('edit ' .. C.PLUGINS_DIR)
     end,
   },
   {
-    label = 'update (plugins)',
+    label = 'plugins.clean',
     callback = function()
-      vim.cmd('lua require("utils.plugins").update()')
+      -- NOTE: Neovim requires commands for multiline printing...
+      -- https://github.com/neovim/neovim/issues/5067
+      vim.cmd('lua require("lib.plugins").clean()')
+    end,
+  },
+  {
+    label = 'plugins.update',
+    callback = function()
+      vim.cmd('lua require("lib.plugins").update()')
     end,
   },
 }
@@ -131,7 +159,7 @@ local DEFAULT_COMMANDS = {
 -- Project Commands
 -- -----------------------------------------------------------------------------
 
-local function get_project_root(dir)
+local function get_git_root(dir)
   dir = dir or path.lead(vim.fn.getcwd())
 
   while dir:match('^' .. C.HOME .. '/.+') do
@@ -143,40 +171,52 @@ local function get_project_root(dir)
   end
 end
 
-local function get_project_commands()
-  local project_root = get_project_root()
+local function get_git_commands()
+  local git_root = get_git_root()
 
-  if project_root == nil then
+  if git_root == nil then
     return {}
   end
 
   return {
     {
-      label = 'project',
+      label = 'git.root',
       callback = function()
-        vim.cmd('edit ' .. project_root)
+        vim.cmd('edit ' .. git_root)
       end,
     },
     {
-      label = 'project.directories',
+      label = 'git.directories',
       subtree = true,
       callback = function()
-        return generators.directory(project_root)
+        local function git_directories()
+          return generators.directories(git_root)
+        end
+
+        return { generator = git_directories }
       end,
     },
     {
-      label = 'project.files',
+      label = 'git.files',
       subtree = true,
       callback = function()
-        return generators.file(project_root)
+        local function git_files()
+          return generators.files(git_root)
+        end
+
+        return { generator = git_files }
       end,
     },
     {
-      label = 'project.grep',
+      label = 'git.grep',
       subtree = true,
-      dynamic = true,
+      lazy = true,
       callback = function(text)
-        return generators.grep(text, project_root)
+        local function git_grep(text)
+          return generators.grep(text, git_root)
+        end
+
+        return { generator = git_grep, lazy = true }
       end,
     },
   }
@@ -205,38 +245,26 @@ local function get_make_commands()
     return {}
   end
 
-  local cmd = table.concat({
+  local pipe_cmd = table.concat({
     ('make --directory "%s" --dry-run --print-data-base'):format(make_root),
     'grep ".PHONY\\s*:"',
     'sed -E "s/.PHONY\\s*:\\s*(.*)/\\1/"',
     'tr " " "\\n"',
   }, ' | ')
 
-  local subcommands = {}
-  local pipe = assert(io.popen(cmd, 'r'))
+  local commands = {}
+  local pipe = assert(io.popen(pipe_cmd, 'r'))
 
   for line in pipe:lines() do
-    table.insert(subcommands, {
-      label = line,
+    table.insert(commands, {
+      label = "make." .. line,
       callback = function()
         vim.cmd(('silent exec "!make --directory %s %s"'):format(make_root, line))
       end,
     })
   end
 
-  if #subcommands == 0 then
-    return {}
-  end
-
-  return {
-    {
-      label = 'make',
-      subtree = true,
-      callback = function()
-        return subcommands
-      end,
-    },
-  }
+  return commands
 end
 
 -- -----------------------------------------------------------------------------
@@ -244,11 +272,11 @@ end
 -- -----------------------------------------------------------------------------
 
 return {
-  callback = function()
+  generator = function()
     return table.merge(
       DEFAULT_COMMANDS,
       generators.favorites(),
-      get_project_commands(),
+      get_git_commands(),
       get_make_commands()
     )
   end,

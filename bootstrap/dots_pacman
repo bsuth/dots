@@ -4,28 +4,29 @@ set -e
 
 declare -a PACMAN_PACKAGES=(
   # System
-  amd-ucode
-  efibootmgr
+  # amd-ucode # AMD
+  intel-ucode
   lvm2
-  upower
-  usbutils
+  # upower # TODO: remove?
+  # usbutils # TODO: remove?
   udiskie
+  sudo
 
   # X11
-  xf86-video-amdgpu # AMD
-  # xf86-video-intel # Intel
+  # xf86-video-amdgpu # AMD
+  xf86-video-intel # Intel
   xorg-server
   xorg-xrandr
-  xorg-server-xephyr
+  # xorg-server-xephyr # TODO: remove?
   xorg-xinit
-  xorg-xev
+  xorg-xev # TODO: remove?
   xclip
   xsel
-  awesome
+  awesome # TODO: remove?
   picom
 
   # Wifi / Bluetooth
-  iwd
+  networkmanager
   bluez
   bluez-utils
 
@@ -48,15 +49,12 @@ declare -a PACMAN_PACKAGES=(
   bear
   nodejs
   npm
-  rust
-  go
-  python3
-  python-pip
 
   # Tools
   reflector
   base-devel
   man-db
+  man-pages
   git
   openssh
   zsh
@@ -67,6 +65,7 @@ declare -a PACMAN_PACKAGES=(
   fzf
   brightnessctl
   htop
+  pass
 
   # Apps
   flameshot
@@ -75,8 +74,6 @@ declare -a PACMAN_PACKAGES=(
   neovim
   firefox-developer-edition
   arandr
-  inkscape
-  mpv
 )
 
 sudo pacman -Syu --needed "${PACMAN_PACKAGES[@]}"

@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -e
-
-cd "$DOTS/st"
-make
-sudo make install
-cd -

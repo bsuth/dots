@@ -5,7 +5,7 @@
 #
 # As root:
 # 1) Creating a new user
-#   useradd -m -d /home/bsuth -s /bin/zsh -G sudo bsuth 
+#   useradd -m -d /home/bsuth -s /bin/zsh -G sudo bsuth
 #   passwd bsuth
 # 2) Creating the sudo group
 #   groupadd sudo
@@ -19,10 +19,10 @@
 #   Ex)
 #    [Match]
 #    Name=wlan0
-#    
+#
 #    [Network]
 #    DHCP=yes
-# 
+#
 # As user:
 # 1) Enable services
 #   - systemd-networkd
@@ -37,10 +37,6 @@ set -e
 DOTS="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 $DOTS/bin/dots_pacman
-$DOTS/bin/dots_npm
-$DOTS/bin/dots_luarocks
-$DOTS/bin/dots_st
-$DOTS/bin/dots_symlinks
 
 echo "The following need to be setup manually:"
 echo "1) Browser"

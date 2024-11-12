@@ -1,6 +1,6 @@
-local nvim_feed_termcodes = require('utils.nvim').nvim_feed_termcodes
-local nvim_get_line_column = require('utils.nvim').nvim_get_line_column
-local string = require('utils.stdlib').string
+local nvim_feed_termcodes = require('lib.nvim').nvim_feed_termcodes
+local nvim_get_line_column = require('lib.nvim').nvim_get_line_column
+local string = require('lib.stdlib').string
 
 -- -----------------------------------------------------------------------------
 -- Variables

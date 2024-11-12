@@ -2,13 +2,20 @@
 # General
 # ------------------------------------------------------------------------------
 
-export DOTS="$HOME/dots"
-export ZDOTDIR="$DOTS/zsh"
-
 export SHELL='/bin/zsh'
 export EDITOR=nvim
 export WORDCHARS=${WORDCHARS//[\/\.]}
 export BROWSER='none'
+
+export DOCUMENTS="$HOME/documents"
+export DOTS="$HOME/dots"
+
+export ZDOTDIR="$DOTS/zsh"
+export GNUPGHOME="$DOCUMENTS/gnupg"
+export PASSWORD_STORE_DIR="$DOCUMENTS/passwords"
+
+export XAUTHORITY="$XDG_RUNTIME_DIR/Xauthority"
+export LESSHISTFILE=-
 
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/bin:$PATH"

@@ -1,4 +1,4 @@
-local plugins = require('utils.plugins')
+local plugins = require('lib.plugins')
 
 plugins.use('matze/vim-move')
 

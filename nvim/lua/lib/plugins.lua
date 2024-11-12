@@ -1,7 +1,7 @@
 local C = require('constants')
-local path = require('utils.path')
-local io = require('utils.stdlib').io
-local table = require('utils.stdlib').table
+local path = require('lib.path')
+local io = require('lib.stdlib').io
+local table = require('lib.stdlib').table
 
 -- -----------------------------------------------------------------------------
 -- Variables

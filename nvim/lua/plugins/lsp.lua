@@ -1,6 +1,6 @@
 local C = require('constants')
-local path = require('utils.path')
-local plugins = require('utils.plugins')
+local path = require('lib.path')
+local plugins = require('lib.plugins')
 
 -- -----------------------------------------------------------------------------
 -- Mappings
@@ -60,12 +60,12 @@ cmp.setup({
 })
 
 -- -----------------------------------------------------------------------------
--- Neodev
+-- lazydev
 -- -----------------------------------------------------------------------------
 
 -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
-plugins.use('folke/neodev.nvim')
-require("neodev").setup({})
+plugins.use('folke/lazydev.nvim')
+require("lazydev").setup({})
 
 -- -----------------------------------------------------------------------------
 -- LSP Config
@@ -76,14 +76,10 @@ plugins.use('neovim/nvim-lspconfig')
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
-local mason_registry = require('mason-registry')
-
 local LSP_SERVERS = {
   clangd = {},
-  cssls = {},
-  elixirls = { cmd = { path.join(C.HOME, '.local/share/nvim/mason/bin/elixir-ls') } },
   eslint = {},
-  jsonls = {},
+  ts_ls = {},
   lua_ls = {
     settings = {
       Lua = {
@@ -91,44 +87,6 @@ local LSP_SERVERS = {
           version = 'LuaJIT',
         },
       },
-    },
-  },
-  pylsp = {
-    settings = {
-      pylsp = {
-        plugins = {
-          pylsp_mypy = { enabled = true },
-          rope = { enabled = true },
-          ruff = {
-            enabled = true,
-            extendSelect = { 'I' },
-            format = { 'I' },
-          },
-        },
-      },
-    },
-  },
-  tailwindcss = {},
-  tsserver = {
-    filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
-    init_options = {
-      plugins = {
-        {
-          name = '@vue/typescript-plugin',
-          languages = { 'vue' },
-          location = mason_registry.get_package('vue-language-server'):get_install_path() ..
-              '/node_modules/@vue/language-server',
-        },
-      },
-    },
-  },
-  volar = {
-    settings = {
-      scss = {
-        lint = {
-          unknownAtRules = 'ignore',
-        },
-      }
     },
   },
 }
