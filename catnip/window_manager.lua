@@ -355,9 +355,26 @@ catnip.windows:on('create', function(window)
   end
 
   table.insert(workspace.windows, window)
-  add_window_tile(window, true)
+
+  local old_focused_window = catnip.focused
+
+  window.x = old_focused_window.x
+  window.y = old_focused_window.y
+  window.width = old_focused_window.width
+  window.height = old_focused_window.height
+
+  old_focused_window.visible = false
+  window.visible = true
+
+  catnip.focused = window
 end)
 
 catnip.windows:on('destroy', function(window)
   remove_window_tile(window)
+
+  local workspace, index = get_window_workspace(window)
+
+  if workspace ~= nil then
+    table.remove(workspace.windows, index)
+  end
 end)

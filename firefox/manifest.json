@@ -1,0 +1,15 @@
+{
+  "name": "dots",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "scripts": ["build/background.js"],
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "js": ["build/content.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

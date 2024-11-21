@@ -12,3 +12,7 @@ slock/slock
 .zcompdump
 .zhistory
 .zwork
+
+# firefox
+node_modules
+build

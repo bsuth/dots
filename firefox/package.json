@@ -1,0 +1,12 @@
+{
+  "name": "firefox",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/watch.mjs"
+  },
+  "devDependencies": {
+    "@types/firefox-webext-browser": "^120.0.4",
+    "esbuild": "^0.24.0"
+  }
+}
