@@ -1,16 +1,9 @@
 import { type Keybindings } from "./types";
 
 export interface State {
-  // TODO
   activeKeybindings: Keybindings;
-
-  // TODO
   activeScrollElement: Element;
-
-  // TODO
   pendingKeySequence: string;
-
-  // TOSO
   pendingKeySequenceTimeout: number;
 }
 

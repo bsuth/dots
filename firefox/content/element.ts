@@ -1,11 +1,3 @@
-export function traverseElement(element: Element, callback: (element: Element) => void) {
-  callback(element);
-
-  for (const child of element.children) {
-    traverseElement(child, callback);
-  }
-}
-
 export function isAncestorElement(child: Element, ancestor: Element) {
   if (child.parentNode === ancestor) {
     return true;
@@ -13,6 +5,22 @@ export function isAncestorElement(child: Element, ancestor: Element) {
     return isAncestorElement(child.parentNode, ancestor);
   } else {
     return false;
+  }
+}
+
+export function isScrollableElement(element: Element) {
+  if (element.clientHeight === element.scrollHeight) {
+    return false;
+  }
+
+  const overflowY = getComputedStyle(element).overflowY;
+
+  if (element === document.documentElement) {
+    // The root element still acts as a scroll container when the overflow is
+    // set to 'visible'.
+    return overflowY !== 'hidden' && overflowY !== 'clip';
+  } else {
+    return overflowY !== 'visible' && overflowY !== 'hidden' && overflowY !== 'clip';
   }
 }
 
@@ -37,18 +45,10 @@ export function isVisibleElement(element: Element) {
   );
 }
 
-export function isScrollableElement(element: Element) {
-  if (element.clientHeight === element.scrollHeight) {
-    return false;
-  }
+export function traverseElement(element: Element, callback: (element: Element) => void) {
+  callback(element);
 
-  const overflowY = getComputedStyle(element).overflowY;
-
-  if (element === document.documentElement) {
-    // The root element still acts as a scroll container when the overflow is
-    // set to 'visible'.
-    return overflowY !== 'hidden' && overflowY !== 'clip';
-  } else {
-    return overflowY !== 'visible' && overflowY !== 'hidden' && overflowY !== 'clip';
+  for (const child of element.children) {
+    traverseElement(child, callback);
   }
 }

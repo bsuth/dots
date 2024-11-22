@@ -1,14 +1,9 @@
-// TODO
 export const SCROLL_HIGHLIGHT_COLOR = '#57A5E5';
 
-// TODO
 export const SCROLL_HIGHLIGHT_TIMEOUT = 500;
 
-// TODO
 export const SCROLL_SPEED_FAST = 500;
 
-// TODO
 export const SCROLL_SPEED_SLOW = 200;
 
-// TODO
 export const KEY_SEQUENCE_TIMEOUT_MS = 500;

@@ -1,13 +1,5 @@
-import { KEY_SEQUENCE_TIMEOUT_MS } from './constants';
-import {
-  cycleHighlightedScrollContainers,
-  scrollDownFast,
-  scrollDownSlow,
-  scrollToTop,
-  scrollToBottom,
-  scrollUpFast,
-  scrollUpSlow,
-} from "./scroll";
+import { KEY_SEQUENCE_TIMEOUT_MS, SCROLL_SPEED_FAST, SCROLL_SPEED_SLOW } from './constants';
+import { cycleActiveScrollElement } from "./cycleActiveScrollElement";
 import { state } from './state';
 import { type Keybindings } from './types';
 
@@ -18,14 +10,14 @@ import { type Keybindings } from './types';
 export const DEFAULT_KEYBINDINGS: Keybindings = {
   H: () => history.back(),
   L: () => history.forward(),
-  j: scrollDownSlow,
-  k: scrollUpSlow,
-  d: scrollDownFast,
-  u: scrollUpFast,
-  gg: scrollToTop,
-  G: scrollToBottom,
-  s: () => cycleHighlightedScrollContainers(1),
-  S: () => cycleHighlightedScrollContainers(-1),
+  j: () => state.activeScrollElement.scrollBy({ top: SCROLL_SPEED_SLOW, behavior: 'instant' }),
+  k: () => state.activeScrollElement.scrollBy({ top: -SCROLL_SPEED_SLOW, behavior: 'instant' }),
+  d: () => state.activeScrollElement.scrollBy({ top: SCROLL_SPEED_FAST, behavior: 'instant' }),
+  u: () => state.activeScrollElement.scrollBy({ top: -SCROLL_SPEED_FAST, behavior: 'instant' }),
+  gg: () => state.activeScrollElement.scrollTo({ top: 0, behavior: 'instant' }),
+  G: () => state.activeScrollElement.scrollTo({ top: state.activeScrollElement.scrollHeight, behavior: 'instant' }),
+  s: () => cycleActiveScrollElement(1),
+  S: () => cycleActiveScrollElement(-1),
 }
 
 // -----------------------------------------------------------------------------
