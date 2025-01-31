@@ -7,7 +7,7 @@ export EDITOR=nvim
 export WORDCHARS=${WORDCHARS//[\/\.]}
 export BROWSER='none'
 
-export DOCUMENTS="$HOME/documents"
+export DOCUMENTS="$HOME/Documents"
 export DOTS="$HOME/dots"
 
 export ZDOTDIR="$DOTS/zsh"

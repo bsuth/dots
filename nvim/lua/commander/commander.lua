@@ -232,7 +232,6 @@ return function(parent_window)
   vim.api.nvim_set_option_value('buftype', 'prompt', { buf = commander.buffer })
   vim.api.nvim_set_option_value('buflisted', false, { buf = commander.buffer })
   vim.api.nvim_set_option_value('swapfile', false, { buf = commander.buffer })
-  vim.api.nvim_buf_set_name(commander.buffer, "[Commander]")
   vim.fn.prompt_setprompt(commander.buffer, '')
 
   local focus_previous = function() commander:focus(commander.focused_index - 1) end

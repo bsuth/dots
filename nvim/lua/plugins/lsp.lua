@@ -1,5 +1,3 @@
-local C = require('constants')
-local path = require('lib.path')
 local plugins = require('lib.plugins')
 
 -- -----------------------------------------------------------------------------
@@ -78,8 +76,23 @@ local cmp_nvim_lsp = require('cmp_nvim_lsp')
 
 local LSP_SERVERS = {
   clangd = {},
+  cssls = {},
   eslint = {},
+  gopls = {},
   ts_ls = {},
+  tailwindcss = {
+    settings = {
+      tailwindCSS = {
+        experimental = {
+          classRegex = {
+            { "classes\\(([^)]*)\\)", [['([^']*)']] },
+            { "classes\\(([^)]*)\\)", [["([^"]*)"]] },
+            { "classes\\(([^)]*)\\)", [[`([^`]*)`]] },
+          },
+        },
+      },
+    },
+  },
   lua_ls = {
     settings = {
       Lua = {
@@ -93,6 +106,12 @@ local LSP_SERVERS = {
 
 for server, config in pairs(LSP_SERVERS) do
   local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
-  capabilities.textDocument.completion.completionItem.snippetSupport = false
+
+  if server == 'tailwindcss' or server == 'cssls' then
+    capabilities.textDocument.completion.completionItem.snippetSupport = true
+  else
+    capabilities.textDocument.completion.completionItem.snippetSupport = false
+  end
+
   lspconfig[server].setup(vim.tbl_deep_extend('force', { capabilities = capabilities }, config))
 end

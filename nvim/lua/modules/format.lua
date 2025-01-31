@@ -1,7 +1,6 @@
 local C = require('constants')
 local path = require('lib.path')
 local io = require('lib.stdlib').io
-local table = require('lib.stdlib').table
 
 -- -----------------------------------------------------------------------------
 -- Jobs
@@ -12,7 +11,7 @@ local buffer_async_jobs = {}
 vim.api.nvim_create_autocmd('BufModifiedSet', {
   group = 'bsuth',
   callback = function(params)
-    if vim.api.nvim_buf_get_option(params.buf, 'modified') then
+    if vim.api.nvim_get_option_value('modified', { buf = params.buf }) then
       for job_id, buffer in pairs(buffer_async_jobs) do
         if buffer == params.buf then
           vim.fn.jobstop(job_id)
@@ -130,6 +129,18 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 })
 
 -- -----------------------------------------------------------------------------
+-- Golang
+-- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = 'bsuth',
+  pattern = { '*.go' },
+  callback = function()
+    vim.lsp.buf.format()
+  end,
+})
+
+-- -----------------------------------------------------------------------------
 -- Eslint
 -- -----------------------------------------------------------------------------
 
@@ -168,7 +179,7 @@ vim.api.nvim_create_autocmd('BufWritePost', {
   pattern = { '*.css', '*.scss', '*.less', '*.html', '*.json', '*.cjson' },
   callback = function(args)
     if has_ancestor(prettier_configs) then
-      format_async(args.buf, 'npx prettier ' .. vim.api.nvim_buf_get_name(args.buf))
+      format_sync(args.buf, 'npx prettier ' .. vim.api.nvim_buf_get_name(args.buf))
     end
   end,
 })

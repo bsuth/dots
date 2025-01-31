@@ -3,9 +3,14 @@ local awful = require('awful')
 return {
   label = 'spawn',
   {
-    label = 'dfeet',
+    label = 'aseprite',
     type = 'once',
-    callback = () -> awful.spawn('d-feet'),
+    callback = () -> awful.spawn('aseprite'),
+  },
+  {
+    label = 'd-spy',
+    type = 'once',
+    callback = () -> awful.spawn('d-spy'),
   },
   {
     label = 'discord',
