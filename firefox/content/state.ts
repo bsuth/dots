@@ -1,15 +1,13 @@
-import { type Keybindings } from "./types";
-
 export interface State {
-  activeKeybindings: Keybindings;
   activeScrollElement: Element;
+  disableKeybindings: boolean;
   pendingKeySequence: string;
   pendingKeySequenceTimeout: number;
 }
 
 export const state: State = {
-  activeKeybindings: {},
   activeScrollElement: document.documentElement,
+  disableKeybindings: false,
   pendingKeySequence: '',
   pendingKeySequenceTimeout: -1,
 };

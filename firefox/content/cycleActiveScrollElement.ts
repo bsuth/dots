@@ -1,34 +1,33 @@
-import { SCROLL_HIGHLIGHT_COLOR, SCROLL_HIGHLIGHT_TIMEOUT } from './constants';
+import {
+  SCROLL_HIGHLIGHT_BACKGROUND,
+  SCROLL_HIGHLIGHT_BORDER,
+  SCROLL_HIGHLIGHT_TIMEOUT,
+} from './constants';
 import { isScrollableElement, isVisibleElement, traverseElement } from './element';
 import { state } from './state';
-
-// -----------------------------------------------------------------------------
-// State
-// -----------------------------------------------------------------------------
 
 let highlightTimeout = -1;
 
 const highlightElement = document.createElement('div');
+highlightElement.style.display = 'none';
 highlightElement.style.zIndex = '2147483647';
 highlightElement.style.position = 'fixed';
 highlightElement.style.boxSizing = 'border-box';
-highlightElement.style.background = `${SCROLL_HIGHLIGHT_COLOR}22`;
-highlightElement.style.border = `4px solid ${SCROLL_HIGHLIGHT_COLOR}FF`;
+highlightElement.style.background = SCROLL_HIGHLIGHT_BACKGROUND;
+highlightElement.style.border = SCROLL_HIGHLIGHT_BORDER;
 document.body.append(highlightElement);
-
-// -----------------------------------------------------------------------------
-// cycleActiveScrollElement
-// -----------------------------------------------------------------------------
 
 export function cycleActiveScrollElement(increment: number) {
   const scrollElements: Element[] = [];
   let activeScrollElementIndex = 0;
 
   traverseElement(document.documentElement, child => {
-    if (child === state.activeScrollElement) {
+    if (!isVisibleElement(child)) {
+      return false;
+    } else if (child === state.activeScrollElement) {
       activeScrollElementIndex = scrollElements.length;
       scrollElements.push(child);
-    } else if (isScrollableElement(child) && isVisibleElement(child)) {
+    } else if (isScrollableElement(child)) {
       scrollElements.push(child);
     }
   });

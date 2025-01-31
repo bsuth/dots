@@ -1,13 +1,9 @@
 import { KEY_SEQUENCE_TIMEOUT_MS, SCROLL_SPEED_FAST, SCROLL_SPEED_SLOW } from './constants';
 import { cycleActiveScrollElement } from "./cycleActiveScrollElement";
+import { find } from './find';
 import { state } from './state';
-import { type Keybindings } from './types';
 
-// -----------------------------------------------------------------------------
-// Keybindings
-// -----------------------------------------------------------------------------
-
-export const DEFAULT_KEYBINDINGS: Keybindings = {
+export const keybindings = {
   H: () => history.back(),
   L: () => history.forward(),
   j: () => state.activeScrollElement.scrollBy({ top: SCROLL_SPEED_SLOW, behavior: 'instant' }),
@@ -18,15 +14,14 @@ export const DEFAULT_KEYBINDINGS: Keybindings = {
   G: () => state.activeScrollElement.scrollTo({ top: state.activeScrollElement.scrollHeight, behavior: 'instant' }),
   s: () => cycleActiveScrollElement(1),
   S: () => cycleActiveScrollElement(-1),
+  f: () => find(),
 }
 
-// -----------------------------------------------------------------------------
-// Main
-// -----------------------------------------------------------------------------
-
-state.activeKeybindings = DEFAULT_KEYBINDINGS;
-
 window.addEventListener('keydown', event => {
+  if (state.disableKeybindings) {
+    return;
+  }
+
   if (document.activeElement instanceof HTMLInputElement) {
     return; // do not block <input>
   }
@@ -35,18 +30,18 @@ window.addEventListener('keydown', event => {
     return; // do not block <textarea>
   }
 
-  const activeKeySequence = state.pendingKeySequence + event.key;
+  const activeKeySequence = state.pendingKeySequence + (event.key.match(/^[a-zA-Z0-9]$/) ? event.key : '');
 
   state.pendingKeySequence = '';
   clearTimeout(state.pendingKeySequenceTimeout);
 
-  if (activeKeySequence in state.activeKeybindings) {
-    state.activeKeybindings[activeKeySequence]();
+  if (activeKeySequence in keybindings) {
+    keybindings[activeKeySequence]();
     event.stopPropagation();
     return;
   }
 
-  for (const keySequence in state.activeKeybindings) {
+  for (const keySequence in keybindings) {
     if (keySequence.startsWith(activeKeySequence)) {
       state.pendingKeySequence = activeKeySequence;
       state.pendingKeySequenceTimeout = setTimeout(
