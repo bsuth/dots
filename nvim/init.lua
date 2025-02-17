@@ -65,9 +65,17 @@ vim.keymap.set('n', '_', function()
   vim.cmd('nohlsearch')
 end)
 
--- remove annoying defaults
-vim.keymap.set('n', 'K', function() end)     -- open manual
-vim.keymap.set('n', '<c-z>', function() end) -- background neovim
+-- remove default bindings
+-- must be done after VimEnter to ensure the keybinding actually exists
+vim.api.nvim_create_autocmd('VimEnter', {
+  group = 'bsuth',
+  callback = function()
+    vim.keymap.del('n', '[%', {}) -- matchit
+    vim.keymap.del('n', ']%', {}) -- matchit
+    vim.keymap.del('n', '[d', {}) -- diagnostics
+    vim.keymap.del('n', ']d', {}) -- diagnostics
+  end,
+})
 
 -- -----------------------------------------------------------------------------
 -- Plugins / Modules

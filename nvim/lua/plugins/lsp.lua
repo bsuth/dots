@@ -73,13 +73,33 @@ plugins.use('neovim/nvim-lspconfig')
 
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
+local mason_registry = require('mason-registry')
 
 local LSP_SERVERS = {
   clangd = {},
   cssls = {},
   eslint = {},
   gopls = {},
-  ts_ls = {},
+  ts_ls = {
+    init_options = {
+      plugins = {
+        {
+          name = "@vue/typescript-plugin",
+          location = mason_registry.get_package('vue-language-server'):get_install_path() ..
+              '/node_modules/@vue/language-server',
+          languages = { "vue" },
+        },
+      },
+    },
+    filetypes = {
+      "typescript",
+      "javascript",
+      "javascriptreact",
+      "typescriptreact",
+      "vue",
+    },
+  },
+  volar = {},
   tailwindcss = {
     settings = {
       tailwindCSS = {

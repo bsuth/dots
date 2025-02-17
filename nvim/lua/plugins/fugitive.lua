@@ -8,11 +8,11 @@ plugins.use('tpope/vim-fugitive')
 -- -----------------------------------------------------------------------------
 
 table.insert(C.TRACK_CWD_FILTERS, function(buffer)
-  return vim.api.nvim_buf_get_option(buffer, 'filetype') == 'fugitive'
+  return vim.api.nvim_get_option_value('filetype', { buf = buffer }) == 'fugitive'
 end)
 
 table.insert(C.TRACK_CWD_FILTERS, function(buffer)
-  return vim.api.nvim_buf_get_option(buffer, 'filetype') == 'git'
+  return vim.api.nvim_get_option_value('filetype', { buf = buffer }) == 'git'
 end)
 
 -- -----------------------------------------------------------------------------

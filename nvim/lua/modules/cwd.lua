@@ -21,19 +21,19 @@ end
 -- -----------------------------------------------------------------------------
 
 table.insert(C.TRACK_CWD_FILTERS, function(buffer)
-  return vim.api.nvim_buf_get_option(buffer, 'filetype') == 'help'
+  return vim.api.nvim_get_option_value('filetype', { buf = buffer }) == 'help'
 end)
 
 table.insert(C.TRACK_CWD_FILTERS, function(buffer)
-  return vim.api.nvim_buf_get_option(buffer, 'filetype') == 'man'
+  return vim.api.nvim_get_option_value('filetype', { buf = buffer }) == 'man'
 end)
 
 table.insert(C.TRACK_CWD_FILTERS, function(buffer)
-  return vim.api.nvim_buf_get_option(buffer, 'buftype') == 'terminal'
+  return vim.api.nvim_get_option_value('buftype', { buf = buffer }) == 'terminal'
 end)
 
 table.insert(C.TRACK_CWD_FILTERS, function(buffer)
-  return vim.api.nvim_buf_get_option(buffer, 'buftype') == 'prompt'
+  return vim.api.nvim_get_option_value('buftype', { buf = buffer }) == 'prompt'
 end)
 
 table.insert(C.TRACK_CWD_FILTERS, function(buffer)

@@ -129,21 +129,21 @@ local BUFFER_STATE_CONFIG = {
     label = '[-]',
     highlight = highlight({ fg = onedark.red, bold = true }),
     qualifier = function()
-      return not vim.api.nvim_buf_get_option(0, 'modifiable')
+      return not vim.api.nvim_get_option_value('modifiable', { buf = 0 })
     end,
   },
   {
     label = '[RO]',
     highlight = highlight({ fg = onedark.yellow, bold = true }),
     qualifier = function()
-      return vim.api.nvim_buf_get_option(0, 'readonly')
+      return vim.api.nvim_get_option_value('readonly', { buf = 0 })
     end,
   },
   {
     label = '[+]',
     highlight = highlight({ fg = onedark.blue, bold = true }),
     qualifier = function()
-      return vim.api.nvim_buf_get_option(0, 'modified')
+      return vim.api.nvim_get_option_value('modified', { buf = 0 })
     end,
   },
 }
@@ -209,9 +209,9 @@ local FILETYPE_HIGHLIGHT = highlight({
 })
 
 local FILETYPE_GETTERS = {
-  function() return vim.api.nvim_buf_get_option(0, 'filetype') end,
-  function() return vim.api.nvim_buf_get_option(0, 'buftype') end,
-  function() return vim.api.nvim_buf_get_option(0, 'syntax') end,
+  function() return vim.api.nvim_get_option_value('filetype', { buf = 0 }) end,
+  function() return vim.api.nvim_get_option_value('buftype', { buf = 0 }) end,
+  function() return vim.api.nvim_get_option_value('syntax', { buf = 0 }) end,
   function() return '???' end,
 }
 

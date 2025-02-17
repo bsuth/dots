@@ -59,7 +59,7 @@ local DEFAULT_COMMANDS = {
     callback = function()
       local cwd = vim.fn.getcwd()
 
-      local function cwd_directories(text)
+      local function cwd_directories()
         return generators.directories(cwd)
       end
 
@@ -72,7 +72,7 @@ local DEFAULT_COMMANDS = {
     callback = function()
       local cwd = vim.fn.getcwd()
 
-      local function cwd_files(text)
+      local function cwd_files()
         return generators.files(cwd)
       end
 
@@ -211,7 +211,7 @@ local function get_git_commands()
       label = 'git.grep',
       subtree = true,
       lazy = true,
-      callback = function(text)
+      callback = function()
         local function git_grep(text)
           return generators.grep(text, git_root)
         end
