@@ -1,6 +1,7 @@
-local C = require('constants')
 local path = require('lib.path')
 local io = require('lib.stdlib').io
+
+local HOME = os.getenv('HOME')
 
 -- -----------------------------------------------------------------------------
 -- Jobs
@@ -25,10 +26,12 @@ vim.api.nvim_create_autocmd('BufModifiedSet', {
 -- Helpers
 -- -----------------------------------------------------------------------------
 
+--- @param filenames string[]
+--- @return boolean
 local function has_ancestor(filenames)
   local dir = path.lead(path.dirname(vim.api.nvim_buf_get_name(0)))
 
-  while dir:match('^' .. C.HOME) do
+  while dir:match('^' .. HOME) do
     for _, filename in ipairs(filenames) do
       if io.exists(path.join(dir, filename)) then
         return true
@@ -37,8 +40,12 @@ local function has_ancestor(filenames)
 
     dir = path.lead(path.dirname(dir))
   end
+
+  return false
 end
 
+--- @param buffer number
+--- @param command string
 local function format_sync(buffer, command)
   local stdout = vim.fn.system(command)
 
@@ -56,6 +63,8 @@ local function format_sync(buffer, command)
   end
 end
 
+--- @param buffer number
+--- @param command string
 local function format_async(buffer, command)
   local job_id = vim.fn.jobstart(command, {
     stdout_buffered = true,
@@ -78,25 +87,6 @@ local function format_async(buffer, command)
 
   buffer_async_jobs[job_id] = buffer
 end
-
--- -----------------------------------------------------------------------------
--- Tidy
---
--- Modified version of https://github.com/mcauley-penney/tidy.nvim
--- -----------------------------------------------------------------------------
-
-vim.api.nvim_create_autocmd('BufWritePre', {
-  group = 'bsuth',
-  callback = function(args)
-    local cursor = vim.api.nvim_win_get_cursor(0)
-
-    vim.cmd([[keepjumps keeppatterns %s/\s\+$//e]])                   -- trailing whitespace
-    vim.cmd([[keepjumps keeppatterns silent! 0;/^\%(\n*.\)\@!/,$d_]]) -- trailing newlines
-
-    cursor[1] = math.min(cursor[1], vim.api.nvim_buf_line_count(args.buf))
-    vim.api.nvim_win_set_cursor(0, cursor)
-  end,
-})
 
 -- -----------------------------------------------------------------------------
 -- Clang Format
@@ -179,7 +169,7 @@ vim.api.nvim_create_autocmd('BufWritePost', {
   pattern = { '*.css', '*.scss', '*.less', '*.html', '*.json', '*.cjson' },
   callback = function(args)
     if has_ancestor(prettier_configs) then
-      format_sync(args.buf, 'npx prettier ' .. vim.api.nvim_buf_get_name(args.buf))
+      format_async(args.buf, 'npx prettier ' .. vim.api.nvim_buf_get_name(args.buf))
     end
   end,
 })

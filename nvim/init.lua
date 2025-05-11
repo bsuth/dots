@@ -65,18 +65,6 @@ vim.keymap.set('n', '_', function()
   vim.cmd('nohlsearch')
 end)
 
--- remove default bindings
--- must be done after VimEnter to ensure the keybinding actually exists
-vim.api.nvim_create_autocmd('VimEnter', {
-  group = 'bsuth',
-  callback = function()
-    vim.keymap.del('n', '[%', {}) -- matchit
-    vim.keymap.del('n', ']%', {}) -- matchit
-    vim.keymap.del('n', '[d', {}) -- diagnostics
-    vim.keymap.del('n', ']d', {}) -- diagnostics
-  end,
-})
-
 -- -----------------------------------------------------------------------------
 -- Plugins / Modules
 -- -----------------------------------------------------------------------------
@@ -93,10 +81,10 @@ load('modules.emacs')
 load('modules.format')
 load('modules.statusline')
 load('modules.surroundjump')
-load('modules.syntax')
 load('modules.tabline')
 load('modules.tabs')
 load('modules.terminal')
+load('modules.tidy')
 load('modules.windows')
 
 load('plugins.commentary')
@@ -106,5 +94,4 @@ load('plugins.lsp')
 load('plugins.move')
 load('plugins.onedark')
 load('plugins.surround')
-load('plugins.syntax')
 load('plugins.treesitter')

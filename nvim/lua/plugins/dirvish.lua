@@ -1,4 +1,3 @@
-local edit = require('lib.edit')
 local plugins = require('lib.plugins')
 
 plugins.use('justinmk/vim-dirvish')
@@ -33,7 +32,7 @@ local function xdg_open()
   if xdg_open_command ~= nil then
     vim.fn.jobstart(('%s "%s" & disown'):format(xdg_open_command, file))
   else
-    edit(file)
+    vim.cmd('edit ' .. file)
   end
 end
 
@@ -52,7 +51,7 @@ vim.api.nvim_create_autocmd('FileType', {
 vim.api.nvim_create_autocmd('BufEnter', {
   group = 'bsuth',
   callback = function()
-    if vim.api.nvim_buf_get_option(0, 'filetype') == 'dirvish' then
+    if vim.api.nvim_get_option_value('filetype', { buf = 0 }) == 'dirvish' then
       vim.cmd('Dirvish') -- refresh
     end
   end,

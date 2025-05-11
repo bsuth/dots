@@ -1,26 +1,36 @@
-local C = require('constants')
 local path = require('lib.path')
 local io = require('lib.stdlib').io
 local table = require('lib.stdlib').table
 
 -- -----------------------------------------------------------------------------
+-- Types
+-- -----------------------------------------------------------------------------
+
+---@alias PluginConfig { dir: string, symlink: boolean, on_install: function, on_update: function }
+---@alias Plugin { path: string, loaded: boolean, config: PluginConfig? }
+
+-- -----------------------------------------------------------------------------
 -- Variables
 -- -----------------------------------------------------------------------------
 
-local M = {}
+--- @type Plugin[]
 local PLUGINS = {}
+
+local M = {
+  root = path.join(vim.fn.stdpath('data'), 'site/pack/plugins/start')
+}
 
 -- -----------------------------------------------------------------------------
 -- Setup
 -- -----------------------------------------------------------------------------
 
-if not io.exists(C.PLUGINS_DIR) then
-  os.execute('mkdir -p ' .. C.PLUGINS_DIR)
+if not io.exists(M.root) then
+  os.execute('mkdir -p ' .. M.root)
 end
 
-for _, plugin_dir in ipairs(vim.fn.readdir(C.PLUGINS_DIR)) do
+for _, plugin_dir in ipairs(vim.fn.readdir(M.root)) do
   table.insert(PLUGINS, {
-    path = path.join(C.PLUGINS_DIR, plugin_dir),
+    path = path.join(M.root, plugin_dir),
     loaded = false,
     config = nil,
   })
@@ -30,9 +40,11 @@ end
 -- API
 -- -----------------------------------------------------------------------------
 
+--- @param plugin_name string
+--- @param config PluginConfig?
 function M.use(plugin_name, config)
   local plugin_dir = (config and config.dir) or path.basename(plugin_name)
-  local plugin_path = path.join(C.PLUGINS_DIR, plugin_dir)
+  local plugin_path = path.join(M.root, plugin_dir)
 
   local plugin = table.find(PLUGINS, function(plugin)
     return plugin.path == plugin_path

@@ -1,4 +1,4 @@
-local nvim_get_line_column = require('lib.nvim').nvim_get_line_column
+local nvim_get_position = require('lib.nvim').nvim_get_position
 
 -- -----------------------------------------------------------------------------
 -- Variables
@@ -20,18 +20,22 @@ local CLOSE_SURROUND_CHARS = {
 -- Helpers
 -- -----------------------------------------------------------------------------
 
+--- @param line number
+--- @param column number
 local function cursor_jump(line, column)
   -- use `lineGcol|` over `setcursorcharpos` so we can push to the jumplist
   vim.cmd(("normal %dG%d|"):format(line, column))
 end
 
+--- @return string
 local function get_cursor_char()
-  local line, column = nvim_get_line_column()
+  local line, column = nvim_get_position()
   return vim.fn.getline(line):sub(column, column)
 end
 
+--- @return fun(): number, number, string
 local function prev_chars()
-  local line, column = nvim_get_line_column()
+  local line, column = nvim_get_position()
   local text = vim.fn.getline(line)
 
   return function()
@@ -47,8 +51,9 @@ local function prev_chars()
   end
 end
 
+--- @return fun(): number, number, string
 local function next_chars()
-  local line, column = nvim_get_line_column()
+  local line, column = nvim_get_position()
   local text = vim.fn.getline(line)
   local line_limit, column_limit = vim.fn.line('$'), #text
 

@@ -260,6 +260,10 @@ module client_keys = {
     c.maximized = false
     c.fullscreen = false
   }),
+
+  awful.key({ 'Mod4', 'Control', 'Shift' }, 'f', c -> {
+    c.floating = !c.floating
+  }),
 }
 
 -- -----------------------------------------------------------------------------

@@ -1,9 +1,12 @@
-local C = require('constants')
 local generators = require('commander.generators')
 local path = require('lib.path')
+local plugins = require('lib.plugins')
 local io = require('lib.stdlib').io
 local table = require('lib.stdlib').table
 local sudo = require('lib.sudo')
+
+local HOME = os.getenv('HOME')
+local SWAP_DIR = path.join(vim.fn.stdpath('data'), 'swap')
 
 -- -----------------------------------------------------------------------------
 -- Default Commands
@@ -113,7 +116,7 @@ local DEFAULT_COMMANDS = {
   {
     label = 'home',
     callback = function()
-      vim.cmd('edit ' .. C.HOME)
+      vim.cmd('edit ' .. HOME)
     end,
   },
   {
@@ -125,7 +128,7 @@ local DEFAULT_COMMANDS = {
   {
     label = 'swap',
     callback = function()
-      vim.cmd('edit ' .. C.SWAP_DIR)
+      vim.cmd('edit ' .. SWAP_DIR)
     end,
   },
 
@@ -136,7 +139,7 @@ local DEFAULT_COMMANDS = {
   {
     label = 'plugins.root',
     callback = function()
-      vim.cmd('edit ' .. C.PLUGINS_DIR)
+      vim.cmd('edit ' .. plugins.root)
     end,
   },
   {
@@ -153,6 +156,17 @@ local DEFAULT_COMMANDS = {
       vim.cmd('lua require("lib.plugins").update()')
     end,
   },
+
+  -- ---------------------------------------------------------------------------
+  -- LSP
+  -- ---------------------------------------------------------------------------
+
+  {
+    label = 'lsp.restart',
+    callback = function()
+      vim.cmd('silent :LspRestart')
+    end,
+  },
 }
 
 -- -----------------------------------------------------------------------------
@@ -162,7 +176,7 @@ local DEFAULT_COMMANDS = {
 local function get_git_root(dir)
   dir = dir or path.lead(vim.fn.getcwd())
 
-  while dir:match('^' .. C.HOME .. '/.+') do
+  while dir:match('^' .. HOME .. '/.+') do
     if io.exists(path.join(dir, '.git')) then
       return dir
     else
@@ -229,7 +243,7 @@ end
 local function get_make_root(dir)
   dir = dir or path.lead(vim.fn.getcwd())
 
-  while dir:match('^' .. C.HOME .. '/.+') do
+  while dir:match('^' .. HOME .. '/.+') do
     if io.exists(path.join(dir, 'Makefile')) then
       return dir
     else
