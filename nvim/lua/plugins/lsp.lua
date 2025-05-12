@@ -4,14 +4,14 @@ local plugins = require('lib.plugins')
 -- Mappings
 -- -----------------------------------------------------------------------------
 
-vim.keymap.set('n', "<leader>h", vim.lsp.buf.hover)
-vim.keymap.set('n', "<leader>o", vim.diagnostic.open_float)                          -- o(pen)
-vim.keymap.set('n', "<leader>r", vim.lsp.buf.rename)                                 -- r(ename)
-vim.keymap.set('n', "<leader>d", vim.lsp.buf.definition)                             -- d(efinition)
-vim.keymap.set('n', "<leader>p", function() vim.diagnostic.jump({ count = -1 }) end) -- p(rev)
-vim.keymap.set('n', "<leader>n", function() vim.diagnostic.jump({ count = 1 }) end)  -- n(ext)
-vim.keymap.set('n', "<leader>l", vim.diagnostic.setloclist)                          -- l(ist)
-vim.keymap.set('n', "<leader>a", vim.lsp.buf.code_action)                            -- a(ction)
+vim.keymap.set('n', '<leader>h', vim.lsp.buf.hover)
+vim.keymap.set('n', '<leader>o', vim.diagnostic.open_float)                          -- o(pen)
+vim.keymap.set('n', '<leader>r', vim.lsp.buf.rename)                                 -- r(ename)
+vim.keymap.set('n', '<leader>d', vim.lsp.buf.definition)                             -- d(efinition)
+vim.keymap.set('n', '<leader>p', function() vim.diagnostic.jump({ count = -1 }) end) -- p(rev)
+vim.keymap.set('n', '<leader>n', function() vim.diagnostic.jump({ count = 1 }) end)  -- n(ext)
+vim.keymap.set('n', '<leader>l', vim.diagnostic.setloclist)                          -- l(ist)
+vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action)                            -- a(ction)
 
 -- -----------------------------------------------------------------------------
 -- Mason (Language Servers)
@@ -61,7 +61,7 @@ cmp.setup({
 
 -- IMPORTANT: make sure to setup neodev BEFORE lspconfig
 plugins.use('folke/lazydev.nvim')
-require("lazydev").setup()
+require('lazydev').setup()
 
 -- -----------------------------------------------------------------------------
 -- LSP Config
@@ -87,25 +87,33 @@ setup_lsp('cssls', nil, true)
 setup_lsp('eslint')
 setup_lsp('gopls')
 setup_lsp('lua_ls')
+setup_lsp('pyright')
+setup_lsp('ruff')
 setup_lsp('tailwindcss', nil, true)
 setup_lsp('volar')
+
+setup_lsp('elixirls', {
+  settings = {
+    cmd = vim.fn.stdpath('data') .. '/mason/bin/elixir-ls'
+  },
+})
 
 setup_lsp('ts_ls', {
   init_options = {
     plugins = {
       {
-        name = "@vue/typescript-plugin",
+        name = '@vue/typescript-plugin',
         location = mason_registry.get_package('vue-language-server'):get_install_path() ..
             '/node_modules/@vue/language-server',
-        languages = { "vue" },
+        languages = { 'vue' },
       },
     },
   },
   filetypes = {
-    "typescript",
-    "javascript",
-    "javascriptreact",
-    "typescriptreact",
-    "vue",
+    'typescript',
+    'javascript',
+    'javascriptreact',
+    'typescriptreact',
+    'vue',
   },
 })

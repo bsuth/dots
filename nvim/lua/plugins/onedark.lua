@@ -7,9 +7,5 @@ plugins.use('navarasu/onedark.nvim')
 -- -----------------------------------------------------------------------------
 
 local onedark = require('onedark')
-local palette = require('onedark.palette').warmer
-
 onedark.setup({ style = 'warmer' })
 onedark.load()
-
-vim.api.nvim_set_hl(0, 'NormalFloat', { bg = palette.bg0 })
