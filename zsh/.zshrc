@@ -17,29 +17,13 @@ zstyle :compinstall filename "$HOME/.zshrc"
 autoload -Uz compinit; compinit
 
 # ------------------------------------------------------------------------------
-# Zgenom
+# Plugins
 # ------------------------------------------------------------------------------
 
-export ZGENOM_ROOT="$HOME/extern/zgenom"
-
-if [[ ! -d $ZGENOM_ROOT ]]; then
-  echo "Installing zgenom"
-  mkdir -p $ZGENOM_ROOT
-  git clone https://github.com/jandamm/zgenom.git $ZGENOM_ROOT
-fi
-
-source "$ZGENOM_ROOT/zgenom.zsh"
-
-zgenom load zsh-users/zsh-completions
-zgenom load zsh-users/zsh-autosuggestions
-zgenom load z-shell/F-Sy-H
-zgenom load z-shell/H-S-MW
-zgenom load spaceship-prompt/spaceship-prompt spaceship
-
-autoload -U promptinit; promptinit
-
-zgenom autoupdate
-! zgenom saved && zgenom save
+source $DOTS/zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $DOTS/zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $DOTS/zsh/H-S-MW/H-S-MW.plugin.zsh
+source $DOTS/zsh/spaceship-prompt/spaceship.zsh
 
 # ------------------------------------------------------------------------------
 # Environment
@@ -118,54 +102,10 @@ zshexit_functions=(${zshexit_functions[@]} "nvim_on_exit")
 # ------------------------------------------------------------------------------
 
 alias ls='ls --color=auto'
-alias lj='luajit'
-
-# https://joshajohnson.com/sea-picro/#documentation
-alias qmk_chocofi='qmk flash -c -kb crkbd -km bsuth -e CONVERT_TO=promicro_rp2040'
-alias qmk_ferris='qmk flash -c -kb "ferris/sweep" -km bsuth -e CONVERT_TO=promicro_rp2040'
-
-alias erdejit='luajit ~/.luarocks/share/lua/5.1/erde/cli.lua'
-alias erde5.1='lua5.1 ~/.luarocks/share/lua/5.1/erde/cli.lua'
-alias erde5.2='lua5.2 ~/.luarocks/share/lua/5.2/erde/cli.lua'
-alias erde5.3='lua5.3 ~/.luarocks/share/lua/5.3/erde/cli.lua'
-alias erde5.4='lua5.4 ~/.luarocks/share/lua/5.4/erde/cli.lua'
-
-function wm {
-  SIZE="${1:-800x600}"
-  export DISPLAY=:0
-  Xephyr -br -ac -noreset -screen $SIZE :1 &
-  export DISPLAY=:1
-  sleep 0.1 # wait for display
-  awesome
-}
-
-function lua_install {
-  luarocks --local --lua-version="5.1" install "$1"
-  luarocks --local --lua-version="5.2" install "$1"
-  luarocks --local --lua-version="5.3" install "$1"
-  luarocks --local --lua-version="5.4" install "$1"
-}
 
 function git_ls() {
   git fetch --prune --quiet
   git branch --remotes --sort=committerdate | tac
-}
-
-function git_cheat {
-  GIT_ROOT=$(pwd)
-
-  while [[ $GIT_ROOT != '/' ]] && [[ ! -d $GIT_ROOT/.git ]]; do
-    GIT_ROOT=$(dirname "$GIT_ROOT")
-  done
-
-  if [[ $GIT_ROOT == '/' ]]; then
-    echo "Not in a git repository"
-    return 1
-  fi
-
-  git add .
-  git commit -m 'update'
-  git push
 }
 
 # ------------------------------------------------------------------------------

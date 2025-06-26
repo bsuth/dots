@@ -1,3 +1,8 @@
 alias single='~/.screenlayout/single.sh'
 alias double='~/.screenlayout/double.sh'
+
+# https://joshajohnson.com/sea-picro/#documentation
+alias qmk_chocofi='qmk flash -c -kb crkbd -km bsuth -e CONVERT_TO=promicro_rp2040'
+alias qmk_ferris='qmk flash -c -kb "ferris/sweep" -km bsuth -e CONVERT_TO=promicro_rp2040'
+
 # vim: filetype=zsh

@@ -271,9 +271,18 @@ local function get_make_commands()
 
   for line in pipe:lines() do
     table.insert(commands, {
-      label = "make." .. line,
+      label = 'make.' .. line,
       callback = function()
-        vim.cmd(('silent exec "!make --directory %s %s"'):format(make_root, line))
+        vim.cmd(('silent exec "!make --directory %s %s > /tmp/bsuth_make_log 2>&1 & disown"'):format(make_root, line))
+      end,
+    })
+  end
+
+  if #commands > 0 then
+    table.insert(commands, {
+      label = 'make.log',
+      callback = function()
+        vim.cmd('edit /tmp/bsuth_make_log')
       end,
     })
   end
