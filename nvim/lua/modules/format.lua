@@ -26,8 +26,8 @@ vim.api.nvim_create_autocmd('BufModifiedSet', {
 -- Helpers
 -- -----------------------------------------------------------------------------
 
---- @param filenames string[]
---- @return boolean
+---@param filenames string[]
+---@return boolean
 local function has_ancestor(filenames)
   local dir = path.lead(path.dirname(vim.api.nvim_buf_get_name(0)))
 
@@ -44,8 +44,8 @@ local function has_ancestor(filenames)
   return false
 end
 
---- @param buffer number
---- @param command string
+---@param buffer number
+---@param command string
 local function format_sync(buffer, command)
   local stdout = vim.fn.system(command)
 
@@ -63,8 +63,8 @@ local function format_sync(buffer, command)
   end
 end
 
---- @param buffer number
---- @param command string
+---@param buffer number
+---@param command string
 local function format_async(buffer, command)
   local job_id = vim.fn.jobstart(command, {
     stdout_buffered = true,

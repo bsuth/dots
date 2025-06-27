@@ -114,7 +114,7 @@ for _, config in pairs(MODE_CONFIG) do
   end
 end
 
---- @return string
+---@return string
 local function statusline_mode()
   local mode = vim.api.nvim_get_mode().mode
   local config = MODE_CONFIG_LOOKUP[mode]
@@ -149,7 +149,7 @@ local BUFFER_STATE_CONFIG = {
   },
 }
 
---- @return string
+---@return string
 local function statusline_buffer_state()
   for _, config in ipairs(BUFFER_STATE_CONFIG) do
     if config.qualifier() then
@@ -183,7 +183,7 @@ local LSP_CONFIG = {
   },
 }
 
---- @return string
+---@return string
 local function statusline_lsp()
   local statusline = {}
 
@@ -218,7 +218,7 @@ local FILETYPE_GETTERS = {
   function() return '???' end,
 }
 
---- @return string
+---@return string
 local function statusline_filetype()
   for _, filetype_getter in ipairs(FILETYPE_GETTERS) do
     local filetype = filetype_getter()
@@ -242,7 +242,7 @@ local CURSOR_HIGHLIGHT = highlight({
   bold = true,
 })
 
---- @return string
+---@return string
 local function statusline_cursor()
   return ("%%#%s# %%l/%%L %%#Normal#"):format(CURSOR_HIGHLIGHT)
 end
@@ -251,7 +251,7 @@ end
 -- Statusline
 -- -----------------------------------------------------------------------------
 
---- @return string
+---@return string
 function STATUSLINE()
   return table.concat({
     statusline_mode(),

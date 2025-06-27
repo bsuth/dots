@@ -28,9 +28,9 @@ end
 -- Helpers
 -- -----------------------------------------------------------------------------
 
---- @param text string
---- @param column number
---- @return number
+---@param text string
+---@param column number
+---@return number
 local function get_word_back_column(text, column)
   local next_char = text:sub(column - 1, column - 1)
 
@@ -47,9 +47,9 @@ local function get_word_back_column(text, column)
   return column
 end
 
---- @param text string
---- @param column number
---- @return number
+---@param text string
+---@param column number
+---@return number
 local function get_move_word_forward_column(text, column)
   local next_char = text:sub(column + 1, column + 1)
 
@@ -66,9 +66,9 @@ local function get_move_word_forward_column(text, column)
   return column + 1
 end
 
---- @param text string
---- @param column number
---- @return number
+---@param text string
+---@param column number
+---@return number
 local function get_delete_word_forward_column(text, column)
   local next_char = text:sub(column + 1, column + 1)
 

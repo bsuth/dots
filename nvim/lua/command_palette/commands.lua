@@ -1,4 +1,4 @@
-local generators = require('commander.generators')
+local generators = require('command_palette.generators')
 local path = require('lib.path')
 local plugins = require('lib.plugins')
 local io = require('lib.stdlib').io
@@ -12,6 +12,7 @@ local SWAP_DIR = path.join(vim.fn.stdpath('data'), 'swap')
 -- Default Commands
 -- -----------------------------------------------------------------------------
 
+---@type CommandPaletteCommand[]
 local DEFAULT_COMMANDS = {
 
   -- ---------------------------------------------------------------------------
@@ -51,14 +52,12 @@ local DEFAULT_COMMANDS = {
 
   {
     label = 'buffers',
-    subtree = true,
     callback = function()
-      return { generator = generators.buffers }
+      return { callback = generators.buffers }
     end,
   },
   {
     label = 'directories',
-    subtree = true,
     callback = function()
       local cwd = vim.fn.getcwd()
 
@@ -66,12 +65,11 @@ local DEFAULT_COMMANDS = {
         return generators.directories(cwd)
       end
 
-      return { generator = cwd_directories }
+      return { callback = cwd_directories }
     end,
   },
   {
     label = 'files',
-    subtree = true,
     callback = function()
       local cwd = vim.fn.getcwd()
 
@@ -79,7 +77,7 @@ local DEFAULT_COMMANDS = {
         return generators.files(cwd)
       end
 
-      return { generator = cwd_files }
+      return { callback = cwd_files }
     end,
   },
   {
@@ -91,21 +89,19 @@ local DEFAULT_COMMANDS = {
         return generators.grep(text, cwd)
       end
 
-      return { generator = cwd_grep, lazy = true }
+      return { callback = cwd_grep, lazy = true }
     end,
   },
   {
     label = 'help',
-    subtree = true,
     callback = function()
-      return { generator = generators.help }
+      return { callback = generators.help }
     end,
   },
   {
     label = 'man',
-    subtree = true,
     callback = function()
-      return { generator = generators.man }
+      return { callback = generators.man }
     end,
   },
 
@@ -173,6 +169,8 @@ local DEFAULT_COMMANDS = {
 -- Project Commands
 -- -----------------------------------------------------------------------------
 
+---@param dir? string
+---@return string?
 local function get_git_root(dir)
   dir = dir or path.lead(vim.fn.getcwd())
 
@@ -185,6 +183,7 @@ local function get_git_root(dir)
   end
 end
 
+---@return CommandPaletteCommand[]
 local function get_git_commands()
   local git_root = get_git_root()
 
@@ -201,36 +200,32 @@ local function get_git_commands()
     },
     {
       label = 'git.directories',
-      subtree = true,
       callback = function()
         local function git_directories()
           return generators.directories(git_root)
         end
 
-        return { generator = git_directories }
+        return { callback = git_directories }
       end,
     },
     {
       label = 'git.files',
-      subtree = true,
       callback = function()
         local function git_files()
           return generators.files(git_root)
         end
 
-        return { generator = git_files }
+        return { callback = git_files }
       end,
     },
     {
       label = 'git.grep',
-      subtree = true,
-      lazy = true,
       callback = function()
         local function git_grep(text)
           return generators.grep(text, git_root)
         end
 
-        return { generator = git_grep, lazy = true }
+        return { callback = git_grep, lazy = true }
       end,
     },
   }
@@ -240,6 +235,8 @@ end
 -- Make Commands
 -- -----------------------------------------------------------------------------
 
+---@param dir? string
+---@return string?
 local function get_make_root(dir)
   dir = dir or path.lead(vim.fn.getcwd())
 
@@ -252,6 +249,7 @@ local function get_make_root(dir)
   end
 end
 
+---@return CommandPaletteCommand[]
 local function get_make_commands()
   local make_root = get_make_root()
 
@@ -294,8 +292,9 @@ end
 -- Return
 -- -----------------------------------------------------------------------------
 
+---@type CommandPaletteGenerator
 return {
-  generator = function()
+  callback = function()
     return table.merge(
       DEFAULT_COMMANDS,
       generators.favorites(),

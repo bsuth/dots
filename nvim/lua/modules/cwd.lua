@@ -14,8 +14,8 @@ function SAVE_BUFFER_CWD()
   BUFFER_CWD[buffer] = vim.fn.getcwd()
 end
 
---- @param buffer number
---- @return boolean
+---@param buffer number
+---@return boolean
 local function should_track_buffer_cwd(buffer)
   local filetype = vim.api.nvim_get_option_value('filetype', { buf = buffer })
   local buftype = vim.api.nvim_get_option_value('buftype', { buf = buffer })

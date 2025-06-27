@@ -74,7 +74,7 @@ local function load(name)
   require(name)
 end
 
-load('commander')
+load('command_palette')
 
 load('modules.cwd')
 load('modules.emacs')

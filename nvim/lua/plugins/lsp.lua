@@ -73,9 +73,9 @@ local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
 local mason_registry = require('mason-registry')
 
---- @param server string
---- @param config table?
---- @param snippets boolean?
+---@param server string
+---@param config table?
+---@param snippets boolean?
 local function setup_lsp(server, config, snippets)
   local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
   capabilities.textDocument.completion.completionItem.snippetSupport = snippets or false

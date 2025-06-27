@@ -3,6 +3,7 @@ local string = require('lib.stdlib').string
 
 local M = {}
 
+---@return CommandPaletteCommand[]
 function M.buffers()
   local commands = {}
 
@@ -25,6 +26,8 @@ function M.buffers()
   return commands
 end
 
+---@param cwd? string
+---@return CommandPaletteCommand[]
 function M.directories(cwd)
   cwd = cwd or vim.fn.getcwd()
 
@@ -46,6 +49,7 @@ function M.directories(cwd)
   return commands
 end
 
+---@return CommandPaletteCommand[]
 function M.favorites()
   local commands = {}
 
@@ -83,6 +87,8 @@ function M.favorites()
   return commands
 end
 
+---@param cwd? string
+---@return CommandPaletteCommand[]
 function M.files(cwd)
   cwd = cwd or vim.fn.getcwd()
 
@@ -104,6 +110,9 @@ function M.files(cwd)
   return commands
 end
 
+---@param text string
+---@param cwd? string
+---@return CommandPaletteCommand[]
 function M.grep(text, cwd)
   text = text or ''
   cwd = cwd or vim.fn.getcwd()
@@ -134,6 +143,7 @@ function M.grep(text, cwd)
   return commands
 end
 
+---@return CommandPaletteCommand[]
 function M.help()
   local commands = {}
 
@@ -162,6 +172,7 @@ function M.help()
   return commands
 end
 
+---@return CommandPaletteCommand[]
 function M.man()
   local commands = {}
   local pipe = assert(io.popen('apropos .', 'r'))

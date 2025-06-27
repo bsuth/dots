@@ -2,8 +2,8 @@
 -- Helpers
 -- -----------------------------------------------------------------------------
 
---- @param point { x: number, y: number }
---- @param rect { x: number, y: number, width: number, height: number }
+---@param point { x: number, y: number }
+---@param rect { x: number, y: number, width: number, height: number }
 local function is_point_in_rect(point, rect)
   return (
     (rect.x <= point.x and point.x <= rect.x + rect.width) and
@@ -11,8 +11,8 @@ local function is_point_in_rect(point, rect)
   )
 end
 
---- @param window number
---- @return { x: number, y: number, width: number, height: number }
+---@param window number
+---@return { x: number, y: number, width: number, height: number }
 local function get_window_rect(window)
   local position = vim.api.nvim_win_get_position(window)
   local width = vim.api.nvim_win_get_width(window)
@@ -20,7 +20,7 @@ local function get_window_rect(window)
   return { x = position[2], y = position[1], width = width, height = height }
 end
 
---- @param direction 'left' | 'down' | 'up' | 'right'
+---@param direction 'left' | 'down' | 'up' | 'right'
 local function split_window(direction)
   if direction == 'left' then
     vim.cmd('aboveleft vsp ' .. vim.fn.getcwd())
@@ -35,7 +35,7 @@ local function split_window(direction)
   end
 end
 
---- @param direction 'left' | 'down' | 'up' | 'right'
+---@param direction 'left' | 'down' | 'up' | 'right'
 local function swap_window(direction)
   local current_window = vim.api.nvim_get_current_win()
   local current_window_rect = get_window_rect(current_window)

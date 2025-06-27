@@ -1,7 +1,7 @@
 local M = {}
 
---- @param command string
---- @return string | nil
+---@param command string
+---@return string | nil
 function M.exec(command)
   vim.fn.inputsave()
   local password = vim.fn.inputsecret('sudo: ')

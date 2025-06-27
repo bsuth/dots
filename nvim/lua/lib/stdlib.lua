@@ -14,18 +14,18 @@ local function _kpairs_iter(a, i)
   return key, value
 end
 
---- @generic V
---- @param t table<string, V>
---- @return fun(a: { [string]: V }, i?: string): string, V
---- @return V
---- @return nil
+---@generic V
+---@param t table<string, V>
+---@return fun(a: { [string]: V }, i?: string): string, V
+---@return V
+---@return nil
 function M.kpairs(t)
   return _kpairs_iter, t, nil
 end
 
---- @param a unknown
---- @param b unknown
---- @return boolean
+---@param a unknown
+---@param b unknown
+---@return boolean
 function M.compare(a, b)
   if type(a) ~= 'table' or type(b) ~= 'table' then
     return a == b
@@ -60,25 +60,25 @@ end
 -- Coroutine
 -- -----------------------------------------------------------------------------
 
---- @class coroutine: coroutinelib
+---@class coroutine: coroutinelib
 local coroutine = setmetatable({}, { __index = coroutine })
 
 -- -----------------------------------------------------------------------------
 -- Debug
 -- -----------------------------------------------------------------------------
 
---- @class debug: debuglib
+---@class debug: debuglib
 local debug = setmetatable({}, { __index = debug })
 
 -- -----------------------------------------------------------------------------
 -- IO
 -- -----------------------------------------------------------------------------
 
---- @class io: iolib
+---@class io: iolib
 local io = setmetatable({}, { __index = io })
 
---- @param path string
---- @return boolean
+---@param path string
+---@return boolean
 function io.exists(path)
   local file = io.open(path, 'r')
 
@@ -91,8 +91,8 @@ function io.exists(path)
   return true
 end
 
---- @param path string
---- @return string
+---@param path string
+---@return string
 function io.readfile(path)
   local file = assert(io.open(path, 'r'))
   local content = assert(file:read('*a'))
@@ -100,8 +100,8 @@ function io.readfile(path)
   return content
 end
 
---- @param path string
---- @param content string
+---@param path string
+---@param content string
 function io.writefile(path, content)
   local file = assert(io.open(path, 'w'))
   assert(file:write(content))
@@ -112,19 +112,19 @@ end
 -- Math
 -- -----------------------------------------------------------------------------
 
---- @class math: mathlib
+---@class math: mathlib
 local math = setmetatable({}, { __index = math })
 
---- @param x number
---- @param min number
---- @param max number
---- @return number
+---@param x number
+---@param min number
+---@param max number
+---@return number
 function math.clamp(x, min, max)
   return math.min(math.max(x, min), max)
 end
 
---- @param x number
---- @return number
+---@param x number
+---@return number
 function math.round(x)
   if x < 0 then
     return math.ceil(x - 0.5)
@@ -137,11 +137,11 @@ end
 -- OS
 -- -----------------------------------------------------------------------------
 
---- @class os: oslib
+---@class os: oslib
 local os = setmetatable({}, { __index = os })
 
---- @param cmd string
---- @return string
+---@param cmd string
+---@return string
 function os.capture(cmd)
   local file = assert(io.popen(cmd, 'r'))
   local stdout = assert(file:read('*a'))
@@ -154,14 +154,14 @@ end
 -- -----------------------------------------------------------------------------
 
 -- EMPTY
---- @class package: packagelib
+---@class package: packagelib
 local package = setmetatable({}, { __index = package })
 
 -- -----------------------------------------------------------------------------
 -- String
 -- -----------------------------------------------------------------------------
 
---- @class string: stringlib
+---@class string: stringlib
 local string = setmetatable({}, { __index = string })
 
 local function _string_chars_iter(a, i)
@@ -172,24 +172,24 @@ local function _string_chars_iter(a, i)
   end
 end
 
---- @param s string
---- @return fun(a: string, i?: number): number, string
---- @return string
---- @return number
+---@param s string
+---@return fun(a: string, i?: number): number, string
+---@return string
+---@return number
 function string.chars(s)
   return _string_chars_iter, s, 0
 end
 
---- @param s string
---- @return string
+---@param s string
+---@return string
 function string.escape(s)
   -- Wrap in parentheses to ensure we return only 1 value.
   return (s:gsub('[().%%+%-*?[^$]', '%%%1'))
 end
 
---- @param s string
---- @param separator? string
---- @return string[]
+---@param s string
+---@param separator? string
+---@return string[]
 function string.split(s, separator)
   separator = separator or '%s+'
 
@@ -206,9 +206,9 @@ function string.split(s, separator)
   return result
 end
 
---- @param s string
---- @param pattern? string
---- @return string
+---@param s string
+---@param pattern? string
+---@return string
 function string.trim(s, pattern)
   pattern = pattern or '%s+'
   -- Wrap in parentheses to ensure we return only 1 value.
@@ -219,19 +219,19 @@ end
 -- Table
 -- -----------------------------------------------------------------------------
 
---- @class table: tablelib
+---@class table: tablelib
 local table = setmetatable({}, { __index = table })
 
 -- Polyfill `table.pack` and `table.unpack`
 if _VERSION == 'Lua 5.1' then
-  --- @diagnostic disable-next-line: duplicate-set-field
+  ---@diagnostic disable-next-line: duplicate-set-field
   table.pack = function(...) return { n = select('#', ...), ... } end
-  --- @diagnostic disable-next-line: deprecated
+  ---@diagnostic disable-next-line: deprecated
   table.unpack = unpack
 end
 
---- @param t table
---- @param ... table
+---@param t table
+---@param ... table
 function table.assign(t, ...)
   for _, _t in pairs({ ... }) do
     for key, value in pairs(_t) do
@@ -244,9 +244,9 @@ function table.assign(t, ...)
   end
 end
 
---- @generic K, V
---- @param t table<K, V>
---- @param condition V | fun(value: V, key: K): boolean
+---@generic K, V
+---@param t table<K, V>
+---@param condition V | fun(value: V, key: K): boolean
 function table.clear(t, condition)
   if type(condition) == 'function' then
     for key, value in M.kpairs(t) do
@@ -275,9 +275,9 @@ function table.clear(t, condition)
   end
 end
 
---- @param iterator fun(): unknown, unknown | nil
---- @param ... unknown
---- @return table
+---@param iterator fun(): unknown, unknown | nil
+---@param ... unknown
+---@return table
 function table.collect(iterator, ...)
   local result = {}
 
@@ -292,9 +292,9 @@ function table.collect(iterator, ...)
   return result
 end
 
---- @generic K, V
---- @param t table<K, V>
---- @return table<K, V>
+---@generic K, V
+---@param t table<K, V>
+---@return table<K, V>
 function table.deepcopy(t)
   local result = {}
 
@@ -309,10 +309,10 @@ function table.deepcopy(t)
   return result
 end
 
---- @generic K, V
---- @param t table<K, V>
---- @param callback fun(value: V, key: K): boolean
---- @return table<K, V>
+---@generic K, V
+---@param t table<K, V>
+---@param callback fun(value: V, key: K): boolean
+---@return table<K, V>
 function table.filter(t, callback)
   local result = {}
 
@@ -329,11 +329,11 @@ function table.filter(t, callback)
   return result
 end
 
---- @generic K, V
---- @param t table<K, V>
---- @param condition V | fun(value: V, key: K): boolean
---- @return V | nil
---- @return K | nil
+---@generic K, V
+---@param t table<K, V>
+---@param condition V | fun(value: V, key: K): boolean
+---@return V | nil
+---@return K | nil
 function table.find(t, condition)
   if type(condition) == 'function' then
     for key, value in pairs(t) do
@@ -350,18 +350,18 @@ function table.find(t, condition)
   end
 end
 
---- @generic K, V
---- @param t table<K, V>
---- @param condition V | fun(value: V, key: K): boolean
---- @return boolean
+---@generic K, V
+---@param t table<K, V>
+---@param condition V | fun(value: V, key: K): boolean
+---@return boolean
 function table.has(t, condition)
   local _, key = table.find(t, condition)
   return key ~= nil
 end
 
---- @generic K
---- @param t table<K>
---- @return K[]
+---@generic K
+---@param t table<K>
+---@return K[]
 function table.keys(t)
   local result = {}
 
@@ -372,10 +372,10 @@ function table.keys(t)
   return result
 end
 
---- @generic K, V, nK, nV
---- @param t table<K, V>
---- @param callback fun(value: V, key: K): unknown, unknown | nil
---- @return table
+---@generic K, V, nK, nV
+---@param t table<K, V>
+---@param callback fun(value: V, key: K): unknown, unknown | nil
+---@return table
 function table.map(t, callback)
   local result = {}
 
@@ -394,19 +394,19 @@ function table.map(t, callback)
   return result
 end
 
---- @param ... table
---- @return table
+---@param ... table
+---@return table
 function table.merge(...)
   local result = {}
   table.assign(result, ...)
   return result
 end
 
---- @generic K, V, I, R
---- @param t table<K, V>
---- @param initial I
---- @param callback fun(result: I | R, value: V, key: K): R
---- @return I | R
+---@generic K, V, I, R
+---@param t table<K, V>
+---@param initial I
+---@param callback fun(result: I | R, value: V, key: K): R
+---@return I | R
 function table.reduce(t, initial, callback)
   local result = initial
 
@@ -417,7 +417,7 @@ function table.reduce(t, initial, callback)
   return result
 end
 
---- @param t table
+---@param t table
 function table.reverse(t)
   local len = #t
 
@@ -426,9 +426,9 @@ function table.reverse(t)
   end
 end
 
---- @generic K, V
---- @param t table<K, V>
---- @return table<K, V>
+---@generic K, V
+---@param t table<K, V>
+---@return table<K, V>
 function table.shallowcopy(t)
   local result = {}
 
@@ -439,9 +439,9 @@ function table.shallowcopy(t)
   return result
 end
 
---- @generic V
---- @param t V[]
---- @return V[]
+---@generic V
+---@param t V[]
+---@return V[]
 function table.slice(t, i, j)
   local len = #t
 
@@ -460,9 +460,9 @@ function table.slice(t, i, j)
   return result
 end
 
---- @generic K, V
---- @param t table<K, V>
---- @return V[]
+---@generic K, V
+---@param t table<K, V>
+---@return V[]
 function table.values(t)
   local result = {}
 

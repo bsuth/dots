@@ -2,9 +2,9 @@
 -- Name
 -- -----------------------------------------------------------------------------
 
---- @param tabpage number
---- @param width number
---- @return string
+---@param tabpage number
+---@param width number
+---@return string
 local function tabline_name(tabpage, width)
   local window = vim.api.nvim_tabpage_get_win(tabpage)
   local buffer = vim.api.nvim_win_get_buf(window)
@@ -34,7 +34,7 @@ end
 -- Tabline
 -- -----------------------------------------------------------------------------
 
---- @return string
+---@return string
 function TABLINE()
   local tabline = {}
 

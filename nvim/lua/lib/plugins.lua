@@ -13,7 +13,7 @@ local table = require('lib.stdlib').table
 -- Variables
 -- -----------------------------------------------------------------------------
 
---- @type Plugin[]
+---@type Plugin[]
 local PLUGINS = {}
 
 local M = {
@@ -40,8 +40,8 @@ end
 -- API
 -- -----------------------------------------------------------------------------
 
---- @param plugin_name string
---- @param config PluginConfig?
+---@param plugin_name string
+---@param config PluginConfig?
 function M.use(plugin_name, config)
   local plugin_dir = (config and config.dir) or path.basename(plugin_name)
   local plugin_path = path.join(M.root, plugin_dir)
