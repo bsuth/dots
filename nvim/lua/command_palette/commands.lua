@@ -93,6 +93,18 @@ local DEFAULT_COMMANDS = {
     end,
   },
   {
+    label = 'grep.pattern',
+    callback = function()
+      local cwd = vim.fn.getcwd()
+
+      local function cwd_grep_pattern(text)
+        return generators.grep(text, cwd, true)
+      end
+
+      return { callback = cwd_grep_pattern, lazy = true }
+    end,
+  },
+  {
     label = 'help',
     callback = function()
       return { callback = generators.help }
@@ -163,6 +175,12 @@ local DEFAULT_COMMANDS = {
       vim.cmd('silent :LspRestart')
     end,
   },
+  {
+    label = 'lsp.symbols',
+    callback = function()
+      vim.lsp.buf.document_symbol()
+    end,
+  },
 }
 
 -- -----------------------------------------------------------------------------
@@ -226,6 +244,16 @@ local function get_git_commands()
         end
 
         return { callback = git_grep, lazy = true }
+      end,
+    },
+    {
+      label = 'git.grep.pattern',
+      callback = function()
+        local function git_grep_pattern(text)
+          return generators.grep(text, git_root, true)
+        end
+
+        return { callback = git_grep_pattern, lazy = true }
       end,
     },
   }

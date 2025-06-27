@@ -112,21 +112,26 @@ end
 
 ---@param text string
 ---@param cwd? string
+---@param patterns? boolean
 ---@return CommandPaletteCommand[]
-function M.grep(text, cwd)
+function M.grep(text, cwd, patterns)
   text = text or ''
   cwd = cwd or vim.fn.getcwd()
 
-  local commands = {}
-
   if text == '' then
-    return commands
+    return {}
   end
 
   -- NOTE: Use `cd` over `rg PATTERN PATH` argument since `cd` will preserve
   -- relative paths in `rg` output.
-  local cmd = ('cd %s; rg --fixed-strings --line-number "%s"'):format(cwd, text:gsub('"', '\\"'))
+  local cmd = ('cd %s; rg --line-number %s "%s"'):format(
+    cwd,
+    patterns and '--no-fixed-strings' or '--fixed-strings',
+    text:gsub('"', '\\"')
+  )
+
   local pipe = assert(io.popen(cmd, 'r'))
+  local commands = {}
 
   for line in pipe:lines() do
     local filepath, row, content = line:match('^([^:]+):([0-9]+):%s*(.*)$')

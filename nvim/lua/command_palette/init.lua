@@ -53,10 +53,9 @@ vim.api.nvim_create_autocmd('WinResized', {
 
     for parent_window, command_palette in pairs(command_palettes) do
       if table.has(resized_windows, parent_window) and command_palette.window ~= -1 then
-        -- Enforce the max height in case nvim tries to resize the window for
-        -- us, for example when another split window is closed.
-        vim.api.nvim_win_set_config(command_palette.window, { height = settings.MAX_WINDOW_HEIGHT })
-        CP.render(command_palette)
+        -- Resize the command palette just in case nvim tries to resize the
+        -- window for us, for example when another split window is closed.
+        CP.resize(command_palette)
       end
     end
   end,

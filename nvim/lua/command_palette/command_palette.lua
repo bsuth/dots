@@ -8,6 +8,15 @@ local table = require('lib.stdlib').table
 local M = {}
 
 ---@param command_palette CommandPalette
+---@return number
+function M.resize(command_palette)
+  -- Add +1 for prompt
+  local window_height = math.min(command_palette.num_filtered_commands + 1, settings.MAX_WINDOW_HEIGHT)
+  vim.api.nvim_win_set_height(command_palette.window, window_height)
+  return window_height
+end
+
+---@param command_palette CommandPalette
 function M.highlight(command_palette)
   vim.api.nvim_buf_clear_namespace(command_palette.buffer, settings.NAMESPACE_ID, 0, -1)
 
@@ -46,14 +55,7 @@ end
 
 ---@param command_palette CommandPalette
 function M.render(command_palette)
-  local window_height = math.min(
-    command_palette.num_filtered_commands + 1, -- + 1 for prompt
-    math.floor(0.4 * vim.api.nvim_win_get_height(command_palette.parent_window)),
-    settings.MAX_WINDOW_HEIGHT
-  )
-
-  vim.api.nvim_win_set_height(command_palette.window, window_height)
-
+  local window_height = M.resize(command_palette)
   local mode = vim.api.nvim_get_mode().mode
   local has_overflow = mode == 'i' and command_palette.num_filtered_commands + 1 > window_height
 
@@ -93,12 +95,12 @@ function M.filter(command_palette)
 
   if text == '' then
     command_palette.filtered_commands = command_palette.commands
-    command_palette.num_filtered_commands = #command_palette.commands
+    command_palette.num_filtered_commands = #command_palette.filtered_commands
     M.render(command_palette)
     return
   elseif head.lazy then
     command_palette.filtered_commands = head.callback(text)
-    command_palette.num_filtered_commands = #command_palette.commands
+    command_palette.num_filtered_commands = #command_palette.filtered_commands
     M.render(command_palette)
     return
   end
@@ -107,11 +109,7 @@ function M.filter(command_palette)
   command_palette.num_filtered_commands = 0
 
   local tokens = table.map(string.split(text), function(token)
-    return {
-      raw = token,
-      pattern = string.escape(token),
-      case_sensitive = token:find('[A-Z]'),
-    }
+    return { pattern = token, case_sensitive = token:find('[A-Z]') }
   end)
 
   for _, command in ipairs(command_palette.commands) do
@@ -174,11 +172,11 @@ function M.select(command_palette, index, persist)
   -- case it expects the current window to be the parent.
   vim.api.nvim_set_current_win(command_palette.parent_window)
 
-  local subtree = command.callback()
+  local generator = command.callback()
 
-  if subtree ~= nil then
+  if generator ~= nil then
     vim.api.nvim_set_current_win(command_palette.window)
-    table.insert(command_palette.path, subtree)
+    table.insert(command_palette.path, generator)
     M.refresh(command_palette)
   elseif not persist then
     M.close(command_palette)

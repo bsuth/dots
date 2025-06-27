@@ -15,5 +15,5 @@
 --- @field callback fun(): CommandPaletteGenerator | nil
 
 --- @class CommandPaletteGenerator
---- @field callback fun(filter?: string): CommandPaletteCommand[]
+--- @field callback fun(text?: string): CommandPaletteCommand[]
 --- @field lazy? boolean
