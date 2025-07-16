@@ -3,6 +3,11 @@ local awful = require('awful')
 return {
   label = 'spawn',
   {
+    label = 'arandr',
+    type = 'once',
+    callback = () -> awful.spawn('arandr'),
+  },
+  {
     label = 'aseprite',
     type = 'once',
     callback = () -> awful.spawn('aseprite'),
