@@ -36,7 +36,19 @@ local DEFAULT_COMMANDS = {
     end,
   },
   {
-    label = 'clean (buffers)',
+    label = 'syntax.light',
+    callback = function()
+      vim.cmd('colorscheme github_light')
+    end,
+  },
+  {
+    label = 'theme.dark',
+    callback = function()
+      vim.cmd('colorscheme github_dark')
+    end,
+  },
+  {
+    label = 'buffers.clean',
     callback = function()
       for _, bufinfo in ipairs(vim.fn.getbufinfo()) do
         if bufinfo.listed == 1 and #bufinfo.windows == 0 then
