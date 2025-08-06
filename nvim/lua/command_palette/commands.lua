@@ -306,12 +306,13 @@ local function get_make_commands()
 
   local commands = {}
   local pipe = assert(io.popen(pipe_cmd, 'r'))
+  local make_log_file = '/tmp/bsuth_make_log'
 
   for line in pipe:lines() do
     table.insert(commands, {
       label = 'make.' .. line,
       callback = function()
-        vim.cmd(('silent exec "!make --directory %s %s > /tmp/bsuth_make_log 2>&1 & disown"'):format(make_root, line))
+        vim.cmd(('silent exec "!make --directory %s %s > %s 2>&1 & disown"'):format(make_root, line, make_log_file))
       end,
     })
   end
@@ -320,7 +321,7 @@ local function get_make_commands()
     table.insert(commands, {
       label = 'make.log',
       callback = function()
-        vim.cmd('edit /tmp/bsuth_make_log')
+        vim.cmd('edit ' .. make_log_file)
       end,
     })
   end

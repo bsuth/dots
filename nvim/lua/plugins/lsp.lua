@@ -17,8 +17,8 @@ vim.keymap.set('n', '<leader>a', vim.lsp.buf.code_action)                       
 -- Mason (Language Servers)
 -- -----------------------------------------------------------------------------
 
-plugins.use('williamboman/mason.nvim')
-plugins.use('williamboman/mason-lspconfig.nvim')
+plugins.use('mason-org/mason.nvim')
+plugins.use('mason-org/mason-lspconfig.nvim')
 
 require('mason').setup()
 require('mason-lspconfig').setup()
@@ -71,7 +71,6 @@ plugins.use('neovim/nvim-lspconfig')
 
 local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
-local mason_registry = require('mason-registry')
 
 ---@param server string
 ---@param config table?
@@ -82,6 +81,13 @@ local function setup_lsp(server, config, snippets)
   lspconfig[server].setup(vim.tbl_deep_extend('force', { capabilities = capabilities }, config or {}))
 end
 
+---@param server string
+---@param config table?
+local function config_lsp(server, config)
+  vim.lsp.config(server, config or {})
+  vim.lsp.enable(server, true)
+end
+
 setup_lsp('clangd')
 setup_lsp('cssls', nil, true)
 setup_lsp('eslint')
@@ -90,22 +96,26 @@ setup_lsp('lua_ls')
 setup_lsp('pyright')
 setup_lsp('ruff')
 setup_lsp('tailwindcss', nil, true)
-setup_lsp('volar')
+config_lsp('vue_ls')
 
-setup_lsp('elixirls', {
+-- setup_lsp('elixirls', {
+--   settings = {
+--     cmd = vim.fn.stdpath('data') .. '/mason/bin/elixir-ls'
+--   },
+-- })
+
+config_lsp('vtsls', {
   settings = {
-    cmd = vim.fn.stdpath('data') .. '/mason/bin/elixir-ls'
-  },
-})
-
-setup_lsp('ts_ls', {
-  init_options = {
-    plugins = {
-      {
-        name = '@vue/typescript-plugin',
-        location = mason_registry.get_package('vue-language-server'):get_install_path() ..
-            '/node_modules/@vue/language-server',
-        languages = { 'vue' },
+    vtsls = {
+      tsserver = {
+        globalPlugins = {
+          {
+            name = '@vue/typescript-plugin',
+            languages = { 'vue' },
+            configNamespace = "typescript",
+            location = vim.fn.expand("$MASON/packages/vue-language-server/node_modules/@vue/language-server"),
+          },
+        },
       },
     },
   },
