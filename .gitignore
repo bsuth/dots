@@ -2,6 +2,7 @@
 autoload/
 bundle/
 .netrwhist
+work.lua
 
 # st / slock
 st/st

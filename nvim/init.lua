@@ -95,3 +95,7 @@ load('plugins.move')
 load('plugins.colorscheme')
 load('plugins.surround')
 load('plugins.treesitter')
+
+pcall(function()
+  load('work')
+end)
