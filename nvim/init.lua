@@ -61,6 +61,8 @@ vim.keymap.set('n', '<c-q>', function()
   end
 end)
 
+vim.keymap.set('n', '\\', 'VHoL<esc>H/\\%V')
+
 vim.keymap.set('n', '_', function()
   vim.cmd('nohlsearch')
 end)

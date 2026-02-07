@@ -69,10 +69,8 @@ local function format_async(buffer, command)
   local job_id = vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_stdout = function(_, stdout)
-      local trimmed_stdout = vim.split(stdout, '\n', { trimempty = true })
-
-      if #trimmed_stdout > 0 then
-        vim.api.nvim_buf_set_lines(buffer, 0, -1, false, trimmed_stdout)
+      if #stdout > 0 then
+        vim.api.nvim_buf_set_lines(buffer, 0, -1, false, stdout)
         vim.cmd('noautocmd update')
 
         -- Sometimes diagnostics seem to disappear after editing, so manually
@@ -131,18 +129,6 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 })
 
 -- -----------------------------------------------------------------------------
--- Python
--- -----------------------------------------------------------------------------
-
-vim.api.nvim_create_autocmd('BufWritePre', {
-  group = 'bsuth',
-  pattern = { '*.py' },
-  callback = function()
-    vim.lsp.buf.format()
-  end,
-})
-
--- -----------------------------------------------------------------------------
 -- Eslint
 -- -----------------------------------------------------------------------------
 
@@ -150,8 +136,8 @@ vim.api.nvim_create_autocmd('BufWritePre', {
   group = 'bsuth',
   pattern = { '*.js', '*.mjs', '*.jsx', '*.ts', '*.tsx', '*.vue' },
   callback = function()
-    if vim.fn.exists(':EslintFixAll') ~= 0 then
-      vim.cmd('EslintFixAll')
+    if vim.fn.exists(':LspEslintFixAll') ~= 0 then
+      vim.cmd('LspEslintFixAll')
     end
   end,
 })
@@ -163,6 +149,18 @@ vim.api.nvim_create_autocmd('BufWritePre', {
 vim.api.nvim_create_autocmd('BufWritePre', {
   group = 'bsuth',
   pattern = { '*.ex', '*.exs' },
+  callback = function()
+    vim.lsp.buf.format()
+  end,
+})
+
+-- -----------------------------------------------------------------------------
+-- Gleam
+-- -----------------------------------------------------------------------------
+
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = 'bsuth',
+  pattern = { '*.gleam' },
   callback = function()
     vim.lsp.buf.format()
   end,
@@ -193,7 +191,7 @@ vim.api.nvim_create_autocmd('BufWritePost', {
   pattern = { '*.css', '*.scss', '*.less', '*.html', '*.json', '*.cjson' },
   callback = function(args)
     if has_ancestor(prettier_configs) then
-      format_async(args.buf, 'npx prettier ' .. vim.api.nvim_buf_get_name(args.buf))
+      format_sync(args.buf, 'npx prettier ' .. vim.api.nvim_buf_get_name(args.buf))
     end
   end,
 })

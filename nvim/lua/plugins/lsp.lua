@@ -67,19 +67,7 @@ require('lazydev').setup()
 -- LSP Config
 -- -----------------------------------------------------------------------------
 
-plugins.use('neovim/nvim-lspconfig')
-
-local lspconfig = require('lspconfig')
 local cmp_nvim_lsp = require('cmp_nvim_lsp')
-
----@param server string
----@param config table?
----@param snippets boolean?
-local function setup_lsp(server, config, snippets)
-  local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
-  capabilities.textDocument.completion.completionItem.snippetSupport = snippets or false
-  lspconfig[server].setup(vim.tbl_deep_extend('force', { capabilities = capabilities }, config or {}))
-end
 
 ---@param server string
 ---@param config table?
@@ -88,21 +76,33 @@ local function config_lsp(server, config)
   vim.lsp.enable(server, true)
 end
 
-setup_lsp('clangd')
-setup_lsp('cssls', nil, true)
-setup_lsp('eslint')
-setup_lsp('gopls')
-setup_lsp('lua_ls')
-setup_lsp('pyright')
-setup_lsp('ruff')
-setup_lsp('tailwindcss', nil, true)
+config_lsp('clangd')
+config_lsp('cssls')
+config_lsp('eslint')
+config_lsp('gopls')
+config_lsp('lua_ls')
 config_lsp('vue_ls')
+config_lsp('gleam')
 
--- setup_lsp('elixirls', {
---   settings = {
---     cmd = vim.fn.stdpath('data') .. '/mason/bin/elixir-ls'
---   },
--- })
+config_lsp('elixirls', {
+  settings = {
+    cmd = vim.fn.stdpath('data') .. '/mason/bin/elixir-ls'
+  },
+})
+
+config_lsp('tailwindcss', {
+  filetypes = { 'gleam' },
+  settings = {
+    tailwindCSS = {
+      experimental = {
+        classRegex = { "\"([^\"]*)\"" },
+      },
+      includeLanguages = {
+        gleam = "html",
+      },
+    },
+  },
+})
 
 config_lsp('vtsls', {
   settings = {
