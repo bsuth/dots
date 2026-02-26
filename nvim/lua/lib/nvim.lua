@@ -34,15 +34,16 @@ function M.nvim_get_visual_selection()
   -- @see https://github.com/neovim/neovim/pull/13896#issuecomment-774680224
   local _, line_start, column_start = unpack(vim.fn.getpos('v'))
   local _, line_end, column_end = unpack(vim.fn.getcurpos())
+  local mode = vim.api.nvim_get_mode().mode
 
   local lines = vim.fn.getline(line_start, line_end)
   vim.fn.setpos('.', { 0, line_start, column_start, 0 })
 
   if type(lines) == 'string' then
     return lines
-  elseif #lines == 1 then
+  elseif #lines == 1 and mode ~= 'V' then
     lines[1] = lines[1]:sub(column_start, column_end)
-  elseif #lines > 1 then
+  elseif #lines > 1 and mode ~= 'V' then
     lines[1] = lines[1]:sub(column_start)
     lines[#lines] = lines[#lines]:sub(1, column_end)
   end

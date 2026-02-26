@@ -67,7 +67,7 @@ require('lazydev').setup()
 -- LSP Config
 -- -----------------------------------------------------------------------------
 
-local cmp_nvim_lsp = require('cmp_nvim_lsp')
+plugins.use('neovim/nvim-lspconfig')
 
 ---@param server string
 ---@param config table?

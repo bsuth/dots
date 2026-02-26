@@ -38,7 +38,6 @@ vim.opt.updatetime = 300
 vim.opt.scrollback = 100000
 
 -- formating
-vim.opt.commentstring = '// %s'
 vim.opt.formatoptions = 'jcroql'
 vim.api.nvim_create_autocmd('FileType', {
   group = 'bsuth',
@@ -60,6 +59,9 @@ vim.keymap.set('n', '<c-q>', function()
     vim.cmd('quit')
   end
 end)
+
+vim.keymap.set('n', '<c-/>', 'gcc', { remap = true })
+vim.keymap.set('v', '<c-/>', 'gc', { remap = true })
 
 vim.keymap.set('n', '\\', 'VHoL<esc>H/\\%V')
 
@@ -89,7 +91,10 @@ load('modules.terminal')
 load('modules.tidy')
 load('modules.windows')
 
-load('plugins.commentary')
+pcall(function()
+  load('work')
+end)
+
 load('plugins.dirvish')
 load('plugins.fugitive')
 load('plugins.lsp')
@@ -97,7 +102,3 @@ load('plugins.move')
 load('plugins.colorscheme')
 load('plugins.surround')
 load('plugins.treesitter')
-
-pcall(function()
-  load('work')
-end)
