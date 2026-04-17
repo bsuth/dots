@@ -1,3 +1,6 @@
 {
-  "format.enable": true
+  "runtime.version": "LuaJIT",
+  "workspace.library": [
+    "/usr/share/nvim/runtime"
+  ]
 }

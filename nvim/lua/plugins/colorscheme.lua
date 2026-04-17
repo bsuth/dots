@@ -1,10 +1,10 @@
 local plugins = require('lib.plugins')
 
-plugins.use('projekt0n/github-nvim-theme')
+plugins.use('navarasu/onedark.nvim')
 
 -- -----------------------------------------------------------------------------
 -- Setup
 -- -----------------------------------------------------------------------------
 
-require('github-theme').setup({})
-vim.cmd('colorscheme github_dark')
+require('onedark').setup({ style = 'cool' })
+require('onedark').load()

@@ -1,5 +1,3 @@
-local nvim_get_position = require('lib.nvim').nvim_get_position
-
 -- -----------------------------------------------------------------------------
 -- Variables
 -- -----------------------------------------------------------------------------
@@ -29,13 +27,15 @@ end
 
 ---@return string
 local function get_cursor_char()
-  local line, column = nvim_get_position()
+  local position = vim.fn.getpos('.')
+  local line, column = position[2], position[3]
   return vim.fn.getline(line):sub(column, column)
 end
 
 ---@return fun(): number, number, string
 local function prev_chars()
-  local line, column = nvim_get_position()
+  local position = vim.fn.getpos('.')
+  local line, column = position[2], position[3]
   local text = vim.fn.getline(line)
 
   return function()
@@ -53,7 +53,8 @@ end
 
 ---@return fun(): number, number, string
 local function next_chars()
-  local line, column = nvim_get_position()
+  local position = vim.fn.getpos('.')
+  local line, column = position[2], position[3]
   local text = vim.fn.getline(line)
   local line_limit, column_limit = vim.fn.line('$'), #text
 

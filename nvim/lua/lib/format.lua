@@ -1,12 +1,9 @@
 local path = require('lib.path')
 local io = require('lib.stdlib').io
 
+local M = {}
+
 local HOME = os.getenv('HOME')
-
--- -----------------------------------------------------------------------------
--- Jobs
--- -----------------------------------------------------------------------------
-
 local buffer_async_jobs = {}
 
 vim.api.nvim_create_autocmd('BufModifiedSet', {
@@ -22,14 +19,11 @@ vim.api.nvim_create_autocmd('BufModifiedSet', {
   end,
 })
 
--- -----------------------------------------------------------------------------
--- Helpers
--- -----------------------------------------------------------------------------
-
+---@param buffer number
 ---@param filenames string[]
 ---@return boolean
-local function has_ancestor(filenames)
-  local dir = path.lead(path.dirname(vim.api.nvim_buf_get_name(0)))
+function M.has_ancestor(buffer, filenames)
+  local dir = path.lead(path.dirname(vim.api.nvim_buf_get_name(buffer)))
 
   while dir:match('^' .. HOME) do
     for _, filename in ipairs(filenames) do
@@ -46,7 +40,7 @@ end
 
 ---@param buffer number
 ---@param command string
-local function format_sync(buffer, command)
+function M.sync(buffer, command)
   local stdout = vim.fn.system(command)
 
   if vim.v.shell_error == 0 then
@@ -65,7 +59,7 @@ end
 
 ---@param buffer number
 ---@param command string
-local function format_async(buffer, command)
+function M.async(buffer, command)
   local job_id = vim.fn.jobstart(command, {
     stdout_buffered = true,
     on_stdout = function(_, stdout)
@@ -86,16 +80,4 @@ local function format_async(buffer, command)
   buffer_async_jobs[job_id] = buffer
 end
 
--- -----------------------------------------------------------------------------
--- Clang Format
--- -----------------------------------------------------------------------------
-
-vim.api.nvim_create_autocmd('BufWritePost', {
-  group = 'bsuth',
-  pattern = { '*.c', '*.h' },
-  callback = function(args)
-    if has_ancestor({ '.clang-format' }) then
-      format_sync(args.buf, 'clang-format ' .. vim.api.nvim_buf_get_name(args.buf))
-    end
-  end,
-})
+return M

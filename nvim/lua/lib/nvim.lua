@@ -21,12 +21,6 @@ function M.nvim_feed_termcodes(termcodes)
   vim.api.nvim_feedkeys(keys, 'n', false)
 end
 
----@return number, number
-function M.nvim_get_position()
-  local position = vim.fn.getpos('.')
-  return position[2], position[3]
-end
-
 ---@return string
 function M.nvim_get_visual_selection()
   -- Do not use '> and '< registers in getpos! These registers are only updated
