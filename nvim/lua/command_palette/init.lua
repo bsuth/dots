@@ -1,5 +1,4 @@
 local CP = require('command_palette.command_palette')
-local settings = require('command_palette.settings')
 local table = require('lib.stdlib').table
 
 ---@type table<number, CommandPalette>

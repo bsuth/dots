@@ -1,4 +1,25 @@
-local onedark = require('lib.onedark')
+-- -----------------------------------------------------------------------------
+-- Palette (Onedark Cool)
+-- https://github.com/navarasu/onedark.nvim
+-- -----------------------------------------------------------------------------
+
+local palette = {
+  black = "#151820",
+  white = "#a5b0c5",
+  purple = "#ca72e4",
+  green = "#97ca72",
+  orange = "#d99a5e",
+  blue = "#5ab0f6",
+  yellow = "#ebc275",
+  cyan = "#4dbdcb",
+  red = "#ef5f6b",
+  grey = "#546178",
+  light_grey = "#7d899f",
+  dark_cyan = "#25747d",
+  dark_red = "#a13131",
+  dark_yellow = "#9a6b16",
+  dark_purple = "#8f36a9",
+}
 
 -- -----------------------------------------------------------------------------
 -- Highlight
@@ -32,77 +53,77 @@ local MODE_CONFIG = {
   {
     label = 'NORMAL',
     modes = { 'n', 'no', 'nov', 'noV', 'no', 'niI', 'niR', 'niV', 'nt', 'ntT' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.light_grey, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.light_grey, bold = true }),
   },
   {
     label = 'VISUAL',
     modes = { 'v', 'vs' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.purple, bold = true }),
   },
   {
     label = 'VISUAL LINE',
     modes = { 'V', 'Vs' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.purple, bold = true }),
   },
   {
     label = 'VISUAL BLOCK',
     modes = { '', 's' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.purple, bold = true }),
   },
   {
     label = 'SELECT',
     modes = { 's' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.purple, bold = true }),
   },
   {
     label = 'SELECT LINE',
     modes = { 'S' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.purple, bold = true }),
   },
   {
     label = 'SELECT BLOCK',
     modes = { '' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.purple, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.purple, bold = true }),
   },
   {
     label = 'INSERT',
     modes = { 'i', 'ic', 'ix' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.green, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.green, bold = true }),
   },
   {
     label = 'REPLACE',
     modes = { 'R', 'Rc', 'Rx' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.red, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.red, bold = true }),
   },
   {
     label = 'VIRTUAL REPLACE',
     modes = { 'Rv', 'Rvc', 'Rvx' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.red, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.red, bold = true }),
   },
   {
     label = 'COMMAND',
     modes = { 'c' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.blue, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.blue, bold = true }),
   },
   {
     label = 'EX',
     modes = { 'cv' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.blue, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.blue, bold = true }),
   },
   {
     label = 'PROMPT',
     modes = { 'r', 'rm', 'r?' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.red, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.red, bold = true }),
   },
   {
     label = 'SHELL',
     modes = { '!' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.red, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.red, bold = true }),
   },
   {
     label = 'TERMINAL',
     modes = { 't' },
-    highlight = highlight({ fg = onedark.black, bg = onedark.yellow, bold = true }),
+    highlight = highlight({ fg = palette.black, bg = palette.yellow, bold = true }),
   },
 }
 
@@ -128,21 +149,21 @@ end
 local BUFFER_STATE_CONFIG = {
   {
     label = '[-]',
-    highlight = highlight({ fg = onedark.red, bold = true }),
+    highlight = highlight({ fg = palette.red, bold = true }),
     qualifier = function()
       return not vim.api.nvim_get_option_value('modifiable', { buf = 0 })
     end,
   },
   {
     label = '[RO]',
-    highlight = highlight({ fg = onedark.yellow, bold = true }),
+    highlight = highlight({ fg = palette.yellow, bold = true }),
     qualifier = function()
       return vim.api.nvim_get_option_value('readonly', { buf = 0 })
     end,
   },
   {
     label = '[+]',
-    highlight = highlight({ fg = onedark.blue, bold = true }),
+    highlight = highlight({ fg = palette.blue, bold = true }),
     qualifier = function()
       return vim.api.nvim_get_option_value('modified', { buf = 0 })
     end,
@@ -167,19 +188,19 @@ end
 local LSP_CONFIG = {
   {
     severity = vim.diagnostic.severity.HINT,
-    highlight = highlight({ fg = onedark.dark_purple, bold = true }),
+    highlight = highlight({ fg = palette.dark_purple, bold = true }),
   },
   {
     severity = vim.diagnostic.severity.INFO,
-    highlight = highlight({ fg = onedark.dark_cyan, bold = true }),
+    highlight = highlight({ fg = palette.dark_cyan, bold = true }),
   },
   {
     severity = vim.diagnostic.severity.WARN,
-    highlight = highlight({ fg = onedark.dark_yellow, bold = true }),
+    highlight = highlight({ fg = palette.dark_yellow, bold = true }),
   },
   {
     severity = vim.diagnostic.severity.ERROR,
-    highlight = highlight({ fg = onedark.dark_red, bold = true }),
+    highlight = highlight({ fg = palette.dark_red, bold = true }),
   },
 }
 
@@ -206,8 +227,8 @@ end
 -- -----------------------------------------------------------------------------
 
 local FILETYPE_HIGHLIGHT = highlight({
-  fg = onedark.black,
-  bg = onedark.purple,
+  fg = palette.black,
+  bg = palette.purple,
   bold = true,
 })
 
@@ -215,7 +236,6 @@ local FILETYPE_GETTERS = {
   function() return vim.api.nvim_get_option_value('filetype', { buf = 0 }) end,
   function() return vim.api.nvim_get_option_value('buftype', { buf = 0 }) end,
   function() return vim.api.nvim_get_option_value('syntax', { buf = 0 }) end,
-  function() return '???' end,
 }
 
 ---@return string
@@ -230,6 +250,8 @@ local function statusline_filetype()
       )
     end
   end
+
+  return '???'
 end
 
 -- -----------------------------------------------------------------------------
@@ -237,8 +259,8 @@ end
 -- -----------------------------------------------------------------------------
 
 local CURSOR_HIGHLIGHT = highlight({
-  fg = onedark.black,
-  bg = onedark.blue,
+  fg = palette.black,
+  bg = palette.blue,
   bold = true,
 })
 

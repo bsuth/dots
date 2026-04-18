@@ -1,20 +1,5 @@
 local M = {}
 
----@param buffer integer
----@param mode string
----@param lhs string
----@param rhs string | function
-function M.nvim_buf_keymap(buffer, mode, lhs, rhs)
-  local options = { noremap = true }
-
-  if type(rhs) == 'function' then
-    options.callback = rhs
-    rhs = ''
-  end
-
-  vim.api.nvim_buf_set_keymap(buffer, mode, lhs, rhs, options)
-end
-
 ---@param termcodes string
 function M.nvim_feed_termcodes(termcodes)
   local keys = vim.api.nvim_replace_termcodes(termcodes, true, false, true)

@@ -7,6 +7,10 @@ vim.g.mapleader = ' '
 vim.opt.clipboard = 'unnamedplus'
 vim.api.nvim_create_augroup('bsuth', {})
 
+-- splitting
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
 -- casing
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
@@ -83,6 +87,13 @@ vim.keymap.set('n', '_', function()
   vim.cmd('nohlsearch')
 end)
 
+-- Tabs
+vim.keymap.set('n', '<c-t>', function() vim.cmd('tabnew ' .. vim.fn.getcwd()) end)
+vim.keymap.set('n', '<c-s-Tab>', function() vim.cmd('tabprevious') end)
+vim.keymap.set('n', '<c-Tab>', function() vim.cmd('tabnext') end)
+vim.keymap.set('n', '<', function() pcall(function() vim.cmd('-tabmove') end) end)
+vim.keymap.set('n', '>', function() pcall(function() vim.cmd('+tabmove') end) end)
+
 -- LSP
 vim.keymap.set('n', '<leader>h', vim.lsp.buf.hover)                                  -- h(over)
 vim.keymap.set('n', '<leader>o', vim.diagnostic.open_float)                          -- o(pen)
@@ -109,25 +120,19 @@ load('command_palette')
 
 load('modules.cwd')
 load('modules.emacs')
-load('modules.format')
 load('modules.statusline')
 load('modules.surroundjump')
 load('modules.tabline')
-load('modules.tabs')
 load('modules.terminal')
 load('modules.tidy')
 load('modules.windows')
 
-pcall(function()
-  load('work')
-end)
-
+load('plugins.colorscheme')
 load('plugins.completion')
 load('plugins.dirvish')
 load('plugins.fugitive')
 load('plugins.mason')
 load('plugins.move')
-load('plugins.colorscheme')
 load('plugins.surround')
 load('plugins.treesitter')
 
@@ -136,3 +141,7 @@ load('languages.gleam')
 load('languages.lua')
 load('languages.tailwind')
 load('languages.typescript')
+
+pcall(function()
+  load('work')
+end)

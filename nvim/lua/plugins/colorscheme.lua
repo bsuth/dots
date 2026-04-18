@@ -7,4 +7,4 @@ plugins.use('navarasu/onedark.nvim')
 -- -----------------------------------------------------------------------------
 
 require('onedark').setup({ style = 'cool' })
-require('onedark').load()
+require('onedark').colorscheme()

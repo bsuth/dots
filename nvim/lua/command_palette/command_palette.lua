@@ -1,24 +1,25 @@
 local root_commands = require('command_palette.commands')
-local settings = require('command_palette.settings')
-local nvim_buf_keymap = require('lib.nvim').nvim_buf_keymap
 local nvim_feed_termcodes = require('lib.nvim').nvim_feed_termcodes
 local string = require('lib.stdlib').string
 local table = require('lib.stdlib').table
 
 local M = {}
 
+local MAX_WINDOW_HEIGHT = 16
+local NAMESPACE_ID = vim.api.nvim_create_namespace('')
+
 ---@param command_palette CommandPalette
 ---@return number
 function M.resize(command_palette)
   -- Add +1 for prompt
-  local window_height = math.min(command_palette.num_filtered_commands + 1, settings.MAX_WINDOW_HEIGHT)
+  local window_height = math.min(command_palette.num_filtered_commands + 1, MAX_WINDOW_HEIGHT)
   vim.api.nvim_win_set_height(command_palette.window, window_height)
   return window_height
 end
 
 ---@param command_palette CommandPalette
 function M.highlight(command_palette)
-  vim.api.nvim_buf_clear_namespace(command_palette.buffer, settings.NAMESPACE_ID, 0, -1)
+  vim.api.nvim_buf_clear_namespace(command_palette.buffer, NAMESPACE_ID, 0, -1)
 
   if vim.api.nvim_get_mode().mode ~= 'i' then
     return
@@ -32,8 +33,8 @@ function M.highlight(command_palette)
 
     vim.hl.range(
       command_palette.buffer,
-      settings.NAMESPACE_ID,
-      'FocusedIndex',
+      NAMESPACE_ID,
+      'MoreMsg',
       { focused_row, 0 },
       { focused_row, -1 }
     )
@@ -45,8 +46,8 @@ function M.highlight(command_palette)
   if has_overflow then
     vim.hl.range(
       command_palette.buffer,
-      settings.NAMESPACE_ID,
-      'OverflowEllipses',
+      NAMESPACE_ID,
+      'NonText',
       { 0, 0 },
       { 0, -1 }
     )
@@ -191,10 +192,8 @@ function M.open(command_palette)
   command_palette.window = vim.api.nvim_open_win(command_palette.buffer, true, {
     win = command_palette.parent_window,
     split = 'below',
-    height = settings.MAX_WINDOW_HEIGHT,
+    height = MAX_WINDOW_HEIGHT,
   })
-
-  vim.api.nvim_win_set_hl_ns(command_palette.window, settings.NAMESPACE_ID)
 end
 
 ---@param command_palette CommandPalette
@@ -242,49 +241,49 @@ function M.create(parent_window)
   local focus_next = function() M.focus(command_palette, 1) end
 
   -- Reverse directions to match bottom prompt
-  nvim_buf_keymap(command_palette.buffer, 'i', '<S-Tab>', focus_previous)
-  nvim_buf_keymap(command_palette.buffer, 'i', '<down>', focus_previous)
-  nvim_buf_keymap(command_palette.buffer, 'i', '<c-n>', focus_previous)
-  nvim_buf_keymap(command_palette.buffer, 'i', '<Tab>', focus_next)
-  nvim_buf_keymap(command_palette.buffer, 'i', '<up>', focus_next)
-  nvim_buf_keymap(command_palette.buffer, 'i', '<c-p>', focus_next)
+  vim.keymap.set('i', '<S-Tab>', focus_previous, { buf = command_palette.buffer })
+  vim.keymap.set('i', '<down>', focus_previous, { buf = command_palette.buffer })
+  vim.keymap.set('i', '<c-n>', focus_previous, { buf = command_palette.buffer })
+  vim.keymap.set('i', '<Tab>', focus_next, { buf = command_palette.buffer })
+  vim.keymap.set('i', '<up>', focus_next, { buf = command_palette.buffer })
+  vim.keymap.set('i', '<c-p>', focus_next, { buf = command_palette.buffer })
 
-  nvim_buf_keymap(command_palette.buffer, 'n', 'i', function()
+  vim.keymap.set('n', 'i', function()
     vim.cmd('startinsert!')
-  end)
+  end, { buf = command_palette.buffer })
 
-  nvim_buf_keymap(command_palette.buffer, 'i', '<cr>', function()
+  vim.keymap.set('i', '<cr>', function()
     if command_palette.path[#command_palette.path].lazy then
       M.filter(command_palette)
     else
       M.select(command_palette, command_palette.focused_index)
     end
-  end)
+  end, { buf = command_palette.buffer })
 
-  nvim_buf_keymap(command_palette.buffer, 'n', '<cr>', function()
+  vim.keymap.set('n', '<cr>', function()
     local buffer_line = vim.api.nvim_win_get_cursor(command_palette.window)[1]
     M.select(command_palette, command_palette.num_filtered_commands - buffer_line + 1)
-  end)
+  end, { buf = command_palette.buffer })
 
-  nvim_buf_keymap(command_palette.buffer, 'i', '<m-cr>', function()
+  vim.keymap.set('i', '<m-cr>', function()
     if not command_palette.path[#command_palette.path].lazy then
       M.select(command_palette, command_palette.focused_index, true)
     end
-  end)
+  end, { buf = command_palette.buffer })
 
-  nvim_buf_keymap(command_palette.buffer, 'n', '<m-cr>', function()
+  vim.keymap.set('n', '<m-cr>', function()
     local buffer_line = vim.api.nvim_win_get_cursor(command_palette.window)[1]
     M.select(command_palette, command_palette.num_filtered_commands - buffer_line + 1, true)
-  end)
+  end, { buf = command_palette.buffer })
 
-  nvim_buf_keymap(command_palette.buffer, 'n', '<esc>', function()
+  vim.keymap.set('n', '<esc>', function()
     if #command_palette.path == 1 then
       M.close(command_palette)
     else
       table.remove(command_palette.path)
       M.refresh(command_palette)
     end
-  end)
+  end, { buf = command_palette.buffer })
 
   vim.api.nvim_buf_attach(command_palette.buffer, false, {
     on_lines = function()
